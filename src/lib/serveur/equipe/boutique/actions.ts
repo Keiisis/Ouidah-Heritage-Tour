@@ -4,6 +4,7 @@ import { refresh, updateTag } from "next/cache";
 import { planifierTraductions } from "@/lib/serveur/traduction-auto/planifier";
 import { base } from "../../base";
 import { journaliser } from "../journal";
+import { exigerDroit } from "../securite/droits";
 import { exigerRole } from "../session";
 import { idValide, objet, slugValide, validerCategorie, validerMatiere, validerProduit, validerZone, versionValide, type RetourBoutique } from "./regles";
 
@@ -20,8 +21,10 @@ async function erreurBase(r: Response): Promise<RetourBoutique> {
   return { erreur: "panne" };
 }
 
+// catalogue (articles, catégories, matières, publication) : admins et agents ayant le droit « boutique » ; grille de
+// livraison : admins seulement
 async function enregistrer(table: Table, brut: unknown): Promise<RetourBoutique> {
-  const s = await exigerRole("admins");
+  const s = await exigerDroit("boutique");
   if (!s) return { erreur: "acces" };
   const b = objet(brut);
   if (!b) return { erreur: "champs", champs: ["formulaire"] };
@@ -57,7 +60,7 @@ export async function enregistrerCategorie(brut: unknown): Promise<RetourBoutiqu
 export async function enregistrerMatiere(brut: unknown): Promise<RetourBoutique> { return enregistrer("matieres", brut); }
 
 export async function publierProduit(id: unknown, version: unknown, publie: unknown): Promise<RetourBoutique> {
-  const s = await exigerRole("admins");
+  const s = await exigerDroit("boutique");
   if (!s) return { erreur: "acces" };
   if (!idValide(id) || !versionValide(version) || typeof publie !== "boolean") return { erreur: "champs" };
   try {

@@ -1,5 +1,6 @@
 import "server-only";
 import { base } from "../../base";
+import { exigerDroit } from "../securite/droits";
 import { exigerRole } from "../session";
 import { objet, sourcePhoto, type PhotoAdmin, type CatalogueAdmin, type CategorieAdmin, type MatiereAdmin, type ProduitAdmin, type ZoneAdmin } from "./regles";
 
@@ -14,7 +15,7 @@ function photoLue(v: unknown, origine: string): PhotoAdmin | null {
 
 /** Aucun cache : les versions utilisées par les mutations correspondent à la lecture affichée. */
 export async function lireCatalogueAdmin(): Promise<CatalogueAdmin | null> {
-  if (!await exigerRole("admins")) return null;
+  if (!await exigerDroit("boutique")) return null; // admins et agents ayant le droit « boutique »
   try {
     const reponses = await Promise.all([
       base(`boutique_produits?select=${COLONNES_PRODUIT}&order=ordre.asc,nom.asc`),

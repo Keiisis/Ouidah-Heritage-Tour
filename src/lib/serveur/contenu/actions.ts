@@ -37,6 +37,12 @@ async function acces(): Promise<Session | { erreur: RefusContenu }> {
   return s ?? { erreur: "refuse" };
 }
 
+// photos : aussi pour les agents qui gèrent les articles de la boutique (droit « boutique »)
+async function accesImage(): Promise<Session | { erreur: RefusContenu }> {
+  const s = (await exigerDroit("site")) ?? (await exigerDroit("boutique"));
+  return s ?? { erreur: "refuse" };
+}
+
 async function refus(s: Session, cle: string | undefined, motif: "champs" | "role" | "adresses" | "conflit" | "verrouille" | "type" | "taille" | "contenu", erreur: RefusContenu, extra: { ecarts?: Ecart[]; adresses?: string[] } = {}): Promise<RetourContenu> {
   await journaliser("contenu.refus", s.profilId, null, { ...(cle ? { cle } : {}), motif, ...(extra.ecarts ? { nombre: extra.ecarts.length } : {}) });
   return { erreur, ...extra };
@@ -149,7 +155,7 @@ export async function restaurerVersion(cle: unknown, id: unknown, version: unkno
 
 /** Étape 1 : type et taille annoncés relus, puis une URL de dépôt signée vers le dépôt privé, pour un objet neuf. */
 export async function preparerImage(mime: unknown, taille: unknown): Promise<RetourContenu> {
-  const s = await acces();
+  const s = await accesImage();
   if ("erreur" in s) return s;
   if (typeof mime !== "string" || !(MIMES_IMAGE as readonly string[]).includes(mime)) return refus(s, undefined, "type", "type");
   if (typeof taille !== "number" || !Number.isInteger(taille) || taille < 1 || taille > IMAGE_MAX) return refus(s, undefined, "taille", "taille");
@@ -161,7 +167,7 @@ export async function preparerImage(mime: unknown, taille: unknown): Promise<Ret
 /** Étape 2 : l'original relu (taille, signature JPEG, PNG ou WebP), redressé, réduit à `largeur` px au plus, converti en
  * WebP vers le compartiment public, puis effacé du dépôt. Le texte alternatif est obligatoire. */
 export async function finaliserImage(objet: unknown, alt: unknown, largeur?: unknown): Promise<RetourContenu> {
-  const s = await acces();
+  const s = await accesImage();
   if ("erreur" in s) return s;
   if (typeof objet !== "string" || !UUID.test(objet)) return { erreur: "champs" };
   if (!altValide(alt)) {

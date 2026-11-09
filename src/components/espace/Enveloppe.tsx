@@ -17,8 +17,9 @@ import "./enveloppe.css";
 export function Enveloppe({ role, session, actif, minute, children }: { role: Role; session: Session; actif: string; minute: number; children: ReactNode }) {
   const courant = (id: string) => (id === actif ? ("page" as const) : undefined);
   const initiales = `${session.prenom[0] ?? ""}${session.nom[0] ?? ""}`.toUpperCase();
-  // « Blog » n'apparaît dans le menu d'un agent qu'avec le droit « site » (la page le revérifie : SansDroit sinon)
-  const masquee = (id: string) => id === "blog" && role === "agents" && session.role !== "admin" && !droitsEffectifs(session.droits).site;
+  // « Blog » et « Articles de la boutique » n'apparaissent dans le menu d'un agent qu'avec le droit « site » ou « boutique »
+  // (la page le revérifie : SansDroit sinon)
+  const masquee = (id: string) => role === "agents" && session.role !== "admin" && ((id === "blog" && !droitsEffectifs(session.droits).site) || (id === "boutique" && !droitsEffectifs(session.droits).boutique));
   return (
     <Cadre role={role} theme={session.theme === "sombre" ? "sombre" : "clair"} minute={minute}>
       <NavCadre

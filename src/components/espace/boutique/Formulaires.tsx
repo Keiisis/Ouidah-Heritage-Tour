@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useId, useRef, useState, useTransition, type ReactNode } from "react";
 import { boutiqueAdmin as B } from "@/content/espace-boutique";
 import { enregistrerCategorie, enregistrerMatiere, enregistrerProduit, enregistrerZone, publierProduit } from "@/lib/serveur/equipe/boutique/actions";
@@ -76,13 +76,13 @@ function Nombre({ cle, initiale, uid, aide, max = 2147483647, requis }: { cle: "
 }
 
 export function FormProduit({ produit: p, categories, matieres }: { produit?: ProduitAdmin; categories: CatalogueAdmin["categories"]; matieres: CatalogueAdmin["matieres"] }) {
-  const uid = useId(), router = useRouter();
+  const uid = useId(), router = useRouter(), chemin = usePathname(); // /admins/boutique ou /agents/boutique
   const [photos, setPhotos] = useState<PhotoAdmin[]>(p?.photos ?? []);
   const [coloris, setColoris] = useState(p?.coloris ?? []);
   const [envoiImage, setEnvoiImage] = useState(false);
   const [version, setVersion] = useState(p?.modifie_le ?? null);
   const [unique, setUnique] = useState(p?.piece_unique ?? false);
-  return <Formulaire action={enregistrerProduit} verrou={envoiImage} suite={(r) => { setVersion(r.version); if (!p) router.replace(`/admins/boutique?produit=${r.id}`); }} composer={(fd) => {
+  return <Formulaire action={enregistrerProduit} verrou={envoiImage} suite={(r) => { setVersion(r.version); if (!p) router.replace(`${chemin}?produit=${r.id}`); }} composer={(fd) => {
     const tailles = valeur(fd, "tailles").split(/\r?\n/).map((t) => t.trim()).filter(Boolean);
     const broderie = nombre(fd, "broderie");
     return { id: p?.id ?? null, version, slug: valeur(fd, "slug"), nom: valeur(fd, "nom"), categorie: valeur(fd, "categorie"), matiere: valeur(fd, "matiere"), lieu: valeur(fd, "lieu") || null, artisan: valeur(fd, "artisan") || null, dimensions: valeur(fd, "dimensions") || null, description: valeur(fd, "description") || null, entretien: valeur(fd, "entretien") || null, prix_xof: nombre(fd, "prix_xof"), ordre: nombre(fd, "ordre"), stock: nombre(fd, "stock"), delai_fabrication_jours: nombre(fd, "delai_fabrication_jours"), piece_unique: unique, coloris, photos, traductions: traductionsSaisies(fd, "produits", photos), options: { tailles: tailles.length ? tailles : null, surMesure: fd.has("sur_mesure"), broderie: broderie === null ? null : { max: broderie } } };
@@ -120,11 +120,11 @@ export function FormProduit({ produit: p, categories, matieres }: { produit?: Pr
 }
 
 export function FormCategorie({ categorie: c }: { categorie?: CategorieAdmin }) {
-  const uid = useId(), router = useRouter();
+  const uid = useId(), router = useRouter(), chemin = usePathname(); // /admins/boutique ou /agents/boutique
   const [photos, setPhotos] = useState(c?.photo ? [c.photo] : []);
   const [occupe, setOccupe] = useState(false);
   const [version, setVersion] = useState(c?.modifie_le ?? null);
-  return <Formulaire action={enregistrerCategorie} verrou={occupe} suite={(r) => { setVersion(r.version); if (!c) router.replace(`/admins/boutique?onglet=categories&categorie=${r.id}`); }} composer={(fd) => ({ version, slug: valeur(fd, "slug"), nom: valeur(fd, "nom"), couleur: valeur(fd, "couleur"), ordre: nombre(fd, "ordre"), photo: photos[0] ?? null, traductions: traductionsSaisies(fd, "categories", photos) })} enfants={<>
+  return <Formulaire action={enregistrerCategorie} verrou={occupe} suite={(r) => { setVersion(r.version); if (!c) router.replace(`${chemin}?onglet=categories&categorie=${r.id}`); }} composer={(fd) => ({ version, slug: valeur(fd, "slug"), nom: valeur(fd, "nom"), couleur: valeur(fd, "couleur"), ordre: nombre(fd, "ordre"), photo: photos[0] ?? null, traductions: traductionsSaisies(fd, "categories", photos) })} enfants={<>
     <div className="champs"><Texte uid={uid} cle="nom" valeur={c?.nom} max={80} requis /><Texte uid={uid} cle="slug" valeur={c?.slug} max={60} requis lecture={Boolean(c)} aide={B.slugAide} /><Nombre uid={uid} cle="ordre" initiale={c?.ordre ?? 0} aide={B.ordreAide} requis /><div className="champ"><label htmlFor={`${uid}-couleur`}>{B.champs.couleur}</label><select id={`${uid}-couleur`} name="couleur" defaultValue={c?.couleur ?? "ocean"}>{COULEURS.map((v) => <option key={v} value={v}>{B.couleurs[v]}</option>)}</select></div></div>
     <fieldset className="bt-groupe"><legend>{B.photoCategorie}</legend><Photos photos={photos} changer={setPhotos} occuper={setOccupe} maximum={1} /></fieldset>
     <Traductions uid={uid} type="categories" source={c} photos={photos} valeurs={c?.traductions} />
@@ -132,9 +132,9 @@ export function FormCategorie({ categorie: c }: { categorie?: CategorieAdmin }) 
 }
 
 export function FormMatiere({ matiere: m }: { matiere?: MatiereAdmin }) {
-  const uid = useId(), router = useRouter();
+  const uid = useId(), router = useRouter(), chemin = usePathname(); // /admins/boutique ou /agents/boutique
   const [version, setVersion] = useState(m?.modifie_le ?? null);
-  return <Formulaire action={enregistrerMatiere} suite={(r) => { setVersion(r.version); if (!m) router.replace(`/admins/boutique?onglet=matieres&matiere=${r.id}`); }} composer={(fd) => ({ version, slug: valeur(fd, "slug"), nom: valeur(fd, "nom"), traductions: traductionsSaisies(fd, "matieres") })} enfants={<><div className="champs"><Texte uid={uid} cle="nom" valeur={m?.nom} max={80} requis /><Texte uid={uid} cle="slug" valeur={m?.slug} max={60} requis lecture={Boolean(m)} aide={B.slugAide} /></div><Traductions uid={uid} type="matieres" source={m} valeurs={m?.traductions} /></>} />;
+  return <Formulaire action={enregistrerMatiere} suite={(r) => { setVersion(r.version); if (!m) router.replace(`${chemin}?onglet=matieres&matiere=${r.id}`); }} composer={(fd) => ({ version, slug: valeur(fd, "slug"), nom: valeur(fd, "nom"), traductions: traductionsSaisies(fd, "matieres") })} enfants={<><div className="champs"><Texte uid={uid} cle="nom" valeur={m?.nom} max={80} requis /><Texte uid={uid} cle="slug" valeur={m?.slug} max={60} requis lecture={Boolean(m)} aide={B.slugAide} /></div><Traductions uid={uid} type="matieres" source={m} valeurs={m?.traductions} /></>} />;
 }
 
 export function Publication({ produit: p }: { produit: Pick<ProduitAdmin, "id" | "modifie_le" | "publie" | "nom"> }) {

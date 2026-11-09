@@ -37,6 +37,7 @@ export const GROUPES: Record<Role, Groupe[]> = {
       ["rendez-vous", "Rendez-vous", "calendrier", "Créneaux disponibles|Rendez-vous réservés par les visiteurs"],
       ["billets", "Contrôle des billets", "billet", "Code QR en plein écran sur téléphone|Saisie du code à la main|Hors ligne toléré"],
       ["commandes", "Commandes boutique", "sac", "À préparer ou à remettre"],
+      ["boutique", "Articles de la boutique", "sac", "Ajouter, modifier, publier|Photos, prix, stock"],
     ]],
     ["Messages", [
       ["boite", "Boîte de réception", "bulle", "Messages du site et réponses des clients|Limitée à vos dossiers"],
@@ -355,7 +356,7 @@ export const espace = {
       resume: "Quelques champs sont à compléter.",
     },
     // [identifiant gardé dans equipe_profils.droits, libellé, coché d'avance]
-    droits: [["demandes", "Demandes et devis", true], ["liens", "Liens de paiement", true], ["billets", "Contrôle des billets", true], ["boutique", "Commandes boutique", false], ["site", "Proposer des modifications du site (validées par vous)", false]] as [string, string, boolean][],
+    droits: [["demandes", "Demandes et devis", true], ["liens", "Liens de paiement", true], ["billets", "Contrôle des billets", true], ["boutique", "Boutique : articles et commandes", false], ["site", "Proposer des modifications du site (validées par vous)", false]] as [string, string, boolean][],
     annonces: {
       invite: (qui: string) => `Invitation envoyée à ${qui}.`,
       suspendu: (qui: string) => `Compte de ${qui} suspendu : plus aucune connexion possible.`,
