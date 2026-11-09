@@ -1,9 +1,9 @@
 {
   "crons": [
-    { "path": "/api/taches/traductions", "schedule": "* * * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 3 * * *" },
     { "path": "/api/taches/rapport", "schedule": "0 7 * * 1" },
-    { "path": "/api/taches/imap", "schedule": "*/15 * * * *" },
-    { "path": "/api/taches/purge", "schedule": "*/15 * * * *" },
+    { "path": "/api/taches/imap", "schedule": "0 6 * * *" },
+    { "path": "/api/taches/purge", "schedule": "30 4 * * *" },
     { "path": "/api/relances", "schedule": "0 8 * * *" }
   ]
 }
