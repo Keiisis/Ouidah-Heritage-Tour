@@ -173,6 +173,10 @@
     {
       "fichier": "20261113_boutique_paiement_immediat.sql",
       "sha256": "6d7704d58ce68ab08ee78ce3058ffa556cdf54aa82c2db0c1c390b0a1b54ebe8"
+    },
+    {
+      "fichier": "20261114_boutique_catalogue_vide.sql",
+      "sha256": "5d21d5bfb8eb6fea768c7088640de837eaa4ca8adc7605ffd1822e4cf4d5271c"
     }
   ]
 }

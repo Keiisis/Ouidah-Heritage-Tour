@@ -13,14 +13,13 @@ import { Icon } from "@/components/ui/Icon";
 // Section 1 — barre de navigation : logo à gauche, 6 entrées (Ouidah et L'agence ouvrent un menu, même plan que le pied
 // de page), devise, langue, un bouton jaune ; dégradé marine en haut de page, verre dépoli après 20 px de défilement.
 // Menu mobile en <dialog> natif (piège du focus et touche Échap fournis par le navigateur).
-// boutique : vrai quand la boutique a au moins un article visible (lu en base par le layout) ; sinon pas de lien.
 // blog : vrai quand au moins un article est publié ; sinon pas de lien.
-export function Header({ boutique, blog }: { boutique: boolean; blog: boolean }) {
+export function Header({ blog }: { blog: boolean }) {
   const nav = useContenu("fr.nav", NAV);
   const langue = useLangue();
   const equipe = useContenu("fr.equipe", EQUIPE);
   const conciergerie = useContenu("fr.conciergerie", CONCIERGERIE);
-  const primary = nav.primary.filter((l) => (boutique || !l.boutique) && (blog || !l.blog)).map((l) => ({
+  const primary = nav.primary.filter((l) => blog || !l.blog).map((l) => ({
     ...l, sous: l.sous?.map((s) => ({ ...s, href: s.href === SECTIONS.agence || s.href === "/a-propos" ? adresseAgence(equipe) : s.href })),
   }));
   const [defile, setDefile] = useState(false);

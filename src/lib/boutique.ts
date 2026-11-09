@@ -125,11 +125,6 @@ export async function lireProduit(slug: string, langue: Langue = "FR"): Promise<
   return (await lireCatalogue(langue)).produits.find((p) => p.slug === slug) ?? null;
 }
 
-/** Vrai si au moins un article est visible. */
-export async function boutiqueOuverte(): Promise<boolean> {
-  return (await lireCatalogue()).produits.length > 0;
-}
-
 /** Slugs des articles visibles (generateStaticParams des fiches). */
 export async function slugsProduits(): Promise<string[]> {
   return (await lireCatalogue()).produits.map((p) => p.slug);

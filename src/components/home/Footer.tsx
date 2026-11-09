@@ -26,9 +26,8 @@ const VERRE = "border border-white/16 bg-abyss/70 shadow-[inset_0_1px_0_rgba(255
 
 type Ciel = { maintenant: string; coucher: string; passe: boolean; nuit: boolean; auj: number };
 
-// boutique : vrai quand la boutique a au moins un article visible (lu en base par le layout) ; sinon pas de colonne « Acheter ».
 // blog : vrai quand au moins un article est publié ; sinon pas de lien « Blog ».
-export function Footer({ year, boutique, blog }: { year: number; boutique: boolean; blog: boolean }) {
+export function Footer({ year, blog }: { year: number; blog: boolean }) {
   const { date } = useFormatsSite();
   const T = useContenu("fr.footer", FOOTER);
   const nav = useContenu("fr.nav", NAV);
@@ -36,7 +35,7 @@ export function Footer({ year, boutique, blog }: { year: number; boutique: boole
   const evenements = useContenu("fr.evenements", EVENEMENTS);
   const newsletter = useContenu("fr.newsletter", NEWSLETTER);
   const equipe = useContenu("fr.equipe", EQUIPE);
-  const colonnes = T.columns.filter((c) => boutique || !c.boutique).map((c) => ({ ...c, links: c.links.filter((l) => blog || !("blog" in l && l.blog)).map((l) => ({ ...l, href: l.href === SECTIONS.agence || l.href === "/a-propos" ? adresseAgence(equipe) : l.href })) }));
+  const colonnes = T.columns.map((c) => ({ ...c, links: c.links.filter((l) => blog || !("blog" in l && l.blog)).map((l) => ({ ...l, href: l.href === SECTIONS.agence || l.href === "/a-propos" ? adresseAgence(equipe) : l.href })) }));
   const zone = useRef<HTMLElement>(null);
   const reglagesBouton = useRef<HTMLButtonElement>(null);
   const reduit = useMouvementReduit();
@@ -168,12 +167,18 @@ export function Footer({ year, boutique, blog }: { year: number; boutique: boole
           {vif(true)}
           <div className="xl:grid xl:grid-cols-[18.75rem_minmax(0,1fr)] xl:gap-8">
             <div className="md:mb-8 xl:mb-0">
-              {/* emblème original sur une pastille blanche (ses brins bleu nuit se perdraient sur le fond) */}
+              {/* même logo que la barre de navigation (Kevin, 09/11) ; sans logo saisi : emblème sur pastille blanche */}
               <p className="flex items-center gap-3">
-                <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white md:size-16">
-                  <Image src={nav.embleme.src} alt="" width={64} height={64} className="size-11 md:size-[52px]" />
-                </span>
-                <span className="font-display text-[20px]/[1.15] font-semibold md:text-[22px]">{nav.brand}</span>
+                {nav.logo ? (
+                  <Image src={nav.logo.src} alt={nav.logo.alt} width={168} height={48} className="h-10 w-auto object-contain md:h-12" />
+                ) : (
+                  <>
+                    <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white md:size-16">
+                      <Image src={nav.embleme.src} alt="" width={64} height={64} className="size-11 md:size-[52px]" />
+                    </span>
+                    <span className="font-display text-[20px]/[1.15] font-semibold md:text-[22px]">{nav.brand}</span>
+                  </>
+                )}
               </p>
               <p className="mt-2 max-w-60 text-[12px]/[1.55] text-white/72 md:mt-4 md:text-[13px]">{T.tagline}</p>
             </div>

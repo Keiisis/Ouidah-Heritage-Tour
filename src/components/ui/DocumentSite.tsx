@@ -13,7 +13,6 @@ import { AssistantSite } from "@/components/assistant/AssistantSite";
 import { Mesure } from "@/components/mesure/Mesure";
 import { Header } from "@/components/home/Header";
 import { Footer } from "@/components/home/Footer";
-import { boutiqueOuverte } from "@/lib/boutique";
 import { articlesPublies } from "@/lib/serveur/blog/public";
 import { ChromeSite } from "@/components/ui/ChromeSite";
 import { ContenuSite } from "@/components/ui/ContenuSite";
@@ -35,9 +34,9 @@ async function annee() {
 }
 
 export default async function DocumentSite({ children, langue = "FR" }: { children: ReactNode; langue?: Langue }) {
-  // catalogue et articles mis en cache (étiquettes « boutique » et « blog ») : le lien n'apparaît qu'avec du contenu publié
-  const [year, boutique, blog, valeurs, nav, theme] = await Promise.all([
-    annee(), boutiqueOuverte(), articlesPublies(langue).then((r) => r.total > 0, () => false),
+  // articles mis en cache (étiquette « blog ») : le lien du blog n'apparaît qu'avec un article publié
+  const [year, blog, valeurs, nav, theme] = await Promise.all([
+    annee(), articlesPublies(langue).then((r) => r.total > 0, () => false),
     surchargesPubliques(langue), lireContenu("fr.nav", langue), lireContenu("site.theme"),
   ]);
   return (
@@ -54,11 +53,11 @@ export default async function DocumentSite({ children, langue = "FR" }: { childr
           {/* /agents et /admins : écran de connexion seul, sans l'habillage du site (ChromeSite) */}
           <ChromeSite>
             <Ouverture />
-            <Header boutique={boutique} blog={blog} />
+            <Header blog={blog} />
           </ChromeSite>
           <main id="contenu">{children}</main>
           <ChromeSite>
-            <Footer year={year} boutique={boutique} blog={blog} />
+            <Footer year={year} blog={blog} />
             <Consentement />
             {/* assistant du site (piste C validée par Kevin le 04/11) et mesure d'audience, chacun sous son accord */}
             <AssistantSite />

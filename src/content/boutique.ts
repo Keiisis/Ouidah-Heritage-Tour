@@ -107,6 +107,8 @@ export const boutique = {
     retirerFiltre: (nom: string) => `Retirer le filtre ${nom}`,
     annonce: (n: number) => `${pieces(n)} affichée${n > 1 ? "s" : ""}.`,
     vide: "Aucune pièce ne correspond à ces critères.",
+    // catalogue sans article publié : la page reste en ligne avec ce message
+    catalogueVide: "Aucune pièce en ligne pour le moment. Elles apparaîtront ici dès leur publication.",
   },
 
   carte: {

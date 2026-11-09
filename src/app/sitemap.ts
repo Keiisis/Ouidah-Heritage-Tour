@@ -16,7 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(equipe.some(m => m.portrait) ? ["/a-propos"] : []),
     ...circuits.filter(c => !c.draft && c.duration !== null).map(c => `/circuits/${c.slug}`),
     ...Object.keys(lieux).map(slug => `/ouidah/lieux/${slug}`),
-    ...(catalogue.produits.length ? ["/boutique", ...catalogue.produits.map(p => `/boutique/${p.slug}`)] : []),
+    "/boutique", ...catalogue.produits.map(p => `/boutique/${p.slug}`),
   ].filter(chemin => seo.pages.find(p => p.chemin === chemin)?.indexer !== false);
   const sortie: MetadataRoute.Sitemap = chemins.flatMap(chemin => LANGUES.map(langue => ({ url: `${origine}${adresseLangue(chemin, langue)}`, alternates: { languages: alternances(chemin) } })));
   for (const langue of LANGUES) {

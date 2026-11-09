@@ -1,6 +1,6 @@
 // Contenus de la page d'accueil, typés comme les futures tables Supabase (le back-office les remplacera).
 import type { NomObjet } from "@/components/ui/Objet3D";
-// boutique : lien affiché seulement quand la boutique a au moins un article visible (boutiqueOuverte, lu en base)
+// boutique : marque gardée pour le contenu déjà enregistré ; le lien est toujours affiché (Kevin, 09/11)
 export type Lien = { label: string; href: string; sous?: Lien[]; boutique?: true; blog?: true };
 export type Media = { src: string; alt: string };
 

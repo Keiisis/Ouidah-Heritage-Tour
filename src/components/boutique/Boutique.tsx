@@ -176,6 +176,8 @@ export function Boutique() {
         </div>
       </section>
 
+      {produits.length ? (
+      <>
       <section className="section container-oht" aria-labelledby="bq-cat-titre">
         <div className="section-tete">
           <h2 id="bq-cat-titre">{T.categories.titre}</h2>
@@ -326,6 +328,14 @@ export function Boutique() {
           </div>
         )}
       </section>
+      </>
+      ) : (
+        <section className="section container-oht" id="boutique" aria-label={T.liste.titre}>
+          <div className="vide">
+            <p>{T.liste.catalogueVide}</p>
+          </div>
+        </section>
+      )}
 
       {avant.length ? (
         <section className="section container-oht mise" aria-labelledby="bq-mise-titre">
