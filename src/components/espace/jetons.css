@@ -1,0 +1,157 @@
+/* Hallmark · checked: 2026-11-02 · genre: modern-minimal · theme: Ouidah · surface: absolute · built: the project · v2.0.0 */
+/* Espace de l'équipe connecté, tableau de bord E « La course du soleil » (maquette t-e-soleil.html). Jetons et base.
+   Tout est rangé sous .esp (racine posée par Cadre.tsx) : aucun sélecteur ne fuit vers le site public. Jetons sur .esp,
+   thème sombre sur .esp[data-theme="sombre"], accent de l'admin sur .esp[data-role="admins"].
+   Mouvement : transform, opacity et clip-path seulement, en fill « backwards » (le rendu de base est l'état final) ;
+   aucune transition de couleur ni de fond (le thème bascule net, le ciel par un volet) ; aucun will-change permanent ;
+   prefers-reduced-motion ramène tout à l'état final. Fonds : blanc pur ou navy, jamais de beige. */
+
+.esp {
+  --ocean: #122460;
+  --abyss: #0b1638;
+  --nuit: #0f162d;
+  --laterite: #ac3215;
+  --soleil: #fdbf28;
+  --safran: #df9410;
+  --blanc: #ffffff;
+  --sable: #f7f1e8; /* encre sur navy seulement, jamais un fond */
+  --laterite-clair: #ef8f6f;
+  --encre: #121a33;
+  --encre-2: #3f4863;
+  --encre-3: #5a6379;
+  --filet: #dde1ea;
+  --filet-fort: #c3c9d6;
+  --fond: #ffffff;
+  --surface: #ffffff;
+  --survol: #eef1f7;
+  --sur-nuit: #f7f1e8;
+  --sur-nuit-2: rgba(247, 241, 232, 0.74);
+  --trait-nuit: rgba(221, 225, 234, 0.14);
+  --trait-nuit-fort: rgba(221, 225, 234, 0.3);
+  --nav-fond: #0b1638;
+  --nav-encre: rgba(247, 241, 232, 0.8);
+  --nav-actif: rgba(221, 225, 234, 0.1);
+  --accent-agent-texte: #ac3215;
+  --accent-admin-texte: #122460;
+  --accent: var(--laterite);
+  --accent-sur: var(--blanc);
+  --accent-texte: var(--accent-agent-texte);
+  --accent-nuit: var(--laterite-clair);
+  --attente: #8a5a00;
+  --ok: #122460;
+  --voile: rgba(11, 22, 56, 0.5);
+  --ombre-forte: rgba(11, 22, 56, 0.34);
+  --focus: #122460;
+  --focus-nuit: #fdbf28;
+  --logo-plaque: #ffffff;
+  --trait-horizon: #121a33;
+  /* encres fixes du ciel (ne suivent pas le thème) */
+  --encre-fixe: #121a33;
+  --encre-2-fixe: #3f4863;
+  --encre-3-fixe: #5a6379;
+  --filet-fixe: #dde1ea;
+  --gris-trait: #c3c9d6;
+  --nuit-2: #17234c;
+  --encre-2-sombre: #c9cfdd;
+  --trait-sombre: #3a4674;
+  --carte-ville: #eef1f7;
+  --encre-safran: #1d2850;
+  --sable-78: rgba(247, 241, 232, 0.78);
+  --sable-74: rgba(247, 241, 232, 0.74);
+  --blanc-26: rgba(255, 255, 255, 0.26);
+  --blanc-28: rgba(255, 255, 255, 0.28);
+  --blanc-30: rgba(255, 255, 255, 0.3);
+  --blanc-50: rgba(255, 255, 255, 0.5);
+  --blanc-60: rgba(255, 255, 255, 0.6);
+  --abysse-10: rgba(11, 22, 56, 0.1);
+  --abysse-35: rgba(11, 22, 56, 0.35);
+  --abysse-60: rgba(11, 22, 56, 0.6);
+  --f-titre: var(--font-fraunces), Georgia, serif;
+  --f-texte: var(--font-manrope), system-ui, sans-serif;
+  --d-court: 180ms;
+  --d-moyen: 320ms;
+  --c-arrivee: cubic-bezier(0, 0, 0.3, 1);
+  --c-etat: cubic-bezier(0.4, 0, 0.2, 1);
+  --c-depart: cubic-bezier(0.4, 0, 1, 1);
+  --c-glisse: cubic-bezier(0.625, 0.05, 0, 1);
+  color-scheme: light;
+
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--fond);
+  color: var(--encre);
+  font: 500 15px/1.5 var(--f-texte);
+  -webkit-font-smoothing: antialiased;
+}
+.esp[data-theme="sombre"] {
+  --fond: #0b1638;
+  --surface: #121f4a;
+  --survol: #1b2b63;
+  --encre: #f7f1e8;
+  --encre-2: #c9cfdd;
+  --encre-3: #a3abc0;
+  --filet: #34427a;
+  --filet-fort: #4d5b94;
+  --nav-fond: #0f162d;
+  --nuit-2: #1b2f78;
+  --accent-agent-texte: #ef8f6f;
+  --accent-admin-texte: #fdbf28;
+  --attente: #f0b54a;
+  --ok: #a9b9f0;
+  --voile: rgba(4, 8, 22, 0.66);
+  --ombre-forte: rgba(2, 6, 18, 0.6);
+  --focus: #fdbf28;
+  --trait-horizon: #c9cfdd;
+  color-scheme: dark;
+}
+.esp[data-role="admins"] {
+  --accent: var(--soleil);
+  --accent-sur: var(--ocean);
+  --accent-texte: var(--accent-admin-texte);
+  --accent-nuit: var(--soleil);
+}
+
+.esp :where(button, input, select, textarea) { font: inherit; color: inherit; }
+.esp button { cursor: pointer; }
+.esp :where(h1, h2, h3) { margin: 0; font-family: var(--f-titre); font-weight: 400; font-style: normal; color: var(--encre); overflow-wrap: break-word; min-width: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.esp :where(p, ul, ol, dl, dd) { margin: 0; }
+.esp :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 8px; }
+.esp .invisible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.esp :where(.num, time, td, .heure) { font-variant-numeric: tabular-nums; }
+.esp .ic { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* chiffres qui défilent : le texte rendu reste en place, le défilé s'affiche par-dessus */
+.esp [data-defile] > .t { display: none; }
+.esp [data-defile]::after { content: attr(data-defile); }
+
+/* atomes partagés */
+.esp .bouton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border: 1px solid var(--ocean); border-radius: 14px; background: var(--ocean); color: var(--blanc); font-weight: 700; text-decoration: none; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp[data-theme="sombre"] .bouton { background: var(--blanc); border-color: var(--blanc); color: var(--abyss); }
+.esp .bouton.accent { background: var(--accent); border-color: var(--accent); color: var(--accent-sur); }
+.esp .bouton:hover { transform: translateY(-2px); }
+.esp .bouton:active { transform: translateY(1px); }
+.esp .lien { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; color: var(--accent-texte); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; white-space: nowrap; }
+.esp .lien:hover { text-decoration-thickness: 2px; }
+.esp .icone-bouton { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border: 1px solid var(--filet); border-radius: 14px; background: var(--surface); color: var(--encre-2); transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .icone-bouton:hover { border-color: var(--filet-fort); color: var(--encre); transform: rotate(-12deg); }
+.esp .icone-bouton[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-texte); }
+.esp .avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--accent); color: var(--accent-sur); font: 700 14px/1 var(--f-texte); }
+.esp .avatar.neutre { background: var(--survol); color: var(--encre); }
+.esp .langue { display: inline-grid; place-items: center; min-width: 32px; height: 24px; padding: 0 4px; border: 1px solid var(--filet-fort); border-radius: 6px; color: var(--encre-2); font: 700 12px/1 var(--f-texte); }
+.esp .etat { display: inline-flex; align-items: center; gap: 4px; padding: 0 8px; border: 1px solid currentColor; border-radius: 8px; font: 700 12px/24px var(--f-texte); white-space: nowrap; }
+.esp .etat:is([data-e="paye"], [data-e="active"]) { background: var(--ok); border-color: var(--ok); color: var(--fond); }
+.esp .etat[data-e="confirmer"] { color: var(--accent-texte); }
+.esp .etat:is([data-e="coupee"], [data-e="nonconf"]) { color: var(--encre-3); border-style: dashed; }
+.esp .mention { color: var(--encre-2); font-size: 14px; }
+
+/* chorégraphie d'entrée : chaque bloc se lève de sa ligne (transform seul) */
+.esp .construit { animation: esp-construit 920ms var(--c-glisse) backwards; animation-delay: calc(var(--i, 0) * 90ms + 160ms); }
+@keyframes esp-construit {
+  from { transform: translateY(48px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esp *,
+  .esp *::before,
+  .esp *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
+}

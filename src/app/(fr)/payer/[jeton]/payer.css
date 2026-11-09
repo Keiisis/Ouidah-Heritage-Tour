@@ -1,0 +1,37 @@
+/* Page publique d'un lien de paiement : fond blanc, carte navy au trait, titre Fraunces, texte Manrope. Tout sous .py.
+   Mouvement : transform et opacity seulement, en fill « backwards » ; rien en mouvement réduit. */
+.py { min-height: 70vh; padding: 128px 20px 80px; background: #ffffff; color: #121a33; font-family: var(--font-manrope, "Manrope", sans-serif); }
+.py-carte { max-width: 560px; margin: 0 auto; display: grid; gap: 20px; padding: 32px; border: 1px solid #dde1ea; border-radius: 28px; background: #ffffff; animation: py-arrive 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.py-pour { margin: 0; color: #3f4863; font-weight: 600; }
+.py-carte h1 { margin: 0; font: 400 clamp(32px, 6vw, 44px) / 1.1 var(--font-fraunces, "Fraunces", serif); color: #0f162d; }
+.py-recap { display: grid; gap: 12px; margin: 0; padding: 16px 0; border-top: 1px solid #dde1ea; border-bottom: 1px solid #dde1ea; }
+.py-recap div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; }
+.py-recap dt { color: #3f4863; font-weight: 600; }
+.py-recap dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.py-total dd { display: grid; justify-items: end; gap: 2px; }
+.py-total b { font: 800 30px/1.1 var(--font-manrope, "Manrope", sans-serif); font-variant-numeric: tabular-nums; color: #0f162d; }
+.py-total span { color: #3f4863; font-size: 14px; font-weight: 600; }
+.py-note, .py-message { margin: 0; color: #3f4863; line-height: 1.5; }
+.py-message:empty { display: none; }
+.py-ok { margin: 0; padding: 14px 16px; border-radius: 14px; background: #122460; color: #ffffff; font-weight: 700; }
+.py-passerelles { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.py-passerelles legend { margin-bottom: 10px; padding: 0; font-weight: 700; color: #0f162d; }
+.py-passerelle { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 64px; padding: 10px 16px; border: 1px solid #c3c9d6; border-radius: 16px; background: #ffffff; color: #0f162d; font: 700 16px/1 var(--font-manrope, "Manrope", sans-serif); cursor: pointer; transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1); }
+.py-passerelle img { width: auto; max-width: 120px; max-height: 28px; }
+.py-passerelle:hover { transform: translateY(-2px); border-color: #122460; }
+.py-passerelle:focus-visible, .py-reverifier:focus-visible { outline: 3px solid #122460; outline-offset: 3px; }
+.py-passerelles:disabled .py-passerelle { cursor: progress; opacity: 0.6; transform: none; }
+.py-reverifier { justify-self: start; min-height: 48px; padding: 0 20px; border: 1px solid #122460; border-radius: 14px; background: #122460; color: #ffffff; font-weight: 700; cursor: pointer; }
+.py-suivi { display: inline-flex; align-items: center; text-decoration: none; }
+@keyframes py-arrive {
+  from { opacity: 0; transform: translateY(16px); }
+}
+@media (max-width: 420px) {
+  .py { padding: 104px 12px 56px; }
+  .py-carte { padding: 24px 18px; border-radius: 22px; }
+  .py-recap dd { text-align: left; }
+  .py-total dd { justify-items: start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .py-carte, .py-passerelle { animation: none; transition: none; }
+}

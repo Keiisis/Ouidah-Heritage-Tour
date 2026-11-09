@@ -1,0 +1,69 @@
+/* Page introuvable (404), maquette A « La correction » (Kevin, 30/10/2026). Bande abysse sous l'en-tête fixe (80 px), aplat
+   soleil, puis blanc pur. Encres froides tirées du navy. Mouvement : lettres en transform + opacity ; mouvement réduit respecté. */
+.pi {
+  --pi-encre: #121a33; --pi-encre-2: #3f4863; --pi-encre-3: #5a6379; --pi-filet: #dde1ea;
+  --pi-abysse-14: rgb(15 22 45 / 0.14); --pi-abysse-24: rgb(15 22 45 / 0.24); --pi-voile: rgb(15 22 45 / 0.08);
+  --pi-courbe: cubic-bezier(0.625, 0.05, 0, 1);
+  padding-top: 80px; background: var(--surface-abyss); color: var(--pi-encre); font-family: var(--font-text);
+}
+.pi-conteneur { width: min(1240px, 100% - 32px); margin-inline: auto; }
+.pi-scene { background: var(--accent-sun); color: var(--surface-abyss); padding: 48px 0 56px; }
+/* le mot : calque rempli par le script, hauteur posée par le script */
+.pi-mot { position: relative; min-height: 1px; }
+.pi-lettre, .pi-mesure span { font: 600 var(--pi-taille, 120px) / 1.02 var(--font-display); font-variation-settings: "opsz" 144; letter-spacing: -0.02em; white-space: pre; }
+.pi-lettre { position: absolute; top: 0; left: 0; will-change: transform, opacity; transition: transform 1s var(--pi-courbe), opacity 0.55s var(--pi-courbe); }
+.pi-lettre.is-ajout { color: var(--brand-primary); }
+.pi-lettre.is-part { opacity: 0; }
+.pi-mesure { position: absolute; inset: 0 0 auto; visibility: hidden; }
+/* titre et proposition */
+.pi-dit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 64px; align-items: end; margin-top: 40px; padding-top: 28px; box-shadow: inset 0 1px 0 var(--pi-abysse-24); }
+.pi-dit h1 { font: 600 32px / 1.15 var(--font-display); letter-spacing: -0.3px; text-wrap: balance; }
+.pi-dit p { margin-top: 8px; font-size: 17px; line-height: 1.6; max-width: 46ch; color: var(--pi-encre); }
+.pi-proposition { display: flex; align-items: center; gap: 20px; transition: opacity 0.6s var(--pi-courbe), transform 0.8s var(--pi-courbe); }
+.pi-proposition:not(.is-vue) { opacity: 0; transform: translateY(24px); }
+.pi-proposition img { width: 80px; height: 80px; flex: none; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px var(--surface-abyss); }
+.pi-quoi { display: block; font-size: 15px; font-weight: 700; color: var(--pi-encre-2); }
+.pi-titre { display: block; font: 600 24px / 1.15 var(--font-display); color: var(--surface-abyss); }
+.pi-proposition .oht-btn { margin-left: auto; }
+/* recherche, dans le premier écran */
+.pi-chercher { margin-top: 40px; }
+.pi-champ { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 24px; border-radius: 99px; background: #fff; color: var(--pi-encre-3); box-shadow: 0 0 0 1.5px var(--surface-abyss); }
+.pi-champ:focus-within { box-shadow: 0 0 0 3px var(--surface-abyss); }
+.pi-champ input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: 500 18px / 1 var(--font-text); color: var(--pi-encre); }
+.pi-resultats { list-style: none; margin: 8px 0 0; padding: 8px; border-radius: 24px; background: #fff; box-shadow: 0 0 0 1.5px var(--surface-abyss); }
+.pi-resultats a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 12px 16px; border-radius: 16px; text-decoration: none; color: var(--pi-encre); }
+.pi-resultats a:hover, .pi-resultats a:focus-visible { background: var(--pi-voile); }
+.pi-resultats .pi-nom { font-weight: 700; }
+.pi-type { font-size: 14px; color: var(--pi-encre-3); white-space: nowrap; }
+/* chemins : grandes lignes typographiques sur blanc */
+.pi-suite { background: #fff; }
+.pi-chemins { list-style: none; margin-block: 0; padding: 40px 0 96px; }
+.pi-chemins a { --pi-t: 0; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 28px; align-items: center; padding: 28px 0; box-shadow: inset 0 -1px 0 var(--pi-filet); text-decoration: none; color: var(--pi-encre); }
+.pi-chemins .pi-nom { display: block; font: 600 clamp(28px, 3.6vw, 48px) / 1.05 var(--font-display); letter-spacing: -0.4px; transition: transform 0.6s var(--pi-courbe); }
+.pi-ou { display: block; margin-top: 8px; font-size: 16px; color: var(--pi-encre-2); transition: transform 0.6s var(--pi-courbe); }
+.pi-chemins a:hover .pi-nom, .pi-chemins a:focus-visible .pi-nom, .pi-chemins a:hover .pi-ou, .pi-chemins a:focus-visible .pi-ou { transform: translateX(4px); }
+.pi-fleche { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--pi-abysse-14); transition: background-color 0.3s, color 0.3s; }
+.pi-fleche svg { transform: rotate(-45deg); transition: transform 0.6s var(--pi-courbe); }
+.pi-chemins a:hover .pi-fleche, .pi-chemins a:focus-visible .pi-fleche { background: var(--surface-abyss); color: var(--accent-sun); box-shadow: none; }
+.pi-chemins a:hover .pi-fleche svg, .pi-chemins a:focus-visible .pi-fleche svg { transform: none; }
+.pi-chemins a:active .pi-fleche { opacity: 0.85; }
+.pi-chemins a:focus-visible { outline: 2px solid var(--surface-brand); outline-offset: 4px; border-radius: 8px; }
+@media (max-width: 1023px) { .pi-dit { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .pi-scene { padding: 32px 0 40px; }
+  .pi-dit { margin-top: 28px; padding-top: 20px; }
+  .pi-dit h1 { font-size: 24px; }
+  .pi-proposition { flex-wrap: wrap; gap: 16px; }
+  .pi-proposition img { width: 64px; height: 64px; }
+  .pi-titre { font-size: 22px; }
+  .pi-proposition .oht-btn { margin-left: 0; }
+  .pi-chercher { margin-top: 28px; }
+  .pi-champ { height: 56px; padding: 0 20px; }
+  .pi-chemins { padding: 16px 0 64px; }
+  .pi-chemins a { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 16px; padding: 24px 0; }
+  .pi-chemins .oht-objet { width: 48px; height: 48px; }
+  .pi-fleche { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pi-lettre, .pi-proposition, .pi-chemins .pi-nom, .pi-ou, .pi-fleche, .pi-fleche svg { transition: none; }
+}

@@ -1,0 +1,116 @@
+/* Écran Équipe des admins (lot L3, maquette E ?role=admins&ecran=equipe) : compteurs qui filtrent, tableau des membres
+   (cartes sous 1100 px), petite course du soleil de chaque membre actif, panneau « Ajouter un agent » (plein écran en
+   390), annonce. Tout sous .esp. Mouvement : transform, opacity et clip-path seulement ; aucune transition de couleur ni
+   de fond ; mouvement réduit ramené à l'état final par jetons.css. */
+
+/* compteurs : actifs, invités, suspendus ; chacun filtre la liste */
+.esp .esp-equipe .filtres { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+.esp .esp-equipe .filtres button { display: grid; justify-items: start; gap: 2px; min-width: 88px; min-height: 64px; padding: 8px 14px; border: 1px solid transparent; border-radius: 14px; background: none; text-align: left; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-equipe .filtres button:hover { transform: translateY(-2px); }
+.esp .esp-equipe .filtres button[aria-pressed="true"] { border-color: var(--filet-fort); box-shadow: inset 0 -3px 0 var(--accent); }
+.esp .esp-equipe .filtres b { font: 800 28px/1.1 var(--f-texte); font-variant-numeric: tabular-nums; color: var(--encre); }
+.esp .esp-equipe .filtres span { color: var(--encre-2); font-size: 14px; font-weight: 600; }
+
+/* boutons secondaires (actions de ligne, annuler) */
+.esp .esp-equipe .bouton-2 { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--filet-fort); border-radius: 14px; background: var(--surface); color: var(--encre); font-weight: 700; white-space: nowrap; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-equipe .bouton-2:hover { border-color: var(--encre-3); transform: translateY(-2px); }
+.esp .esp-equipe .bouton-2:active { transform: translateY(1px); }
+.esp .esp-equipe :is(.bouton, .bouton-2):disabled { background: var(--survol); border-color: var(--filet); color: var(--encre-3); cursor: progress; transform: none; }
+.esp .esp-equipe .bouton-petit { min-height: 44px; padding: 0 12px; font-size: 14px; }
+.esp .esp-equipe .bouton-2 .ic { width: 18px; height: 18px; }
+.esp .esp-equipe .bloc-tete .bouton { flex: none; }
+
+/* tableau des membres */
+.esp .esp-equipe .qui { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.esp .esp-equipe .qui > span:last-child { min-width: 0; }
+.esp .esp-equipe .qui b { display: block; font-weight: 700; }
+.esp .esp-equipe .qui small { display: block; color: var(--encre-2); font-size: 13px; }
+.esp .esp-equipe .qui .courriel { overflow-wrap: anywhere; }
+.esp .esp-equipe .langues { display: flex; flex-wrap: wrap; gap: 4px; max-width: 112px; }
+.esp .esp-equipe .meta { color: var(--encre-2); font-size: 14px; }
+.esp .esp-equipe .actions-ligne { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.esp .esp-equipe .tableau .etat { white-space: nowrap; }
+.esp .esp-equipe .etat[data-e="actif"] { background: var(--ok); border-color: var(--ok); color: var(--fond); }
+.esp .esp-equipe .etat[data-e="invite"] { color: var(--attente); }
+.esp .esp-equipe .etat[data-e="suspendu"] { color: var(--encre-3); border-style: dashed; }
+.esp .esp-equipe .bloc-corps > .mention { color: var(--encre-2); }
+
+/* petite course du soleil d'un membre actif */
+.esp .esp-equipe .jour-arc { display: grid; gap: 2px; justify-items: start; }
+.esp .esp-equipe .mini-arc { display: block; width: 176px; height: 44px; }
+.esp .esp-equipe .mini-arc .arc { fill: none; stroke: var(--filet-fort); stroke-width: 1.25; }
+.esp .esp-equipe .mini-arc .arc-p { fill: none; stroke: var(--trait-horizon); stroke-width: 2; stroke-linecap: round; }
+.esp .esp-equipe .mini-arc .hz { stroke: var(--encre-3); stroke-width: 1; }
+.esp .esp-equipe .mini-arc .sol { fill: var(--soleil); }
+.esp .esp-equipe .mini-arc[data-lumiere="aube"] .sol { fill: var(--safran); }
+.esp .esp-equipe .mini-arc[data-lumiere="soir"] .sol { fill: var(--laterite-clair); }
+.esp .esp-equipe .jour-arc .meta { font-size: 12px; }
+.esp .esp-equipe .mini-arc .moment { fill: var(--surface); stroke: var(--ocean); stroke-width: 2; } /* un point par moment du jour (lot L4) */
+.esp[data-theme="sombre"] .esp-equipe .mini-arc .moment { stroke: var(--soleil); }
+
+/* panneau « Ajouter un agent » : tiroir à droite, plein écran en 390 */
+.esp .esp-tiroir { position: fixed; inset: 0 0 0 auto; width: min(640px, 100%); height: 100dvh; max-width: none; max-height: none; margin: 0 0 0 auto; padding: 0; border: 0; border-radius: 24px 0 0 24px; background: var(--surface); color: var(--encre); box-shadow: -24px 0 64px var(--ombre-forte); overflow: hidden; }
+.esp .esp-tiroir::backdrop { background: var(--voile); }
+.esp .esp-tiroir[open] { animation: esp-tiroir 560ms var(--c-glisse) backwards; }
+@keyframes esp-tiroir {
+  from { transform: translateX(100%); }
+}
+@keyframes esp-tiroir-bas {
+  from { transform: translateY(100%); }
+}
+.esp .esp-tiroir .tiroir-cadre { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+.esp .esp-tiroir .tiroir-tete { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 24px 28px 20px; border-bottom: 1px solid var(--filet); }
+.esp .esp-tiroir .tiroir-tete h2 { font-size: 30px; line-height: 1.1; }
+.esp .esp-tiroir .tiroir-tete p { margin-top: 4px; color: var(--encre-2); }
+.esp .esp-tiroir .tiroir-corps { overflow-y: auto; overscroll-behavior: contain; padding: 20px 28px 28px; }
+.esp .esp-tiroir .tiroir-pied { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; padding: 16px 28px; border-top: 1px solid var(--filet); }
+.esp .esp-tiroir .champs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.esp .esp-tiroir .champ { display: grid; gap: 4px; align-content: start; min-width: 0; margin: 0; padding: 0; border: 0; }
+.esp .esp-tiroir .champ.large { grid-column: 1 / -1; }
+.esp .esp-tiroir .champ > :is(label, legend) { padding: 0; font-size: 14px; font-weight: 700; }
+.esp .esp-tiroir .champ :is(input[type="text"], input[type="email"], input[type="tel"], select) { width: 100%; height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); }
+.esp .esp-tiroir .champ :is(input[type="text"], input[type="email"], input[type="tel"])[aria-invalid="true"] { border-color: var(--accent-agent-texte); }
+.esp .esp-tiroir .aide { color: var(--encre-2); font-size: 13px; }
+.esp .esp-tiroir .erreur { color: var(--accent-agent-texte); font-size: 13px; font-weight: 700; }
+.esp .esp-tiroir .erreur:empty { display: none; }
+.esp .esp-tiroir .message-erreur { margin-bottom: 16px; padding: 12px 16px; border: 1px solid var(--accent-agent-texte); border-radius: 12px; color: var(--accent-agent-texte); font-weight: 700; }
+.esp .esp-tiroir .puces { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.esp .esp-tiroir .puce { display: inline-flex; max-width: 100%; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.esp .esp-tiroir .puce input { width: 18px; height: 18px; margin: 0; accent-color: var(--ocean); }
+.esp[data-theme="sombre"] .esp-tiroir .puce input { accent-color: var(--soleil); }
+.esp .esp-tiroir .puce:has(input:checked) { border-color: var(--encre); background: var(--survol); }
+.esp .esp-tiroir .puce:has(input[aria-invalid="true"]) { border-color: var(--accent-agent-texte); }
+
+/* annonce : ce qui vient de se passer (ou ce qui a échoué), posée en bas de l'écran */
+.esp .esp-equipe .esp-annonce { position: fixed; left: 50%; bottom: 28px; z-index: 60; max-width: calc(100% - 32px); padding: 12px 20px; border-radius: 14px; background: var(--abyss); color: var(--sable); font-weight: 700; box-shadow: 0 16px 40px var(--ombre-forte); transform: translateX(-50%); transition: transform var(--d-moyen) var(--c-arrivee), opacity var(--d-moyen) var(--c-arrivee); }
+.esp[data-theme="sombre"] .esp-equipe .esp-annonce { background: var(--blanc); color: var(--abyss); }
+.esp .esp-equipe .esp-annonce[data-ton="erreur"] { box-shadow: inset 4px 0 0 var(--laterite-clair), 0 16px 40px var(--ombre-forte); }
+.esp .esp-equipe .esp-annonce:empty { opacity: 0; transform: translate(-50%, 160%); }
+
+/* sous 1100 px : chaque membre devient une carte */
+@media (max-width: 1100px) {
+  .esp .esp-equipe .tableau thead { display: none; }
+  .esp .esp-equipe .tableau,
+  .esp .esp-equipe .tableau tbody { display: block; width: 100%; }
+  .esp .esp-equipe .tableau tr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 16px 0; border-bottom: 1px solid var(--filet); }
+  .esp .esp-equipe .tableau tr:last-child { border-bottom: 0; }
+  .esp .esp-equipe .tableau td { display: block; padding: 0; border: 0; }
+  .esp .esp-equipe .tableau td:first-child,
+  .esp .esp-equipe .tableau td:last-child { flex: 1 1 100%; }
+  .esp .esp-equipe .tableau td:nth-child(2) { flex: 0 1 auto; }
+  .esp .esp-equipe .langues { max-width: none; }
+  .esp .esp-equipe .actions-ligne { justify-content: flex-start; }
+}
+
+@media (max-width: 760px) {
+  .esp .esp-equipe .filtres button { min-width: 0; padding: 8px 10px; }
+  .esp .esp-equipe .filtres b { font-size: 24px; }
+  .esp .esp-tiroir { inset: 0; width: 100%; margin: 0; border-radius: 0; box-shadow: none; }
+  .esp .esp-tiroir[open] { animation-name: esp-tiroir-bas; }
+  .esp .esp-tiroir :is(.tiroir-tete, .tiroir-corps, .tiroir-pied) { padding-left: 16px; padding-right: 16px; }
+  .esp .esp-tiroir .tiroir-tete h2 { font-size: 26px; }
+  .esp .esp-tiroir .champs { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-tiroir .tiroir-pied { flex-direction: column-reverse; }
+  .esp .esp-tiroir .tiroir-pied > * { width: 100%; }
+  .esp .esp-equipe .esp-annonce { bottom: calc(96px + env(safe-area-inset-bottom)); }
+}

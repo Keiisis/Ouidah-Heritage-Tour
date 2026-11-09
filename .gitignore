@@ -1,0 +1,65 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+!.env.example
+
+# Fichiers opérateur, documents clients et outils locaux : jamais sur GitHub.
+/.claude/
+/.agents/
+/.codex/
+/AGENTS.md
+CLAUDE.local.md
+/floorplan/
+/graphify-out/
+/supabase/.temp/
+*.pdf
+*.har
+*.log
+*.zip
+*.key
+*.p12
+*.pfx
+*.har.gz
+*.bak
+/reprises/
+/docs/
+# Généré par postinstall à partir de la dépendance verrouillée.
+/public/vendor/maplibre-gl-worker.mjs

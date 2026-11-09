@@ -1,0 +1,16 @@
+/* Rubriques de l'accueil : grille sur ordinateur (les panneaux s'effacent, leurs blocs se placent dans la grille), onglets
+   collants en 390 (un seul panneau visible). Tout sous .esp. */
+
+.esp .onglets-barre { display: none; }
+.esp .onglet { display: contents; }
+
+@media (max-width: 760px) {
+  .esp .onglets-barre { position: sticky; top: 0; z-index: 5; display: flex; gap: 4px; margin: 0 -16px 12px; padding: 8px 16px; overflow-x: auto; background: var(--fond); border-bottom: 1px solid var(--filet); scrollbar-width: none; }
+  /* les 4 onglets de l'agent tiennent dans 390 ; les 5 de l'admin défilent, avec un fondu tant qu'il reste des onglets à droite */
+  .esp .onglets-barre[data-suite] { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
+  .esp .onglets-barre [role="tab"] { flex: 1 0 auto; min-height: 44px; padding: 0 10px; border: 1px solid var(--filet-fort); border-radius: 22px; background: none; color: var(--encre-2); font: 700 13px/1 var(--f-texte); }
+  .esp .onglets-barre [role="tab"][aria-selected="true"] { border-color: var(--ocean); background: var(--ocean); color: var(--blanc); }
+  .esp[data-theme="sombre"] .onglets-barre [role="tab"][aria-selected="true"] { border-color: var(--blanc); background: var(--blanc); color: var(--abyss); }
+  .esp .onglet { display: block; }
+  .esp .onglet:not([data-actif]) { display: none; }
+}

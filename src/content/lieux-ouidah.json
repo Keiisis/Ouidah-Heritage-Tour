@@ -1,0 +1,5472 @@
+{
+ "releve": "2026-10-20",
+ "zone": "Commune de Ouidah (OpenStreetMap, relation 2946173) et incontournables proches (hors_commune)",
+ "sources": "OpenStreetMap (© contributeurs OpenStreetMap, licence ODbL) et recherche web, chaque lieu avec ses URL sources",
+ "verification": {
+  "osm": "vu sur OpenStreetMap seulement",
+  "web": "vu dans des sources web seulement",
+  "osm+web": "confirmé par OpenStreetMap et le web"
+ },
+ "note": "Valeurs de départ, à valider par OHT puis gérées depuis l'admin (ajout, correction, retrait).",
+ "lieux": [
+  {
+   "slug": "arbre-du-retour",
+   "nom": "Arbre du Retour",
+   "categorie": "a-voir",
+   "sous_type": "Mémorial",
+   "coords": [
+    6.3401724,
+    2.0889473
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Arbre autour duquel, selon la croyance vodun, les captifs tournaient avant l'embarquement pour que leur âme revienne sur la terre natale.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724571",
+    "https://www.voyage-benin.com/guide-benin/attraction/etapes-route-des-esclaves",
+    "https://www.laurewanders.com/things-to-do-in-ouidah/",
+    "https://savoirs-dev.huma-num.fr/fr/articles/cPDPF4SrlJzXz8xDU3xLhg/download.epub"
+   ],
+   "destination": "arbre-du-retour"
+  },
+  {
+   "slug": "arbre-sculpte",
+   "nom": "Arbre sculpté",
+   "categorie": "a-voir",
+   "sous_type": "Œuvre d'art",
+   "coords": [
+    6.3583422,
+    2.0869517
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724546"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "basilique-de-l-immaculee-conception-de-ouidah",
+   "nom": "Basilique de l'Immaculée-Conception de Ouidah",
+   "categorie": "a-voir",
+   "sous_type": "Lieu sacré",
+   "coords": [
+    6.3606287,
+    2.0848596
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Principal lieu de culte catholique de la ville, construit de 1903 à 1909 et élevé au rang de basilique mineure en 1989.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/402951938",
+    "https://fr.wikipedia.org/wiki/Basilique_de_l%27Immacul%C3%A9e-Conception_de_Ouidah"
+   ],
+   "destination": "basilique"
+  },
+  {
+   "slug": "bateau-du-depart",
+   "nom": "Bateau du Départ",
+   "categorie": "a-voir",
+   "sous_type": "Navire-musée",
+   "coords": [
+    6.322947,
+    2.085392
+   ],
+   "adresse": "Marina, Djègbadji",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Réplique de l'Aurore, l'un des derniers navires négriers partis de Ouidah vers Cuba vers 1863, utilisée comme navire-musée.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Bateau_du_D%C3%A9part",
+    "https://www.wikidata.org/wiki/Q137795348"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bouche-du-roy",
+   "nom": "Bouche du Roy",
+   "categorie": "a-voir",
+   "sous_type": "Embouchure / aire protégée",
+   "coords": [
+    6.2952,
+    1.93116
+   ],
+   "adresse": "Grand-Popo",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Embouchure du fleuve Mono à Grand-Popo, aire communautaire de conservation de 9 678 ha intégrée à la réserve de biosphère transfrontière du Mono.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": true,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Bouche_du_Roy",
+    "https://www.icotonou.com/villes/grand-popo-plages-ecotourisme-bouche-du-roy/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "capitaine-jean-adjovi",
+   "nom": "Capitaine Jean ADJOVI",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3597776,
+    2.0828628
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084824"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "case-zomai",
+   "nom": "Case Zomaï",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3410953,
+    2.0890706
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Étape de la route des esclaves, « là où le feu et la lumière ne doivent pas entrer », où les captifs étaient enfermés pour les conditionner aux cales des navires.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6524137185",
+    "https://memoire-esclavage.org/la-fme-au-benin-aissata-seck-la-rencontre-des-acteurs-de-memoire",
+    "https://benin360.com/ouidah-route-des-esclaves/",
+    "https://www.ness-voyage.com/carnet/que-faire-a-ouidah/",
+    "https://www.tripadvisor.fr/Attraction_Review-g479758-d23944863-Reviews-Case_Zomai-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cimetiere-militaire-francais-de-ouidah",
+   "nom": "Cimetière militaire français de Ouidah",
+   "categorie": "a-voir",
+   "sous_type": "Patrimoine",
+   "coords": [
+    6.3596569,
+    2.0954995
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Cimetière militaire français créé vers 1892.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/454532545",
+    "https://www.wikidata.org/wiki/Q109448510"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "emile-poissons",
+   "nom": "Emile POISSONS",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3597527,
+    2.0827857
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084896"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "esplanade-du-fort-francais",
+   "nom": "Esplanade du Fort Français",
+   "categorie": "a-voir",
+   "sous_type": "Vestiges",
+   "coords": [
+    6.3595471,
+    2.0821238
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Emplacement de l'ancien fort français, sans bâtiment conservé, dont l'esplanade accueille des statues de personnalités de Ouidah.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724543",
+    "https://www.openstreetmap.org/node/13446050796",
+    "https://www.openstreetmap.org/node/5981084444",
+    "https://fr.wikipedia.org/wiki/Ouidah",
+    "https://www.gouv.bj/article/1055/destination-benin---ouidah-terre-hxueda--ville-vocation-historique--culturelle--cultuelle-touristique/",
+    "https://www.banouto.bj/culture/article/20251231-vodun-days-2026-le-programme-detaille-des-trois-jours-a-ouidah",
+    "https://www.gouv.bj/article/3406/succes-eclatant-vodun-days-2026-benin-assume-statut-grande-nation-culture-traditions-ancestrales/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "foret-sacree-de-kpasse",
+   "nom": "Forêt sacrée de Kpassè",
+   "categorie": "a-voir",
+   "sous_type": "Lieu sacré",
+   "coords": [
+    6.3648371,
+    2.0963694
+   ],
+   "adresse": null,
+   "telephone": "96916360",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Îlot forestier de 4 hectares en pleine ville, lié au roi Kpassè, qui héberge des divinités vodun et des sculptures et sert de cadre à des cérémonies, notamment pendant les Vodun Days.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330840851",
+    "https://fr.wikipedia.org/wiki/For%C3%AAt_sacr%C3%A9e_de_Kpass%C3%A8",
+    "https://en.wikipedia.org/wiki/Ouidah",
+    "https://www.banouto.bj/culture/article/20251231-vodun-days-2026-le-programme-detaille-des-trois-jours-a-ouidah"
+   ],
+   "destination": "foret-sacree-kpasse"
+  },
+  {
+   "slug": "fosse-commune-route-des-esclaves",
+   "nom": "Fosse commune, Route des Esclaves",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3397194,
+    2.0893451
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6524137285"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "francisco-de-souza-chacha-1er",
+   "nom": "Francisco de SOUZA CHACHA 1er",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3597856,
+    2.0827672
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084444"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ganvie",
+   "nom": "Ganvié",
+   "categorie": "a-voir",
+   "sous_type": "Cité lacustre",
+   "coords": [
+    6.46769444,
+    2.39125
+   ],
+   "adresse": "Sô-Ava",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Cité lacustre du lac Nokoué, dans la commune de Sô-Ava, surnommée la Venise de l'Afrique.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": true,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Ganvi%C3%A9",
+    "https://en.wikipedia.org/wiki/Ganvie"
+   ],
+   "destination": "ganvie"
+  },
+  {
+   "slug": "jacob-adegoun",
+   "nom": "Jacob ADEGOUN",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3598314,
+    2.0827568
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084699"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "jardin-d-essai-de-la-fondation-zinsou",
+   "nom": "Jardin d'Essai de la Fondation Zinsou",
+   "categorie": "a-voir",
+   "sous_type": "Jardin / exposition",
+   "coords": [
+    6.36756889,
+    2.12513111
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Espace d'environ 6 ha ouvert au public depuis 2016, associant collection de plantes rares, trace de savane du Dahomey Gap et œuvres d'art, visites gratuites de 9 h à 18 h.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Jardin_d%27Essai_(Ouidah)",
+    "https://www.wikidata.org/wiki/Q136148430"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maison-atelier-artiste-adjosse",
+   "nom": "Maison Atelier artiste Adjosse",
+   "categorie": "a-voir",
+   "sous_type": "Œuvre d'art",
+   "coords": [
+    6.3616938,
+    2.0912874
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Maison-atelier d'artiste cartographiée dans OpenStreetMap.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/11109356506"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maison-coloniale-du-gouverneur",
+   "nom": "Maison Coloniale du Gouverneur",
+   "categorie": "a-voir",
+   "sous_type": "Vestiges",
+   "coords": [
+    6.3560151,
+    2.0734173
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724579"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maison-du-bresil-maison-de-memoire",
+   "nom": "Maison du Brésil (Maison de Mémoire)",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3563056,
+    2.0760861
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Bâtiment afro-brésilien de 1930 appartenant à la famille de Souza, réhabilité de 2016 à 2022, qui expose des œuvres du musée d'histoire pendant la rénovation de celui-ci.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724601",
+    "https://fr.wikipedia.org/wiki/Maison_du_Br%C3%A9sil_(Ouidah)"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "monument-d-entree-de-ouidah-carrefour-vasseho",
+   "nom": "Monument d'entrée de Ouidah (carrefour Vassého)",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3609495,
+    2.1060658
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Monument cartographié au carrefour Vassého, à l'entrée de Ouidah.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330840850"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "mosquee",
+   "nom": "Mosquée",
+   "categorie": "a-voir",
+   "sous_type": "Lieu sacré",
+   "coords": [
+    6.3547478,
+    2.0682642
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495175"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "musee-d-histoire-de-ouidah-fort-portugais-sao-joao-baptista-",
+   "nom": "Musée d'histoire de Ouidah (Fort portugais São João Baptista de Ajudá)",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3588947,
+    2.0901242
+   ],
+   "adresse": null,
+   "telephone": "+229 97334558",
+   "site": "https://www.museeouidah.org/",
+   "horaires": null,
+   "cuisine": null,
+   "description": "Musée installé dans l'ancien fort portugais construit en 1721, riche de 700 pièces, dont le site est en travaux pour accueillir le Musée international de la mémoire et de l'esclavage (MIME).",
+   "remarque": "Fermé pour rénovation selon un avis récent (projet du musée de la mémoire) ; date de réouverture inconnue, à confirmer",
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330840849",
+    "https://www.openstreetmap.org/way/402954433",
+    "https://fr.wikipedia.org/wiki/Mus%C3%A9e_d%27histoire_de_Ouidah",
+    "https://fr.wikipedia.org/wiki/Fort_portugais_de_Ouidah",
+    "https://www.gouv.bj/article/1644/reconstruction-identique-cite-historique-ouidah-nouvelle-descente-ministres-chantiers-construction-infrastructures-touristiques-museales/"
+   ],
+   "destination": "musee-histoire"
+  },
+  {
+   "slug": "musee-de-la-fondation-zinsou-villa-ajavon",
+   "nom": "Musée de la Fondation Zinsou (Villa Ajavon)",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3615035,
+    2.0853627
+   ],
+   "adresse": null,
+   "telephone": "+229 97386479",
+   "site": "https://www.fondation-zinsou.org/",
+   "horaires": null,
+   "cuisine": null,
+   "description": "Musée d'art contemporain ouvert le 11 novembre 2013 dans la villa Ajavon de 1922, derrière la basilique, ouvert tous les jours sauf le lundi.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926196902",
+    "https://fr.wikipedia.org/wiki/Mus%C3%A9e_d%27Art_contemporain_de_Ouidah",
+    "https://fr.wikipedia.org/wiki/Villa_Ajavon",
+    "https://www.fondation-zinsou.org/infospratiques",
+    "http://fondationzinsou.blogspot.com/2015/03/museumweek-promenade-architecturale.html",
+    "https://www.fondation-zinsou.org/cafe-boutique"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "musee-de-la-porte-du-non-retour",
+   "nom": "Musée de la Porte du Non-Retour",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3225582,
+    2.0832343
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": "Tu-Su,PH 09:00-13:00,15:00-18:00",
+   "cuisine": null,
+   "description": "Musée cartographié près de la Porte du Non-Retour, cité par le gouvernement comme « Musée de la Porte du Retour ».",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724598",
+    "https://www.gouv.bj/article/1055/destination-benin---ouidah-terre-hxueda--ville-vocation-historique--culturelle--cultuelle-touristique/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "memorial-de-l-arbre-de-l-oubli",
+   "nom": "Mémorial de l'Arbre de l'Oubli",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3480979,
+    2.0868848
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Étape de la route des esclaves où, selon la tradition, les captifs étaient conduits autour d'un arbre pour leur faire oublier nom, origine et identité.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5985258282",
+    "https://www.wikidata.org/wiki/Q66480982",
+    "https://www.voyage-benin.com/guide-benin/attraction/etapes-route-des-esclaves",
+    "https://savoirs-dev.huma-num.fr/fr/articles/cPDPF4SrlJzXz8xDU3xLhg/download.epub"
+   ],
+   "destination": "arbre-de-l-oubli"
+  },
+  {
+   "slug": "memorial-de-zoungbodji",
+   "nom": "Mémorial de Zoungbodji",
+   "categorie": "a-voir",
+   "sous_type": "Mémorial",
+   "coords": [
+    6.3398445,
+    2.0893791
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Mémorial du village de Zoungbodji, dernier lieu de séjour des captifs avant l'embarquement, près de la fosse commune où étaient jetés les morts.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724544",
+    "https://www.voyage-benin.com/guide-benin/attraction/etapes-route-des-esclaves",
+    "https://savoirs-dev.huma-num.fr/fr/articles/cPDPF4SrlJzXz8xDU3xLhg/download.epub",
+    "https://www.tripadvisor.fr/Attraction_Review-g479758-d23961709-Reviews-Memorial_Zoungbodji-Ouidah_Atlantique_Department.html",
+    "https://lanouvelletribune.info/2024/11/culture-tourisme-et-arts-au-benin-les-projets-et-reformes-devoiles/"
+   ],
+   "destination": "memorial-zoungbodji"
+  },
+  {
+   "slug": "memorial-du-grand-jubile-de-l-an-2000",
+   "nom": "Mémorial du Grand Jubilé de l'an 2000",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.323236,
+    2.087788
+   ],
+   "adresse": "Djègbadji (plage)",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Monument érigé pour le jubilé de l'an 2000 près de la Porte du Non-Retour, en hommage aux premiers missionnaires catholiques.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.wikidata.org/wiki/Q66473431",
+    "https://fr.wikipedia.org/wiki/Ouidah",
+    "https://www.openstreetmap.org/node/6330840857"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "place-chacha-place-des-encheres",
+   "nom": "Place Chacha (Place des Enchères)",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.35653,
+    2.0850804
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Ancienne place où se tenaient les enchères publiques d'esclaves, première étape de la route des esclaves, réhabilitée en 1999.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330840854",
+    "https://fr.wikipedia.org/wiki/Place_Chacha_(Ouidah)",
+    "https://www.openstreetmap.org/way/388148384"
+   ],
+   "destination": "place-chacha"
+  },
+  {
+   "slug": "place-maro",
+   "nom": "Place Maro",
+   "categorie": "a-voir",
+   "sous_type": "Lieu de cérémonies et de fêtes",
+   "coords": [
+    6.35662,
+    2.08247
+   ],
+   "adresse": "Centre historique",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Place du centre où sortent les masques Egungun pendant les Vodun Days.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13446050794",
+    "https://www.banouto.bj/culture/article/20251231-vodun-days-2026-le-programme-detaille-des-trois-jours-a-ouidah",
+    "https://www.gouv.bj/article/3406/succes-eclatant-vodun-days-2026-benin-assume-statut-grande-nation-culture-traditions-ancestrales/",
+    "https://fr.wikipedia.org/wiki/Ouidah"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "place-publique-fond-francais",
+   "nom": "Place publique fond français",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3597987,
+    2.0828113
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330840852"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "porte-du-non-retour",
+   "nom": "Porte du Non-Retour",
+   "categorie": "a-voir",
+   "sous_type": "Musée",
+   "coords": [
+    6.3229457,
+    2.0878162
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Arc mémorial en béton et bronze érigé en 1995 sur la plage à l'initiative de l'UNESCO, à la mémoire des captifs déportés, dont une nouvelle version plus imposante accueillait les visiteurs aux Vodun Days 2026.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330750192",
+    "https://www.openstreetmap.org/node/6330840857",
+    "https://fr.wikipedia.org/wiki/Porte_du_non-retour",
+    "https://www.wikidata.org/wiki/Q18467833",
+    "https://fr.africanews.com/2026/01/09/benin-le-president-patrice-talon-inaugure-les-vodun-days/"
+   ],
+   "destination": "porte-du-non-retour"
+  },
+  {
+   "slug": "savi-ancienne-capitale-du-royaume-houeda",
+   "nom": "Savi (ancienne capitale du royaume houéda)",
+   "categorie": "a-voir",
+   "sous_type": "Site historique / arrondissement",
+   "coords": [
+    6.4274735,
+    2.1023605
+   ],
+   "adresse": "Savi",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Arrondissement de Ouidah, ancienne capitale du royaume houéda (Xwéda).",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Savi_(arrondissement)",
+    "https://en.wikipedia.org/wiki/Ouidah",
+    "https://fr.wikipedia.org/wiki/For%C3%AAt_sacr%C3%A9e_de_Kpass%C3%A8"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "source-thermale-de-possotome",
+   "nom": "Source thermale de Possotomè",
+   "categorie": "a-voir",
+   "sous_type": "Source thermale",
+   "coords": [
+    6.521662,
+    1.9681247
+   ],
+   "adresse": "Possotomè (Bopa)",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Source naturelle à environ 40 °C au bord du lac Ahémé, alimentant une fontaine publique et embouteillée sous la marque Possotomé.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": true,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Possotom%C3%A8",
+    "https://benin360.com/source-thermale-possotome/",
+    "https://www.gouv.bj/article/1002/destination-benin---bopa-cite-bleu/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "temple-des-pythons",
+   "nom": "Temple des Pythons",
+   "categorie": "a-voir",
+   "sous_type": "Lieu sacré",
+   "coords": [
+    6.3599695,
+    2.0850416
+   ],
+   "adresse": null,
+   "telephone": "91007400",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Sanctuaire vodun du culte du serpent Dangbé, attesté depuis la fin du XVIIe siècle, situé face à la basilique et abritant des pythons sacrés vivants.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/654211346",
+    "https://fr.wikipedia.org/wiki/Temple_des_Pythons",
+    "https://www.tripadvisor.fr/Attraction_Review-g479758-d5018948-Reviews-Temple_des_Pythons-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": "temple-des-pythons"
+  },
+  {
+   "slug": "temple-du-vodoun-yaloui",
+   "nom": "Temple du vodoun Yaloui",
+   "categorie": "a-voir",
+   "sous_type": "Lieu sacré",
+   "coords": [
+    6.3394596,
+    2.0874561
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Lieu de culte vodun cartographié par le projet cartotourisme près de Zoungbodji.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6330840856"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "temple-vaudoum-adahouto-houta",
+   "nom": "Temple Vaudoum Adahouto Houta",
+   "categorie": "a-voir",
+   "sous_type": "Lieu sacré",
+   "coords": [
+    6.3460843,
+    2.2617219
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/816576634"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "tovalou-codio-houenou",
+   "nom": "Tovalou Codio HOUENOU",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.35985,
+    2.0828371
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084430"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "elisabeth-hodonou",
+   "nom": "Élisabeth HODONOU",
+   "categorie": "a-voir",
+   "sous_type": "Monument",
+   "coords": [
+    6.3598132,
+    2.0828494
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084743"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ecobank-distributeur",
+   "nom": "Ecobank (distributeur)",
+   "categorie": "argent",
+   "sous_type": "Distributeur",
+   "coords": [
+    6.358391,
+    2.086117
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Point Ecobank cartographié comme distributeur dans OpenStreetMap.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084930"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ets-ads",
+   "nom": "Ets ADS",
+   "categorie": "argent",
+   "sous_type": "Transfert d'argent",
+   "coords": [
+    6.3573954,
+    2.0774866
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084909"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ets-promo-multi-service",
+   "nom": "Ets Promo-Multi-Service",
+   "categorie": "argent",
+   "sous_type": "Transfert d'argent",
+   "coords": [
+    6.3740775,
+    2.0879328
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042616571"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "moneygram",
+   "nom": "MoneyGram",
+   "categorie": "argent",
+   "sous_type": "Transfert d'argent",
+   "coords": [
+    6.3679332,
+    2.0774472
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926202012"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "sao-god-gsm",
+   "nom": "Sao God GSM",
+   "categorie": "argent",
+   "sous_type": "Transfert d'argent",
+   "coords": [
+    6.3698904,
+    2.0869471
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042615179"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "uba-ouidah",
+   "nom": "UBA Ouidah",
+   "categorie": "argent",
+   "sous_type": "Banque",
+   "coords": [
+    6.3584116,
+    2.0864382
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Agence United Bank for Africa équipée d'un distributeur automatique.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5985261462",
+    "https://www.openstreetmap.org/node/6042617901"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ads-couture",
+   "nom": "ADS-COUTURE",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3584311,
+    2.0800005
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084915"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "art-ziza",
+   "nom": "Art Ziza",
+   "categorie": "artisanat",
+   "sous_type": "Galerie d'art",
+   "coords": [
+    6.359106,
+    2.0811867
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Galerie d'art cartographiée dans OpenStreetMap près de la place du Fort français.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084920"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "atedje-haute-couture",
+   "nom": "Atedje Haute Couture",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3565184,
+    2.0795672
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084899"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "centre-de-developpement-artistique-et-culturel-elijah",
+   "nom": "Centre de Développement Artistique et Culturel Elijah",
+   "categorie": "artisanat",
+   "sous_type": "Centre culturel",
+   "coords": [
+    6.3243444,
+    2.0819889
+   ],
+   "adresse": null,
+   "telephone": "0617117238",
+   "site": "https://www.cdacelijah.com/",
+   "horaires": null,
+   "cuisine": null,
+   "description": "Centre de développement artistique et culturel de Djègbadji proposant des bungalows à la location.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/681993877",
+    "https://www.booking.com/hotel/bj/cdac-elijah-47-bungalows.fr.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "centre-international-d-art-et-de-musique-de-ouidah-ciamo",
+   "nom": "Centre International d'Art et de Musique de Ouidah (CIAMO)",
+   "categorie": "artisanat",
+   "sous_type": "Centre culturel",
+   "coords": [
+    6.3588522,
+    2.0803592
+   ],
+   "adresse": null,
+   "telephone": "+22921341066",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Centre d'art et de musique cartographié dans OpenStreetMap au centre de Ouidah.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/416896155"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "elisha-couture",
+   "nom": "Elisha Couture",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3702639,
+    2.0767635
+   ],
+   "adresse": null,
+   "telephone": "+22998148463",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926201253"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "finess-couture-divinie-grace",
+   "nom": "Finess Couture Divinie Grace",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3576426,
+    2.0776281
+   ],
+   "adresse": null,
+   "telephone": "+22966062033",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084931"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "habillez-vous",
+   "nom": "Habillez Vous",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3655069,
+    2.085943
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042617319"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "haute-couture",
+   "nom": "Haute Couture",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.360065,
+    2.090585
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926195346"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "rose-couture",
+   "nom": "Rose Couture",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3538614,
+    2.0742809
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084934"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "silhouette-couture",
+   "nom": "Silhouette Couture",
+   "categorie": "artisanat",
+   "sous_type": "Couture",
+   "coords": [
+    6.3658587,
+    2.0791682
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5984694541"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "tapisserie-le-mental",
+   "nom": "Tapisserie le mental",
+   "categorie": "artisanat",
+   "sous_type": "Artisanat",
+   "coords": [
+    6.3706385,
+    2.0756406
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5984694253"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "assemblee-de-dieu",
+   "nom": "Assemblée de Dieu",
+   "categorie": "culte",
+   "sous_type": "Église",
+   "coords": [
+    6.3533921,
+    2.0860506
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042618137"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chapelle-internationalle-des-vainqueurs",
+   "nom": "Chapelle internationalle des vainqueurs",
+   "categorie": "culte",
+   "sous_type": "Lieu de culte",
+   "coords": [
+    6.3722002,
+    2.0871435
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042617895"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "eglise-biblique-du-christ-pour-le-monde",
+   "nom": "Eglise biblique du Christ pour le monde",
+   "categorie": "culte",
+   "sous_type": "Lieu de culte",
+   "coords": [
+    6.3600242,
+    2.0605902
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495046"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "eglise-pentecote-unie-du-benin",
+   "nom": "Eglise pentecote Unie du Benin",
+   "categorie": "culte",
+   "sous_type": "Lieu de culte",
+   "coords": [
+    6.3628959,
+    2.0580836
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495168"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "epmb-le-bon-berger-de-segbanou",
+   "nom": "EPMB le Bon Berger de Sêgbanou",
+   "categorie": "culte",
+   "sous_type": "Lieu de culte",
+   "coords": [
+    6.3896544,
+    2.1462514
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/12479094628"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ministere-international-du-triomphe-de-l-evangile-mite",
+   "nom": "Ministère International du Triomphe de l'Évangile MITE",
+   "categorie": "culte",
+   "sous_type": "Lieu de culte",
+   "coords": [
+    6.3725983,
+    2.09484
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": "24/7",
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/12347726701"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "paroisse-de-pahou",
+   "nom": "Paroisse de Pahou",
+   "categorie": "culte",
+   "sous_type": "Église",
+   "coords": [
+    6.3859017,
+    2.2214199
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250000854"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "paroisse-st-gabriel-jesuhwendo-vasseho",
+   "nom": "Paroisse St Gabriel Jesuhwendo VASSEHO",
+   "categorie": "culte",
+   "sous_type": "Église",
+   "coords": [
+    6.3575422,
+    2.1099753
+   ],
+   "adresse": "OUIDAH",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13415924115"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "sainte-epiphanie-d-ouesse",
+   "nom": "Sainte Épiphanie d'Ouèssè",
+   "categorie": "culte",
+   "sous_type": "Église",
+   "coords": [
+    6.4068258,
+    2.1387179
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/838922123"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "urch-ouidah",
+   "nom": "URCH Ouidah",
+   "categorie": "culte",
+   "sous_type": "Lieu de culte",
+   "coords": [
+    6.3601428,
+    2.0568084
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495045"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "eglise-catholique-de-savi",
+   "nom": "Église catholique de Savi",
+   "categorie": "culte",
+   "sous_type": "Église",
+   "coords": [
+    6.4273149,
+    2.1036168
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4180958333"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "au-coeur-de-ouidah",
+   "nom": "Au coeur de Ouidah",
+   "categorie": "hebergement",
+   "sous_type": "Maison d'hôtes",
+   "coords": [
+    6.3627081,
+    2.0800467
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Hébergement chez l'habitant avec jardin et parking gratuit, une seconde unité (Au cœur de Ouidah 2) étant aussi listée sur Booking.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/11097590206",
+    "https://www.booking.com/hotel/bj/au-coeur-de-ouidah.fr.html",
+    "https://www.booking.com/hotel/bj/au-coeur-de-ouidah-2.fr.html",
+    "https://nz.trip.com/hotels/ouidah-hotel-detail-106037978/au-cur-de-ouidah"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "auberge-du-salut",
+   "nom": "Auberge du salut",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3602362,
+    2.085793
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549205"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "auberge-le-crepuscule",
+   "nom": "Auberge le crépuscule",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3635733,
+    2.1140659
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250001028"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "auberge-mon-destin",
+   "nom": "Auberge mon destin",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.359098,
+    2.0666581
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549210"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "auberge-sassou",
+   "nom": "Auberge Sassou",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3682164,
+    2.0634395
+   ],
+   "adresse": null,
+   "telephone": "66076000",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250083207"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-resto-auberge-miwa-city",
+   "nom": "Bar-Resto-Auberge Miwa City",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3770778,
+    2.0803092
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549206"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bungalows-hotel-djegba",
+   "nom": "Bungalows Hôtel Djègba",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3213288,
+    2.0798492
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724536"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "benin-diaspora-hotel",
+   "nom": "Bénin Diaspora Hôtel",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3250154,
+    2.0923971
+   ],
+   "adresse": null,
+   "telephone": "+229 94 56 96 73",
+   "site": "http://www.diasporahotels.com/",
+   "horaires": null,
+   "cuisine": null,
+   "description": "Établissement situé à quelques pas de la Porte du Non-Retour, répertorié sur Tripadvisor sous les noms Hôtel de la Diaspora et Diaspora Auberge.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/relation/11568090",
+    "https://www.tripadvisor.fr/Hotel_Review-g479758-d14177924-Reviews-Hotel_de_la_Diaspora-Ouidah_Atlantique_Department.html",
+    "https://www.tripadvisor.fr/Hotel_Review-g479758-d2418342-Reviews-Diaspora_Auberge-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-foumi",
+   "nom": "Chez Foumi",
+   "categorie": "hebergement",
+   "sous_type": "Maison d'hôtes",
+   "coords": [
+    6.3831741,
+    2.2201201
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/8268733418"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-le-vieux",
+   "nom": "Chez le Vieux",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3757184,
+    2.0744044
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549208"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-ma-tante",
+   "nom": "Chez ma tante",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.363463,
+    2.1137041
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549201"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-patou",
+   "nom": "Chez Patou",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3717599,
+    2.206538
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549200"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "complexe-hotelerie-edmar",
+   "nom": "Complexe hôtelerie EDMAR",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3674735,
+    2.0659581
+   ],
+   "adresse": null,
+   "telephone": "65851880",
+   "site": null,
+   "horaires": null,
+   "cuisine": "European",
+   "description": "Complexe de chambres climatisées et ventilées avec cuisine africaine et européenne, selon OpenStreetMap.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496795"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "djedokansi",
+   "nom": "Djedokansi",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3832354,
+    2.2169812
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549199"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-makuta",
+   "nom": "Hotel Makuta",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3674389,
+    2.0673823
+   ],
+   "adresse": null,
+   "telephone": "97540674",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel de chambres climatisées et ventilées cartographié par le projet cartotourisme.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496794"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-antonio",
+   "nom": "Hôtel Antonio",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.369668,
+    2.0590936
+   ],
+   "adresse": null,
+   "telephone": "97556817",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel avec piscine et wifi, chambres de 5 000 à 20 000 FCFA selon OpenStreetMap.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496787"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-cercle-du-rail",
+   "nom": "Hôtel Cercle du Rail",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3766846,
+    2.0866151
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496791"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-djanwale",
+   "nom": "Hôtel DJANWALE",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3772684,
+    2.0765179
+   ],
+   "adresse": null,
+   "telephone": "61062936",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel de chambres ventilées et climatisées dans un bâtiment R+2, cartographié par le projet cartotourisme.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496792"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-djegba",
+   "nom": "Hôtel Djègba",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3236651,
+    2.0802693
+   ],
+   "adresse": null,
+   "telephone": "94478847",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel avec piscine, salle de conférences et restaurant, situé route des Pêches non loin de la Porte du Non-Retour.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6328818196",
+    "https://www.tripadvisor.com/Hotel_Review-g479758-d2258868-Reviews-Djegba_Hotel-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-dk",
+   "nom": "Hôtel DK",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3637835,
+    2.099369
+   ],
+   "adresse": null,
+   "telephone": "69783717",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel avec piscine situé au bord de la route nationale, à distance de marche du centre.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250000853",
+    "https://www.tripadvisor.fr/Hotel_Review-g479758-d9863399-Reviews-Hotel_Dk-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-la-joie",
+   "nom": "Hôtel la joie",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3684985,
+    2.0704374
+   ],
+   "adresse": null,
+   "telephone": "97083363",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496788",
+    "https://www.openstreetmap.org/node/7804947173",
+    "https://www.openstreetmap.org/node/7890111585"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-la-mariella",
+   "nom": "Hôtel La Mariella",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3588514,
+    2.1002743
+   ],
+   "adresse": null,
+   "telephone": "61224374",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel aux chambres simples et spacieuses avec moustiquaires et petit-déjeuner, selon un avis Tripadvisor.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496796",
+    "https://www.tripadvisor.com/Hotels-g479758-zff8-Ouidah_Atlantique_Department-Hotels.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-la-passion",
+   "nom": "Hôtel la Passion",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3797922,
+    2.0669746
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13442415058"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hotel-terra-nostra",
+   "nom": "Hôtel Terra Nostra",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3700792,
+    2.0682621
+   ],
+   "adresse": null,
+   "telephone": "96356350",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Hôtel avec piscine et wifi cartographié par le projet cartotourisme.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161496793"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "l-ermitage-2",
+   "nom": "l'Ermitage 2",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3696784,
+    2.0770444
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5743809021",
+    "https://www.openstreetmap.org/node/6161549209"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-casa-del-papa",
+   "nom": "La Casa del Papa",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3139133,
+    2.0358757
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": "https://casadelpapa.com/",
+   "horaires": null,
+   "cuisine": null,
+   "description": "Resort en bord d'océan à environ 7 km de la Porte du Non-Retour, avec 68 chambres climatisées, spa, deux piscines et plage privée.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/relation/11834180",
+    "https://www.tripadvisor.fr/Hotel_Review-g479758-d943521-Reviews-Casa_del_Papa_Resort_SPA-Ouidah_Atlantique_Department.html",
+    "https://www.booking.com/hotel/bj/casa-del-papa.fr.html",
+    "https://benin360.com/hotel-ouidah/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-patience-1",
+   "nom": "La Patience 1",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3867006,
+    2.227985
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549198"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-dauphin",
+   "nom": "Le dauphin",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3629393,
+    2.0550154
+   ],
+   "adresse": null,
+   "telephone": "0022995069520",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Complexe hôtelier avec bar et restaurant cartographié par le projet cartotourisme.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020494936"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-jardin-secret",
+   "nom": "Le Jardin secret",
+   "categorie": "hebergement",
+   "sous_type": "Maison d'hôtes",
+   "coords": [
+    6.3609249,
+    2.0981384
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Chambres d'hôtes ventilées avec jardin et galerie d'artistes locaux, à quelques minutes à pied du Temple des Pythons.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4718272393",
+    "https://www.openstreetmap.org/node/6161549204",
+    "https://www.openstreetmap.org/way/654216525",
+    "https://www.tripadvisor.fr/Hotel_Review-g479758-d2515223-Reviews-Le_Jardin_Secret-Ouidah_Atlantique_Department.html",
+    "https://benin360.com/hotel-ouidah/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "les-rives-de-toho-2",
+   "nom": "Les Rives de Toho",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3884278,
+    2.1797924
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/816812943"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maison-de-detente-chez-dubel",
+   "nom": "Maison de détente chez Dubel",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.351262,
+    2.0948958
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549202"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maison-priscilla",
+   "nom": "maison Priscilla",
+   "categorie": "hebergement",
+   "sous_type": "Maison d'hôtes",
+   "coords": [
+    6.3706703,
+    2.0823557
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4286160199"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maison-priscilla-2",
+   "nom": "maison Priscilla 2",
+   "categorie": "hebergement",
+   "sous_type": "Maison d'hôtes",
+   "coords": [
+    6.3659502,
+    2.1201276
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4306153293"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "notre-jardin-secret",
+   "nom": "notre jardin secret",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3613055,
+    2.0981491
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6286773985"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "oriki-bar",
+   "nom": "Oriki bar",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3582858,
+    2.0747824
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495177",
+    "https://www.openstreetmap.org/node/6161639965"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "paradise-island",
+   "nom": "Paradise Island",
+   "categorie": "hebergement",
+   "sous_type": "Hôtel",
+   "coords": [
+    6.3385666,
+    2.1519881
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": "yes",
+   "description": "Établissement installé sur un îlot, listé comme hôtel sur Booking et comme parc d'attractions sur Tripadvisor.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6329453693",
+    "https://www.booking.com/hotel/bj/paradise-island-ouidah.fr.html",
+    "https://www.openstreetmap.org/way/836734134",
+    "https://www.tripadvisor.com/Attraction_Review-g479758-d4947092-Reviews-Ouidah_Museum_of_History-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "site-padmar-benin-avlekete",
+   "nom": "SITE PADMAR-BENIN AVLEKETE",
+   "categorie": "hebergement",
+   "sous_type": "Campement",
+   "coords": [
+    6.3431066,
+    2.2137711
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/9532898217"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "st-joseph",
+   "nom": "St joseph",
+   "categorie": "hebergement",
+   "sous_type": "Auberge",
+   "coords": [
+    6.3530628,
+    2.0604596
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161549211"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "marche-de-kpasse",
+   "nom": "Marché de Kpassè",
+   "categorie": "marche",
+   "sous_type": "Marché",
+   "coords": [
+    6.3737819,
+    2.0886479
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Marché du quartier Kpassè.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/624057783",
+    "https://www.wikidata.org/wiki/Q136718947"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "marche-de-pahou",
+   "nom": "Marché de Pahou",
+   "categorie": "marche",
+   "sous_type": "Marché",
+   "coords": [
+    6.3846188,
+    2.2104218
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Marché de l'arrondissement de Pahou.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/816532096",
+    "https://www.wikidata.org/wiki/Q136719786"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "marche-de-segbohoue",
+   "nom": "Marché de Sègbohouè",
+   "categorie": "marche",
+   "sous_type": "Marché",
+   "coords": [
+    6.401737,
+    1.960205
+   ],
+   "adresse": "Sègbohouè (Kpomassè)",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Marché de Sègbohouè (commune de Kpomassè) répertorié par Tripadvisor parmi les activités autour de Ouidah.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": true,
+   "sources": [
+    "https://www.tripadvisor.com/Attractions-g479758-Activities-Ouidah_Atlantique_Department.html",
+    "https://www.openstreetmap.org/way/813851747"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "marche-de-zobe",
+   "nom": "Marché de Zobè",
+   "categorie": "marche",
+   "sous_type": "Marché",
+   "coords": [
+    6.3595525,
+    2.0876612
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Marché de la ville situé près du fort portugais.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/847520111",
+    "https://www.wikidata.org/wiki/Q115449700"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "lac-aheme",
+   "nom": "Lac Ahémé",
+   "categorie": "nature",
+   "sous_type": "Lac",
+   "coords": [
+    6.4897703,
+    1.9405111
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Lac d'environ 78 km² alimenté par le Couffo, dont les villages riverains vivent de pêche et d'agriculture.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": true,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Lac_Ah%C3%A9m%C3%A9",
+    "https://www.openstreetmap.org/relation/1205283"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "lac-toho-pahou",
+   "nom": "Lac Tôho (Pahou)",
+   "categorie": "nature",
+   "sous_type": "Lac",
+   "coords": [
+    6.4117157,
+    2.1438068
+   ],
+   "adresse": "Pahou",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Lac de l'arrondissement de Pahou, cité par le gouvernement entre Tchiakpêcodji et Ahozon, sur la rive duquel se trouve le complexe Les Rives de Toho.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/relation/11211037",
+    "https://www.gouv.bj/article/1055/destination-benin---ouidah-terre-hxueda--ville-vocation-historique--culturelle--cultuelle-touristique/",
+    "https://www.tripadvisor.fr/Restaurant_Review-g479758-d23960965-Reviews-Les_Rives_De_Toho-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "lagune-de-ouidah",
+   "nom": "Lagune de Ouidah",
+   "categorie": "nature",
+   "sous_type": "Lagune / espace naturel",
+   "coords": [
+    6.327778,
+    2.0825
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Lagune côtière séparant la ville de l'océan, l'un des écosystèmes côtiers les plus importants du Bénin.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://fr.wikipedia.org/wiki/Lagune_de_Ouidah",
+    "https://www.wikidata.org/wiki/Q140834238",
+    "https://www.openstreetmap.org/relation/11502953"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "manguier",
+   "nom": "Manguier",
+   "categorie": "nature",
+   "sous_type": "Arbre remarquable",
+   "coords": [
+    6.3728293,
+    2.1420435
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5545421138"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "villa-dallys-tom-medali",
+   "nom": "Villa Dallys Tom MEDALI",
+   "categorie": "nature",
+   "sous_type": "Espace vert",
+   "coords": [
+    6.3666492,
+    2.1017455
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13415948508"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ile-aux-oiseaux",
+   "nom": "Île aux Oiseaux",
+   "categorie": "nature",
+   "sous_type": "Forêt",
+   "coords": [
+    6.3467617,
+    1.9577088
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/851843980"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cote-lagune",
+   "nom": "Côté Lagune",
+   "categorie": "plage",
+   "sous_type": "Plage",
+   "coords": [
+    6.3143048,
+    2.0362136
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/relation/11834179"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cote-mer",
+   "nom": "Côté Mer",
+   "categorie": "plage",
+   "sous_type": "Plage",
+   "coords": [
+    6.3130882,
+    2.0358757
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/relation/11834178"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "plage-de-grand-popo",
+   "nom": "Plage de Grand-Popo",
+   "categorie": "plage",
+   "sous_type": "Plage océanique",
+   "coords": [
+    6.283333,
+    1.833333
+   ],
+   "adresse": "Grand-Popo",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Plage principale longeant le centre-ville de Grand-Popo, à l'océan agité, où la baignade exige de la prudence.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": true,
+   "sources": [
+    "https://benin360.com/plages-littoral-benin/",
+    "https://fr.wikipedia.org/wiki/Grand-Popo"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "plage-de-ouidah-zone-de-la-porte-du-non-retour",
+   "nom": "Plage de Ouidah (zone de la Porte du Non-Retour)",
+   "categorie": "plage",
+   "sous_type": "Plage océanique",
+   "coords": [
+    6.324,
+    2.0894
+   ],
+   "adresse": "Djègbadji",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Longue plage peu aménagée au bout de la route des esclaves, marquée par la Porte du Non-Retour et utilisée pour la Grande cérémonie et les concerts des Vodun Days ; baignade déconseillée par vent fort.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://benin360.com/plages-littoral-benin/",
+    "https://www.gouv.bj/article/2954/record-absolu-vodun-days-2025-accueillent-plus-participants-ouidah/",
+    "https://www.gouv.bj/article/3406/succes-eclatant-vodun-days-2026-benin-assume-statut-grande-nation-culture-traditions-ancestrales/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "adjadi",
+   "nom": "ADJADI",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.4137685,
+    2.181051
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/8758525918"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "alozo",
+   "nom": "Alôzô",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3611593,
+    2.0851602
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Restaurant-terrasse de grillades et cuisine européenne situé à environ 76 m du musée de la Fondation Zinsou.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13442415059",
+    "https://no.tripadvisor.com/PostPhotos-d27162591",
+    "https://www.tripadvisor.fr/Restaurants-g479758-Ouidah_Atlantique_Department.html",
+    "https://www.tripadvisor.fr/Attraction_Review-g479758-d5990229-Reviews-Musee_de_la_Fondation_Zinsou-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-cafe-hwenoukpo",
+   "nom": "Bar Café Hwenoukpo",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3834327,
+    2.1988029
+   ],
+   "adresse": null,
+   "telephone": "97643383",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766987"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-la-presidence",
+   "nom": "Bar la présidence",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3627666,
+    2.0859166
+   ],
+   "adresse": null,
+   "telephone": "94470206",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042618048",
+    "https://www.openstreetmap.org/node/6439766977"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-restau-la-miraculeuse",
+   "nom": "Bar Restau LA MIRACULEUSE",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3670897,
+    2.0779323
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5984694279"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-restaurant-fofo-sahel",
+   "nom": "Bar restaurant Fofo sahel",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3612958,
+    2.0589247
+   ],
+   "adresse": null,
+   "telephone": "95955078",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766953"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-restaurant-vis-ta-vie",
+   "nom": "Bar Restaurant Vis ta Vie",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.370376,
+    2.0769116
+   ],
+   "adresse": null,
+   "telephone": "+22997073887",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926202902"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-sheric",
+   "nom": "Bar Sheric",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3607325,
+    2.0826061
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926199149"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bar-tchigan",
+   "nom": "Bar tchigan",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3600669,
+    2.0751755
+   ],
+   "adresse": null,
+   "telephone": "97178314",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766975"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "bergamot",
+   "nom": "BERGAMOT",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3639682,
+    2.0837264
+   ],
+   "adresse": null,
+   "telephone": "62815158",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639963",
+    "https://www.openstreetmap.org/node/6439766986"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "brayan",
+   "nom": "BRAYAN",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3846934,
+    2.1986403
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639938"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "buvette-ahiminvo",
+   "nom": "Buvette Ahiminvo",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3629983,
+    2.0554699
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020481102"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cafe-bar-sacre-zion-tawe",
+   "nom": "Café Bar Sacré Zion Tawe",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3639087,
+    2.0960119
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4148748700"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cafe-du-musee-de-la-fondation-zinsou",
+   "nom": "Café du Musée de la Fondation Zinsou",
+   "categorie": "restauration",
+   "sous_type": "Café",
+   "coords": [
+    6.361804,
+    2.085339
+   ],
+   "adresse": "Rue Benoît XVI",
+   "telephone": "+229 61 19 02 82",
+   "site": "https://www.fondation-zinsou.org/cafe-boutique",
+   "horaires": null,
+   "cuisine": null,
+   "description": "Café du musée proposant restauration légère, plats béninois revisités, salades, pâtisseries et sorbets, ouvert aux horaires du musée.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.fondation-zinsou.org/cafe-boutique",
+    "https://www.trip.com/restaurant/benin/ouidah/detail/cafe-du-musee-de-la-fondation-zinsou-19873926/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cafetaria-chez-semavo",
+   "nom": "Cafétaria Chez Semavo",
+   "categorie": "restauration",
+   "sous_type": "Café",
+   "coords": [
+    6.3615758,
+    2.1078863
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926195262"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cafeteria-la-montagne-chez-dadje",
+   "nom": "Cafétéria La Montagne Chez Dadjè",
+   "categorie": "restauration",
+   "sous_type": "Café",
+   "coords": [
+    6.3701486,
+    2.0770914
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/10694541940"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cafeteria-mea-culpa",
+   "nom": "Cafétéria Mea-culpa",
+   "categorie": "restauration",
+   "sous_type": "Café",
+   "coords": [
+    6.3669115,
+    2.0869678
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042617318"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "casa-beach-bar",
+   "nom": "Casa Beach Bar",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3131151,
+    2.0363921
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/8080715611"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-colo",
+   "nom": "Chez colo",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3585888,
+    2.0864636
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766980"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-colo-1",
+   "nom": "chez colo 1",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3717635,
+    2.0664049
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4304500989"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-dona-re",
+   "nom": "Chez Dona-RE",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3864907,
+    2.2260972
+   ],
+   "adresse": null,
+   "telephone": "96938988",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439767000"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-kantre",
+   "nom": "Chez Kantre",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3664726,
+    2.0822592
+   ],
+   "adresse": null,
+   "telephone": "96095543",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639958",
+    "https://www.openstreetmap.org/node/6439767004"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-maman-bonheur",
+   "nom": "Chez Maman Bonheur",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3829451,
+    2.1852484
+   ],
+   "adresse": null,
+   "telephone": "97421945",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766992"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-maman-brunelle",
+   "nom": "Chez maman Brunelle",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3568516,
+    2.0842385
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042617321"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-mami-life",
+   "nom": "Chez Mami Life",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3572644,
+    2.0772564
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495499"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "chez-zigo",
+   "nom": "Chez Zigo",
+   "categorie": "restauration",
+   "sous_type": "Restauration rapide",
+   "coords": [
+    6.3574069,
+    2.0775379
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084939"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cica-fils-bar-restau-la-rencontre-des-amoureux",
+   "nom": "Cica & Fils Bar Restau LA RENCONTRE DES AMOUREUX",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3759749,
+    2.0824584
+   ],
+   "adresse": null,
+   "telephone": "97997997",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766956"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cote-peche",
+   "nom": "Côté Pêche",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3529308,
+    2.0858386
+   ],
+   "adresse": null,
+   "telephone": "97464379",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Restaurant servant riz sauce poisson, viande et boissons.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724506",
+    "https://www.openstreetmap.org/node/6439766993"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "dagbemanbou",
+   "nom": "Dagbemanbou",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3695021,
+    2.0672522
+   ],
+   "adresse": null,
+   "telephone": "97262110",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Maquis de pâtes noire, blanche et de manioc, riz, sauce de mouton et viande de lapin.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766968"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "djolomahouton",
+   "nom": "Djolomahouton",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3627302,
+    2.0554066
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495044"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "droit-au-but",
+   "nom": "Droit au but",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3788658,
+    2.0694952
+   ],
+   "adresse": null,
+   "telephone": "61321925",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639941",
+    "https://www.openstreetmap.org/node/6439766994"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "escale",
+   "nom": "Escale+",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3699593,
+    2.0698486
+   ],
+   "adresse": null,
+   "telephone": "66689331",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766967"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "espace-joie-maxi",
+   "nom": "Espace joie maxi",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3716853,
+    2.0730498
+   ],
+   "adresse": null,
+   "telephone": "61128839",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766964"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "espace-tgv",
+   "nom": "Espace TGV",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3220635,
+    2.0836599
+   ],
+   "adresse": null,
+   "telephone": "95057948",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Maquis proche de la Porte du Non-Retour servant agbéli, couscous au poisson et dakouin.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766985"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "food-truck-viande-fumee",
+   "nom": "Food-truck Viande fumée",
+   "categorie": "restauration",
+   "sous_type": "Restauration rapide",
+   "coords": [
+    6.3597958,
+    2.0819062
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/10777808605"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hankpete",
+   "nom": "HANKPETE",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3710333,
+    2.0735833
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981354213"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "j-adore",
+   "nom": "J'adore",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3646974,
+    2.0796197
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926201405"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "jeremy-jeff-jaz",
+   "nom": "Jérémy Jeff Jaz",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3827035,
+    2.1828635
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639949"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "kole",
+   "nom": "Kolè",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3695917,
+    2.0858741
+   ],
+   "adresse": null,
+   "telephone": "+229 01 66 50 62 22",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Restaurant de cuisine locale ouvert de 9 h à 23 h 30 tous les jours, en face de l'école publique de Kpassè.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13446050793",
+    "https://www.tripadvisor.com/Restaurant_Review-g479758-d33988322-Reviews-Kole-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "l-amicale",
+   "nom": "L'Amicale",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3604041,
+    2.085734
+   ],
+   "adresse": null,
+   "telephone": "66746360",
+   "site": null,
+   "horaires": null,
+   "cuisine": "european",
+   "description": "Restaurant de mets africains et européens, rue Benoît XVI.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766979",
+    "https://www.tripadvisor.com/PostPhotos-d3832674",
+    "https://www.tripadvisor.fr/Restaurants-g479758-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-bouche-du-roi",
+   "nom": "La Bouche du Roi",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3156792,
+    2.0355921
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": "https://casadelpapa.com/fr/restauration/",
+   "horaires": "Mo-Su 12:00-15:00,19:00-22:30",
+   "cuisine": null,
+   "description": "Restaurant du resort Casa del Papa ouvert de 12 h à 15 h et de 19 h à 22 h 30.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/8080713570",
+    "https://casadelpapa.com/fr/restauration/"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-cabana",
+   "nom": "La cabana",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3700645,
+    2.0763758
+   ],
+   "adresse": null,
+   "telephone": "97498348",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766963"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-colombe",
+   "nom": "La colombe",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3714265,
+    2.0777803
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766959"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-famille-le-qg",
+   "nom": "La famille le QG",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3695994,
+    2.0728916
+   ],
+   "adresse": null,
+   "telephone": "97499990",
+   "site": null,
+   "horaires": null,
+   "cuisine": "european",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766966"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-joie-fils",
+   "nom": "La joie & fils",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3712788,
+    2.0732456
+   ],
+   "adresse": null,
+   "telephone": "97083363",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766965"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-manne",
+   "nom": "La Manne",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.351382,
+    2.0860854
+   ],
+   "adresse": null,
+   "telephone": "+229 95 95 17 69",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Restaurant de cuisine africaine avec service à table et réservations, au 041 route des Esclaves face à l'IRSP.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724532",
+    "https://www.tripadvisor.fr/Restaurant_Review-g479758-d5895635-Reviews-La_Manne-Ouidah_Atlantique_Department.html"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-manne-plus",
+   "nom": "La Manne plus",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3486322,
+    2.0865372
+   ],
+   "adresse": null,
+   "telephone": "96705808",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Maquis servant poisson, poulet, sauces, aloco, igname, riz et frites.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766983"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-paix",
+   "nom": "La Paix",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3583829,
+    2.0863167
+   ],
+   "adresse": null,
+   "telephone": "96444341",
+   "site": null,
+   "horaires": null,
+   "cuisine": "european",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766981"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-passion",
+   "nom": "La Passion",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3790939,
+    2.0675671
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13446050795"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-reine-des-bieres",
+   "nom": "La Reine des Bières",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3752106,
+    2.0835829
+   ],
+   "adresse": null,
+   "telephone": "97888741",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766957"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-rive-droite-lrd",
+   "nom": "La Rive Droite (LRD)",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.4048336,
+    2.1909668
+   ],
+   "adresse": null,
+   "telephone": "65895505",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/7791407792"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-taverne",
+   "nom": "La taverne",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.3553503,
+    2.0728713
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495497"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-victoire",
+   "nom": "La Victoire",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3605694,
+    2.1058586
+   ],
+   "adresse": null,
+   "telephone": "67018787",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639937",
+    "https://www.openstreetmap.org/node/6439766998"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "la-vigilance-d-owendo",
+   "nom": "La Vigilance d'Owendo",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3867769,
+    2.2242744
+   ],
+   "adresse": null,
+   "telephone": "62481645",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766990"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-duge",
+   "nom": "LE DUGE",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3701748,
+    2.0936794
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766954"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-pacifique",
+   "nom": "Le pacifique",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3647106,
+    2.0736319
+   ],
+   "adresse": null,
+   "telephone": "95203234",
+   "site": null,
+   "horaires": null,
+   "cuisine": "european",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766970"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-privilege",
+   "nom": "Le Privilège",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3705084,
+    2.0763195
+   ],
+   "adresse": null,
+   "telephone": "91346309",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766962"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-retour",
+   "nom": "Le Retour",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3227267,
+    2.0849213
+   ],
+   "adresse": null,
+   "telephone": "+22966142571",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": "Maquis proche de la Porte du Non-Retour servant thé, omelettes, spaghetti, couscous et boissons.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6440664699"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-temoin",
+   "nom": "Le témoin",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.36606,
+    2.07869
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5984694280"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "le-vatican",
+   "nom": "Le vatican",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3604908,
+    2.0853317
+   ],
+   "adresse": null,
+   "telephone": "99323525",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766978"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "les-aventuriers",
+   "nom": "Les Aventuriers",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3842717,
+    2.1875081
+   ],
+   "adresse": null,
+   "telephone": "97588518",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766997"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "les-delices",
+   "nom": "Les délices",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3707525,
+    2.0767756
+   ],
+   "adresse": null,
+   "telephone": "67575242",
+   "site": null,
+   "horaires": null,
+   "cuisine": "european",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766960"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "les-rives-de-toho",
+   "nom": "Les Rives de Tôho",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.388775,
+    2.1780906
+   ],
+   "adresse": null,
+   "telephone": "69379051",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Complexe sur la rive du lac Tôho avec bar, restaurant et restaurant flottant, accessible en barque depuis Ganhatin.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439767003",
+    "https://www.tripadvisor.fr/Restaurant_Review-g479758-d23960965-Reviews-Les_Rives_De_Toho-Ouidah_Atlantique_Department.html",
+    "https://www.openstreetmap.org/way/816812943"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "les-ruelles-du-paradis",
+   "nom": "Les ruelles du paradis",
+   "categorie": "restauration",
+   "sous_type": "Bar",
+   "coords": [
+    6.37912,
+    2.06955
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5982554995"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "macafe",
+   "nom": "MaCafé",
+   "categorie": "restauration",
+   "sous_type": "Café",
+   "coords": [
+    6.3826133,
+    2.1830051
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250001152"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maquis-chez-nafi",
+   "nom": "Maquis Chez Nafi",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3728959,
+    2.1421952
+   ],
+   "adresse": null,
+   "telephone": "96129660",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5545416517"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maquis-chez-soi",
+   "nom": "Maquis chez soi",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3667401,
+    2.0689511
+   ],
+   "adresse": null,
+   "telephone": "96048256",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639935",
+    "https://www.openstreetmap.org/node/6439766989"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maquis-la-lumiere",
+   "nom": "Maquis la lumière",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.367231,
+    2.0625034
+   ],
+   "adresse": null,
+   "telephone": "95285050",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766969"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "marvin-s-club",
+   "nom": "Marvin's club",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3867819,
+    2.2294736
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639942"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "merveille-d-amour",
+   "nom": "Merveille d'amour",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3746258,
+    2.0854599
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250000500"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "oxygene-bar-restaurant",
+   "nom": "Oxygène Bar restaurant",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3725296,
+    2.0771141
+   ],
+   "adresse": null,
+   "telephone": "97120419",
+   "site": null,
+   "horaires": null,
+   "cuisine": "european",
+   "description": "Bar-restaurant de mets africains et européens et de pâtisseries.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766958"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "palais-des-frites",
+   "nom": "Palais des frites",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3536719,
+    2.0857568
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639952",
+    "https://www.openstreetmap.org/node/6439766995"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "papa-1er",
+   "nom": "Papa 1er",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3841816,
+    2.2093557
+   ],
+   "adresse": null,
+   "telephone": "+22995808903",
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6161639946"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "paradise-island-2",
+   "nom": "Paradise Island",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3389804,
+    2.1511851
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439767005"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "prince-nimber-one",
+   "nom": "Prince Nimber one",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3755624,
+    2.0844298
+   ],
+   "adresse": null,
+   "telephone": "94067858",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766955"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "retour-de-la-diaspora",
+   "nom": "Retour de la Diaspora",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3537065,
+    2.0856857
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Restaurant cartographié dans OpenStreetMap.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724549"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "takeaway",
+   "nom": "TakeAway",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3674926,
+    2.1172453
+   ],
+   "adresse": "OUIDAH",
+   "telephone": "002290197006853",
+   "site": null,
+   "horaires": null,
+   "cuisine": "steak_house;porc_et_mouton;regional",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13415967464"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "tropicana",
+   "nom": "Tropicana",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3621562,
+    2.0814425
+   ],
+   "adresse": null,
+   "telephone": "97077709",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766976"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "village-artisanal-de-ouidah",
+   "nom": "Village artisanal de Ouidah",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3513367,
+    2.086371
+   ],
+   "adresse": null,
+   "telephone": "96203105",
+   "site": null,
+   "horaires": null,
+   "cuisine": "african",
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6439766982"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "virginia",
+   "nom": "Virginia",
+   "categorie": "restauration",
+   "sous_type": "Restaurant",
+   "coords": [
+    6.3838654,
+    2.1947448
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13447601161"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "action-solidarite-service-ouidah",
+   "nom": "Action Solidarite Service Ouidah",
+   "categorie": "sante",
+   "sous_type": "Centre de santé",
+   "coords": [
+    6.3632371,
+    2.0806051
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926200700"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "centre-communautaire-et-humanitaire",
+   "nom": "Centre communautaire et humanitaire",
+   "categorie": "sante",
+   "sous_type": "Centre de santé",
+   "coords": [
+    6.360617,
+    2.0617005
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495169"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "centre-de-sante-avlekete",
+   "nom": "Centre de Santé Avlékété",
+   "categorie": "sante",
+   "sous_type": "Centre de santé",
+   "coords": [
+    6.3460979,
+    2.2062641
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4264120629"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "clinique-medicale-autel-d-eli",
+   "nom": "Clinique médicale Autel d'Eli",
+   "categorie": "sante",
+   "sous_type": "Centre de santé",
+   "coords": [
+    6.3673906,
+    2.0781272
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": "Mo-Su 00:00+",
+   "cuisine": null,
+   "description": "Clinique médicale ouverte 24 h/24 selon OpenStreetMap.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/14022415826"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cs-ganlononcodji",
+   "nom": "CS GANLONONCODJI",
+   "categorie": "sante",
+   "sous_type": "Hôpital",
+   "coords": [
+    6.3528544,
+    2.0804626
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/11071056105"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "cs-houakpe-daho",
+   "nom": "CS HOUAKPE DAHO",
+   "categorie": "sante",
+   "sous_type": "Hôpital",
+   "coords": [
+    6.3218255,
+    2.0302272
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/11071097106"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "hopital-de-zone-de-ouidah",
+   "nom": "Hôpital de Zone de Ouidah",
+   "categorie": "sante",
+   "sous_type": "Hôpital",
+   "coords": [
+    6.3837383,
+    2.0663976
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Hôpital de zone de la commune.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/way/787522943"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "maman-pk",
+   "nom": "Maman PK",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.3969257,
+    2.1988454
+   ],
+   "adresse": "Pahou",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/9461431969"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "pharmacie-de-pahou",
+   "nom": "Pharmacie de Pahou",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.3854587,
+    2.215836
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Pharmacie répertoriée dans OpenStreetMap et Wikidata.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250001175",
+    "https://www.wikidata.org/wiki/Q115610676"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "pharmacie-gbena",
+   "nom": "Pharmacie Gbèna",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.365805,
+    2.0789317
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Pharmacie répertoriée dans OpenStreetMap et Wikidata.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926200609",
+    "https://www.wikidata.org/wiki/Q115599143"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "pharmacie-la-grace",
+   "nom": "Pharmacie la Grâce",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.3589277,
+    2.0870676
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Pharmacie répertoriée dans OpenStreetMap et Wikidata.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6042618131",
+    "https://www.wikidata.org/wiki/Q115599126"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "pharmacie-la-providence",
+   "nom": "Pharmacie La Providence",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.3748887,
+    2.0878105
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Pharmacie répertoriée dans OpenStreetMap et Wikidata.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3879101289",
+    "https://www.wikidata.org/wiki/Q115610669"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "pharmacie-mitonwe",
+   "nom": "Pharmacie Mitonwe",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.3605025,
+    2.0818842
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Pharmacie répertoriée dans OpenStreetMap et Wikidata.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926199150",
+    "https://www.wikidata.org/wiki/Q115599138"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "pharmacie-pahou-kapot",
+   "nom": "Pharmacie Pahou Kapot",
+   "categorie": "sante",
+   "sous_type": "Pharmacie",
+   "coords": [
+    6.3866595,
+    2.2291019
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13447601166"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "brigade-de-recherche",
+   "nom": "Brigade de recherche",
+   "categorie": "services",
+   "sous_type": "Police / gendarmerie",
+   "coords": [
+    6.355071,
+    2.0721877
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3261445869"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "brigade-territoriale-de-gendarmerie-de-ouidah",
+   "nom": "Brigade territoriale de gendarmerie de Ouidah",
+   "categorie": "services",
+   "sous_type": "Police / gendarmerie",
+   "coords": [
+    6.3550193,
+    2.0717782
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Brigade territoriale de gendarmerie.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3261445868"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "commissariat",
+   "nom": "Commissariat",
+   "categorie": "services",
+   "sous_type": "Police / gendarmerie",
+   "coords": [
+    6.3550491,
+    2.0717941
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/6020495290"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "commissariat-central-de-police-de-ouidah",
+   "nom": "Commissariat central de police de Ouidah",
+   "categorie": "services",
+   "sous_type": "Police / gendarmerie",
+   "coords": [
+    6.3746051,
+    2.0803927
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Commissariat central de police de la ville.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4998323821"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "mairie-de-ouidah",
+   "nom": "Mairie de Ouidah",
+   "categorie": "services",
+   "sous_type": "Mairie",
+   "coords": [
+    6.356295,
+    2.0745492
+   ],
+   "adresse": "Ouidah",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Hôtel de ville de la commune.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724568",
+    "https://www.openstreetmap.org/way/1231709540"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "office-de-tourisme",
+   "nom": "Office de Tourisme",
+   "categorie": "services",
+   "sous_type": "Office de tourisme",
+   "coords": [
+    6.3590624,
+    2.0815305
+   ],
+   "adresse": "Ouidah",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Point d'information touristique sur la ville de Ouidah.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3925041426",
+    "https://www.wikidata.org/wiki/Q111829533"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "poste-de-police",
+   "nom": "Poste de police",
+   "categorie": "services",
+   "sous_type": "Police / gendarmerie",
+   "coords": [
+    6.361235,
+    2.1084041
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250000978"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "sapeurs-pompiers",
+   "nom": "Sapeurs Pompiers",
+   "categorie": "services",
+   "sous_type": "Pompiers",
+   "coords": [
+    6.362071,
+    2.0864557
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Caserne des sapeurs-pompiers de Ouidah.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084921",
+    "https://www.openstreetmap.org/node/6042618051"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "embarcadere-des-pirogues-de-la-lagune",
+   "nom": "Embarcadère des pirogues de la lagune",
+   "categorie": "transport",
+   "sous_type": "Embarcadère",
+   "coords": [
+    6.330397,
+    2.087376
+   ],
+   "adresse": "Djègbadji",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Petit embarcadère de pirogues pour la lagune.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724587"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "ewell",
+   "nom": "Ewell",
+   "categorie": "transport",
+   "sous_type": "Station-service",
+   "coords": [
+    6.3852901,
+    2.2041509
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/4250001157"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "gare-routiere-de-ouidah",
+   "nom": "Gare Routière de Ouidah",
+   "categorie": "transport",
+   "sous_type": "Gare routière",
+   "coords": [
+    6.3578849,
+    2.0853559
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Gare routière de la ville.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/3926195005"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "jnp",
+   "nom": "JNP",
+   "categorie": "transport",
+   "sous_type": "Station-service",
+   "coords": [
+    6.386567,
+    2.2211888
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/7120293943",
+    "https://www.openstreetmap.org/node/13447601167"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "mrs",
+   "nom": "MRS",
+   "categorie": "transport",
+   "sous_type": "Station-service",
+   "coords": [
+    6.3583661,
+    2.0862086
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/5981084938"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "petite-gare-routiere",
+   "nom": "Petite gare routière",
+   "categorie": "transport",
+   "sous_type": "Taxis",
+   "coords": [
+    6.3581395,
+    2.0863671
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Station de taxis cartographiée comme petite gare routière.",
+   "remarque": null,
+   "verification": "osm+web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724556"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "peage-d-ahozon",
+   "nom": "Péage d'Ahozon",
+   "categorie": "transport",
+   "sous_type": "Péage",
+   "coords": [
+    6.3678,
+    2.1436
+   ],
+   "adresse": "Ahozon",
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": "Poste de péage et de pesage situé à Ahozon.",
+   "remarque": null,
+   "verification": "web",
+   "hors_commune": false,
+   "sources": [
+    "https://www.wikidata.org/wiki/Q107640996",
+    "https://www.openstreetmap.org/node/330788244"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "station-service",
+   "nom": "Station-service",
+   "categorie": "transport",
+   "sous_type": "Station-service",
+   "coords": [
+    6.3721318,
+    2.074686
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724559"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "station-service-2",
+   "nom": "Station-service",
+   "categorie": "transport",
+   "sous_type": "Station-service",
+   "coords": [
+    6.358097,
+    2.0851573
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724590"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "station-service-3",
+   "nom": "Station-service",
+   "categorie": "transport",
+   "sous_type": "Station-service",
+   "coords": [
+    6.3850276,
+    2.2066051
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/13447601158"
+   ],
+   "destination": null
+  },
+  {
+   "slug": "taxi-brousse-pour-grand-popo-togo",
+   "nom": "Taxi Brousse pour Grand-Popo/Togo",
+   "categorie": "transport",
+   "sous_type": "Taxis",
+   "coords": [
+    6.3745442,
+    2.0881909
+   ],
+   "adresse": null,
+   "telephone": null,
+   "site": null,
+   "horaires": null,
+   "cuisine": null,
+   "description": null,
+   "remarque": null,
+   "verification": "osm",
+   "hors_commune": false,
+   "sources": [
+    "https://www.openstreetmap.org/node/2436724584",
+    "https://www.openstreetmap.org/node/2436724602"
+   ],
+   "destination": null
+  }
+ ]
+}

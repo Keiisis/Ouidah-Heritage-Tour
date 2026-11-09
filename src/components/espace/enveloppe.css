@@ -1,0 +1,84 @@
+/* Enveloppe de l'espace (maquette E) : barre latérale navy (suite de l'arrivée G) avec la petite course du soleil en tête,
+   en-tête de chaque écran, barre du bas en 390. Tout sous .esp. */
+
+/* ---------- navigation ---------- */
+.esp .esp-nav { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; gap: 4px; padding: 24px 16px; background: var(--nav-fond); color: var(--nav-encre); }
+.esp .esp-nav :focus-visible { outline-color: var(--focus-nuit); }
+.esp .esp-nav-logo { width: auto; height: 30px; margin: 0 8px 20px; align-self: flex-start; }
+.esp .esp-groupes { flex: 1; min-height: 0; overflow-y: auto; display: grid; align-content: start; gap: 2px; margin: 0 -8px; padding: 0 8px; scrollbar-width: thin; scrollbar-color: var(--trait-nuit-fort) transparent; }
+.esp .esp-groupe summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 12px; border-radius: 12px; color: var(--sur-nuit-2); font: 700 13px/1.2 var(--f-texte); list-style: none; cursor: pointer; }
+.esp .esp-groupe summary::-webkit-details-marker { display: none; }
+.esp .esp-groupe summary:hover { color: var(--sur-nuit); background: var(--nav-actif); }
+.esp .esp-groupe .chev { width: 16px; height: 16px; transition: transform var(--d-court) var(--c-etat); }
+.esp .esp-groupe[open] .chev { transform: rotate(90deg); }
+.esp .esp-groupe ul { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 2px; }
+.esp .esp-nav :is(a, button) { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: none; color: var(--nav-encre); font-weight: 600; text-decoration: none; text-align: left; }
+.esp .esp-nav :is(a, button):hover { background: var(--nav-actif); color: var(--sur-nuit); }
+.esp .esp-nav a[aria-current="page"] { background: var(--nav-actif); color: var(--sur-nuit); }
+.esp .esp-nav a[aria-current="page"]::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: var(--accent); }
+.esp .esp-nav-pied { margin-top: auto; display: grid; gap: 8px; padding-top: 16px; border-top: 1px solid var(--trait-nuit); }
+.esp .esp-nav-pied button[aria-pressed="true"] { color: var(--sur-nuit); }
+.esp .moi { display: flex; align-items: center; gap: 12px; padding: 4px 8px; color: var(--sur-nuit); }
+.esp .moi small { display: block; color: var(--nav-encre); font-size: 13px; font-weight: 600; }
+.esp .esp-bas { display: none; }
+
+/* la petite course du soleil, la même lumière sur tous les écrans */
+.esp .esp-nav-soleil { margin: -6px 8px 18px; color: var(--nav-encre); }
+.esp .esp-nav-soleil svg { display: block; width: 100%; height: 52px; overflow: visible; }
+.esp .esp-nav-soleil .arc { fill: none; stroke: var(--blanc-28); stroke-width: 1.25; }
+.esp .esp-nav-soleil .arc-p { fill: none; stroke: var(--blanc); stroke-width: 2; stroke-linecap: round; }
+.esp .esp-nav-soleil .hz { stroke: var(--blanc-50); stroke-width: 1; }
+.esp .esp-nav-soleil .sol { fill: var(--soleil); animation: esp-sol-nav 1600ms var(--c-glisse) backwards 300ms; }
+.esp .esp-nav-soleil[data-lumiere="aube"] .sol { fill: var(--safran); }
+.esp .esp-nav-soleil[data-lumiere="soir"] .sol { fill: var(--laterite-clair); }
+.esp .esp-nav-soleil[data-lumiere="nuit"] .sol { fill: var(--nav-fond); stroke: var(--blanc); stroke-width: 1.5; }
+.esp .esp-nav-soleil p { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font: 700 12px/18px var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp .esp-nav-soleil p b { color: var(--sur-nuit); }
+@keyframes esp-sol-nav {
+  from { transform: translate(var(--dx), var(--dy)); }
+}
+
+/* ---------- contenu et en-tête ---------- */
+.esp .esp-principal { min-width: 0; padding: 32px 40px 64px; }
+.esp .esp-tete { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
+.esp .reglage-tache { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.esp .reglage-tache .choix { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.esp .reglage-tache input[type="checkbox"] { flex: none; width: 20px; height: 20px; accent-color: var(--accent); }
+.esp .reglage-tache [role="status"] { flex-basis: 100%; margin: 0; }
+.esp .esp-tete h1 { font-size: 58px; line-height: 1; letter-spacing: -0.025em; animation: esp-leve-titre 1050ms var(--c-glisse) backwards 60ms; }
+.esp .esp-tete .sous { margin-top: 8px; color: var(--encre-2); font-size: 16px; animation: esp-leve-titre 900ms var(--c-glisse) backwards 220ms; }
+.esp .esp-tete .sous b { color: var(--encre); font-weight: 700; }
+.esp .esp-tete .outils { display: flex; align-items: center; gap: 8px; animation: esp-construit 760ms var(--c-arrivee) backwards 320ms; }
+.esp .esp-embleme { display: none; }
+@keyframes esp-leve-titre {
+  from { transform: translateY(72%); clip-path: inset(0 0 100% 0); }
+  to { transform: none; clip-path: inset(-20% -4% -20% -4%); }
+}
+.esp .chercher { display: flex; align-items: center; gap: 12px; min-width: 300px; min-height: 48px; padding: 0 16px; border: 1px solid var(--filet); border-radius: 14px; background: var(--surface); color: var(--encre-3); font-weight: 600; }
+.esp .chercher:hover { border-color: var(--filet-fort); }
+.esp .chercher kbd { margin-left: auto; padding: 0 8px; border: 1px solid var(--filet); border-radius: 8px; font: 700 12px/24px var(--f-texte); color: var(--encre-2); }
+
+/* ---------- 390 : l'agent sur le terrain ---------- */
+@media (max-width: 760px), (max-height: 500px) and (max-width: 1180px) {
+  .esp { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-nav { position: fixed; z-index: 40; inset: auto 0 0 0; height: auto; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); border-radius: 20px 20px 0 0; }
+  .esp .esp-nav > :not(.esp-bas) { display: none; }
+  .esp .esp-bas { display: flex; justify-content: space-around; }
+  .esp .esp-nav[data-ouvert] { top: 0; border-radius: 0; padding-top: 16px; }
+  .esp .esp-nav[data-ouvert] .esp-groupes { overscroll-behavior: contain; }
+  .esp .esp-nav[data-ouvert] .esp-groupes { display: grid; order: -1; }
+  .esp .esp-nav[data-ouvert] .esp-nav-pied { display: grid; margin: 8px 0; padding-top: 8px; }
+  .esp .esp-bas :is(a, button) { flex-direction: column; justify-content: center; gap: 2px; min-width: 64px; min-height: 56px; padding: 4px; font-size: 12px; text-align: center; }
+  .esp .esp-bas a[aria-current="page"]::before { left: 20px; right: 20px; top: auto; bottom: 0; width: auto; height: 3px; }
+  .esp .esp-principal { padding: 20px 16px 120px; }
+  /* le salut tient sur une ligne : emblème, titre, outils côte à côte */
+  .esp .esp-tete { flex-wrap: nowrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .esp .esp-embleme { display: block; flex: none; width: 32px; height: 32px; }
+  .esp .esp-tete .titres { flex: 1; min-width: 0; }
+  .esp .esp-tete h1 { overflow: hidden; font-size: 24px; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
+  .esp .esp-tete .sous { overflow: hidden; margin-top: 2px; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; }
+  .esp .esp-tete .outils { gap: 6px; }
+  .esp .esp-tete .icone-bouton { width: 44px; height: 44px; }
+  .esp .chercher { min-width: 0; width: 44px; min-height: 44px; padding: 0; justify-content: center; }
+  .esp .chercher :is(span, kbd) { display: none; }
+}

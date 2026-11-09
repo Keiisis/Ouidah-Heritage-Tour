@@ -1,0 +1,174 @@
+/* Écran « Signer le devis » (/suivi/<jeton>/signer), maquette E « La carte du séjour » validée le 03/11/2026
+   (e-signer.html + e.css). Charte OHT des documents : fonds blanc pur ou navy, jamais beige. Tout est préfixé sg-. */
+.sg {
+  --sg-ocean: #122460; --sg-blanc: #fff; --sg-pointille: #a9b1c2; --sg-abysse: #0f162d; --sg-soleil: #fdbf28; --sg-sable: #f7f1e8;
+  --sg-ardoise: #3f4863; --sg-gris: #5a6379; --sg-filet: #dde1ea; --sg-filet-f: #c9cfdc;
+  --sg-serif: var(--font-fraunces), Fraunces, Georgia, serif; --sg-sans: var(--font-manrope), Manrope, system-ui, sans-serif;
+  background: var(--sg-blanc); color: var(--sg-abysse); font-family: var(--sg-sans); font-size: 15px; line-height: 1.5; overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+.sg *, .sg *::before, .sg *::after { box-sizing: border-box; }
+.sg :is(p, h1, h2, dl, dd, figure) { margin: 0; }
+.sg :is(h1, h2) { font-weight: 500; font-style: normal; text-wrap: balance; }
+.sg code { font: inherit; }
+.sg-num { font-variant-numeric: tabular-nums; }
+
+/* en-tête */
+.sg-haut { max-width: 1320px; margin: 0 auto; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--sg-filet); }
+.sg-marque { display: flex; align-items: center; gap: 12px; font-family: var(--sg-serif); font-size: 17px; font-weight: 500; color: var(--sg-abysse); text-decoration: none; }
+.sg-marque img { width: 40px; height: 40px; display: block; }
+.sg-haut p { font-size: 14px; color: var(--sg-ardoise); }
+.sg-haut p b { color: var(--sg-abysse); font-variant-numeric: tabular-nums; }
+
+.sg-ecran { max-width: 1320px; margin: 0 auto; padding: 28px 40px 64px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 48px; align-items: start; }
+.sg-feuille { border: 1px solid var(--sg-filet); border-radius: 8px; overflow: hidden; background: var(--sg-blanc); min-width: 0; }
+
+/* carte : en-tête du devis */
+.sg-carte-ecran { position: relative; height: 470px; margin: 0; }
+.sg-carte-ecran > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sg-c-serif { font-family: var(--sg-serif); }
+.sg-c-sans { font-family: var(--sg-sans); }
+.sg-anime .sg-trace { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sg-tracer 1.3s cubic-bezier(.45, 0, .2, 1) .2s forwards; }
+@keyframes sg-tracer { to { stroke-dashoffset: 0; } }
+.sg-cartouche { position: absolute; left: 32px; top: 32px; width: min(400px, 52%); }
+.sg-cartouche h2 { font-family: var(--sg-serif); font-size: 80px; line-height: .84; letter-spacing: -.03em; font-variation-settings: "opsz" 144; }
+.sg-numero { margin-top: 16px; font-size: 15px; font-weight: 700; letter-spacing: .01em; font-variant-numeric: tabular-nums; }
+.sg-etat { margin-top: 8px; display: flex; align-items: flex-start; gap: 8px; font-size: 12px; font-weight: 600; color: var(--sg-ardoise); }
+.sg-etat i, .sg-etat-c i { width: 8px; height: 8px; border-radius: 50%; background: var(--sg-soleil); box-shadow: 0 0 0 1.5px var(--sg-abysse) inset; flex: none; }
+.sg-etat i { margin-top: 4px; }
+.sg-client { margin-top: 24px; }
+.sg-client.is-doc { display: none; }
+.sg-nom { margin-top: 4px; font-family: var(--sg-serif); font-size: 26px; line-height: 1.1; overflow-wrap: anywhere; }
+.sg-mail { margin-top: 4px; font-size: 12px; color: var(--sg-gris); overflow-wrap: anywhere; }
+.sg-meta { margin-top: 12px; display: grid; grid-template-columns: auto auto; justify-content: start; gap: 4px 16px; align-items: baseline; }
+.sg-meta div { display: contents; }
+.sg-meta dd { font-size: 13px; font-weight: 600; line-height: 1.35; }
+.sg :is(.sg-lib, dt, th) { font-size: 12px; font-weight: 700; color: var(--sg-gris); letter-spacing: .02em; }
+
+/* corps du devis */
+.sg-doc { padding: 28px 32px 32px; }
+.sg-lignes { width: 100%; border-collapse: collapse; }
+.sg-lignes th { text-align: left; padding: 0 0 8px; border-bottom: 1.5px solid var(--sg-abysse); }
+.sg-lignes td { padding: 12px 0; border-bottom: 1px solid var(--sg-filet); font-size: 14px; line-height: 1.35; vertical-align: middle; }
+.sg-d { font-weight: 600; overflow-wrap: anywhere; }
+.sg-s { display: block; font-size: 13px; color: var(--sg-gris); font-weight: 500; }
+.sg-s .sg-num { white-space: nowrap; }
+.sg-lignes .sg-n { text-align: right; white-space: nowrap; padding-left: 16px; font-variant-numeric: tabular-nums; }
+.sg-lignes td.sg-t { font-weight: 700; }
+.sg-c-e { width: 76px; } .sg-c-t { width: 120px; }
+.sg-ref-etape { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: var(--sg-gris); }
+.sg-ref-etape b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--sg-ocean); color: var(--sg-blanc); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sg-note { margin-top: 12px; font-size: 13px; line-height: 1.5; color: var(--sg-ardoise); }
+
+.sg-somme { margin-top: 24px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: end; }
+.sg-somme .sg-lib { display: flex; align-items: center; gap: 8px; }
+.sg-somme .sg-lib::before { content: ""; width: 22px; height: 4px; border-radius: 2px; background: var(--sg-soleil); }
+.sg-montant { margin-top: 8px; font-size: 48px; font-weight: 300; line-height: .9; letter-spacing: -.03em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sg-montant small { margin-left: 12px; font-size: 14px; font-weight: 700; letter-spacing: 0; }
+.sg-lettres { font-family: var(--sg-serif); font-size: 14px; line-height: 1.45; color: var(--sg-ardoise); }
+.sg-lettres b { color: var(--sg-abysse); font-weight: 500; }
+.sg-refs { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 2px 20px; font-size: 12px; line-height: 1.45; color: var(--sg-ardoise); }
+.sg-refs b { font-size: 12px; font-weight: 700; color: var(--sg-gris); margin-right: 4px; letter-spacing: .02em; }
+
+/* deux cartes de signature jumelles */
+.sg-sign { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.sg-carte-s { border: 1px solid var(--sg-filet-f); border-radius: 6px; padding: 12px 20px; display: flex; flex-direction: column; min-width: 0; }
+.sg-carte-s header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sg-carte-s h2 { font-family: var(--sg-serif); font-size: 17px; line-height: 1.2; }
+.sg-etat-c { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.sg-etat-c.is-attente i { background: var(--sg-blanc); box-shadow: 0 0 0 1.5px var(--sg-gris) inset; }
+.sg-zone { margin-top: 4px; height: 60px; border-bottom: 1px solid var(--sg-abysse); display: flex; align-items: flex-end; padding-bottom: 4px; min-width: 0; }
+.sg-sig-img { display: block; height: 54px; width: 100%; background: no-repeat left bottom / contain; }
+.sg-tapee { font-family: var(--sg-serif); font-size: 34px; line-height: 1; color: var(--sg-ocean); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-scelle :is(.sg-sig-img, .sg-tapee) { animation: sg-poser .6s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes sg-poser { from { opacity: 0; transform: translateY(6px) scale(.97); } }
+.sg-ligne-nom { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; }
+.sg-qui { font-size: 13.5px; font-weight: 700; overflow-wrap: anywhere; }
+.sg-qui span { font-weight: 500; color: var(--sg-gris); font-size: 12px; }
+.sg-preuve { margin-top: 4px; font-size: 12px; line-height: 1.5; color: var(--sg-gris); }
+.sg-pied-c { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--sg-filet); font-size: 12px; line-height: 1.45; color: var(--sg-gris); }
+.sg-vide { border: 1px dashed var(--sg-pointille); color: var(--sg-gris); font-size: 12px; line-height: 1.3; text-align: center; display: grid; place-items: center; }
+.sg-vide.is-sig { flex: 1; height: 48px; border-radius: 4px; }
+/* Direction générale : cachet et signature seulement s'ils existent ; sans signature, un filet sous le titre, rien de vide */
+.sg-cachet-img { width: 66px; height: 66px; flex: none; background: no-repeat center / contain; }
+.sg-carte-s.is-sans-signature .sg-ligne-nom { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--sg-abysse); }
+.sg-verif { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--sg-filet); font-size: 12px; line-height: 1.5; color: var(--sg-gris); overflow-wrap: anywhere; }
+.sg-verif b { color: var(--sg-abysse); font-weight: 600; }
+
+/* panneau de signature */
+.sg-panneau { position: sticky; top: 24px; border: 1px solid var(--sg-filet-f); border-radius: 8px; padding: 24px; background: var(--sg-blanc); min-width: 0; }
+.sg-panneau h1 { font-family: var(--sg-serif); font-size: 30px; line-height: 1.1; letter-spacing: -.01em; }
+.sg-resume { margin-top: 8px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sg-resume b { font-size: 26px; font-weight: 300; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--sg-abysse); }
+.sg-resume b small { margin-left: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0; }
+.sg-resume > span { font-size: 13px; color: var(--sg-gris); }
+.sg-champ { margin-top: 20px; }
+.sg-champ label, .sg-lib-s { display: block; font-size: 12px; font-weight: 700; color: var(--sg-ardoise); }
+.sg-champ input { margin-top: 8px; width: 100%; height: 48px; padding: 0 12px; border: 1px solid var(--sg-filet-f); border-radius: 6px; font: 600 16px var(--sg-sans); color: var(--sg-abysse); background: var(--sg-blanc); }
+.sg :is(.sg-champ input, .sg-toile, button, .sg-accord input, a):focus-visible { outline: 2px solid var(--sg-ocean); outline-offset: 2px; }
+.sg-mode { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--sg-filet-f); border-radius: 6px; }
+.sg-mode button { border: 0; border-radius: 4px; padding: 8px 6px; background: var(--sg-blanc); font: 700 13px var(--sg-sans); color: var(--sg-ardoise); cursor: pointer; }
+.sg-mode button[aria-pressed="true"] { background: var(--sg-ocean); color: var(--sg-blanc); }
+.sg-sig-tete { margin-top: 16px; display: flex; justify-content: space-between; align-items: baseline; }
+.sg-effacer { border: 0; background: none; padding: 4px 0; font: 600 13px var(--sg-sans); color: var(--sg-ocean); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.sg-effacer:disabled { color: var(--sg-gris); text-decoration: none; cursor: default; }
+.sg-toile { position: relative; margin-top: 8px; height: 150px; border: 1px solid var(--sg-filet-f); border-radius: 6px; touch-action: none; cursor: crosshair; }
+.sg-toile canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sg-base { position: absolute; left: 18px; right: 18px; bottom: 34px; border-bottom: 1px solid var(--sg-filet); pointer-events: none; }
+.sg-invite { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-size: 12px; color: var(--sg-gris); pointer-events: none; }
+.sg-toile.is-encre .sg-invite { visibility: hidden; }
+.sg-apercu { margin-top: 12px; height: 64px; border-bottom: 1px solid var(--sg-abysse); display: flex; align-items: flex-end; padding: 0 4px 8px; font-family: var(--sg-serif); font-size: 32px; line-height: 1; color: var(--sg-ocean); overflow: hidden; white-space: nowrap; }
+.sg-accord { margin-top: 16px; display: flex; gap: 10px; align-items: flex-start; font-size: 14px; font-weight: 600; line-height: 1.4; cursor: pointer; }
+.sg-accord input { width: 20px; height: 20px; margin: 0; flex: none; accent-color: var(--sg-ocean); }
+.sg-btn { margin-top: 20px; width: 100%; height: 52px; border: 0; border-radius: 6px; background: var(--sg-ocean); color: var(--sg-blanc); font: 700 15px var(--sg-sans); cursor: pointer; transition: background .2s; }
+.sg-btn:hover:not(:disabled) { background: var(--sg-abysse); }
+.sg-btn:disabled { background: var(--sg-filet); color: var(--sg-gris); cursor: not-allowed; }
+.sg-aide { margin-top: 12px; min-height: 20px; font-size: 12px; line-height: 1.45; color: var(--sg-gris); }
+.sg-aide.is-pret { color: var(--sg-abysse); font-weight: 600; }
+
+/* état « Signé » */
+.sg-signe h1 { margin-top: 12px; outline: none; }
+.sg-signe dl { margin-top: 20px; display: grid; gap: 12px; }
+.sg-signe dd { margin-top: 2px; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.sg-signe dd code { font-size: 13px; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.sg-lien { margin-top: 24px; display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px 12px; text-align: center; border: 1.5px solid var(--sg-ocean); border-radius: 6px; font: 700 14px var(--sg-sans); color: var(--sg-ocean); text-decoration: none; }
+.sg-apparait { animation: sg-apparait .45s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes sg-apparait { from { opacity: 0; transform: translateY(8px); } }
+
+.sg-barre { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .sg-anime .sg-trace { animation: none; stroke-dashoffset: 0; }
+  .is-scelle :is(.sg-sig-img, .sg-tapee), .sg-apparait { animation: none; }
+}
+
+@media (max-width: 1100px) {
+  .sg-ecran { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 24px 24px 48px; }
+  .sg-panneau { position: static; }
+  .sg-haut { padding: 16px 24px; }
+}
+@media (max-width: 600px) {
+  .sg { font-size: 14px; padding-bottom: 84px; }
+  .sg-haut { padding: 12px 16px; }
+  .sg-marque { font-size: 15px; white-space: nowrap; } .sg-marque img { width: 34px; height: 34px; }
+  .sg-mot { display: none; } .sg-haut p { font-size: 13px; white-space: nowrap; }
+  .sg-ecran { padding: 16px 16px 32px; gap: 20px; }
+  .sg-carte-ecran { height: 560px; }
+  .sg-cartouche { left: 16px; top: 116px; width: 140px; }
+  .sg-cartouche h2 { font-size: 44px; }
+  .sg-numero { margin-top: 12px; font-size: 13px; }
+  .sg-client.is-carte { display: none; }
+  .sg-client.is-doc { display: block; margin-top: 0; }
+  .sg-doc { padding: 20px 16px; }
+  .sg-meta { margin-top: 12px; }
+  .sg-lignes { margin-top: 20px; }
+  .sg-c-e { width: 64px; } .sg-c-t { width: 80px; }
+  .sg-somme { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .sg-montant { font-size: 42px; }
+  .sg-sign { grid-template-columns: minmax(0, 1fr); }
+  .sg-panneau { padding: 20px 16px; }
+  .sg-barre { display: block; position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--sg-ocean); z-index: 40; }
+  .sg-barre .sg-btn { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px; box-shadow: inset 0 0 0 1px var(--sg-sable); }
+  .sg-barre .sg-btn:hover { background: var(--sg-ocean); }
+  .sg-barre :focus-visible { outline: 2px solid var(--sg-blanc); }
+  .sg-barre[hidden] { display: none; }
+}

@@ -1,0 +1,84 @@
+/* Écrans du lot « pilotage » (vague 2) : statistiques, en direct, rapport, performances, wiki, pistes, documents. Posés
+   sur les styles des écrans finances (.esp-finances : formulaires, états, tableaux empilés en 390, mouvement réduit), sous
+   .esp .esp-pilotage. Mouvement : transform, opacity et clip-path seulement ; aucune transition de couleur ni de fond. */
+
+.esp .esp-pilotage .barre { display: block; height: 8px; border-radius: 4px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(max(var(--v), 0.02)); animation: pil-pousse 900ms var(--c-glisse) backwards calc(var(--k, 0) * 60ms + 200ms); }
+@keyframes pil-pousse {
+  from { transform: scaleX(0); }
+}
+
+/* statistiques : mois, répartitions, définitions */
+.esp .esp-pilotage .pil-mois { text-transform: capitalize; }
+.esp .esp-pilotage .pil-compte { display: grid; grid-template-columns: 3ch minmax(48px, 160px); align-items: center; gap: 10px; }
+.esp .esp-pilotage .pil-total td { border-top: 1px solid var(--filet-fort); }
+.esp .esp-pilotage .pil-barres { list-style: none; padding: 0; display: grid; gap: 10px; }
+.esp .esp-pilotage .pil-barres li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(40px, 1fr) auto; align-items: center; gap: 12px; }
+.esp .esp-pilotage .pil-nom { min-width: 0; overflow-wrap: anywhere; font-weight: 700; color: var(--encre); }
+.esp .esp-pilotage .pil-barres .num { font-size: 14px; }
+.esp .esp-pilotage .pil-definitions { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--encre-2); font-size: 13px; line-height: 1.5; }
+.esp .esp-pilotage .chiffre[data-conversion] b { font-size: 40px; }
+
+/* audience : chiffres, vues par jour en colonnes (échelle seulement), bornes de la période */
+.esp .esp-pilotage .pil-audience { display: grid; gap: 16px; }
+.esp .esp-pilotage .pil-courbe { display: grid; gap: 8px; margin: 0; }
+.esp .esp-pilotage .pil-courbe figcaption { font-weight: 700; color: var(--encre); }
+.esp .esp-pilotage .pil-jours { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: end; gap: 3px; height: 120px; border-bottom: 1px solid var(--filet-fort); }
+.esp .esp-pilotage .pil-jours li { height: 100%; display: flex; align-items: flex-end; }
+.esp .esp-pilotage .pil-jours .barre-v { display: block; width: 100%; height: 100%; border-radius: 3px 3px 0 0; background: var(--accent); transform-origin: 50% 100%; transform: scaleY(max(var(--v), 0.02)); animation: pil-monte 900ms var(--c-glisse) backwards calc(var(--k, 0) * 20ms + 200ms); }
+@keyframes pil-monte {
+  from { transform: scaleY(0); }
+}
+.esp .esp-pilotage .pil-bornes { display: flex; justify-content: space-between; gap: 12px; margin: 0; color: var(--encre-2); font-size: 13px; font-weight: 600; }
+
+/* en direct : l'heure de la dernière relecture, un point qui bat (opacité et échelle seulement) */
+.esp .esp-pilotage .pil-relu { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.esp .esp-pilotage .pil-pouls { width: 10px; height: 10px; border-radius: 50%; background: var(--ok); animation: pil-pouls 2400ms ease-in-out infinite; }
+@keyframes pil-pouls {
+  50% { opacity: 0.35; transform: scale(0.7); }
+}
+.esp .esp-pilotage .avatar { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--ocean); color: var(--blanc); font: 800 14px/1 var(--f-texte); }
+.esp[data-theme="sombre"] .esp-pilotage .avatar { background: var(--blanc); color: var(--abyss); }
+
+/* rapport : la semaine, ses lignes, l'aperçu de l'e-mail */
+.esp .esp-pilotage .pil-semaine { margin: 0; font: 400 28px/1.15 var(--f-titre); color: var(--encre); }
+.esp .esp-pilotage .pil-lignes { display: grid; margin: 0; }
+.esp .esp-pilotage .pil-lignes div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--filet); animation: fin-ligne 520ms var(--c-glisse) backwards calc(var(--k, 0) * 50ms); }
+.esp .esp-pilotage .pil-lignes div:first-child { border-top: 0; }
+.esp .esp-pilotage .pil-lignes dt { min-width: 0; color: var(--encre-2); font-weight: 600; }
+.esp .esp-pilotage .pil-lignes dd { margin: 0; font-weight: 800; color: var(--encre); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.esp .esp-pilotage .pil-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.esp .esp-pilotage .pil-apercu { display: block; width: 100%; height: 560px; border: 1px solid var(--filet); border-radius: 16px; background: var(--blanc); }
+
+/* performances et pistes : choix de la période */
+.esp .esp-pilotage .pil-periodes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.esp .esp-pilotage .pil-periodes [aria-current="page"] { border-color: var(--encre); box-shadow: inset 0 -3px 0 var(--accent); }
+
+/* wiki : pages repliées, texte simple, outils de l'admin */
+.esp .esp-pilotage .pil-wiki { display: grid; gap: 16px; }
+.esp .esp-pilotage .pil-wiki section { display: grid; gap: 4px; }
+.esp .esp-pilotage .pil-page > summary { grid-template-columns: minmax(0, 1fr) auto; }
+.esp .esp-pilotage .pil-texte { display: grid; gap: 10px; max-width: 72ch; color: var(--encre); line-height: 1.6; overflow-wrap: anywhere; white-space: pre-line; }
+.esp .esp-pilotage .pil-texte p { margin: 0; }
+.esp .esp-pilotage .pil-outils { display: grid; gap: 16px; padding-top: 12px; border-top: 1px solid var(--filet); }
+.esp .esp-pilotage .pil-modifier > summary { list-style: none; justify-self: start; width: max-content; }
+.esp .esp-pilotage .pil-modifier > summary::-webkit-details-marker { display: none; }
+.esp .esp-pilotage .pil-modifier[open] > .fin-form { margin-top: 16px; animation: fin-ouvre 360ms var(--c-glisse) backwards; }
+
+/* pistes : motif, badges, réglage de la priorité et du rappel */
+.esp .esp-pilotage .pil-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.esp .esp-pilotage .etat[data-e="priorite-haute"] { color: var(--accent-agent-texte); border-color: var(--accent-agent-texte); }
+.esp .esp-pilotage .pil-suivi { padding: 0 8px 16px; }
+.esp .esp-pilotage .pil-suivi .champs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 240px)); }
+
+/* documents */
+.esp .esp-pilotage .pil-fichier { overflow-wrap: anywhere; }
+.esp .esp-pilotage tr[data-echu] td:first-child { box-shadow: inset 3px 0 0 var(--attente); }
+
+@media (max-width: 760px) {
+  .esp .esp-pilotage .pil-semaine { font-size: 24px; }
+  .esp .esp-pilotage .pil-barres li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; }
+  .esp .esp-pilotage .pil-barres .barre { grid-column: 1 / -1; grid-row: 2; height: 6px; }
+  .esp .esp-pilotage .pil-compte { grid-template-columns: 3ch minmax(0, 1fr); }
+  .esp .esp-pilotage .pil-apercu { height: 480px; }
+  .esp .esp-pilotage .pil-suivi { padding: 0 0 16px; }
+}

@@ -1,0 +1,12 @@
+/* Fiche sobre d'une section sans écran détaillé (lot L2) : son titre, ses fonctions, la mention « bientôt ». Tout sous .esp. */
+
+.esp .esp-fiche { max-width: 560px; display: grid; gap: 12px; justify-items: start; padding: 32px; border: 1px dashed var(--filet-fort); border-radius: 20px; color: var(--encre-2); }
+.esp .esp-fiche h2 { font-size: 28px; }
+.esp .fonctions { list-style: none; padding: 0; display: grid; gap: 8px; }
+.esp .fonctions li { display: flex; gap: 12px; align-items: flex-start; color: var(--encre); font-weight: 600; }
+.esp .fonctions .ic { margin-top: 2px; color: var(--accent-texte); }
+.esp .mention-fiche { width: 100%; padding-top: 12px; border-top: 1px solid var(--filet); color: var(--encre-2); }
+
+@media (max-width: 760px) {
+  .esp .esp-fiche { padding: 24px 16px; }
+}

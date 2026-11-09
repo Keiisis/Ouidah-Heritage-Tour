@@ -1,0 +1,251 @@
+/* Demandes, dossier voyage et clients (lot L4, maquette E ?ecran=dossier) : liste filtrée par étape, attribution, tiroir
+   du dossier (carte de Ouidah, itinéraire numéroté, course du soleil du jour, moments, devis, historique), fiches
+   clients. Tout sous .esp. Mouvement : transform, opacity et clip-path seulement, en fill « backwards » ; aucune
+   transition de couleur ni de fond ; mouvement réduit ramené à l'état final par jetons.css. */
+
+.esp {
+  --carte-lagune: #bcd3ec;
+  --carte-ville-sombre: #1a2650;
+  --carte-lagune-sombre: #1e3d73;
+  --carte-mer-sombre: #08102b;
+}
+
+/* une rangée qui est un lien ou un bouton */
+.esp :is(a, button).rangee { border: 0; background: none; color: inherit; font: inherit; text-align: left; text-decoration: none; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp :is(a, button).rangee:hover { transform: translateX(4px); }
+.esp :is(a, button).rangee:hover .titre { text-decoration: underline; text-underline-offset: 3px; }
+
+/* boutons secondaires, compteurs qui filtrent, annonce (repris de l'écran Équipe) */
+.esp .esp-dossiers .bouton-2 { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--filet-fort); border-radius: 14px; background: var(--surface); color: var(--encre); font-weight: 700; white-space: nowrap; cursor: pointer; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-dossiers .bouton-2:hover { border-color: var(--encre-3); transform: translateY(-2px); }
+.esp .esp-dossiers .bouton-2:active { transform: translateY(1px); }
+.esp .esp-dossiers :is(.bouton, .bouton-2):disabled { background: var(--survol); border-color: var(--filet); color: var(--encre-3); cursor: not-allowed; transform: none; }
+.esp .esp-dossiers :is(.bouton, .bouton-2)[aria-busy="true"] { cursor: progress; }
+.esp .esp-dossiers .bouton-petit { min-height: 44px; padding: 0 12px; font-size: 14px; }
+.esp .esp-dossiers :is(.bouton, .bouton-2) .ic { width: 18px; height: 18px; }
+.esp .esp-dossiers .icone-bouton.petit { width: 40px; height: 40px; border-radius: 12px; }
+.esp .esp-dossiers .bloc-tete .bouton-2 { flex: none; }
+.esp .esp-dossiers .outils-liste { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.esp .esp-dossiers .filtres { display: flex; flex-wrap: wrap; gap: 4px 8px; min-width: 0; }
+.esp .esp-dossiers .filtres button { display: grid; justify-items: start; gap: 2px; min-width: 80px; min-height: 64px; padding: 8px 12px; border: 1px solid transparent; border-radius: 14px; background: none; text-align: left; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-dossiers .filtres button:hover { transform: translateY(-2px); }
+.esp .esp-dossiers .filtres button[aria-pressed="true"] { border-color: var(--filet-fort); box-shadow: inset 0 -3px 0 var(--accent); }
+.esp .esp-dossiers .filtres b { font: 800 26px/1.1 var(--f-texte); font-variant-numeric: tabular-nums; color: var(--encre); }
+.esp .esp-dossiers .filtres span { color: var(--encre-2); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.esp .esp-dossiers :is(.filtre-agent, .attribution) { display: grid; gap: 4px; min-width: 0; font-size: 13px; font-weight: 700; color: var(--encre-2); }
+.esp .esp-dossiers select, .esp .esp-dossiers input:not([type="checkbox"]), .esp .esp-dossiers textarea { max-width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-dossiers textarea { width: 100%; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.esp .esp-dossiers :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--accent-agent-texte); box-shadow: inset 0 0 0 1px var(--accent-agent-texte); }
+.esp .esp-dossiers .esp-annonce { position: fixed; left: 50%; bottom: 28px; z-index: 60; max-width: calc(100% - 32px); padding: 12px 20px; border-radius: 14px; background: var(--abyss); color: var(--sable); font-weight: 700; box-shadow: 0 16px 40px var(--ombre-forte); transform: translateX(-50%); transition: transform var(--d-moyen) var(--c-arrivee), opacity var(--d-moyen) var(--c-arrivee); }
+.esp[data-theme="sombre"] .esp-dossiers .esp-annonce { background: var(--blanc); color: var(--abyss); }
+.esp .esp-dossiers .esp-annonce[data-ton="erreur"] { box-shadow: inset 4px 0 0 var(--laterite-clair), 0 16px 40px var(--ombre-forte); }
+.esp .esp-dossiers .esp-annonce:empty { opacity: 0; transform: translate(-50%, 160%); }
+
+/* étapes du dossier, états d'un moment */
+.esp .etat[data-e="nouvelle"] { color: var(--accent-texte); }
+.esp .etat[data-e="devis_envoye"] { color: var(--attente); }
+.esp .etat:is([data-e="payee"], [data-e="en_voyage"]) { background: var(--ok); border-color: var(--ok); color: var(--fond); }
+.esp .etat:is([data-e="terminee"], [data-e="fait"]) { color: var(--encre-3); }
+.esp .etat[data-e="perdue"] { color: var(--encre-3); border-style: dashed; }
+.esp .etat[data-e="aclore"] { color: var(--accent-texte); border-style: dashed; }
+
+/* liste des demandes : la rangée ouvre le dossier ; l'admin attribue à droite */
+.esp .liste-demandes > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px; }
+.esp .liste-demandes > li:not(:has(.attribution)) { grid-template-columns: minmax(0, 1fr); }
+.esp .liste-demandes .rangee { flex-wrap: wrap; gap: 8px 16px; }
+.esp .liste-demandes .rangee .texte { flex: 1 1 260px; }
+.esp .liste-demandes .attribution select { width: 220px; }
+.esp .esp-demandes .groupe-etape { display: grid; gap: 4px; padding-top: 12px; }
+.esp .esp-demandes .groupe-etape h3 { display: flex; align-items: center; gap: 8px; font-size: 20px; }
+.esp .compte-petit { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 13px; background: var(--survol); color: var(--encre); font: 800 13px/1 var(--f-texte); }
+.esp .liste-clients .courriel { overflow-wrap: anywhere; }
+
+/* ---------- tiroir du dossier ---------- */
+.esp .esp-tiroir.tiroir-dossier { width: min(900px, 100%); }
+.esp .esp-tiroir .tiroir-tete .type { display: block; margin-bottom: 4px; color: var(--accent-texte); font: 700 13px/1.2 var(--f-texte); }
+.esp .esp-tiroir .tiroir-tete h2:focus { outline: none; }
+.esp .esp-tiroir .tiroir-corps { padding-top: 4px; }
+.esp .esp-tiroir .section { padding: 20px 0; border-bottom: 1px solid var(--filet); }
+.esp .esp-tiroir .section:last-child { border-bottom: 0; }
+.esp .esp-tiroir .section h3 { margin-bottom: 12px; font-size: 22px; }
+.esp .esp-tiroir .section > .mention + * { margin-top: 8px; }
+.esp .esp-tiroir .section > * + .mention { margin-top: 12px; }
+.esp .esp-tiroir .paires { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+.esp .esp-tiroir .paires > div { min-width: 0; }
+.esp .esp-tiroir .paires .large { grid-column: 1 / -1; }
+.esp .esp-tiroir .paires dt { color: var(--encre-2); font-size: 13px; font-weight: 700; }
+.esp .esp-tiroir .paires dd { font-weight: 600; overflow-wrap: anywhere; }
+.esp .esp-tiroir .paires .lien { min-height: 0; padding: 0; white-space: normal; overflow-wrap: anywhere; }
+.esp .esp-tiroir .puce .ic { width: 18px; height: 18px; color: var(--encre-3); }
+.esp .esp-tiroir .puce { cursor: default; }
+.esp .esp-tiroir .message-client { margin: 8px 0 0; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--survol); white-space: pre-line; overflow-wrap: anywhere; }
+.esp .esp-tiroir .libelle { font-size: 14px; font-weight: 700; }
+.esp .esp-tiroir .en-ligne { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.esp .esp-tiroir .en-ligne select { flex: 1 1 160px; min-width: 0; }
+.esp .esp-tiroir .champ select, .esp .esp-tiroir .champ input:not([type="checkbox"]) { width: 100%; }
+.esp .esp-tiroir .champ .bouton-2 { justify-self: start; }
+.esp .esp-tiroir .champ > .etat { justify-self: start; }
+.esp .esp-tiroir .erreur:not(:empty) { margin-top: 4px; }
+.esp .esp-tiroir .tiroir-pied { align-items: center; }
+.esp .esp-tiroir .annonce-tiroir { flex: 1 1 100%; min-height: 24px; color: var(--encre); font-weight: 700; font-size: 14px; }
+.esp .esp-tiroir .annonce-tiroir:empty { display: none; }
+.esp .esp-tiroir .annonce-tiroir[data-ton="erreur"] { color: var(--accent-agent-texte); }
+.esp .esp-tiroir .annonce-tiroir:not(:empty) { animation: esp-annonce-tiroir 420ms var(--c-arrivee) backwards; }
+@keyframes esp-annonce-tiroir {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* le parcours : la carte, la course du soleil du jour, les moments numérotés */
+.esp .parcours { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.esp .plan { overflow: hidden; border: 1px solid var(--filet); border-radius: 18px; background: var(--blanc); }
+.esp[data-theme="sombre"] .plan { background: var(--surface); }
+.esp .carte { display: block; width: 100%; height: auto; --terre: var(--blanc); --ville: var(--carte-ville); --rue: var(--filet-fixe); --lagune: var(--carte-lagune); --mer: var(--ocean); }
+.esp[data-theme="sombre"] .carte { --terre: var(--surface); --ville: var(--carte-ville-sombre); --rue: var(--trait-sombre); --lagune: var(--carte-lagune-sombre); --mer: var(--carte-mer-sombre); }
+.esp .carte .terre { fill: var(--terre); }
+.esp .carte .ville { fill: var(--ville); }
+.esp .carte .rue { fill: none; stroke: var(--rue); stroke-width: 6; stroke-linecap: round; }
+.esp .carte .lagune { fill: var(--lagune); }
+.esp .carte .plage { fill: var(--soleil); }
+.esp .carte .mer { fill: var(--mer); }
+.esp .carte .route { fill: none; stroke: var(--encre-3); stroke-width: 2; stroke-dasharray: 2 8; stroke-linecap: round; }
+.esp .carte .mer-nom { fill: var(--blanc); font: 700 22px var(--f-texte); }
+.esp .carte .eau-nom { fill: var(--encre-2); font: 700 21px var(--f-texte); }
+.esp .carte .lieu-fond circle { fill: var(--encre-3); }
+.esp .carte .seg { fill: var(--accent); transform-box: fill-box; transform-origin: 0 50%; }
+.esp .carte .etape .rond { fill: var(--ocean); stroke: var(--terre); stroke-width: 3; }
+.esp .carte .etape .rang { fill: var(--blanc); font: 800 21px var(--f-texte); text-anchor: middle; font-variant-numeric: tabular-nums; }
+.esp .carte .etape .nom { fill: var(--encre); font: 800 24px var(--f-texte); paint-order: stroke; stroke: var(--terre); stroke-width: 7px; stroke-linejoin: round; }
+.esp .carte .etape .pose { transform-box: fill-box; transform-origin: center; }
+.esp[data-theme="sombre"] .carte .etape .rond { fill: var(--soleil); }
+.esp[data-theme="sombre"] .carte .etape .rang { fill: var(--abyss); }
+.esp .carte .disque-carte { fill: var(--soleil); stroke: var(--ocean); stroke-width: 3; }
+/* chorégraphie : chaque étape se pose, puis le trajet suivant se trace jusqu'à elle */
+.esp .carte .etape .pose { animation: esp-pose-etape 460ms var(--c-glisse) backwards; animation-delay: calc(var(--d) * 640ms + 860ms); }
+.esp .carte .etape .nom { animation: esp-apparait 360ms var(--c-arrivee) backwards; animation-delay: calc(var(--d) * 640ms + 1000ms); }
+.esp .carte .seg { animation: esp-trace 600ms var(--c-glisse) backwards; animation-delay: calc(var(--d) * 640ms + 1000ms); }
+@keyframes esp-pose-etape {
+  from { transform: scale(0); }
+  70% { transform: scale(1.15); }
+}
+@keyframes esp-apparait {
+  from { opacity: 0; }
+}
+@keyframes esp-trace {
+  from { transform: scaleX(0); }
+}
+.esp .mini-arc.parcours-arc { display: block; width: 100%; height: auto; margin: 0 0 8px; }
+.esp .parcours-arc .arc { fill: none; stroke: var(--filet-fort); stroke-width: 1.5; }
+.esp .parcours-arc .hz { stroke: var(--encre-3); stroke-width: 1; }
+.esp .parcours-arc .pt-etape circle { fill: var(--ocean); }
+.esp .parcours-arc .pt-etape text { fill: var(--blanc); font: 800 11px var(--f-texte); text-anchor: middle; }
+.esp .parcours-arc .hz-txt { fill: var(--encre-2); font: 700 11px var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp[data-theme="sombre"] .parcours-arc .pt-etape circle { fill: var(--soleil); }
+.esp[data-theme="sombre"] .parcours-arc .pt-etape text { fill: var(--abyss); }
+.esp .parcours-arc .pt-etape { animation: esp-apparait 360ms var(--c-arrivee) backwards; animation-delay: calc(var(--k) * 640ms + 860ms); }
+
+.esp .etapes-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.esp .etapes-l > li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 4px 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--filet); animation: esp-arrive-moment 620ms var(--c-glisse) backwards; animation-delay: calc(var(--d) * 90ms + 300ms); }
+.esp .etapes-l > li:first-child { border-top: 0; }
+@keyframes esp-arrive-moment {
+  from { transform: translateY(16px); opacity: 0; }
+}
+.esp .etapes-l .rang-l { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--ocean); color: var(--blanc); font: 800 14px/1 var(--f-texte); }
+.esp .etapes-l .rang-l.sans { background: var(--survol); color: var(--encre-2); }
+.esp .etapes-l .rang-l .ic { width: 16px; height: 16px; }
+.esp[data-theme="sombre"] .etapes-l .rang-l:not(.sans) { background: var(--soleil); color: var(--abyss); }
+.esp .etapes-l .moment-texte { display: grid; gap: 2px; min-width: 0; }
+.esp .etapes-l .moment-texte .etat { justify-self: start; margin-top: 4px; }
+.esp .etapes-l .titre { font-weight: 700; overflow-wrap: anywhere; }
+.esp .etapes-l .meta { color: var(--encre-2); font-size: 14px; overflow-wrap: anywhere; }
+.esp .etapes-l .creneau-l { color: var(--encre-2); font: 800 13px/1.3 var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp .etapes-l li[data-etat="fait"] :is(.titre, .creneau-l) { color: var(--encre-3); }
+.esp .actions-moment { grid-column: 2; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
+.esp .deplacer[open] { flex-basis: 100%; order: 9; }
+.esp .deplacer summary { list-style: none; }
+.esp .deplacer summary::-webkit-details-marker { display: none; }
+.esp .deplacer[open] form { margin-top: 6px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; padding: 12px; border: 1px solid var(--filet); border-radius: 14px; animation: esp-deplie 360ms var(--c-glisse) backwards; }
+@keyframes esp-deplie {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.esp .deplacer label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--encre-2); }
+.esp .outils-parcours { display: grid; gap: 12px; margin-top: 16px; }
+.esp .outils-parcours .proposer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.esp .outils-parcours .proposer .aide { flex: 1 1 220px; }
+.esp .ajout-moment { border: 1px solid var(--filet); border-radius: 16px; }
+.esp .ajout-moment summary { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 16px; font-weight: 700; cursor: pointer; list-style: none; }
+.esp .ajout-moment summary::-webkit-details-marker { display: none; }
+.esp .ajout-moment summary .ic { transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .ajout-moment[open] summary .ic { transform: rotate(45deg); }
+.esp .ajout-moment form { display: grid; gap: 12px; padding: 4px 16px 16px; animation: esp-deplie 420ms var(--c-glisse) backwards; }
+.esp .ajout-moment .champs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.esp .ajout-moment .bouton { justify-self: start; }
+
+/* ---------- le devis ---------- */
+.esp .editeur-devis { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 20px; align-items: start; }
+.esp .devis-saisie { display: grid; gap: 12px; min-width: 0; }
+/* une ligne du devis = une carte : la désignation sur toute la largeur (90 caractères lisibles), puis quantité, prix
+   unitaire et montant, chacun avec son libellé (repris de data-l, textes de content/espace.ts) */
+.esp .lignes-devis { display: block; width: 100%; font-size: 14px; }
+.esp .lignes-devis thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.esp .lignes-devis :is(tbody, tfoot) { display: block; width: 100%; }
+.esp .lignes-devis tr { display: grid; grid-template-columns: 96px minmax(0, 1fr) minmax(0, 1fr) 40px; align-items: end; gap: 6px 12px; padding: 12px 0; border-bottom: 1px solid var(--filet); }
+.esp .lignes-devis td { display: block; min-width: 0; padding: 0; }
+.esp .lignes-devis tbody td:first-child { grid-column: 1 / -1; }
+.esp .lignes-devis tbody td[data-l]:not(:first-child)::before { content: attr(data-l); display: block; margin-bottom: 4px; color: var(--encre-2); font: 700 12px/1.2 var(--f-texte); }
+.esp .lignes-devis td.num { text-align: right; }
+.esp .lignes-devis input[type="text"] { width: 100%; }
+.esp .lignes-devis input[type="number"] { width: 100%; text-align: right; font-variant-numeric: tabular-nums; }
+.esp .lignes-devis tbody td:nth-child(4) { padding-bottom: 12px; white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; }
+.esp .lignes-devis tfoot tr { grid-template-columns: minmax(0, 1fr) auto; align-items: start; border-bottom: 0; font-weight: 800; font-size: 16px; }
+.esp .lignes-devis tfoot td:empty { display: none; }
+.esp .lignes-devis tfoot small { display: block; color: var(--encre-2); font-size: 13px; font-weight: 600; }
+.esp .lignes-devis tbody tr { animation: esp-arrive-moment 420ms var(--c-glisse) backwards; }
+.esp .compteur { display: block; margin-top: 2px; color: var(--encre-3); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.esp .compteur[data-plein] { color: var(--accent-agent-texte); }
+.esp .ajout-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.esp .ajout-ligne .compteur { margin: 0; }
+.esp .editeur-devis .champ { display: grid; gap: 4px; }
+.esp .editeur-devis .champ > label { font-size: 14px; font-weight: 700; }
+.esp .editeur-devis .note-lue { white-space: pre-line; overflow-wrap: anywhere; }
+/* aperçu : une page A4 réduite, qui se remplit pendant la saisie */
+.esp .apercu-devis { position: sticky; top: 0; display: grid; gap: 8px; margin: 0; }
+.esp .apercu-devis figcaption { display: grid; gap: 2px; font-size: 13px; }
+.esp .apercu-devis figcaption span { color: var(--encre-2); }
+.esp .apercu-devis .feuille { display: flex; flex-direction: column; gap: 6px; aspect-ratio: 210 / 297; overflow: hidden; padding: 14px 12px; border: 1px solid var(--filet-fort); border-radius: 6px; background: var(--blanc); color: var(--encre-fixe); font-size: 6.5px; line-height: 1.35; box-shadow: 0 8px 24px var(--abysse-10); }
+.esp .apercu-devis .tete-feuille { display: block; height: 22px; flex: none; border-radius: 3px; background: var(--ocean); }
+.esp .apercu-devis ol { list-style: none; padding: 0; display: grid; gap: 2px; }
+.esp .apercu-devis li { display: flex; justify-content: space-between; gap: 6px; padding-bottom: 2px; border-bottom: 0.5px solid var(--filet-fixe); }
+.esp .apercu-devis li span:first-child { overflow-wrap: anywhere; }
+.esp .apercu-devis li span:last-child { flex: none; font-variant-numeric: tabular-nums; }
+.esp .apercu-devis .total-feuille { display: flex; justify-content: space-between; font-weight: 800; font-size: 8px; }
+.esp .apercu-devis .note-feuille { white-space: pre-line; overflow-wrap: anywhere; color: var(--encre-2-fixe); }
+.esp .lien-client { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 16px; padding: 14px 16px; border: 1px dashed var(--filet-fort); border-radius: 14px; }
+.esp .lien-client > span { display: inline-flex; align-items: center; gap: 6px; }
+.esp .lien-client code { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
+.esp .lien-client .mention { flex-basis: 100%; }
+.esp .historique li { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; }
+
+@media (max-width: 900px) {
+  .esp .parcours { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .esp .editeur-devis { grid-template-columns: minmax(0, 1fr); }
+  .esp .apercu-devis { position: static; max-width: 220px; }
+}
+
+@media (max-width: 760px) {
+  /* en 390 : quantité, prix et le bouton retirer sur une ligne, le montant dessous */
+  .esp .lignes-devis tbody tr { grid-template-columns: 72px minmax(0, 1fr) 40px; }
+  .esp .lignes-devis tbody td:nth-child(4) { grid-column: 1 / -1; grid-row: 3; padding-bottom: 0; text-align: left; }
+  .esp .lignes-devis tbody td:nth-child(5) { grid-column: 3; grid-row: 2; }
+  .esp .liste-demandes > li { grid-template-columns: minmax(0, 1fr); padding-bottom: 8px; }
+  .esp .liste-demandes .attribution select { width: 100%; }
+  .esp .esp-dossiers .filtres button { min-width: 0; padding: 8px 10px; }
+  .esp .esp-dossiers .filtres b { font-size: 22px; }
+  .esp .esp-dossiers .outils-liste, .esp .esp-dossiers .filtre-agent, .esp .esp-dossiers .filtre-agent select { width: 100%; }
+  .esp .esp-dossiers .esp-annonce { bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .esp .esp-tiroir .paires { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-tiroir .tiroir-pied > * { width: 100%; }
+  .esp .ajout-moment .champs { grid-template-columns: minmax(0, 1fr); }
+  .esp .actions-moment { grid-column: 1 / -1; }
+  .esp .historique li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}

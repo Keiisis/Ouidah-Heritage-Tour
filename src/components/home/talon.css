@@ -1,0 +1,194 @@
+/* Hallmark · section Agenda · talon de réservation (talon B v2, validé par Kevin le 27/10/2026) · OHT · surface: billet · posture: committed · nav: bandeau du site */
+/* Grand billet perforé : corps (événement, formule, places, accompagnement) + talon (coordonnées, passerelles, total,
+   paiement). Bureau : posé sur la section, la colonne de gauche s'efface (voile). Téléphone : de haut en bas, perforation
+   horizontale, bouton de paiement collé en bas de l'écran. Mouvement : transform et opacity seulement. Classes globales
+   préfixées tl- (la règle Turbopack « *.css » de next.config rend les modules CSS inopérants). */
+:root {
+  --tl-nuit: var(--surface-abyss);
+  --tl-encre: var(--surface-abyss);
+  --tl-encre-2: color-mix(in oklab, var(--surface-abyss) 74%, transparent);
+  --tl-encre-3: color-mix(in oklab, var(--surface-abyss) 58%, transparent);
+  --tl-filet: color-mix(in oklab, var(--surface-abyss) 12%, transparent);
+  --tl-filet-2: color-mix(in oklab, var(--surface-abyss) 26%, transparent);
+  --tl-blanc: #fff;
+  --tl-gris: #f1f3f7;
+  --tl-soleil: var(--accent-sun);
+  --tl-laterite: var(--brand-primary);
+  --tl-vert: #1d7a4f;
+  --tl-vert-pale: color-mix(in oklab, #1d7a4f 12%, transparent);
+  --tl-trou: #121a2d;
+  --tl-ombre: rgb(3 6 16 / 0.5);
+  --tl-voile: rgb(11 15 29 / 0.92);
+  --tl-voile-0: rgb(11 15 29 / 0);
+  --tl-photo: rgb(8 11 22 / 0.78);
+  --tl-photo-0: rgb(8 11 22 / 0.04);
+  --tl-sur-photo: rgb(255 255 255 / 0.86);
+  --tl-verre: rgb(255 255 255 / 0.16);
+  --tl-courbe: cubic-bezier(0.625, 0.05, 0, 1);
+}
+
+.tl-voile { display: none; }
+.tl-billet { position: relative; z-index: 5; display: grid; grid-template-columns: minmax(0, 1fr); color: var(--tl-encre); filter: drop-shadow(0 30px 60px var(--tl-ombre)); }
+.tl-corps, .tl-talon { position: relative; background: var(--tl-blanc); }
+.tl-corps { border-radius: 26px 26px 0 0; overflow: hidden; display: flex; flex-direction: column; }
+.tl-talon { border-radius: 0; padding: 20px 16px 16px; display: flex; flex-direction: column; }
+.tl-talon:last-child { border-radius: 0 0 26px 26px; }
+.tl-talon::before { content: ""; position: absolute; left: 16px; right: 16px; top: -1px; border-top: 2px dashed var(--tl-filet-2); transform-origin: left; }
+.tl-trou { position: absolute; top: -12px; width: 24px; height: 24px; border-radius: 99px; background: var(--tl-trou); z-index: 2; }
+.tl-trou.tl-h { left: -12px; }
+.tl-trou.tl-b { right: -12px; }
+
+/* bande photo de l'événement */
+.tl-bande { position: relative; height: 104px; padding: 14px 16px; color: var(--tl-blanc); display: flex; align-items: flex-end; }
+.tl-voileBande { position: absolute; inset: 0; background: linear-gradient(to top, var(--tl-photo), var(--tl-photo-0)); }
+.tl-titreBande { position: relative; font: 600 28px/1 var(--font-display); letter-spacing: -0.02em; }
+.tl-titreBande small { display: block; margin-top: 6px; font: 600 13px var(--font-text); color: var(--tl-sur-photo); letter-spacing: 0; }
+.tl-puce { position: absolute; left: 16px; top: 14px; padding: 4px 10px; border-radius: 99px; background: var(--tl-soleil); color: var(--tl-nuit); font: 600 12px var(--font-text); }
+.tl-fermer { position: absolute; right: 12px; top: 12px; width: 36px; height: 36px; border: 0; border-radius: 99px; background: var(--tl-verre); color: var(--tl-blanc); display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(12px); }
+.tl-fermer:hover { background: color-mix(in oklab, var(--tl-blanc) 26%, transparent); }
+
+.tl-dedans { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; }
+.tl-resume { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--tl-filet); }
+.tl-resume dt { font-size: 12px; font-weight: 700; color: var(--tl-encre-3); }
+.tl-resume dd { margin: 2px 0 0; font-size: 15px; font-weight: 600; }
+.tl-lib { font-size: 13px; font-weight: 600; color: var(--tl-encre); padding: 0; }
+.tl-lib small { display: block; font-size: 12px; font-weight: 600; color: var(--tl-encre-3); }
+.tl-accomp .tl-lib small { display: inline; }
+
+.tl-formules { border: 0; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.tl-formule { position: relative; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 10px 12px 10px 36px; border-radius: 12px; border: 1px solid var(--tl-filet-2); cursor: pointer; font-size: 14px; }
+.tl-formule input, .tl-moyen input { position: absolute; left: 12px; top: 50%; width: 16px; height: 16px; margin: -8px 0 0; accent-color: var(--tl-nuit); }
+.tl-formule span { font-size: 12px; font-weight: 700; color: var(--tl-encre-3); white-space: nowrap; }
+.tl-formule.tl-on, .tl-moyen.tl-on { border-color: var(--tl-nuit); box-shadow: inset 0 0 0 1px var(--tl-nuit); background: var(--tl-gris); }
+
+.tl-places { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+.tl-pas { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: var(--tl-gris); }
+.tl-pas button { width: 36px; height: 36px; border: 0; border-radius: 999px; background: var(--tl-blanc); color: var(--tl-encre); display: grid; place-items: center; cursor: pointer; }
+.tl-pas button:disabled { background: transparent; color: var(--tl-encre-3); cursor: default; }
+.tl-pas b { min-width: 28px; text-align: center; font-size: 16px; font-variant-numeric: tabular-nums; }
+.tl-jauge { display: block; margin-top: 6px; height: 4px; border-radius: 9px; background: var(--tl-gris); overflow: hidden; }
+.tl-jauge i { display: block; height: 100%; background: var(--tl-soleil); border-radius: 9px; transform-origin: left; animation: tl-jauge 1.2s 0.5s var(--tl-courbe) both; }
+
+.tl-accomp { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--tl-filet); }
+.tl-ligne { width: 100%; display: flex; align-items: center; gap: 10px; padding: 6px 0; border: 0; border-top: 1px dashed var(--tl-filet); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.tl-accomp .tl-lib + .tl-ligne { border-top: 0; }
+.tl-ligneTexte { flex: 1; font-size: 14px; font-weight: 700; line-height: 1.3; }
+.tl-ligneTexte small { display: block; font-size: 12px; color: var(--tl-encre-3); font-weight: 600; }
+.tl-ligneTexte em { font-style: normal; color: var(--tl-vert); font-weight: 700; }
+.tl-coche { flex: none; width: 24px; height: 24px; border-radius: 7px; border: 1.5px solid var(--tl-filet-2); display: grid; place-items: center; }
+.tl-coche.tl-on { background: var(--tl-nuit); border-color: var(--tl-nuit); color: var(--tl-blanc); }
+.tl-unique { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--tl-gris); font-size: 12.5px; line-height: 1.45; color: var(--tl-encre-2); }
+.tl-unique b { color: var(--tl-encre); }
+.tl-recap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 8px; margin: 12px 0 0; }
+.tl-recap dt { font-size: 12px; font-weight: 700; color: var(--tl-encre-3); }
+.tl-recap dd { margin: 2px 0 0; font-size: 15px; font-weight: 600; }
+.tl-recapLarge { grid-column: 1 / -1; padding: 10px 12px; border-radius: 12px; background: var(--tl-gris); }
+.tl-recapLarge dd { font-size: 13.5px; font-weight: 600; line-height: 1.45; color: var(--tl-encre-2); }
+
+/* talon : formulaire */
+.tl-formulaire { display: flex; flex-direction: column; flex: 1; }
+.tl-titre { font: 650 22px/1.15 var(--font-display); letter-spacing: -0.02em; outline: none; }
+.tl-champ { display: block; margin-top: 10px; }
+.tl-champ span { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--tl-encre-2); margin-bottom: 4px; }
+.tl-champ em { font-style: normal; font-weight: 600; color: var(--tl-vert); }
+.tl-champ input { width: 100%; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--tl-filet-2); font: 600 16px var(--font-text); color: var(--tl-encre); background: var(--tl-blanc); }
+.tl-champ input:focus-visible { outline: 2px solid var(--tl-soleil); outline-offset: 1px; border-color: var(--tl-nuit); }
+.tl-piege { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.tl-moyens { border: 0; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.tl-moyen { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 12px 0 36px; border-radius: 12px; border: 1px solid var(--tl-filet-2); cursor: pointer; }
+.tl-logo { height: 20px; width: auto; }
+.tl-moyen small { font-size: 11.5px; font-weight: 700; color: var(--tl-encre-3); text-align: right; }
+.tl-moyen small.tl-reco { color: var(--tl-vert); }
+.tl-accord { display: flex; gap: 8px; margin-top: 10px; font-size: 12px; line-height: 1.45; color: var(--tl-encre-2); cursor: pointer; }
+.tl-accord input { flex: none; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--tl-nuit); }
+.tl-accord a { color: var(--tl-encre); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.tl-compte { margin-top: auto; padding-top: 12px; }
+.tl-compte p { font-size: 13px; font-weight: 600; color: var(--tl-encre-2); }
+.tl-compte .bt-tuiles { margin-top: 6px; }
+.tl-compte small { display: block; margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--tl-encre-3); }
+.tl-erreur { min-height: 0; margin-top: 6px; font-size: 13px; font-weight: 700; color: var(--tl-laterite); }
+.tl-erreur:empty { margin: 0; }
+/* barre de paiement : sous le talon ; téléphone et tablette : collée en bas de l'écran tant que le billet est visible */
+.tl-barre { position: sticky; bottom: 0; z-index: 4; padding: 10px 16px 14px; background: var(--tl-blanc); border-top: 1px solid var(--tl-filet); border-radius: 0 0 26px 26px; }
+.tl-trou.tl-fin { display: none; }
+.tl-payer { width: 100%; height: 48px; border: 0; border-radius: 999px; background: var(--tl-soleil); color: var(--tl-nuit); font: 600 15px var(--font-text); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+.tl-payer:disabled { background: var(--tl-gris); color: var(--tl-encre-3); cursor: progress; }
+.tl-note { margin-top: 8px; font-size: 11.5px; line-height: 1.4; color: var(--tl-encre-3); text-align: center; }
+
+/* talon : paiement en cours, vérification */
+.tl-attente { margin: auto 0; padding: 16px 0; text-align: center; }
+.tl-attente p { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--tl-encre-2); }
+.tl-logoGrand { height: 28px; width: auto; margin: 0 auto 16px; display: block; }
+.tl-fil { position: relative; display: block; height: 4px; width: 180px; margin: 0 auto 16px; border-radius: 9px; background: var(--tl-gris); overflow: hidden; }
+.tl-fil i { position: absolute; top: 0; bottom: 0; width: 40%; border-radius: 9px; background: var(--tl-soleil); animation: tl-fil 1.3s ease-in-out infinite; }
+.tl-lien { margin-top: 14px; border: 0; background: none; padding: 4px 0; font: 700 13.5px var(--font-text); color: var(--tl-encre); border-bottom: 1.5px solid var(--tl-nuit); cursor: pointer; }
+
+/* talon : payé */
+.tl-paye { position: relative; display: flex; flex-direction: column; }
+.tl-tampon { position: absolute; right: 2px; top: -6px; width: 96px; height: 96px; border-radius: 99px; border: 3px solid var(--tl-vert); color: var(--tl-vert); background: var(--tl-vert-pale); display: grid; place-content: center; text-align: center; font: 600 11px/1.3 var(--font-text); transform: rotate(-12deg); animation: tl-frappe 0.55s 0.2s cubic-bezier(0.2, 1.5, 0.4, 1) both; z-index: 3; }
+.tl-tampon b { display: block; font: 700 21px/1 var(--font-display); }
+.tl-paye .tl-titre, .tl-paye .tl-pour { padding-right: 104px; }
+.tl-pour { margin-top: 4px; font-size: 13px; color: var(--tl-encre-3); font-weight: 600; }
+.tl-billetQr { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 14px; align-items: end; margin-top: 12px; }
+.tl-qr { position: relative; width: 124px; height: 124px; padding: 8px; border-radius: 14px; border: 1px solid var(--tl-filet); background: var(--tl-blanc); overflow: hidden; }
+.tl-qr > span, .tl-qr svg { display: block; width: 100%; height: 100%; }
+.tl-imprime { position: absolute; inset: 0; background: var(--tl-blanc); transform-origin: bottom; animation: tl-imprime 1.4s 0.6s steps(14) both; }
+.tl-billetQr p { font-size: 13px; line-height: 1.5; color: var(--tl-encre-2); }
+.tl-billetQr p b { display: block; font-size: 14px; color: var(--tl-encre); }
+.tl-pagination { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--tl-encre-2); }
+.tl-pagination button { width: 32px; height: 32px; border: 0; border-radius: 99px; background: var(--tl-gris); color: var(--tl-encre); display: grid; place-items: center; cursor: pointer; }
+.tl-boutons { display: grid; grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; margin-top: 12px; }
+.tl-principal { height: 48px; border: 0; border-radius: 999px; background: var(--tl-nuit); color: var(--tl-blanc); font: 600 15px var(--font-text); cursor: pointer; }
+.tl-rond { height: 48px; border: 0; border-radius: 99px; background: var(--tl-gris); display: grid; place-items: center; cursor: pointer; }
+.tl-ref { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--tl-gris); font-size: 13px; line-height: 1.45; }
+.tl-ref b { font-variant-numeric: tabular-nums; }
+.tl-confirme { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--tl-encre-2); }
+.tl-confirme svg { color: var(--tl-vert); flex: none; }
+.tl-suivi { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; font-size: 14px; font-weight: 700; color: var(--tl-encre); text-decoration: underline; text-underline-offset: 4px; }
+
+/* états des contrôles */
+.tl-billet button:focus-visible, .tl-billet a:focus-visible, .tl-billet input:focus-visible { outline: 2px solid var(--tl-soleil); outline-offset: 2px; }
+.tl-billet button:active:not(:disabled) { transform: scale(0.97); }
+.tl-formule:hover, .tl-moyen:hover, .tl-ligne:hover .tl-coche { border-color: var(--tl-nuit); }
+
+/* dépliage (talon B v2) */
+.tl-deplie .tl-talon, .tl-deplie .tl-barre { animation: tl-talon 0.8s 0.1s var(--tl-courbe) both; }
+.tl-deplie .tl-talon::before { animation: tl-perfo 0.7s 0.45s var(--tl-courbe) both; }
+.tl-deplie .tl-corps { animation: tl-corps 0.8s var(--tl-courbe) both; }
+@keyframes tl-corps { from { transform: scale(0.97); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes tl-talon { from { transform: translateY(-48px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes tl-perfo { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes tl-jauge { from { transform: scaleX(0); } }
+@keyframes tl-fil { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@keyframes tl-frappe { 0% { transform: rotate(-12deg) scale(2.1); opacity: 0; } 60% { opacity: 1; } 100% { transform: rotate(-12deg) scale(1); opacity: 1; } }
+@keyframes tl-imprime { from { transform: scaleY(1); } to { transform: scaleY(0); } }
+
+
+/* bureau : le pass se déplie en grand billet horizontal posé sur la section */
+@media (min-width: 1024px) {
+  .tl-voile { display: block; position: absolute; left: 0; top: 0; bottom: 0; width: 62%; z-index: 4; pointer-events: none; background: linear-gradient(90deg, var(--tl-voile) 0%, var(--tl-voile) 72%, var(--tl-voile-0)); animation: tl-apparait 0.6s var(--tl-courbe) both; }
+  .tl-billet { position: absolute; top: 7rem; right: 6rem; width: min(840px, calc(100% - 12rem)); grid-template-columns: minmax(0, 480fr) minmax(0, 360fr); grid-template-rows: 1fr auto; }
+  .tl-corps { grid-row: 1 / 3; border-radius: 26px 0 0 26px; }
+  .tl-talon { grid-column: 2; grid-row: 1; border-radius: 0 26px 0 0; padding: 20px 24px 8px; }
+  .tl-talon:last-child { border-radius: 0 26px 26px 0; padding-bottom: 16px; }
+  .tl-talon::before { left: -1px; right: auto; top: 18px; bottom: 0; border-top: 0; border-left: 2px dashed var(--tl-filet-2); transform-origin: top; }
+  .tl-talon:last-child::before { bottom: 18px; }
+  .tl-trou { left: -12px; }
+  .tl-trou.tl-h { top: -12px; }
+  .tl-trou.tl-b { top: auto; bottom: -12px; right: auto; }
+  .tl-talon:not(:last-child) .tl-trou.tl-b { display: none; }
+  .tl-barre { position: relative; grid-column: 2; grid-row: 2; padding: 0 24px 16px; border-top: 0; border-radius: 0 0 26px 0; }
+  .tl-barre::before { content: ""; position: absolute; left: -1px; top: 0; bottom: 18px; border-left: 2px dashed var(--tl-filet-2); }
+  .tl-trou.tl-fin { display: block; top: auto; bottom: -12px; left: -12px; }
+  .tl-resume { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tl-formules { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tl-deplie .tl-talon, .tl-deplie .tl-barre { animation-name: tl-talonLarge; }
+  @keyframes tl-talonLarge { from { transform: translateX(-120px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes tl-perfo { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+}
+@keyframes tl-apparait { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-billet *, .tl-billet *::before, .tl-voile { animation: none !important; }
+  .tl-imprime { display: none; }
+}

@@ -1,0 +1,121 @@
+/* Blocs des accueils (maquette E) : le titre posé sur sa ligne d'horizon, le compte en disque. Grille de 12 colonnes,
+   6 sous 1180 px, une seule en 390 où les blocs marqués data-repli se rangent sur leur titre. Tout sous .esp. */
+
+.esp .esp-grille { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px; }
+.esp .esp-bloc { grid-column: span var(--s, 6); min-width: 0; padding: 28px; border: 1px solid var(--filet); border-radius: 24px; background: var(--surface); }
+.esp .esp-bloc:hover { border-color: var(--filet-fort); }
+.esp .bloc-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.esp .bloc-tete h2 { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; font-size: 26px; line-height: 1.15; }
+.esp .bloc-tete h2::after { content: ""; order: 2; flex: 1; min-width: 16px; height: 1px; background: var(--filet-fort); }
+.esp .bloc-tete .compte { order: 3; display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 8px; border-radius: 16px; background: var(--ocean); color: var(--blanc); font: 800 14px/1 var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp[data-theme="sombre"] .bloc-tete .compte { background: var(--blanc); color: var(--abyss); }
+.esp .bloc-corps { display: grid; gap: 12px; }
+.esp .sous-titre, .esp .a-confirmer h3 { color: var(--encre-2); font: 700 13px/20px var(--f-texte); }
+
+/* états vides : ce qui manque, puis ce qui viendra ici */
+.esp .vide { display: grid; gap: 4px; justify-items: start; padding: 20px; border: 1px dashed var(--filet-fort); border-radius: 14px; color: var(--encre-2); }
+.esp .vide b { color: var(--encre); font-weight: 700; }
+
+/* listes et rangées */
+.esp .liste { list-style: none; padding: 0; display: grid; }
+.esp .liste > li { border-top: 1px solid var(--filet); }
+.esp .liste > li:first-child { border-top: 0; }
+.esp .rangee { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 64px; padding: 12px 8px; }
+.esp .rangee .texte { flex: 1; min-width: 0; }
+.esp .rangee .titre { display: block; font-weight: 700; color: var(--encre); }
+.esp .rangee .meta { display: block; color: var(--encre-2); font-size: 14px; }
+.esp .rangee > .ic { color: var(--encre-3); }
+.esp .type { display: block; margin-bottom: 2px; color: var(--accent-texte); font: 700 13px/1.2 var(--f-texte); }
+.esp .num { font-weight: 700; text-align: right; white-space: nowrap; }
+.esp .num small { display: block; color: var(--encre-2); font-size: 13px; font-weight: 600; }
+
+/* billets à contrôler */
+.esp .billet-jour { display: grid; gap: 16px; padding: 12px 0; }
+.esp .billet-jour .evt { display: grid; gap: 4px; }
+.esp .billet-jour .evt b { font: 400 22px/1.2 var(--f-titre); color: var(--encre); }
+.esp .billet-jour .evt span { color: var(--encre-2); font-weight: 600; }
+.esp .billet-jour .bouton { justify-self: start; }
+
+/* caisse : encaissé du mois, du jour, en attente, à confirmer, ventilé par mode */
+.esp .caisse-total { display: grid; gap: 4px; }
+.esp .caisse-total b { font: 800 40px/1.1 var(--f-texte); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.esp .caisse-total span { color: var(--encre-2); font-weight: 600; }
+.esp .resume { display: flex; gap: 32px; flex-wrap: wrap; }
+.esp .resume b { display: block; font: 800 24px/1.1 var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp .resume span { color: var(--encre-2); font-weight: 600; font-size: 14px; }
+.esp .a-confirmer { display: grid; gap: 4px; padding: 12px 16px; border: 1px dashed var(--filet-fort); border-radius: 14px; }
+.esp .a-confirmer p { color: var(--encre-2); font-size: 14px; }
+.esp .modes { list-style: none; padding: 0; display: grid; gap: 10px; }
+.esp .modes li { display: grid; grid-template-columns: 112px minmax(0, 1fr) 132px; align-items: center; gap: 12px; }
+.esp .modes .mode-nom { display: grid; place-items: center; height: 40px; padding: 0 8px; border: 1px dashed var(--filet-fort); border-radius: 10px; color: var(--encre-2); font: 700 12px/1.1 var(--f-texte); text-align: center; }
+.esp .modes .barre { height: 10px; border-radius: 5px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(max(var(--v), 0.01)); animation: esp-pousse 900ms var(--c-glisse) backwards 400ms; }
+.esp .modes li[data-mode="manuel"] .barre { background: var(--filet); }
+.esp .modes .num { font-size: 14px; }
+@keyframes esp-pousse {
+  from { transform: scaleX(0); }
+}
+.esp .logo-plaque { display: grid; place-items: center; height: 40px; padding: 4px 8px; border: 1px solid var(--filet); border-radius: 10px; background: var(--logo-plaque); }
+.esp .logo-plaque img { width: auto; max-width: 76px; max-height: 24px; }
+.esp .passerelle { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 60px; padding: 8px 0; }
+.esp .passerelle .texte b { font-weight: 700; }
+
+/* billets du jour : un bandeau (entrées comptées au contrôle des billets, lot L5) */
+.esp .esp-bandeau { display: grid; gap: 6px; margin-bottom: 20px; }
+.esp .bandeau-billets { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; border-radius: 16px; background: var(--abyss); color: var(--sur-nuit); }
+.esp .bandeau-billets .evt { font: 400 20px/1.2 var(--f-titre); }
+.esp .compte-billets { display: inline-flex; align-items: baseline; gap: 4px; font: 800 22px/1 var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp .compte-billets span:last-child { font-size: 13px; font-weight: 700; color: var(--sur-nuit-2); }
+.esp .bandeau-billets .bouton { margin-left: auto; min-height: 44px; }
+
+/* passerelles : une ligne d'état en 390 (le bloc détaillé reste sur ordinateur) */
+.esp .ligne-passerelles { display: none; }
+
+/* tableau des réservations : empilé en 390 */
+.esp .tableau { width: 100%; border-collapse: collapse; }
+.esp .tableau th { padding: 8px 12px; border-bottom: 1px solid var(--filet); color: var(--encre-2); font: 700 13px/1.3 var(--f-texte); text-align: left; white-space: nowrap; }
+.esp .tableau td { padding: 12px; border-bottom: 1px solid var(--filet); vertical-align: middle; }
+.esp .tableau tr:last-child td { border-bottom: 0; }
+.esp .tableau b { font-weight: 700; }
+.esp .sous-cell { display: block; color: var(--encre-2); font-size: 13px; font-weight: 600; }
+.esp .tableau .num small { margin-top: 4px; }
+
+/* activité, raccourcis d'édition */
+.esp .fil-act { list-style: none; padding: 0; display: grid; }
+.esp .fil-act li { display: grid; gap: 2px; padding: 12px 0; border-top: 1px solid var(--filet); }
+.esp .fil-act li:first-child { border-top: 0; }
+.esp .fil-act time { color: var(--encre-3); font-weight: 700; font-size: 13px; }
+.esp .raccourcis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.esp .raccourcis a { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 12px; border: 1px solid var(--filet); border-radius: 12px; color: var(--encre); font-weight: 700; text-decoration: none; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .raccourcis a:hover { border-color: var(--encre-3); transform: translateY(-2px); }
+.esp .raccourcis a .ic { color: var(--accent-texte); transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .raccourcis a:hover .ic { transform: rotate(-8deg) scale(1.1); }
+.esp .raccourcis a small { display: block; color: var(--encre-2); font-weight: 600; font-size: 13px; }
+
+@media (max-width: 1180px) {
+  .esp .esp-grille { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .esp .esp-bloc { grid-column: span 6; }
+}
+@media (max-width: 760px) {
+  .esp .esp-grille { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .esp .esp-bloc { grid-column: 1 / -1; padding: 20px 16px; }
+  .esp .bloc-tete { flex-wrap: wrap; }
+  .esp .bloc-tete h2 { flex: 0 1 auto; font-size: 24px; }
+  .esp .bloc-tete h2::after { display: none; }
+  .esp .cache-390 { display: none; }
+  .esp .ligne-passerelles { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 12px; color: var(--encre-2); font-size: 14px; font-weight: 700; }
+  .esp .ligne-passerelles .lien { min-height: 44px; margin-left: auto; }
+  .esp .bandeau-billets { padding: 10px 12px; }
+  .esp .bandeau-billets .bouton { flex: 1 1 100%; }
+  .esp .caisse-total b { font-size: 32px; }
+  .esp .modes li { grid-template-columns: 96px minmax(0, 1fr); row-gap: 6px; }
+  .esp .modes .num { grid-row: 1; grid-column: 2; }
+  .esp .modes .barre { grid-column: 1 / -1; height: 6px; }
+  .esp .raccourcis { grid-template-columns: minmax(0, 1fr); }
+  .esp .rangee { flex-wrap: wrap; gap: 8px 12px; }
+  .esp .tableau thead { display: none; }
+  .esp .tableau, .esp .tableau tbody { display: block; width: 100%; }
+  .esp .tableau tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 12px 0; border-bottom: 1px solid var(--filet); }
+  .esp .tableau td { display: block; padding: 0; border: 0; }
+  .esp .tableau td:nth-child(2) { flex: 1 1 100%; }
+  .esp .tableau .num { margin-left: auto; }
+}

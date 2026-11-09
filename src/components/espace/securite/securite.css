@@ -1,0 +1,146 @@
+/* Écrans du lot « securite » (vague 2, maquette E) : pare-feu et sessions, sauvegardes, protection des données, rôles et
+   droits. Tout sous .esp .esp-securite. Mouvement : transform, opacity et clip-path seulement, en fill « backwards » (le
+   rendu de base est l'état final) ; aucune transition de couleur ni de fond ; mouvement réduit ramené à l'état final par
+   jetons.css. Mobile 390 : tableaux empilés (blocs.css), formulaires sur une colonne, rien ne déborde. */
+
+.esp .esp-securite { display: grid; gap: 20px; min-width: 0; }
+.esp .esp-securite .esp-grille { align-items: start; }
+
+/* boutons secondaires (repris de l'écran Équipe) */
+.esp .esp-securite .bouton-2 { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--filet-fort); border-radius: 14px; background: var(--surface); color: var(--encre); font-weight: 700; white-space: nowrap; cursor: pointer; text-decoration: none; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-securite .bouton-2:hover { border-color: var(--encre-3); transform: translateY(-2px); }
+.esp .esp-securite .bouton-2:active { transform: translateY(1px); }
+.esp .esp-securite .bouton-petit { min-height: 44px; padding: 0 12px; font-size: 14px; }
+.esp .esp-securite :is(.bouton, .bouton-2):disabled { background: var(--survol); border-color: var(--filet); color: var(--encre-3); cursor: progress; transform: none; }
+
+/* formulaires */
+.esp .esp-securite .sec-form { display: grid; gap: 16px; min-width: 0; }
+.esp .esp-securite .champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; }
+.esp .esp-securite .champ { display: grid; gap: 6px; min-width: 0; align-content: start; margin: 0; padding: 0; border: 0; }
+.esp .esp-securite .champ.large { grid-column: 1 / -1; }
+.esp .esp-securite .champ > :is(label, legend) { padding: 0; color: var(--encre); font: 700 14px/1.3 var(--f-texte); }
+.esp .esp-securite .aide { color: var(--encre-2); font-size: 13px; line-height: 1.45; }
+.esp .esp-securite :is(select, input:not([type="checkbox"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-securite textarea { min-height: 96px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.esp .esp-securite :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--accent-agent-texte); box-shadow: inset 0 0 0 1px var(--accent-agent-texte); }
+.esp .esp-securite .sec-pied { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* retour d'un envoi */
+.esp .esp-securite .sec-retour:empty { display: none; }
+.esp .esp-securite .sec-retour { display: grid; gap: 4px; padding: 10px 14px; border: 1px solid var(--filet-fort); border-radius: 12px; color: var(--encre); font-size: 14px; font-weight: 600; animation: sec-monte var(--d-moyen) var(--c-arrivee) backwards; }
+.esp .esp-securite .sec-retour[data-ton="erreur"] { border-color: var(--accent-agent-texte); box-shadow: inset 4px 0 0 var(--accent-agent-texte); }
+.esp .esp-securite .sec-retour[data-ton="ok"] { box-shadow: inset 4px 0 0 var(--ok); }
+.esp .esp-securite .sec-retour ul { margin: 0; padding-left: 18px; font-weight: 500; }
+.esp .esp-securite .sec-bouton { display: inline-grid; gap: 6px; justify-items: start; }
+@keyframes sec-monte {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+/* périmètre : la limite honnête de cet écran */
+.esp .esp-securite .perimetre { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px 16px; align-items: start; padding: 20px 24px; border-radius: 20px; background: var(--abyss); color: var(--sur-nuit); }
+.esp .esp-securite .perimetre .ic { width: 28px; height: 28px; color: var(--soleil); }
+.esp .esp-securite .perimetre h2 { color: var(--sur-nuit); font-size: 22px; }
+.esp .esp-securite .perimetre p { color: var(--sur-nuit-2); }
+.esp .esp-securite .perimetre p + p { margin-top: 6px; }
+
+/* tableaux et lignes */
+.esp .esp-securite .tableau td { overflow-wrap: anywhere; }
+.esp .esp-securite .tableau .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.esp .esp-securite .empreinte { font: 700 13px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.02em; color: var(--encre); white-space: nowrap; }
+.esp .esp-securite .sous-cell { display: block; color: var(--encre-2); font-size: 13px; font-weight: 600; }
+.esp .esp-securite .etat[data-e="bloquee"] { color: var(--accent-texte); }
+.esp .esp-securite .etat[data-e="moi"] { background: var(--ok); border-color: var(--ok); color: var(--fond); }
+.esp .esp-securite .sec-arrivee { animation: sec-ligne 560ms var(--c-glisse) backwards; animation-delay: calc(var(--k, 0) * 40ms); }
+@keyframes sec-ligne {
+  from { clip-path: inset(0 100% 0 0); }
+}
+.esp .esp-securite details.sec-repli { border-top: 1px solid var(--filet); padding-top: 12px; }
+.esp .esp-securite details.sec-repli > summary { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--accent-texte); font-weight: 700; cursor: pointer; list-style: none; }
+.esp .esp-securite details.sec-repli > summary::-webkit-details-marker { display: none; }
+.esp .esp-securite details.sec-repli > summary .ic { transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-securite details.sec-repli[open] > summary .ic { transform: rotate(90deg); }
+.esp .esp-securite details.sec-repli[open] > :not(summary) { animation: sec-monte var(--d-moyen) var(--c-arrivee) backwards; }
+
+/* journal : filtres sur une ligne, puis le fil */
+.esp .esp-securite .filtres-journal { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 12px; align-items: end; }
+.esp .esp-securite .filtres-journal .boutons { display: flex; flex-wrap: wrap; gap: 8px; }
+.esp .esp-securite .journal-total { color: var(--encre-2); font-size: 14px; font-weight: 600; }
+.esp .esp-securite .details-journal { display: flex; flex-wrap: wrap; gap: 4px 10px; color: var(--encre-2); font-size: 13px; }
+.esp .esp-securite .details-journal b { color: var(--encre); font-weight: 700; }
+
+/* sauvegardes */
+.esp .esp-securite .telechargements { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+/* registre */
+.esp .esp-securite .registre { list-style: none; padding: 0; display: grid; gap: 12px; }
+.esp .esp-securite .fiche-traitement { display: grid; gap: 10px; padding: 16px 20px; border: 1px solid var(--filet); border-radius: 16px; }
+.esp .esp-securite .fiche-traitement h3 { font-size: 20px; }
+.esp .esp-securite .fiche-traitement dl { display: grid; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); gap: 6px 16px; }
+.esp .esp-securite .fiche-traitement dt { color: var(--encre-2); font-size: 13px; font-weight: 700; }
+.esp .esp-securite .fiche-traitement dd { white-space: pre-line; overflow-wrap: anywhere; }
+
+/* demandes d'une personne */
+.esp .esp-securite .trouve { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 8px; }
+.esp .esp-securite .trouve li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border: 1px solid var(--filet); border-radius: 12px; }
+.esp .esp-securite .trouve li[data-garde="true"] { border-style: dashed; }
+.esp .esp-securite .trouve b { font-variant-numeric: tabular-nums; }
+.esp .esp-securite .conserves { padding: 12px 16px; border: 1px dashed var(--filet-fort); border-radius: 14px; color: var(--encre-2); font-size: 14px; }
+.esp .esp-securite .conserves b { display: block; color: var(--encre); }
+.esp .esp-securite .zone-effacer { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--accent-agent-texte); border-radius: 16px; }
+
+/* incidents : la procédure, puis chaque incident et sa course des 72 h */
+.esp .esp-securite .procedure { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; counter-reset: etape; }
+.esp .esp-securite .procedure li { display: grid; gap: 4px; align-content: start; padding: 14px 16px; border-top: 3px solid var(--accent); background: var(--survol); border-radius: 0 0 14px 14px; counter-increment: etape; }
+.esp .esp-securite .procedure b::before { content: counter(etape) ". "; }
+.esp .esp-securite .procedure span { color: var(--encre-2); font-size: 14px; }
+.esp .esp-securite .incidents { list-style: none; padding: 0; display: grid; gap: 12px; }
+.esp .esp-securite .incident { display: grid; gap: 10px; padding: 16px 20px; border: 1px solid var(--filet); border-radius: 16px; }
+.esp .esp-securite .incident p { white-space: pre-line; overflow-wrap: anywhere; }
+.esp .esp-securite .course { display: grid; gap: 6px; }
+.esp .esp-securite .course .piste { height: 8px; overflow: hidden; border-radius: 4px; background: var(--filet); }
+.esp .esp-securite .course .barre { height: 100%; border-radius: 4px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--v, 0)); animation: sec-pousse 900ms var(--c-glisse) backwards; }
+.esp .esp-securite .course[data-depasse="true"] .barre { background: var(--laterite); }
+.esp .esp-securite .course span { color: var(--encre-2); font-size: 13px; font-weight: 700; }
+@keyframes sec-pousse {
+  from { transform: scaleX(0); }
+}
+.esp .esp-securite .etapes-incident { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+
+/* consentements */
+.esp .esp-securite .consentements { list-style: none; padding: 0; display: grid; }
+.esp .esp-securite .consentements li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--filet); }
+.esp .esp-securite .consentements li:first-child { border-top: 0; }
+.esp .esp-securite .consentements b { font: 800 24px/1.1 var(--f-texte); font-variant-numeric: tabular-nums; }
+
+/* rôles : ce que chaque droit ouvre, puis les cases par membre */
+.esp .esp-securite .regles-droits { list-style: none; padding: 0; display: grid; gap: 8px; }
+.esp .esp-securite .regles-droits li { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 4px 16px; padding: 10px 0; border-top: 1px solid var(--filet); }
+.esp .esp-securite .regles-droits li:first-child { border-top: 0; }
+.esp .esp-securite .puces { display: flex; flex-wrap: wrap; gap: 8px; }
+.esp .esp-securite .puce { display: inline-flex; max-width: 100%; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.esp .esp-securite .puce input { width: 18px; height: 18px; margin: 0; accent-color: var(--ocean); }
+.esp[data-theme="sombre"] .esp-securite .puce input { accent-color: var(--soleil); }
+.esp .esp-securite .puce:has(input:checked) { border-color: var(--encre); background: var(--survol); }
+.esp .esp-securite .droits-membre { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 12px 20px; align-items: start; padding: 16px 0; border-top: 1px solid var(--filet); }
+.esp .esp-securite .droits-membre:first-child { border-top: 0; }
+.esp .esp-securite .droits-membre .qui b { display: block; }
+
+@media (max-width: 1180px) {
+  .esp .esp-securite .procedure { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .esp .esp-securite .filtres-journal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .esp .esp-securite .filtres-journal .boutons { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .esp .esp-securite .perimetre { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+  .esp .esp-securite .procedure { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-securite .filtres-journal { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-securite .filtres-journal .boutons > * { flex: 1 1 100%; }
+  .esp .esp-securite .fiche-traitement { padding: 14px; }
+  .esp .esp-securite .fiche-traitement dl,
+  .esp .esp-securite .regles-droits li,
+  .esp .esp-securite .droits-membre { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-securite .tableau .actions,
+  .esp .esp-securite .telechargements { justify-content: flex-start; }
+  .esp .esp-securite .sec-pied > .bouton { flex: 1 1 100%; }
+  .esp .esp-securite .empreinte { white-space: normal; }
+}

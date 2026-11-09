@@ -1,0 +1,42 @@
+/* Hallmark : extension du système OHT existant, sans nouvelle direction graphique. */
+:root { --services-blanc: #fff; }
+body:has(.services-page) [data-navigation] { background: var(--surface-abyss); }
+.services-page { color: var(--surface-abyss); background: var(--services-blanc); min-height: 90svh; padding: clamp(120px,14vw,180px) 24px 80px; }
+.services-entete { max-width: 900px; margin: 0 auto 48px; text-align: center; }
+.services-entete h1 { font: 600 clamp(38px,6vw,72px)/1.08 var(--font-display); letter-spacing: -.03em; text-wrap: balance; margin: 0 0 24px; }
+.services-entete p { font: 400 18px/1.65 var(--font-text); max-width: 58ch; margin: auto; }
+.services-form,.services-acces,.services-recu,.services-vide { width: 100%; max-width: 680px; margin: auto; font: 400 16px/1.6 var(--font-text); }
+.services-form,.services-acces,.services-acces form { display: grid; gap: 24px; }
+.services-form label,.services-equipe label { display: grid; gap: 8px; min-width: 0; font-weight: 600; }
+.services-form small { font-size: 14px; font-weight: 400; }
+.services-form input,.services-form select,.services-form textarea,.services-equipe input,.services-equipe select,.services-equipe textarea { width: 100%; border: 1px solid var(--text-secondary); border-radius: 8px; padding: 12px 16px; min-height: 48px; color: inherit; background: var(--services-blanc); font: inherit; font-weight: 400; }
+.services-form textarea,.services-equipe textarea { resize: vertical; }
+.services-case { display: flex!important; align-items: flex-start; gap: 12px!important; font-weight: 400!important; }
+.services-case input { width: 20px; height: 20px; min-height: 20px; flex: 0 0 20px; margin-top: 4px; accent-color: var(--surface-brand); }
+.services-bouton { min-height: 52px; justify-self: start; padding: 12px 24px; border: 1px solid var(--surface-brand); border-radius: 28px; color: var(--text-inverse); background: var(--surface-brand); font: 600 16px/1.4 var(--font-text); cursor: pointer; transition: transform .2s ease; }
+.services-bouton:hover:not(:disabled) { transform: translateY(-2px); }
+.services-bouton:active:not(:disabled) { transform: translateY(1px); }
+.services-bouton.secondaire { color: var(--surface-brand); background: var(--services-blanc); }
+.services-bouton:disabled { cursor: wait; color: var(--text-secondary); background: var(--border-default); border-color: var(--border-default); }
+.services-page :focus-visible,.services-equipe :focus-visible { outline: 3px solid var(--brand-primary); outline-offset: 4px; }
+.services-page a { color: var(--surface-brand); text-decoration: underline; text-underline-offset: 4px; }
+.services-erreur { color: var(--brand-primary); }
+.services-piege { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.services-recu { border-top: 4px solid var(--accent-sun); padding-top: 24px; overflow-wrap: anywhere; }
+.services-recu p { margin-bottom: 24px; }
+.services-equipe { display: grid; gap: 32px; margin: 24px; }
+.esp .services-equipe :where(input,select,textarea) { color: var(--encre); background: var(--surface); border-color: var(--filet-fort); }
+.esp .services-equipe .services-bouton { color: var(--accent-sur); background: var(--accent); border-color: var(--accent); }
+.esp .services-equipe .services-bouton.secondaire { color: var(--encre); background: var(--surface); border-color: var(--filet-fort); }
+.esp .services-equipe .services-bouton:disabled { color: var(--encre-3); background: var(--survol); border-color: var(--filet); }
+.esp .services-equipe :focus-visible { outline-color: var(--focus); }
+.services-equipe section { display: grid; gap: 20px; }
+.services-equipe h2 { font: 600 28px/1.25 var(--font-display); }
+.services-equipe form { display: grid; gap: 16px; }
+.services-equipe article { padding: 24px 0; border-bottom: 1px solid var(--border-default); overflow-wrap: anywhere; }
+.esp .services-equipe article { border-color: var(--filet); }
+.services-equipe article p { margin: 8px 0; }
+.services-ligne { display:flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.services-ligne>label { flex: 1 1 220px; }
+@media (max-width: 600px) { .services-page { padding: 120px 20px 56px; } .services-entete { text-align: left; margin-bottom: 32px; } .services-bouton { width: 100%; justify-self: stretch; } .services-equipe { margin: 16px; } }
+@media (prefers-reduced-motion: reduce) { .services-bouton { transition: none; } .services-bouton:hover:not(:disabled),.services-bouton:active:not(:disabled) { transform: none; } }

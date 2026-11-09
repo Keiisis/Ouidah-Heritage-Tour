@@ -1,0 +1,47 @@
+/* Catalogue admin : mêmes blocs, champs et tables que les écrans E2. */
+.esp .esp-boutique .bt-onglets { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--filet); }
+.esp .esp-boutique .bt-onglets a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 16px; color: var(--encre-2); font-weight: 600; text-decoration: none; border-bottom: 3px solid transparent; }
+.esp .esp-boutique .bt-onglets a[aria-current="page"] { color: var(--encre); border-bottom-color: var(--accent); }
+.esp .esp-boutique .bt-outils { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; justify-content: space-between; margin-bottom: 24px; }
+.esp .esp-boutique .bt-recherche { display: flex; align-items: end; gap: 8px; flex: 1 1 320px; }
+.esp .esp-boutique .bt-recherche .champ { flex: 1; }
+.esp .esp-boutique .bt-identite { display: flex; align-items: center; gap: 12px; min-width: 180px; }
+.esp .esp-boutique .bt-identite img { width: 56px; height: 70px; object-fit: cover; border-radius: 8px; }
+.esp .esp-boutique .bt-identite a { color: var(--encre); text-decoration: none; }
+.esp .esp-boutique .bt-identite a:hover { text-decoration: underline; }
+.esp .esp-boutique .bt-identite span, .esp .esp-boutique .bt-sous { display: block; margin-top: 4px; color: var(--encre-2); font-size: 13px; font-weight: 500; }
+.esp .esp-boutique .bt-table .num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.esp .esp-boutique .bt-form-champs { display: grid; min-width: 0; gap: 24px; border: 0; padding: 0; margin: 0; }
+.esp .esp-boutique .bt-groupe { display: grid; min-width: 0; gap: 16px; border: 0; border-top: 1px solid var(--filet); padding: 16px 0 0; margin: 0; }
+.esp .esp-boutique .bt-groupe legend { padding: 0 12px 0 0; color: var(--encre); font: 600 18px/1.4 var(--f-texte); }
+.esp .esp-boutique .bt-case { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.esp .esp-boutique .bt-case input { width: 20px; height: 20px; accent-color: var(--accent); }
+.esp .esp-boutique .aide { color: var(--encre-2); font-size: 14px; line-height: 1.5; margin: 0; }
+.esp .esp-boutique .bt-stock { font-variant-numeric: tabular-nums; }
+.esp .esp-boutique .bt-coloris { display: grid; gap: 12px; justify-items: start; }
+.esp .esp-boutique .bt-coloris-ligne { display: grid; width: 100%; grid-template-columns: minmax(120px, 1fr) 80px auto; gap: 12px; align-items: end; }
+.esp .esp-boutique .bt-coloris input[type="color"] { padding: 4px; cursor: pointer; }
+.esp .esp-boutique .bt-photos { display: grid; gap: 16px; }
+.esp .esp-boutique .bt-photos-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; }
+.esp .esp-boutique .bt-photos-liste li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; align-items: start; }
+.esp .esp-boutique .bt-photo { display: block; width: 120px; height: 150px; object-fit: cover; border-radius: 8px; }
+.esp .esp-boutique .bt-photo-champs { display: grid; gap: 12px; min-width: 0; }
+.esp .esp-boutique .bt-upload { display: grid; gap: 12px; justify-items: start; padding: 16px 0; }
+.esp .esp-boutique .bt-upload .champs { width: 100%; }
+.esp .esp-boutique .bt-publication { display: grid; gap: 8px; }
+.esp .esp-boutique .bt-publication .fin-retour { max-width: 320px; white-space: normal; text-align: left; }
+.esp .esp-boutique .bt-public { margin: 0 0 24px; }
+.esp .esp-boutique .bt-form-champs [readonly] { color: var(--encre-2); }
+.esp .esp-boutique .bt-traductions details { border-bottom: 1px solid var(--filet); }
+.esp .esp-boutique .bt-traductions summary { min-height: 48px; padding: 12px 0; cursor: pointer; font-weight: 600; }
+.esp .esp-boutique .bt-traductions details .champs { padding: 8px 0 24px; }
+.esp .esp-boutique .bouton-2 { white-space: normal; text-align: center; }
+@media (max-width: 600px) {
+  .esp .esp-boutique .bt-onglets { gap: 0; }
+  .esp .esp-boutique .bt-onglets a { flex: 1 1 50%; padding: 0 12px; }
+  .esp .esp-boutique .bt-photos-liste li { grid-template-columns: 80px minmax(0, 1fr); gap: 12px; }
+  .esp .esp-boutique .bt-photo { width: 80px; height: 100px; }
+  .esp .esp-boutique .bt-photo-champs .fin-pied { grid-column: 1 / -1; }
+  .esp .esp-boutique .bt-coloris-ligne { grid-template-columns: minmax(0, 1fr) 72px; }
+  .esp .esp-boutique .bt-coloris-ligne > button { grid-column: 1 / -1; justify-self: start; }
+}

@@ -1,0 +1,4 @@
+/* l'habillage n'ajoute aucune boîte : ses enfants se placent comme s'ils étaient directement dans <body> */
+.chrome-site { display: contents; }
+/* espaces de l'équipe : l'écran de connexion occupe toute la page */
+body:has([data-espace-equipe]) .chrome-site { display: none; }

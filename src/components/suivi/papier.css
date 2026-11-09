@@ -1,0 +1,40 @@
+/* Papier du ticket imprimé (maquette experience.html validée par Kevin) : un objet, il garde son papier thermique.
+   Tailles de la maquette au format bureau ; la page de suivi et l'animation les ajustent chacune de leur côté.
+   Chiffres et libellés en chasse fixe (police système) : l'aspect d'un ticket de caisse. */
+.sv-papier {
+  --sv-papier: #fbf8f2; --sv-encre: #1b1a22; --sv-encre-douce: #6b6a72; --sv-filet: #c9c4bb;
+  --sv-vert: #1f6b46; --sv-ok-fond: #e3efe7; --sv-attente-fond: #fff1cf; --sv-attente-encre: #8a5a00; --sv-pret-fond: #e6eaf7;
+  --sv-ocean: #122460; --sv-laterite: #ac3215; --sv-masque: #000;
+  --sv-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  background: var(--sv-papier);
+  color: var(--sv-encre);
+  padding: 32px 36px 44px;
+  font: 500 15px/1.55 var(--sv-mono);
+  -webkit-mask: linear-gradient(var(--sv-masque) 0 0) top / 100% calc(100% - 12px) no-repeat, conic-gradient(from -45deg at bottom, transparent, var(--sv-masque) 1deg 89deg, transparent 90deg) bottom / 16px 12px repeat-x;
+  mask: linear-gradient(var(--sv-masque) 0 0) top / 100% calc(100% - 12px) no-repeat, conic-gradient(from -45deg at bottom, transparent, var(--sv-masque) 1deg 89deg, transparent 90deg) bottom / 16px 12px repeat-x;
+}
+.sv-papier .sv-embleme { position: static; display: block; width: 68px; height: 68px; margin: 0 auto; }
+.sv-marque { display: block; margin-top: 8px; text-align: center; font: 600 15px/1.2 var(--font-text); letter-spacing: 0.04em; color: var(--sv-ocean); }
+.sv-doc { display: block; text-align: center; margin-top: 8px; font: 700 13px/1.2 var(--font-text); color: var(--sv-encre-douce); }
+.sv-sep { border: 0; border-top: 1.5px dashed var(--sv-filet); margin: 16px 0; }
+.sv-lignes { margin: 0; }
+.sv-ligne { display: flex; justify-content: space-between; gap: 16px; margin: 0; }
+.sv-ligne > :first-child { flex: none; color: var(--sv-encre-douce); font-size: 14px; }
+.sv-ligne > :last-child { margin: 0; text-align: right; font-weight: 700; overflow-wrap: anywhere; }
+.sv-total { display: flex; justify-content: space-between; gap: 16px; margin: 4px 0 0; font: 600 24px/1.2 var(--font-text); }
+.sv-total > :last-child { text-align: right; }
+.sv-paye-avec { margin-top: 6px; }
+.sv-ligne-statut { display: flex; align-items: center; justify-content: space-between; min-height: 40px; margin-top: 8px; }
+.sv-statut { padding: 8px 12px; border-radius: 99px; font: 600 14px/1 var(--font-text); }
+.sv-statut.is-paye, .sv-statut.is-remise { background: var(--sv-ok-fond); color: var(--sv-vert); }
+.sv-statut.is-attente, .sv-statut.is-a_confirmer, .sv-statut.is-a_preparer { background: var(--sv-attente-fond); color: var(--sv-attente-encre); }
+.sv-statut.is-pret, .sv-statut.is-rembourse, .sv-statut.is-prete { background: var(--sv-pret-fond); color: var(--sv-ocean); }
+.sv-tampon { flex: none; width: 100px; height: 100px; margin: 0 8px -16px 0; transform: rotate(-14deg); }
+.sv-tampon-arc { font: 700 9.5px/1 var(--font-text); letter-spacing: 0.22em; fill: var(--sv-laterite); text-transform: uppercase; }
+.sv-tampon-sigle { font: 600 34px/1 var(--font-text); fill: var(--sv-laterite); }
+.sv-qr { display: grid; grid-template-columns: 124px 1fr; gap: 16px; align-items: center; }
+.sv-qr-code { display: block; width: 124px; height: 124px; }
+.sv-qr-code svg { display: block; width: 100%; height: 100%; }
+.sv-qr p { margin: 0; font: 600 15px/1.45 var(--font-text); }
+.sv-qr em { display: block; margin-top: 8px; font: 500 12px/1.4 var(--sv-mono); font-style: normal; color: var(--sv-encre-douce); }
+.sv-merci { margin: 12px 0 0; text-align: center; font: 700 16px/1.4 var(--font-text); color: var(--sv-laterite); }

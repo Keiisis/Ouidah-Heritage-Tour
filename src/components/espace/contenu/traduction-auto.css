@@ -1,0 +1,12 @@
+.esp .tr-auto { margin: 0 0 2rem; padding: clamp(1rem, 3vw, 2rem); border: 1px solid var(--filet); border-radius: 1.2rem; background: var(--surface); }
+.esp .tr-auto h2 { margin: 0 0 .6rem; }
+.esp .tr-auto-etats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin: 1.4rem 0; }
+.esp .tr-auto-etats dt { font-size: .85rem; }
+.esp .tr-auto-etats dd { margin: .3rem 0 0; font-size: 1.7rem; font-weight: 600; }
+.esp .tr-auto-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.esp .tr-auto-form label { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.esp .tr-auto-form input:not([type=checkbox]), .esp .tr-auto-form textarea { width: 100%; padding: .8rem; color: var(--encre); background: var(--surface); border: 1px solid var(--filet-fort); border-radius: .6rem; }
+.esp .tr-auto-form .tr-auto-choix { grid-column: 1 / -1; flex-direction: row; align-items: center; }
+.esp .tr-auto-large, .esp .tr-auto-actions { grid-column: 1 / -1; }
+.esp .tr-auto-actions { display: flex; flex-wrap: wrap; gap: .7rem; }
+@media (max-width: 640px) { .esp .tr-auto-form { grid-template-columns: minmax(0, 1fr); } .esp .tr-auto-etats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

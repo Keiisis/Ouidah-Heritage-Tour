@@ -1,0 +1,573 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* Kit de marque OHT (12 jetons) sur l'ADN mesuré de la référence (Keys_Osi 91/100). */
+:root {
+  --surface-base: #f7f1e8;
+  --surface-muted: #efe6d8;
+  --surface-inverse: #0b1638;
+  --surface-brand: #122460;
+  --text-primary: #2b1a10;
+  --text-secondary: #6b5545;
+  --text-muted: #75604f;
+  --text-inverse: #f7f1e8;
+  --border-default: #cbbba6;
+  --brand-primary: #ac3215;
+  --brand-primary-hover: #8e2a10;
+  --brand-secondary: #df9410;
+  /* Navigation et ouverture, reprises du dossier bénin-tours */
+  --accent-sun: #fdbf28;
+  --accent-sun-hover: #f0a22a;
+  --surface-abyss: #0f162d;
+  /* Section 7 : planche contact (crayon rouge, pellicule, numéros de bord) */
+  --mark-pencil: #d3302a;
+  --film-base: #17130f;
+  --film-edge: #e39b2f;
+  --paper-table: #f3f2ef;
+}
+
+@theme inline {
+  --font-display: var(--font-fraunces), "Noto Serif", Georgia, serif;
+  --font-text: var(--font-manrope), "Noto Sans", system-ui, sans-serif;
+
+  --text-display: 96px;
+  --text-display--line-height: 104px;
+  --text-display--letter-spacing: -1.5px;
+  --text-h1: 72px;
+  --text-h1--line-height: 90px;
+  --text-h1--letter-spacing: -1px;
+  --text-h2: 56px;
+  --text-h2--line-height: 72px;
+  --text-h2--letter-spacing: -1px;
+  --text-h3: 40px;
+  --text-h3--line-height: 52px;
+  --text-h4: 28px;
+  --text-h4--line-height: 36px;
+  --text-body: 16px;
+  --text-body--line-height: 26px;
+  --text-ui: 14px;
+  --text-label: 12px;
+
+  --color-surface: var(--surface-base);
+  --color-sand: var(--surface-muted);
+  --color-night: var(--surface-inverse);
+  --color-ocean: var(--surface-brand);
+  --color-ink: var(--text-primary);
+  --color-ink-soft: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+  --color-ivory: var(--text-inverse);
+  --color-hairline: var(--border-default);
+  --color-laterite: var(--brand-primary);
+  --color-laterite-deep: var(--brand-primary-hover);
+  --color-ochre: var(--brand-secondary);
+  --color-sun: var(--accent-sun);
+  --color-sun-deep: var(--accent-sun-hover);
+  --color-abyss: var(--surface-abyss);
+  --color-pencil: var(--mark-pencil);
+  --color-film: var(--film-base);
+  --color-film-edge: var(--film-edge);
+  --color-paper: var(--paper-table);
+
+  --radius-frame: 2px;
+}
+
+@layer base {
+  html {
+    background: var(--surface-base);
+    color: var(--text-primary);
+    overflow-x: clip;
+  }
+  body {
+    font-family: var(--font-text);
+    font-size: 16px;
+    line-height: 26px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-style: normal;
+    text-wrap: balance;
+  }
+  ::selection {
+    background: var(--brand-primary);
+    color: var(--text-inverse);
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 3px;
+  }
+  .on-dark :focus-visible {
+    outline-color: var(--brand-secondary);
+  }
+  dialog::backdrop {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .container-oht {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+  @media (min-width: 768px) {
+    .container-oht {
+      padding-inline: 40px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-oht {
+      padding-inline: 64px;
+    }
+  }
+  .hairline {
+    border-top: 1px solid var(--border-default);
+  }
+  .on-dark .hairline {
+    border-color: color-mix(in oklab, var(--text-inverse) 18%, transparent);
+  }
+  .label {
+    font: 500 12px/16px var(--font-text);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .frame {
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .link-line {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-block: 8px;
+    min-height: 44px;
+  }
+  .link-line::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 8px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0.3);
+    transform-origin: left;
+    transition: transform 500ms cubic-bezier(0.6, 0, 0.5, 1);
+  }
+  .link-line:hover::after,
+  .link-line:focus-visible::after {
+    transform: scaleX(1);
+  }
+  .ken-burns {
+    animation: ken-burns 24s ease-in-out infinite alternate;
+  }
+}
+
+/* Keyframes mesurées sur la référence */
+/* Repères des lieux sur la carte de la section 3 : photo ronde cerclée (comme la section 2) + numéro */
+/* pas de « position » ici : MapLibre place le repère en absolu (.maplibregl-marker), le redéfinir le décale */
+/* Section 7 : perforations de la pellicule, en haut et en bas de la bande */
+.oht-pellicule {
+  position: relative;
+}
+.oht-pellicule::before,
+.oht-pellicule::after {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  height: 0.4375rem;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, transparent 0 0.45rem, var(--paper-table) 0.45rem 1.05rem, transparent 1.05rem 1.5rem);
+}
+.oht-pellicule::before {
+  top: 0.3125rem;
+}
+.oht-pellicule::after {
+  bottom: 0.3125rem;
+}
+
+.oht-repere {
+  width: 52px;
+  height: 52px;
+  cursor: default;
+}
+.oht-repere span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid var(--surface-abyss);
+  box-shadow: 0 4px 12px -2px color-mix(in oklab, var(--surface-abyss) 45%, transparent);
+  transition: transform 500ms cubic-bezier(0.6, 0, 0.5, 1), border-color 500ms;
+}
+.oht-repere b {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--surface-abyss);
+  color: #fff;
+  font: 700 11px/1 var(--font-display);
+  transition: background-color 500ms, color 500ms;
+}
+.oht-repere.is-actif {
+  z-index: 2;
+}
+.oht-repere.is-actif span {
+  border-color: var(--accent-sun);
+  transform: scale(1.35);
+}
+.oht-repere.is-actif b {
+  background: var(--accent-sun);
+  color: var(--surface-abyss);
+}
+/* Section 5 : repères des lieux (photo ronde, ou point quand OHT n'a pas encore de photo) */
+.oht-lieu { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.oht-lieu-photo { position: relative; width: 2.75rem; height: 2.75rem; border-radius: 999px; border: 3px solid var(--surface-abyss); background-size: cover; background-position: center; box-shadow: 0 8px 16px -8px color-mix(in oklab, var(--surface-abyss) 55%, transparent); transition: width 400ms, height 400ms, border-color 400ms, box-shadow 400ms; }
+.oht-lieu-point { position: relative; width: 0.875rem; height: 0.875rem; border-radius: 999px; background: #fff; border: 3px solid var(--surface-abyss); }
+.oht-lieu b { position: absolute; right: -0.4rem; bottom: -0.4rem; display: none; place-items: center; width: 1.375rem; height: 1.375rem; border-radius: 999px; background: var(--accent-sun); color: var(--surface-abyss); font: 800 0.6875rem/1 var(--font-display); }
+.oht-lieu-point b { right: -1rem; bottom: -0.9rem; }
+.oht-lieu-nom { display: none; background: #fff; color: var(--surface-abyss); border-radius: 0.5rem; padding: 0.25rem 0.5rem; font: 800 0.6875rem/1.2 var(--font-text); white-space: nowrap; box-shadow: 0 8px 16px -8px color-mix(in oklab, var(--surface-abyss) 45%, transparent); }
+.oht-lieu.is-nomme .oht-lieu-nom, .oht-lieu:hover .oht-lieu-nom { display: block; }
+.oht-lieu.is-garde .oht-lieu-photo { border-color: var(--accent-sun); }
+.oht-lieu.is-garde .oht-lieu-point { border-color: var(--accent-sun); background: var(--accent-sun); }
+.oht-lieu.is-garde b { display: grid; }
+.oht-lieu.is-ici { z-index: 3; }
+.oht-lieu.is-ici .oht-lieu-photo { width: 4rem; height: 4rem; border-color: #fff; box-shadow: 0 0 0 0.375rem color-mix(in oklab, var(--accent-sun) 60%, transparent), 0 16px 32px -8px color-mix(in oklab, var(--surface-abyss) 60%, transparent); }
+.oht-lieu.is-cache { display: none; }
+.oht-lieu.is-gauche { flex-direction: row-reverse; translate: calc(-100% + 2.75rem) 0; }
+.oht-lieu.is-gauche:has(.oht-lieu-point) { translate: calc(-100% + 0.875rem) 0; }
+.oht-lieu.is-ici.is-gauche { translate: calc(-100% + 4rem) 0; }
+/* Verre liquide (recette Prompt-Pro « wanderful-hero ») : réservé aux éléments posés sur une photo */
+@utility verre-liquide {
+  background: rgb(255 255 255 / 0.07);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  backdrop-filter: blur(12px) saturate(1.3);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.12);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.45), rgb(255 255 255 / 0.15) 20%, transparent 40%, transparent 60%, rgb(255 255 255 / 0.15) 80%, rgb(255 255 255 / 0.45));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+  }
+}
+
+/* Verre façon Apple (section 6) : flou épais, saturation, liseré spéculaire et reflet en haut à gauche */
+@utility verre-clair {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(140deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.06) 45%, rgb(255 255 255 / 0.1));
+  -webkit-backdrop-filter: blur(26px) saturate(1.8);
+  backdrop-filter: blur(26px) saturate(1.8);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), inset 0 -1px 0 rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.16), 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 0.6);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(80% 60% at 18% 0%, rgb(255 255 255 / 0.28), transparent 60%);
+  }
+}
+@utility verre-sombre {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(140deg, rgb(28 30 40 / 0.62), rgb(14 16 26 / 0.5));
+  -webkit-backdrop-filter: blur(26px) saturate(1.8);
+  backdrop-filter: blur(26px) saturate(1.8);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), inset 0 0 0 1px rgb(255 255 255 / 0.1), 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 0.7);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(70% 50% at 15% 0%, rgb(255 255 255 / 0.14), transparent 60%);
+  }
+}
+
+/* tête du trajet : point soleil lumineux qui avance sur la carte */
+.oht-comete {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--accent-sun);
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 8px color-mix(in oklab, var(--accent-sun) 35%, transparent),
+    0 0 24px 6px color-mix(in oklab, var(--accent-sun) 60%, transparent);
+}
+
+/* Halo sombre serré sous les lettres : lisibilité du texte posé sur une photo sans voile */
+@utility text-halo {
+  text-shadow:
+    0 0 2px var(--surface-abyss),
+    0 0 8px color-mix(in oklab, var(--surface-abyss) 85%, transparent),
+    0 2px 24px color-mix(in oklab, var(--surface-abyss) 70%, transparent);
+}
+
+/* Variante dense pour les petits textes (accroche, sous-titre, légendes) */
+@utility text-halo-fort {
+  text-shadow:
+    0 0 1px var(--surface-abyss),
+    0 0 2px var(--surface-abyss),
+    0 0 4px var(--surface-abyss),
+    0 0 8px color-mix(in oklab, var(--surface-abyss) 90%, transparent),
+    0 1px 16px color-mix(in oklab, var(--surface-abyss) 80%, transparent);
+}
+
+@keyframes ken-burns {
+  from { transform: scale(1.04) translate(0, 0); }
+  to { transform: scale(1.16) translate(-1.5%, -2%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns {
+    animation: none;
+  }
+  .link-line::after {
+    transition: none;
+  }
+}
+
+/* Boutons et liens D1 « Pastille double » (mécanique mesurée sur Mejuma Tuscany, Webflow : 0,6 s cubic-bezier(.625,.05,0,1)).
+   --oht-t va de 0 (repos) à 1 (survol ou focus clavier) ; tout le mouvement en dérive. Objets 3D : gris tant que rien n'est réglé. */
+@property --oht-t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@layer components {
+  .oht-btn {
+    --oht-t: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 48px;
+    font: 700 15px/1 var(--font-text);
+    white-space: nowrap;
+    color: var(--oht-btn-texte, #fff);
+    transition: --oht-t 420ms cubic-bezier(0.625, 0.05, 0, 1);
+  }
+  .oht-btn:hover,
+  .oht-btn:focus-visible {
+    --oht-t: 1;
+    transition-duration: 600ms;
+  }
+  .oht-btn:focus-visible {
+    outline: none;
+  }
+  .oht-btn:focus-visible .oht-btn-pilule {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 3px;
+  }
+  .oht-btn-pilule {
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 24px;
+    border-radius: 999px;
+    background: var(--oht-btn-fond, var(--surface-abyss));
+    transform: translateX(calc((1 - var(--oht-t)) * -54px));
+  }
+  .oht-btn-pastille {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--oht-btn-fond, var(--surface-abyss));
+    font-variant-numeric: tabular-nums;
+  }
+  .oht-btn-pastille svg {
+    width: 18px;
+    height: 18px;
+  }
+  .oht-btn-pastille.is-gauche {
+    transform: scale(var(--oht-t));
+  }
+  .oht-btn-pastille.is-gauche svg {
+    transform: rotate(calc((1 - var(--oht-t)) * 45deg));
+  }
+  .oht-btn-pastille.is-droite {
+    transform: translateX(calc((1 - var(--oht-t)) * -54px)) scale(calc(1 - var(--oht-t)));
+  }
+  .oht-btn.is-clair {
+    --oht-btn-fond: #fff;
+    --oht-btn-texte: var(--surface-abyss);
+  }
+  .oht-btn[aria-disabled="true"] {
+    --oht-t: 0 !important;
+    --oht-btn-fond: color-mix(in oklab, var(--surface-abyss) 7%, transparent);
+    --oht-btn-texte: var(--text-muted);
+    cursor: not-allowed;
+  }
+  .oht-lien {
+    --oht-t: 0;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-weight: 700;
+    transition: --oht-t 420ms cubic-bezier(0.65, 0.05, 0, 1);
+  }
+  .oht-lien:hover,
+  .oht-lien:focus-visible {
+    --oht-t: 1;
+    transition-duration: 500ms;
+  }
+  .oht-lien::before {
+    content: "";
+    flex: none;
+    width: calc(var(--oht-t) * 0.75rem);
+    height: calc(var(--oht-t) * 0.75rem);
+    margin-right: calc((1 - var(--oht-t)) * -10px);
+    border-radius: 50%;
+    background: var(--brand-primary);
+  }
+  .oht-objet {
+    display: block;
+    flex: none;
+    object-fit: contain;
+    transform: perspective(500px) rotateX(var(--oht-rx, 0deg)) rotateY(var(--oht-ry, 0deg));
+    transition:
+      filter 500ms cubic-bezier(0.625, 0.05, 0, 1),
+      opacity 500ms cubic-bezier(0.625, 0.05, 0, 1),
+      transform 600ms cubic-bezier(0.625, 0.05, 0, 1);
+  }
+  .oht-objet.is-eteint {
+    filter: grayscale(1);
+    opacity: 0.4;
+  }
+  :is(a, button, label):hover > .oht-objet,
+  :is(a, button, label):focus-visible > .oht-objet {
+    --oht-rx: 8deg;
+    --oht-ry: -12deg;
+  }
+  /* sur fond bleu nuit : bouton clair encore lisible quand il manque une réponse */
+  .oht-btn.is-clair[aria-disabled="true"] {
+    --oht-btn-fond: color-mix(in oklab, #fff 55%, transparent);
+    --oht-btn-texte: var(--surface-abyss);
+  }
+  .oht-btn.is-attente {
+    cursor: progress;
+  }
+  .oht-tourne {
+    width: 18px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: oht-tourne 0.9s linear infinite;
+  }
+
+}
+@keyframes oht-tourne {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oht-btn,
+  .oht-lien,
+  .oht-objet {
+    transition: none;
+  }
+  .oht-tourne {
+    animation: none;
+    border-right-color: currentColor;
+    opacity: 0.6;
+  }
+}
+@media (max-width: 639px) {
+  /* bouton pleine largeur sur téléphone : pas de pastille flèche (pas de survol au doigt), pilule étirée */
+  .oht-btn.is-plein-mobile {
+    width: 100%;
+  }
+  .oht-btn.is-plein-mobile .oht-btn-pastille.is-gauche {
+    display: none;
+  }
+  .oht-btn.is-plein-mobile .oht-btn-pilule {
+    flex: 1;
+    justify-content: center;
+    transform: none;
+  }
+  .oht-btn.is-plein-mobile .oht-btn-pastille.is-droite {
+    transform: none;
+  }
+}
+/* Préparer votre voyage : ondes autour du repère de Ouidah sur la carte */
+.oht-onde {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: oht-onde 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.oht-onde.is-tard {
+  animation-delay: 1.2s;
+}
+@keyframes oht-onde {
+  from {
+    transform: scale(0.15);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oht-onde {
+    animation: none;
+    opacity: 0;
+  }
+}
+/* Pied de page « Verre sur Ouidah » : fondu entre photos (1,6 s) et soulignement des liens. Pas de zoom continu :
+   sous le flou du verre, chaque image animée oblige à recalculer le flou (capture bloquée en test, lourd sur téléphone). */
+.oht-pied-photo {
+  opacity: 0;
+  transition: opacity 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.oht-pied-photo.is-on {
+  opacity: 1;
+}
+.oht-pied-lien {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s;
+}
+.oht-pied-lien:hover,
+.oht-pied-lien:focus-visible {
+  background-size: 100% 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .oht-pied-photo,
+  .oht-pied-lien {
+    transition: none;
+  }
+}
+
+/* menu mobile ouvert : la page derrière ne défile plus */
+html:has(dialog#site-menu[open]) {
+  overflow: hidden;
+}

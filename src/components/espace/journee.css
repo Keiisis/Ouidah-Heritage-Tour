@@ -1,0 +1,178 @@
+/* « La course du soleil » (maquette E) : le ciel au-dessus de l'horizon, l'arc réel du soleil sur Ouidah, quatre lumières
+   nettes sur [data-lumiere] (aube océan, plein jour blanc, fin d'après-midi safran, nuit abysse). Sous l'horizon, un sol
+   navy qui monte au coucher (clip-path). Aucune lueur : traits fins, disque plein. Tout sous .esp. */
+
+.esp .esp-journee {
+  --hz: 268px;
+  --ciel-fond: var(--blanc);
+  --ciel-encre: var(--encre-fixe);
+  --ciel-encre-2: var(--encre-2-fixe);
+  --ciel-trait: var(--gris-trait);
+  --ciel-trait-fort: var(--encre-3-fixe);
+  --ciel-passe: var(--ocean);
+  --ciel-disque: var(--soleil);
+  --ciel-anneau: var(--ocean);
+  --ciel-bord: var(--filet-fixe);
+  --ciel-survol: var(--carte-ville);
+  --ciel-etiq: var(--ocean);
+  --ciel-etiq-encre: var(--blanc);
+  --ciel-focus: var(--ocean);
+  --sol: var(--ocean);
+  --sol-encre: var(--sable);
+  --sol-encre-2: var(--sable-78);
+  --sol-trait: var(--blanc-30);
+  position: relative;
+  isolation: isolate;
+  margin-bottom: 24px;
+  padding: 28px 32px 32px;
+  border: 1px solid var(--ciel-bord);
+  border-radius: 28px;
+  background: var(--ciel-fond);
+  color: var(--ciel-encre);
+}
+.esp[data-role="admins"] .esp-journee { --hz: 300px; }
+.esp .esp-journee[data-lumiere="aube"] { --ciel-focus: var(--soleil); --ciel-fond: var(--ocean); --ciel-encre: var(--sable); --ciel-encre-2: var(--sable-78); --ciel-trait: var(--blanc-30); --ciel-trait-fort: var(--blanc-60); --ciel-passe: var(--blanc); --ciel-disque: var(--safran); --ciel-anneau: var(--ocean); --ciel-bord: var(--ocean); --ciel-survol: var(--nuit-2); --ciel-etiq: var(--blanc); --ciel-etiq-encre: var(--abyss); --sol: var(--abyss); }
+.esp .esp-journee[data-lumiere="soir"] { --ciel-focus: var(--abyss); --ciel-fond: var(--safran); --ciel-encre: var(--encre-fixe); --ciel-encre-2: var(--encre-safran); --ciel-trait: var(--abysse-35); --ciel-trait-fort: var(--abysse-60); --ciel-passe: var(--abyss); --ciel-disque: var(--laterite); --ciel-anneau: var(--abyss); --ciel-bord: var(--safran); --ciel-survol: var(--abysse-10); --ciel-etiq: var(--abyss); --ciel-etiq-encre: var(--blanc); --sol: var(--abyss); }
+.esp .esp-journee[data-lumiere="nuit"] { --ciel-focus: var(--soleil); --ciel-fond: var(--abyss); --ciel-encre: var(--sable); --ciel-encre-2: var(--sable-74); --ciel-trait: var(--blanc-26); --ciel-trait-fort: var(--blanc-60); --ciel-passe: var(--blanc); --ciel-disque: var(--abyss); --ciel-anneau: var(--blanc); --ciel-bord: var(--abyss); --ciel-survol: var(--nuit-2); --ciel-etiq: var(--blanc); --ciel-etiq-encre: var(--abyss); --sol: var(--nuit); }
+.esp[data-theme="sombre"] .esp-journee[data-lumiere="jour"] { --ciel-focus: var(--soleil); --ciel-fond: var(--surface); --ciel-encre: var(--sable); --ciel-encre-2: var(--encre-2-sombre); --ciel-trait: var(--trait-sombre); --ciel-trait-fort: var(--blanc-60); --ciel-passe: var(--blanc); --ciel-anneau: var(--surface); --ciel-bord: var(--filet); --ciel-survol: var(--survol); --ciel-etiq: var(--blanc); --ciel-etiq-encre: var(--abyss); --sol: var(--abyss); }
+.esp .esp-journee > * { position: relative; z-index: 1; }
+/* volet : l'ancienne lumière (ou l'ancien thème) se retire vers le haut, la nouvelle est déjà dessous */
+.esp .esp-journee > .volet-zone { position: absolute; inset: -1px; z-index: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.esp .volet-lumiere { position: absolute; inset: 0; }
+.esp .esp-journee :focus-visible { outline-color: var(--ciel-focus); }
+.esp .esp-journee h2 { color: var(--ciel-encre); font-size: 32px; }
+
+.esp .journee-tete { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; margin-bottom: 8px; }
+.esp .journee-tete .sous { margin-top: 4px; color: var(--ciel-encre-2); font-weight: 600; }
+.esp .soleil-info { display: flex; gap: 28px; flex-wrap: wrap; }
+.esp .soleil-info div { display: grid; }
+.esp .soleil-info dt { color: var(--ciel-encre-2); font-size: 13px; font-weight: 600; }
+.esp .soleil-info dd { font: 700 22px/1.3 var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp .proposer-sombre { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 12px; padding: 0 16px; border: 1px solid var(--ciel-trait-fort); border-radius: 22px; background: none; color: var(--ciel-encre); font-weight: 700; transition: transform var(--d-court) var(--c-etat); }
+.esp .proposer-sombre:hover { background: var(--ciel-survol); transform: translateY(-1px); }
+
+/* la scène : le ciel au-dessus de l'horizon ; l'horizon est le bas de la scène. x en cqw, hauteur en part de --hz */
+.esp .ciel-scene { position: relative; z-index: 2; height: var(--hz); margin: 4px -8px 0; container-type: inline-size; }
+.esp :is(.ciel-arc, .ciel-passe) { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.esp .ciel-arc .arc { fill: none; stroke: var(--ciel-trait); stroke-width: 1.25; }
+.esp .ciel-arc .arc-sol { fill: none; stroke: var(--sol-trait); stroke-width: 1.25; }
+.esp .ciel-arc .caisse-tick { stroke: var(--ciel-passe); stroke-width: 2; stroke-linecap: round; }
+.esp .ciel-passe .arc { fill: none; stroke: var(--ciel-passe); stroke-width: 2.25; stroke-linecap: round; }
+.esp .ciel-passe .arc-sol { fill: none; stroke: var(--sol-encre); stroke-width: 2.25; stroke-linecap: round; }
+
+/* le disque du soleil : solide, net ; son heure défile avec lui à l'entrée */
+.esp .disque { position: absolute; left: 0; top: 0; z-index: 3; width: 0; height: 0; transform: translate(calc(var(--sx) * 1cqw), calc(var(--sy) * var(--hz))); transition: transform 1200ms var(--c-glisse); pointer-events: none; }
+.esp .disque i { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%; background: var(--ciel-disque); box-shadow: 0 0 0 2px var(--ciel-anneau); }
+.esp .esp-journee[data-lumiere="nuit"] .disque i { box-shadow: inset 0 0 0 2px var(--ciel-anneau); }
+.esp .disque::before { content: ""; position: absolute; left: -0.5px; top: 22px; width: 1px; height: max(0px, calc((1 - var(--sy)) * var(--hz) - 22px)); background: var(--ciel-passe); opacity: 0.4; }
+.esp .disque b { position: absolute; left: 0; bottom: 30px; transform: translateX(-50%); padding: 0 8px; border-radius: 8px; background: var(--ciel-etiq); color: var(--ciel-etiq-encre); font: 800 12px/24px var(--f-texte); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.esp .esp-journee[data-lumiere="nuit"] .disque b { display: none; }
+.esp .esp-journee[data-lumiere="nuit"] .disque::before { display: none; }
+.esp .disque.bord-g b { transform: translateX(-12px); }
+.esp .disque.bord-d b { transform: translateX(calc(-100% + 12px)); }
+
+/* le sol : sous l'horizon ; il monte dans le ciel au coucher (clip-path) */
+.esp .sol { position: relative; z-index: 1; margin: 0 -8px; padding: 32px 16px 20px; border-radius: 0 0 18px 18px; background: var(--sol); color: var(--sol-encre); animation: esp-sol-leve 900ms var(--c-glisse) backwards 200ms; }
+.esp .sol::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: var(--hz); background: var(--sol); clip-path: inset(calc(100% - var(--monte, 0) * 100%) 0 0 0); transition: clip-path 1200ms var(--c-glisse); pointer-events: none; }
+.esp .sol :focus-visible { outline-color: var(--focus-nuit); }
+@keyframes esp-sol-leve {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.esp .ciel-heures { position: absolute; left: 0; right: 0; top: 6px; height: 20px; pointer-events: none; }
+.esp .ciel-heures span { position: absolute; top: 0; left: calc(var(--hx) * 1%); transform: translateX(-50%); color: var(--sol-encre-2); font: 700 12px/20px var(--f-texte); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* sous l'horizon : ce qui est prévu aujourd'hui (agent), la caisse du jour (admin) */
+.esp .lt-pile { display: grid; gap: 8px; }
+.esp .lt-pile li { display: inline-flex; gap: 8px; align-items: center; color: var(--sol-encre); font-size: 14px; font-weight: 600; line-height: 1.4; }
+.esp .lt-pile li .ic { width: 16px; height: 16px; color: var(--sol-encre-2); }
+.esp .lt-pile :is(.pile-vide, .pile-note) { color: var(--sol-encre-2); font-size: 14px; }
+.esp .lt-pile .pile-vide { color: var(--sol-encre); }
+/* en cours, à clore (une ligne qui défile horizontalement), ensuite (deux lignes, le reste replié) */
+.esp .lt-pile .etiq { flex: none; padding: 0 8px; border: 1px solid var(--sol-trait); border-radius: 6px; color: var(--sol-encre-2); font: 700 12px/22px var(--f-texte); }
+.esp :is(.esp-maintenant, .a-clore, .ensuite) { display: flex; align-items: baseline; gap: 12px; min-width: 0; color: var(--sol-encre); font-size: 14px; font-weight: 600; }
+.esp .esp-maintenant { font-size: 15px; font-weight: 700; }
+.esp :is(.esp-maintenant, .a-clore, .ensuite) :is(ul, ol) { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 24px; min-width: 0; }
+.esp .ensuite { flex-wrap: wrap; }
+.esp .ensuite details { flex-basis: 100%; }
+.esp .ensuite summary { display: inline-flex; align-items: center; min-height: 32px; color: var(--sol-encre-2); cursor: pointer; }
+.esp .ensuite details ol { margin-top: 4px; }
+.esp .a-clore .defile-x { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; padding-bottom: 4px; }
+.esp .a-clore .defile-x li { flex: none; white-space: nowrap; }
+.esp .caisse-ciel { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: var(--sol-encre-2); font-weight: 700; }
+.esp .caisse-ciel b { color: var(--sol-encre); font: 800 24px/1.2 var(--f-texte); font-variant-numeric: tabular-nums; }
+.esp .caisse-l ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.esp .caisse-l li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--sol-trait); }
+.esp .caisse-l .heure { font-weight: 800; }
+.esp .caisse-l .num { font-weight: 800; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .esp .esp-journee { --hz: 150px; margin: 0 -4px 16px; padding: 14px 16px 16px; border-radius: 20px; }
+  .esp[data-role="admins"] .esp-journee { --hz: 150px; }
+  /* une seule ligne au-dessus de l'arc : « Lever · Coucher · Lumière » */
+  .esp .esp-journee h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .esp .journee-tete { margin-bottom: 4px; }
+  .esp .journee-tete .sous { display: none; }
+  .esp .journee-tete > div:first-child:not(:has(.proposer-sombre)) { position: absolute; }
+  .esp .proposer-sombre { margin-top: 0; }
+  /* une ligne qui tient en 390 même à la lumière la plus longue (« Fin d'après-midi ») */
+  .esp .soleil-info { flex-wrap: nowrap; gap: 0; min-width: 0; font-size: 13px; }
+  .esp .soleil-info [data-info="aube"] { display: none; }
+  .esp .soleil-info [data-info="lever"] { order: 1; }
+  .esp .soleil-info [data-info="coucher"] { order: 2; }
+  .esp .soleil-info [data-info="lumiere"] { order: 3; }
+  .esp .soleil-info div { display: flex; gap: 4px; align-items: baseline; white-space: nowrap; }
+  /* séparateurs posés selon l'ordre affiché (order), pas selon l'ordre du HTML où « Lumière » vient en premier */
+  .esp .soleil-info :is([data-info="coucher"], [data-info="lumiere"])::before { content: "·"; margin: 0 5px; color: var(--ciel-encre-2); }
+  .esp .soleil-info [data-info="lumiere"] dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .esp .soleil-info dd { font-size: 13px; font-weight: 800; }
+  .esp .ciel-scene { margin: 0 -4px; }
+  .esp .sol { margin: 0 -4px; padding: 28px 12px 16px; border-radius: 0 0 14px 14px; }
+  .esp .disque i { left: -14px; top: -14px; width: 28px; height: 28px; }
+  .esp .disque::before { top: 14px; height: max(0px, calc((1 - var(--sy)) * var(--hz) - 14px)); }
+  .esp .disque b { bottom: 20px; font-size: 11px; line-height: 20px; }
+  .esp .ciel-heures .secondaire { display: none; }
+  .esp .caisse-l ol { grid-template-columns: minmax(0, 1fr); }
+  .esp .caisse-l li:nth-child(n + 3) { display: none; }
+  .esp .caisse-ciel b { font-size: 20px; }
+  .esp :is(.esp-maintenant, .a-clore, .ensuite) { gap: 8px; }
+
+}
+
+/* moments des dossiers (lot L4) : à venir et en cours posés sur l'arc à leur heure (un lien vers le dossier), au-dessus
+   de la scène (même boîte : la scène est décorative, aria-hidden) ; ils se lèvent de l'horizon à l'entrée */
+.esp .esp-journee > .ciel-reperes { position: relative; z-index: 4; height: var(--hz); margin: calc(-1 * var(--hz)) -8px 0; container-type: inline-size; pointer-events: none; }
+/* --ry : hauteur sur l'arc, jamais si bas que le repère touche l'horizon (près de l'aube ou du coucher) */
+.esp .ciel-reperes .creneau { --garde: 24px; --ry: min(calc(var(--my) * var(--hz)), calc(var(--hz) - var(--garde))); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 36px; height: 36px; margin: -18px 0 0 -18px; border: 2px solid var(--ciel-trait-fort); border-radius: 50%; background: var(--ciel-fond); color: var(--ciel-encre); text-decoration: none; pointer-events: auto; transform: translate(calc(var(--mx) * 1cqw), var(--ry)); transition: transform var(--d-moyen) var(--c-glisse); animation: esp-repere-leve 980ms var(--c-glisse) backwards; animation-delay: calc(var(--i, 0) * 70ms + 520ms); }
+@keyframes esp-repere-leve {
+  from { transform: translate(calc(var(--mx) * 1cqw), var(--hz)) scale(0.4); opacity: 0; }
+}
+.esp .ciel-reperes .creneau:is(:hover, :focus-visible) { z-index: 2; transform: translate(calc(var(--mx) * 1cqw), var(--ry)) scale(1.12); }
+.esp .ciel-reperes .creneau.encours { --garde: 27px; width: 42px; height: 42px; margin: -21px 0 0 -21px; border-color: var(--ciel-passe); background: var(--ciel-passe); color: var(--ciel-fond); }
+.esp .ciel-reperes .creneau .ic { width: 16px; height: 16px; }
+.esp .ciel-reperes .creneau .ini { font: 800 13px/1 var(--f-texte); }
+.esp .ciel-reperes .info-repere { position: absolute; left: 50%; bottom: calc(100% + 10px); display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: var(--ciel-etiq); color: var(--ciel-etiq-encre); font: 600 12px/1.35 var(--f-texte); text-align: left; white-space: nowrap; opacity: 0; transform: translate(-50%, 6px); transition: opacity var(--d-court) var(--c-arrivee), transform var(--d-court) var(--c-arrivee); pointer-events: none; }
+.esp .ciel-reperes .creneau:is(:hover, :focus-visible) .info-repere { opacity: 1; transform: translate(-50%, 0); }
+.esp .ciel-reperes .creneau.bord-g .info-repere { left: 0; transform: translate(-8px, 6px); }
+.esp .ciel-reperes .creneau.bord-g:is(:hover, :focus-visible) .info-repere { transform: translate(-8px, 0); }
+.esp .ciel-reperes .creneau.bord-d .info-repere { left: auto; right: 0; transform: translate(8px, 6px); }
+.esp .ciel-reperes .creneau.bord-d:is(:hover, :focus-visible) .info-repere { transform: translate(8px, 0); }
+/* sous l'horizon : ce qui est passé, et les liens « À clore » vers leur dossier */
+.esp .sous-horizon { display: flex; align-items: baseline; gap: 12px; min-width: 0; color: var(--sol-encre-2); font-size: 14px; font-weight: 600; }
+.esp .sous-horizon ul { list-style: none; padding: 0 0 4px; display: flex; flex-wrap: nowrap; gap: 6px 24px; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.esp .sous-horizon li { flex: none; white-space: nowrap; color: var(--sol-encre-2); }
+.esp .sol > .lt-pile + .lt-pile { margin-top: 12px; } /* caisse du jour, puis les moments de l'équipe (admin) */
+.esp .lt-pile li a { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.esp .lt-pile li a:hover { text-decoration-thickness: 2px; }
+
+@media (max-width: 760px) {
+  .esp .esp-journee > .ciel-reperes { margin: calc(-1 * var(--hz)) -4px 0; }
+  .esp .ciel-reperes .creneau, .esp .ciel-reperes .creneau.encours { --garde: 16px; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-width: 1.5px; }
+  .esp .ciel-reperes .creneau .ic { width: 12px; height: 12px; }
+  .esp .ciel-reperes .creneau .ini { font-size: 11px; }
+  .esp .ciel-reperes .info-repere { display: none; }
+  .esp .sous-horizon { gap: 8px; }
+  .esp .sous-horizon ul { flex: 1 1 0; flex-wrap: wrap; overflow-x: visible; }
+  .esp .sous-horizon li { flex: 0 1 auto; min-width: 0; white-space: normal; }
+  .esp .sous-horizon li span { min-width: 0; overflow-wrap: anywhere; }
+}

@@ -1,0 +1,113 @@
+/* Fiche circuit, piste A « Le tracé » (Kevin, 30/10/2026). Blanc pur pour la lecture, navy pour la carte et le bloc final,
+   encres froides tirées du navy (règle du 23/10 : jamais de brun ni de beige sur blanc). Mouvement : transform et opacity
+   seulement ; l'état « non dessiné » n'existe que sous .fc-anime, posé par CarteTrace. Préfixe fc- (CSS global). */
+.fc {
+  --fc-encre: #121a33; --fc-encre-2: #3f4863; --fc-encre-3: #5a6379; --fc-filet: #dde1ea;
+  --fc-sable-82: rgb(247 241 232 / 0.82); --fc-sable-62: rgb(247 241 232 / 0.62); --fc-sable-38: rgb(247 241 232 / 0.38); --fc-sable-20: rgb(247 241 232 / 0.2);
+  --fc-voile-fort: rgb(15 22 45 / 0.88); --fc-voile-moyen: rgb(15 22 45 / 0.4); --fc-voile-nul: rgb(15 22 45 / 0); --fc-voile-haut: rgb(15 22 45 / 0.55);
+  --fc-courbe: cubic-bezier(0.625, 0.05, 0, 1);
+  --fc-entete: 72px; /* hauteur de l'en-tête fixe du site après défilement */
+  background: #fff; color: var(--fc-encre); font-size: 17px; line-height: 1.65;
+}
+.fc :focus-visible { outline: 2px solid var(--accent-sun); outline-offset: 3px; border-radius: 4px; }
+
+/* ouverture : bande photo pleine largeur sous l'en-tête, titre posé dessus */
+.fc-bande { position: relative; height: clamp(480px, 70svh, 720px); overflow: hidden; background: var(--surface-abyss); color: var(--text-inverse); }
+.fc-bande img { object-fit: cover; }
+.fc-voile { position: absolute; inset: 0; background: linear-gradient(to top, var(--fc-voile-fort), var(--fc-voile-moyen) 42%, var(--fc-voile-nul) 68%), linear-gradient(to bottom, var(--fc-voile-haut), var(--fc-voile-nul) 26%); }
+.fc-bande-texte { position: absolute; left: 0; right: 0; bottom: clamp(32px, 6vh, 56px); }
+.fc-bande h1 { font: 600 clamp(44px, 6vw, 96px)/1 var(--font-display); letter-spacing: -0.02em; max-width: 14ch; overflow-wrap: break-word; }
+.fc-theme { margin-top: 16px; font-size: 18px; color: var(--fc-sable-82); }
+.fc-intro { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px 64px; align-items: start; padding-top: 56px; padding-bottom: 64px; }
+.fc-chapo { font: 500 clamp(21px, 1.7vw, 25px)/1.5 var(--font-display); color: var(--fc-encre); max-width: 46ch; text-wrap: pretty; }
+.fc-resume { font-size: 18px; font-weight: 600; color: var(--surface-abyss); }
+.fc-trajet { margin-top: 4px; color: var(--fc-encre-2); }
+.fc-conditions { margin-top: 4px; color: var(--fc-encre-2); }
+.fc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; margin-top: 24px; }
+
+/* étapes à gauche, carte collée à droite */
+.fc-grille { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); border-top: 1px solid var(--fc-filet); }
+.fc-etapes { grid-column: 1; grid-row: 1; list-style: none; margin: 0; padding: 0 clamp(24px, 5vw, 88px); }
+.fc-etape { padding: 12vh 0 10vh; border-top: 1px solid var(--fc-filet); }
+.fc-etape:first-child { border-top: 0; }
+.fc-etape:last-child { padding-bottom: 72px; }
+.fc-tete { display: grid; grid-template-columns: clamp(76px, 8.6vw, 140px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.fc-num { font: 600 clamp(64px, 7vw, 112px)/0.84 var(--font-display); color: var(--surface-abyss); font-variant-numeric: lining-nums tabular-nums; transition: opacity 0.6s var(--fc-courbe); }
+.fc-lecture .fc-num { opacity: 0.14; }
+.fc-lecture .fc-etape.fc-actif .fc-num { opacity: 1; }
+.fc-chemin .fc-num { width: 22px; height: 22px; margin: 16px 0 0 16px; background: var(--accent-sun); transform: rotate(45deg); }
+.fc-lecture .fc-chemin .fc-num { opacity: 0.4; }
+.fc-etape h2 { font: 600 clamp(30px, 3.1vw, 46px)/1.08 var(--font-display); color: var(--surface-abyss); letter-spacing: -0.012em; overflow-wrap: break-word; }
+.fc-chemin h2 { font-size: clamp(26px, 2.4vw, 34px); }
+.fc-borne { margin-top: 8px; font-size: 16px; color: var(--fc-encre-3); }
+.fc-photo { margin: 36px 0 0; }
+.fc-cadre { position: relative; width: 100%; max-height: 72vh; overflow: hidden; border-radius: 18px; background: var(--surface-abyss); }
+.fc-cadre img { object-fit: cover; }
+.fc-photo figcaption { margin-top: 12px; font-size: 15px; line-height: 1.45; color: var(--fc-encre-3); }
+.fc-annee { margin-left: 8px; font-weight: 600; color: var(--fc-encre-2); font-variant-numeric: lining-nums; }
+.fc-texte { margin-top: 32px; max-width: 62ch; }
+.fc-texte p { color: var(--fc-encre-2); font-size: 18px; line-height: 1.7; }
+.fc-texte p + p { margin-top: 16px; }
+.fc-lieu { margin-top: 16px; }
+.fc-etapes .oht-lien, .fc-intro .oht-lien { color: var(--surface-abyss); }
+
+/* carte : navy, collée sous l'en-tête */
+.fc-carte { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: var(--fc-entete); height: calc(100svh - var(--fc-entete)); overflow: hidden; background: var(--surface-abyss); color: var(--text-inverse); }
+.fc-carte svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.fc-camera { transform-box: view-box; transform-origin: 0 0; transition: transform 0.9s var(--fc-courbe); }
+.fc-m-lieux { fill: none; stroke: var(--fc-sable-20); stroke-width: 3.8; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.fc-m-fond { fill: none; stroke: var(--fc-sable-38); stroke-width: 2.5; stroke-dasharray: 1 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.fc-seg { fill: none; stroke: var(--accent-sun); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: opacity 0.3s linear; }
+.fc-anime .fc-seg { opacity: 0; }
+.fc-anime .fc-seg.fc-on { opacity: 1; }
+.fc-pastille { transform-box: fill-box; transform-origin: center; transition: transform 0.6s var(--fc-courbe); }
+.fc-forme { fill: var(--surface-abyss); stroke: var(--fc-sable-62); stroke-width: 2; }
+.fc-losange { stroke: var(--accent-sun); }
+.fc-m-num { fill: var(--text-inverse); font: 600 13px var(--font-text); text-anchor: middle; }
+.fc-vu .fc-forme { fill: var(--text-inverse); stroke: var(--text-inverse); }
+.fc-vu .fc-m-num { fill: var(--surface-abyss); }
+.fc-actif .fc-forme { fill: var(--accent-sun); stroke: var(--accent-sun); }
+.fc-actif .fc-m-num { fill: var(--surface-abyss); }
+.fc-actif .fc-pastille { transform: scale(1.25); }
+.fc-m-nom { fill: var(--text-inverse); font: 700 15px var(--font-text); opacity: 0.62; paint-order: stroke; stroke: var(--surface-abyss); stroke-width: 5px; stroke-linejoin: round; }
+.fc-m-nom-actif { opacity: 1; }
+.fc-nord { position: absolute; right: 30px; top: 30px; display: grid; justify-items: center; gap: 2px; font-weight: 600; font-size: 15px; color: var(--fc-sable-62); pointer-events: none; }
+.fc-nord::before { content: ""; width: 0; height: 0; border-inline: 7px solid transparent; border-bottom: 12px solid var(--fc-filet); }
+.fc-echelle { position: absolute; left: 32px; bottom: 28px; display: grid; gap: 8px; font-size: 14px; font-weight: 700; color: var(--fc-sable-62); pointer-events: none; }
+.fc-echelle i { display: block; height: 8px; border: 2px solid var(--fc-filet); border-top: 0; }
+
+/* bloc final : navy, juste après la dernière étape */
+.fc-reserver { background: var(--surface-abyss); color: var(--text-inverse); padding: 88px 0 96px; }
+.fc-reserver-grille { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 32px 64px; align-items: end; }
+.fc-reserver h2 { font: 600 clamp(36px, 4.4vw, 68px)/1.04 var(--font-display); letter-spacing: -0.02em; max-width: 14ch; overflow-wrap: break-word; }
+.fc-reserver .fc-conditions { margin-top: 0; color: var(--text-inverse); font-weight: 700; }
+.fc-marche { margin-top: 4px; color: var(--fc-sable-82); }
+.fc-chapitre { margin-top: 16px; }
+.fc-reserver .oht-lien { color: var(--text-inverse); }
+.fc-reserver .oht-lien::before { background: var(--accent-sun); }
+
+@media (max-width: 1023px) {
+  .fc-intro { grid-template-columns: minmax(0, 1fr); padding-top: 40px; padding-bottom: 44px; }
+  .fc-grille { display: block; }
+  .fc-carte { height: 44svh; z-index: 3; box-shadow: 0 1px 0 var(--fc-sable-20); }
+  .fc-grille:not(.fc-lecture) .fc-m-nom { display: none; } /* bandeau : seul le nom de l'étape lue, posé par CarteTrace */
+  .fc-etapes { padding: 0 24px; }
+  .fc-etape { padding: 9vh 0 7vh; }
+  .fc-nord { right: 18px; top: 14px; }
+  .fc-echelle { left: 18px; bottom: 14px; }
+  .fc-reserver { padding: 64px 0 72px; }
+  .fc-reserver-grille { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 639px) {
+  .fc { font-size: 16px; }
+  .fc-bande { height: 56svh; min-height: 400px; }
+  .fc-carte { height: 34svh; min-height: 220px; }
+  .fc-etapes { padding: 0 20px; }
+  .fc-tete { grid-template-columns: 70px minmax(0, 1fr); gap: 12px; }
+  .fc-num { font-size: 56px; }
+  .fc-texte p { font-size: 17px; }
+  .fc-actions { gap: 12px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc *, .fc *::before { transition: none !important; }
+}

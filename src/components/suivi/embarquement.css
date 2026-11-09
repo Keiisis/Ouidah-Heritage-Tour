@@ -1,0 +1,98 @@
+/* Animation « Bienvenue au Bénin » : CSS de la maquette experience.html (validée), préfixé eb-. Les décors du film gardent
+   leurs couleurs d'origine ; polices du site. Ne bougent que transform et opacity, chaque calque mobile a sa couche
+   (will-change) ; aucun mix-blend-mode. */
+.eb-cadre {
+  --eb-sable: #f7f1e8; --eb-sable-billet: #f9f1e8; --eb-ocean: #122460; --eb-abysse: #0b1638; --eb-soleil: #fdbf28;
+  --eb-ocean-clair: #17306f; --eb-fente-haut: #f4f1ec; --eb-fente-bas: #cfcbc4; --eb-ombre-forte: rgba(0, 0, 0, 0.35);
+  --eb-ombre-douce: rgba(0, 0, 0, 0.12); --eb-fente-fond: #2a2a33; --eb-sable-80: rgba(247, 241, 232, 0.8);
+  --eb-sable-40: rgba(247, 241, 232, 0.4); --eb-sable-28: rgba(247, 241, 232, 0.28); --eb-mer-haut: #4acfe3; --eb-mer-milieu: #19a7d4;
+  --eb-mer-bas: #1593c4; --eb-ombre-sol: rgba(43, 26, 16, 0.28); --eb-ombre-sol-0: rgba(43, 26, 16, 0); --eb-soleil-95: rgba(253, 191, 40, 0.95);
+  --eb-soleil-0: rgba(253, 191, 40, 0); --eb-soleil-22: rgba(253, 191, 40, 0.22); --eb-soleil-55: rgba(253, 191, 40, 0.55);
+  --eb-cabine-haut: #2a1d14; --eb-cabine-bas: #4a3220; --eb-chambranle: #e9e6e0; --eb-ocean-30: rgba(18, 36, 96, 0.3);
+  --eb-fumee: #fbf8f2; --eb-fond-depart: #fef4e8; --eb-fond-approche: #fcf5ea; --eb-fond-cotonou: #f9f1e8;
+  position: fixed;
+  inset: 0;
+  z-index: 90; /* au-dessus de l'en-tête et du bandeau des cookies, sous l'ouverture « Dangbé » (100), attendue avant le film */
+  overflow: hidden;
+  background: var(--eb-abysse);
+  animation: eb-secours 0.4s 4s forwards;
+}
+/* filet sans JavaScript : le voile s'efface de lui-même, la page de suivi reste lisible */
+@keyframes eb-secours { to { opacity: 0; visibility: hidden; } }
+.eb-scene { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--eb-sable); transform-origin: 0 0; opacity: 0; }
+.eb-couche { position: absolute; inset: 0; }
+.eb-scene img { position: absolute; display: block; width: auto; height: auto; max-width: none; user-select: none; -webkit-user-drag: none; }
+.eb-scene p { margin: 0; }
+.eb-monde { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.eb-pile { position: absolute; }
+.eb-scene .eb-pile img { left: 0; top: 0; height: 100%; visibility: hidden; }
+/* tout ce qui bouge a sa propre couche : le GPU compose au lieu de redessiner */
+.eb-scene :is([data-eb="ticket"], [data-eb="titre"], [data-eb="titre-fond"]), .eb-anim > .eb-couche { will-change: opacity; }
+.eb-scene :is([data-eb="m-depart"], [data-eb="vol"], [data-eb="avion-vol"], [data-eb="titre-billet"], [data-eb="globe"], [data-eb="bande"], [data-eb="piste-depart"],
+  [data-eb="imprimante"], [data-eb="l1p"], [data-eb="epingle"], [data-eb="perso-scan"], [data-eb="escalier"], [data-eb="n1"], [data-eb="n2"], [data-eb="n3"],
+  [data-eb="billet-comptoir"], [data-eb="ombre-perso"], [data-eb="l1"], [data-eb="tampon"], [data-eb="feux"], [data-eb="porte"], [data-eb="porte-dock"],
+  [data-eb="lueur-scan"]), .eb-pile, .eb-l2 span, .eb-sortie .sv-papier { will-change: transform; }
+
+/* ---------- ticket ---------- */
+.eb-ticket { color: var(--eb-sable); z-index: 20; }
+.eb-ticket-fond { position: absolute; inset: 0; background: radial-gradient(90% 90% at 30% 0%, var(--eb-ocean-clair) 0%, var(--eb-ocean) 40%, var(--eb-abysse) 100%); }
+.eb-imprimante { position: absolute; left: 0; top: 0; width: 720px; height: 800px; transform-origin: 0 0; }
+.eb-fente { position: absolute; left: 0; width: 720px; top: 0; height: 38px; border-radius: 19px; z-index: 3;
+  background: linear-gradient(var(--eb-fente-haut), var(--eb-fente-bas)); box-shadow: 0 10px 22px var(--eb-ombre-forte), inset 0 -3px 0 var(--eb-ombre-douce); }
+.eb-fente::after { content: ""; position: absolute; left: 24px; right: 24px; bottom: 8px; height: 6px; border-radius: 3px; background: var(--eb-fente-fond); }
+.eb-sortie { position: absolute; left: 30px; width: 660px; top: 22px; height: 778px; overflow: hidden; z-index: 2; }
+.eb-sortie .sv-papier { position: absolute; left: 0; right: 0; top: 0; }
+.eb-texte { position: absolute; left: 1200px; top: 0; bottom: 0; width: 560px; display: flex; flex-direction: column; justify-content: center; }
+.eb-h1 { text-wrap: balance; font: 600 92px/0.98 var(--font-display); font-style: normal; font-variation-settings: "opsz" 144; letter-spacing: -0.02em; }
+.eb-scene .eb-sous { margin-top: 24px; font: 600 24px/1.45 var(--font-text); color: var(--eb-sable-80); max-width: 30ch; }
+.eb-actions { display: flex; flex-direction: column; gap: 16px; margin-top: 48px; }
+.eb-actions a { height: 64px; border-radius: 99px; display: grid; place-items: center; font: 700 20px/1 var(--font-text); text-decoration: none; }
+.eb-actions a:active { transform: translateY(1px); }
+.eb-actions .is-primaire { background: var(--eb-soleil); color: var(--eb-abysse); }
+.eb-actions .is-secondaire { border: 1.5px solid var(--eb-sable-40); color: var(--eb-sable); }
+
+/* ---------- animation ---------- */
+.eb-anim { z-index: 10; }
+.eb-anim > .eb-couche, [data-eb="titre-billet"] { transform-origin: 0 0; }
+/* fond prolongé à la couleur de chaque décor : aucun bord visible quand la caméra s'élargit */
+.eb-fond { position: absolute; left: -4000px; top: -4000px; width: 10000px; height: 10000px; }
+.eb-mer { position: absolute; left: 0; top: 1350px; width: 2400px; height: 1400px; background: linear-gradient(var(--eb-mer-haut), var(--eb-mer-milieu) 55%, var(--eb-mer-bas)); }
+.eb-ombre { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, var(--eb-ombre-sol), var(--eb-ombre-sol-0)); }
+.eb-lueur { position: absolute; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(closest-side, var(--eb-soleil-95), var(--eb-soleil-0)); }
+.eb-ouverture { position: absolute; border-radius: 10px; background: linear-gradient(var(--eb-cabine-haut), var(--eb-cabine-bas)); box-shadow: inset 0 0 0 3px var(--eb-chambranle); }
+/* fumée de l'atterrissage : taille finale (rayon 68), réduite et déplacée par transform */
+.eb-fumee { position: absolute; left: 0; top: 0; width: 136px; height: 95.2px; border-radius: 50%; background: var(--eb-fumee); transform-origin: 0 0; will-change: transform, opacity; }
+svg.eb-arc { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+
+/* ---------- titre ---------- */
+.eb-titre { z-index: 15; }
+.eb-titre-fond { position: absolute; inset: 0; background: var(--eb-sable-billet); }
+.eb-titre-texte { position: absolute; left: 286px; top: 296px; width: 1090px; color: var(--eb-sable); }
+.eb-l1 { font: 600 88px/1 var(--font-display); font-style: normal; font-variation-settings: "opsz" 144; letter-spacing: -0.01em; padding-left: 12px; }
+.eb-scene .eb-l1p { display: none; }
+.eb-scene .eb-l2 { font: 600 300px/0.88 var(--font-display); font-style: normal; font-variation-settings: "opsz" 144; letter-spacing: -0.035em; margin-top: 8px; white-space: nowrap; }
+.eb-l2 span { display: inline-block; }
+.eb-feux { display: flex; gap: 48px; margin-top: 40px; padding-left: 24px; }
+.eb-feux i { width: 18px; height: 18px; border-radius: 50%; background: var(--eb-sable-28); }
+.eb-feux i.is-on { background: var(--eb-soleil); box-shadow: 0 0 0 6px var(--eb-soleil-22), 0 0 26px 6px var(--eb-soleil-55); }
+.eb-tampon { position: absolute; left: 1424px; top: 410px; width: 240px; height: 240px; overflow: visible; }
+.eb-tampon-arc { font: 700 17px/1 var(--font-text); letter-spacing: 0.26em; text-transform: uppercase; fill: var(--eb-soleil); }
+.eb-tampon-sigle { font: 600 72px/1 var(--font-text); letter-spacing: 0.03em; fill: var(--eb-soleil); }
+
+/* ---------- portrait 9:16 ---------- */
+.eb-scene.is-portrait .eb-texte { left: 80px; right: 80px; width: auto; bottom: auto; justify-content: flex-start; }
+.eb-scene.is-portrait .eb-h1 { font-size: 76px; margin-top: 16px; }
+.eb-scene.is-portrait .eb-sous { display: none; }
+.eb-scene.is-portrait .eb-actions { margin-top: 32px; }
+.eb-scene.is-portrait .eb-actions a { height: 96px; font-size: 34px; }
+.eb-scene.is-portrait .sv-papier { padding: 36px 32px 48px; font-size: 23px; }
+.eb-scene.is-portrait .sv-papier .sv-embleme { width: 96px; height: 96px; }
+.eb-scene.is-portrait .sv-marque { font-size: 23px; }
+.eb-scene.is-portrait :is(.sv-doc, .sv-ligne > :first-child, .sv-statut, .sv-qr em) { font-size: 23px; }
+.eb-scene.is-portrait .sv-total { font-size: 32px; }
+.eb-scene.is-portrait .sv-qr { grid-template-columns: 180px 1fr; }
+.eb-scene.is-portrait .sv-qr-code { width: 180px; height: 180px; }
+.eb-scene.is-portrait :is(.sv-qr p, .sv-merci) { font-size: 23px; }
+.eb-scene.is-portrait .sv-tampon { width: 130px; height: 130px; }
+.eb-scene.is-portrait .eb-l1 { visibility: hidden; }
+.eb-scene.is-portrait .eb-l1p { display: block; position: absolute; left: 0; right: 0; top: 560px; text-align: center; font: 600 76px/1.1 var(--font-display); font-style: normal; font-variation-settings: "opsz" 144; color: var(--eb-ocean); }

@@ -1,0 +1,139 @@
+/* Lettres à palettes (split-flap) partagées : billet E de /devis et talon de réservation de l'Agenda. Chaque tuile a deux
+   moitiés fixes et deux volets qui tournent (transform seulement). Classes globales préfixées bt- (la règle Turbopack
+   « *.css » de next.config rend les modules CSS inopérants). */
+:root {
+  --b-tuile: var(--surface-abyss);
+  --b-tuile-haut: #19223f;
+  --b-tuile-pli: rgb(2 4 12 / 0.42);
+  --b-blanc: #fff;
+}
+.bt-tuiles {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--g, 4px);
+  vertical-align: top;
+  max-width: 100%;
+}
+.bt-mot {
+  display: inline-flex;
+  gap: var(--g, 4px);
+}
+.bt-volet {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  height: var(--h);
+  contain: layout paint;
+  font-family: var(--font-display);
+  font-size: var(--fs);
+  font-weight: 600;
+  line-height: var(--h);
+  color: var(--b-blanc);
+  text-align: center;
+  white-space: pre;
+}
+.bt-volet > .bt-t {
+  display: block;
+  visibility: hidden;
+  padding: 0 var(--px);
+}
+.bt-volet > i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  font-style: normal;
+  background: var(--b-tuile);
+  backface-visibility: hidden;
+}
+.bt-volet > i > b {
+  display: block;
+  height: var(--h);
+  padding: 0 var(--px);
+  font-weight: inherit;
+}
+.bt-volet > .bt-h,
+.bt-volet > .bt-ph {
+  top: 0;
+  background: var(--b-tuile-haut);
+  border-radius: var(--r) var(--r) 0 0;
+  transform-origin: 50% 100%;
+}
+.bt-volet > .bt-b,
+.bt-volet > .bt-pb {
+  bottom: 0;
+  border-radius: 0 0 var(--r) var(--r);
+  transform-origin: 50% 0;
+}
+.bt-volet > .bt-b > b,
+.bt-volet > .bt-pb > b {
+  margin-top: calc(var(--h) / -2);
+}
+.bt-volet > .bt-ph,
+.bt-volet > .bt-pb {
+  z-index: 2;
+}
+.bt-volet::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  margin-top: -0.5px;
+  background: var(--b-tuile-pli);
+}
+.bt-car {
+  width: var(--w);
+  --px: 0px;
+}
+.bt-car > .bt-t {
+  overflow: hidden;
+}
+.bt-grand {
+  --w: 38px;
+  --h: 56px;
+  --fs: 34px;
+  --r: 6px;
+}
+.bt-moyen {
+  --w: 30px;
+  --h: 46px;
+  --fs: 27px;
+  --r: 5px;
+  --g: 3px;
+}
+.bt-petit {
+  --w: 24px;
+  --h: 38px;
+  --fs: 21px;
+  --r: 4px;
+  --g: 3px;
+}
+.bt-mini {
+  --w: 22px;
+  --h: 32px;
+  --fs: 19px;
+  --r: 4px;
+  --g: 3px;
+}
+.bt-chiffre {
+  --w: 36px;
+  --h: 40px;
+  --fs: 22px;
+  --r: 5px;
+}
+.bt-ligneTuile {
+  max-width: 100%;
+  --h: 44px;
+  --fs: 18px;
+  --px: 13px;
+  --r: 7px;
+}
+.bt-ligneTuile > .bt-t,
+.bt-ligneTuile > i > b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

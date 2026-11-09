@@ -1,0 +1,233 @@
+/* Hallmark · pages /blog et /blog/<article> · construction directe sans maquette (Kevin, 05/11/2026) · OHT · surface: absolute (blanc pur de Kevin, 21-22/10) */
+/* Hallmark · waive 7b · stamp declares surface: absolute · fond de lecture en blanc pur, règle des fonds de Kevin du 21-22/10 */
+/* Blog public (/blog et /blog/<article>), construit sans maquette à la demande de Kevin (05/11/2026) dans le langage des
+   fiches circuit et lieu : haut de page abysse sous l'en-tête fixe, lecture sur blanc pur, encres froides tirées du navy
+   (règle du 23/10 : jamais de brun ni de beige sur blanc), Fraunces 600 romain pour les titres, Manrope pour le texte,
+   cadres photo à 18 px, courbe OHT (.625, .05, 0, 1). Un mouvement par section, transform et opacity seulement, coupé ou
+   réduit à un fondu par « mouvement réduit ». Feuille globale : classes préfixées jo- pour « journal », distinctes des bl- de l’espace (règle Turbopack du projet). */
+:root {
+  --jo-encre: #121a33; --jo-encre-2: #3f4863; --jo-encre-3: #5a6379; --jo-filet: #dde1ea; --jo-fond-photo: #e9ecf2;
+  --jo-blanc: #fff;
+  --jo-sable-82: rgb(247 241 232 / 0.82); --jo-sable-62: rgb(247 241 232 / 0.62); --jo-sable-20: rgb(247 241 232 / 0.2);
+  --jo-voile-fort: rgb(15 22 45 / 0.9); --jo-voile-moyen: rgb(15 22 45 / 0.45); --jo-voile-nul: rgb(15 22 45 / 0); --jo-voile-haut: rgb(15 22 45 / 0.55);
+  --jo-nuit-photo: #1b2546;
+  --jo-courbe: cubic-bezier(0.625, 0.05, 0, 1);
+  --jo-sortie: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.jo {
+  background: var(--jo-blanc); color: var(--jo-encre); font-size: 17px; line-height: 1.65;
+}
+.jo h1, .jo h2, .jo h3 { font-family: var(--font-display); font-style: normal; text-wrap: balance; overflow-wrap: break-word; hyphens: auto; min-width: 0; }
+.jo :focus-visible:not(.oht-btn) { outline: 2px solid var(--brand-primary); outline-offset: 3px; border-radius: 4px; }
+.jo .on-dark :focus-visible:not(.oht-btn), .jo.on-dark :focus-visible:not(.oht-btn) { outline-color: var(--accent-sun); }
+
+/* ---------- liste : haut de page ---------- */
+.jo-tete { background: var(--surface-abyss); color: var(--text-inverse); padding: 168px 0 72px; }
+.jo-tete:has(.jo-une-zone) { padding-bottom: 0; }
+.jo-titre { font: 600 clamp(42px, 7.4vw, 120px)/0.98 var(--font-display); letter-spacing: -0.025em; max-width: 14ch; }
+.jo-masque { display: block; overflow: hidden; padding-bottom: 0.08em; }
+.jo-masque > span { display: block; animation: jo-monte 1.1s var(--jo-courbe) 0.1s backwards; }
+.jo-phrase { margin-top: 24px; max-width: 52ch; font-size: clamp(18px, 1.5vw, 22px); font-weight: 500; line-height: 1.5; color: var(--jo-sable-82); }
+.jo-proposition { margin-top: 16px; }
+.jo-proposition .oht-lien { color: var(--text-inverse); }
+.jo-proposition .oht-lien::before { background: var(--accent-sun); }
+.jo-langues { margin-top: 20px; }
+.jo-langues ul, .jo-filtres ul { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.jo-langues ul { gap: 0 20px; }
+.jo-langues a { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--jo-sable-62); text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 5px; }
+.jo-langues a:hover, .jo-langues a[aria-current="page"] { color: var(--text-inverse); text-decoration-color: var(--accent-sun); }
+.jo-filtres { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--jo-sable-20); }
+.jo-filtres ul { gap: 0 32px; }
+.jo-filtres a { position: relative; display: inline-flex; align-items: baseline; gap: 8px; padding: 12px 0; min-height: 44px; font-size: 16px; font-weight: 700; color: var(--jo-sable-62); }
+.jo-filtres a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 6px; height: 2px; background: var(--accent-sun); transform: scaleX(0); transform-origin: left; transition: transform 0.6s var(--jo-courbe); }
+.jo-filtres a:hover, .jo-filtres a:focus-visible, .jo-filtres a[aria-current="page"] { color: var(--text-inverse); }
+.jo-filtres a:hover::after, .jo-filtres a:focus-visible::after, .jo-filtres a[aria-current="page"]::after { transform: scaleX(1); }
+.jo-nombre { font-size: 13px; font-weight: 600; color: var(--jo-sable-62); font-variant-numeric: tabular-nums; }
+
+/* ---------- cartes ---------- */
+.jo-carte { position: relative; display: grid; align-content: start; min-width: 0; }
+.jo-carte-photo { position: relative; overflow: hidden; aspect-ratio: 3 / 2; border-radius: 18px; background: var(--jo-fond-photo); }
+.jo-carte-cadre { position: absolute; inset: 0; }
+.jo-carte-cadre img { object-fit: cover; }
+.jo-carte-texte { padding-top: 24px; min-width: 0; }
+.jo-cat { margin-bottom: 12px; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--brand-primary); }
+.jo-cat a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; }
+.jo-carte-titre { font-size: clamp(24px, 2vw, 30px); font-weight: 600; line-height: 1.12; letter-spacing: -0.012em; color: var(--surface-abyss); }
+.jo-large .jo-carte-titre { font-size: clamp(28px, 2.6vw, 40px); }
+.jo-etire { color: inherit; }
+.jo-etire::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.jo .jo-etire:focus-visible { outline: none; }
+.jo-carte:has(.jo-etire:focus-visible) { outline: 2px solid var(--brand-primary); outline-offset: 8px; border-radius: 20px; }
+.jo-carte-trait { display: block; width: 56px; height: 3px; margin-top: 16px; border-radius: 2px; background: var(--brand-primary); transform: scaleX(0.3); transform-origin: left; transition: transform 0.6s var(--jo-courbe); }
+.jo-carte:hover .jo-carte-trait, .jo-carte:focus-within .jo-carte-trait { transform: scaleX(1); }
+.jo-carte-chapo { margin-top: 16px; max-width: 58ch; font-size: 16px; line-height: 1.6; color: var(--jo-encre-2); }
+.jo-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--jo-encre-3); font-variant-numeric: lining-nums; }
+.jo-meta > span::before { content: ""; display: inline-block; width: 5px; height: 5px; margin: 0 12px 2px; background: currentColor; opacity: 0.6; transform: rotate(45deg); }
+
+/* cartes sur fond sombre (une, articles liés) */
+.on-dark .jo-carte-photo { background: var(--jo-nuit-photo); color: var(--text-inverse); }
+.on-dark .jo-cat { color: var(--accent-sun); }
+.on-dark .jo-carte-titre { color: var(--text-inverse); }
+.on-dark .jo-carte-trait { background: var(--accent-sun); }
+.on-dark .jo-carte-chapo { color: var(--jo-sable-82); }
+.on-dark .jo-meta { color: var(--jo-sable-62); }
+.on-dark .jo-carte:has(.jo-etire:focus-visible) { outline-color: var(--accent-sun); }
+
+/* à la une : photo 7 colonnes sur 12, texte à côté ; la photo remonte derrière son cadre à l'ouverture */
+.jo-une-zone { padding-top: 56px; padding-bottom: 104px; }
+.jo-une, .jo-seule { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 64px; align-items: end; }
+.jo-une.jo-sans-photo, .jo-seule.jo-sans-photo { grid-template-columns: minmax(0, 1fr); }
+.jo-une .jo-carte-photo, .jo-seule .jo-carte-photo { aspect-ratio: 4 / 3; }
+.jo-une .jo-carte-cadre { animation: jo-rideau 1.5s var(--jo-courbe) 0.25s backwards; }
+.jo-une .jo-carte-texte, .jo-seule .jo-carte-texte { padding-top: 0; padding-bottom: 8px; }
+.jo-une .jo-carte-titre { font-size: clamp(32px, 3.6vw, 56px); line-height: 1.04; letter-spacing: -0.02em; }
+.jo-une.jo-sans-photo .jo-carte-titre { font-size: clamp(36px, 4.6vw, 72px); max-width: 20ch; }
+.jo-une .jo-carte-chapo { font-size: 18px; }
+.jo-seule .jo-carte-titre { font-size: clamp(30px, 3vw, 46px); line-height: 1.06; }
+
+/* ---------- liste : grille éditoriale ---------- */
+.jo-grille-zone { padding: 112px 0 128px; }
+.jo-titre-grille { margin-bottom: 56px; max-width: 22ch; font-size: clamp(34px, 4vw, 60px); font-weight: 600; line-height: 1.02; letter-spacing: -0.02em; color: var(--surface-abyss); }
+.jo-grille { display: grid; gap: 96px; }
+.jo-rangee { display: grid; gap: 64px 32px; }
+.jo-rangee-large { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.jo-rangee-moyenne { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.jo-moyenne .jo-carte-photo { aspect-ratio: 4 / 5; }
+.jo-rangee-moyenne > :nth-child(2) { margin-top: 72px; } /* décalage de la carte du milieu : rythme de magazine */
+
+/* pagination */
+.jo-pages { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px 24px; margin-top: 112px; padding-top: 28px; border-top: 1px solid var(--jo-filet); }
+.jo-page-lien { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 700; color: var(--surface-abyss); }
+.jo-page-lien svg { transition: transform 0.6s var(--jo-courbe); }
+.jo-page-lien[rel="prev"]:hover svg { transform: translateX(-6px); }
+.jo-page-lien[rel="next"]:hover svg { transform: translateX(6px); }
+.jo-pages > :last-child { justify-self: end; }
+.jo-page-lien:active, .jo-filtres a:active, .jo-langues a:active, .jo-traductions a:active, .jo-corps a:active, .jo-cat a:active { opacity: 0.72; }
+.jo-carte:active .jo-carte-trait { transform: scaleX(0.6); }
+.jo-page-n { font-size: 15px; font-weight: 600; color: var(--jo-encre-3); font-variant-numeric: tabular-nums; }
+
+/* état vide */
+.jo-vide { padding: 112px 0 144px; }
+.jo-vide-grille { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px 64px; align-items: end; }
+.jo-vide h2 { max-width: 18ch; font-size: clamp(32px, 3.6vw, 54px); font-weight: 600; line-height: 1.06; letter-spacing: -0.02em; color: var(--surface-abyss); }
+.jo-vide p { max-width: 46ch; font-size: 18px; color: var(--jo-encre-2); }
+.jo-vide-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; margin-top: 28px; }
+.jo-vide .oht-lien { color: var(--surface-abyss); }
+
+/* ---------- article ---------- */
+.jo-progression { position: fixed; top: 0; left: 0; right: 0; z-index: 60; height: 3px; pointer-events: none; }
+.jo-progression-barre { height: 100%; background: var(--accent-sun); transform: scaleX(0); transform-origin: left; }
+
+/* couverture pleine largeur, titre posé dessus ; sans photo, haut de page abysse */
+.jo-couv { position: relative; background: var(--surface-abyss); color: var(--text-inverse); }
+.jo-couv-photo { position: relative; height: clamp(540px, 82svh, 880px); overflow: hidden; }
+.jo-couv-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: jo-pose 1.8s var(--jo-courbe) backwards; }
+.jo-couv-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--jo-voile-fort), var(--jo-voile-moyen) 40%, var(--jo-voile-nul) 66%), linear-gradient(to bottom, var(--jo-voile-haut), var(--jo-voile-nul) 24%); }
+.jo-couv-texte { position: absolute; left: 0; right: 0; bottom: clamp(36px, 7vh, 72px); }
+.jo-couv-nue .jo-couv-texte { position: static; padding: 176px 0 72px; }
+.jo-couv .jo-cat { margin-bottom: 4px; }
+.jo-couv-titre { max-width: 18ch; font-size: clamp(36px, 5.6vw, 92px); font-weight: 600; line-height: 1.02; letter-spacing: -0.022em; animation: jo-leve 1.2s var(--jo-courbe) 0.15s backwards; }
+
+/* colonne de lecture : intro, corps, appel ; figures et citations plus larges */
+.jo-page { padding-top: 56px; padding-bottom: 120px; }
+.jo-intro, .jo-cta, .jo-corps > * { max-width: 700px; margin-inline: auto; }
+.jo-retour { color: var(--surface-abyss); }
+.jo-chapo { margin-top: 20px; font: 500 clamp(22px, 1.9vw, 28px)/1.45 var(--font-display); color: var(--jo-encre); text-wrap: pretty; }
+.jo-signature { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--jo-filet); font-size: 15px; font-weight: 600; color: var(--jo-encre-3); font-variant-numeric: lining-nums; }
+.jo-signature > span + span::before { content: ""; display: inline-block; width: 5px; height: 5px; margin: 0 16px 2px; background: var(--brand-secondary); transform: rotate(45deg); }
+.jo-auteur { font-weight: 600; color: var(--surface-abyss); }
+.jo-traductions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--jo-encre-3); }
+.jo-traductions ul { display: flex; flex-wrap: wrap; gap: 0 16px; list-style: none; margin: 0; padding: 0; }
+.jo-traductions a { display: inline-flex; align-items: center; min-height: 44px; color: var(--surface-abyss); text-decoration: underline; text-decoration-color: var(--brand-secondary); text-underline-offset: 5px; }
+.jo-traductions a:hover { text-decoration-thickness: 2px; }
+
+.jo-corps { margin-top: 64px; font-size: 19px; line-height: 1.75; color: var(--jo-encre-2); }
+.jo-corps > * + * { margin-top: 1.15em; }
+.jo-corps > p:first-child::first-letter { float: left; margin: 0.08em 0.12em 0 0; font: 600 4.2em/0.8 var(--font-display); color: var(--surface-abyss); }
+.jo-corps strong { font-weight: 750; color: var(--jo-encre); }
+.jo-corps a { color: var(--surface-abyss); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: var(--brand-primary); text-underline-offset: 0.22em; }
+.jo-corps a:hover { text-decoration-thickness: 2px; }
+.jo-corps > .jo-h2 { margin-top: 2.4em; font-size: clamp(28px, 2.6vw, 40px); font-weight: 600; line-height: 1.12; letter-spacing: -0.015em; color: var(--surface-abyss); }
+.jo-h2-trait { display: block; width: 64px; height: 4px; margin-bottom: 20px; border-radius: 2px; background: var(--accent-sun); transform-origin: left; }
+.jo-corps > .jo-h3 { margin-top: 2em; font-size: clamp(22px, 1.8vw, 27px); font-weight: 600; line-height: 1.25; color: var(--surface-abyss); }
+.jo-corps > .jo-h2 + *, .jo-corps > .jo-h3 + * { margin-top: 0.7em; }
+.jo-ul, .jo-ol { list-style: none; padding: 0; }
+.jo-ol { counter-reset: jo-n; }
+.jo-ul li, .jo-ol li { position: relative; padding-left: 36px; }
+.jo-ul li + li, .jo-ol li + li { margin-top: 0.55em; }
+.jo-ul li::before { content: ""; position: absolute; left: 6px; top: 0.66em; width: 8px; height: 8px; background: var(--brand-secondary); transform: rotate(45deg); }
+.jo-ol li { counter-increment: jo-n; }
+.jo-ol li::before { content: counter(jo-n); position: absolute; left: 0; top: 0; font: 600 1em/1.75 var(--font-display); color: var(--surface-abyss); font-variant-numeric: lining-nums; }
+.jo-corps > .jo-citation { max-width: 880px; margin-block: 2.2em; font: 500 clamp(24px, 2.4vw, 34px)/1.36 var(--font-display); letter-spacing: -0.01em; color: var(--surface-abyss); }
+.jo-citation::before { content: "\201C"; display: block; height: 0.62em; font: 600 3.4em/1 var(--font-display); color: var(--accent-sun); }
+.jo-citation p + p { margin-top: 0.6em; }
+.jo-corps > .jo-figure { max-width: 1040px; margin-block: 2.4em; }
+.jo-figure img { display: block; width: 100%; height: auto; border-radius: 18px; background: var(--jo-fond-photo); }
+
+/* appel discret vers /devis, à la fin du texte */
+.jo-cta { margin-top: 104px; padding-top: 40px; border-top: 1px solid var(--jo-filet); }
+.jo-cta-titre { max-width: 22ch; font: 600 clamp(26px, 2.4vw, 36px)/1.15 var(--font-display); letter-spacing: -0.012em; color: var(--surface-abyss); text-wrap: balance; }
+.jo-cta-texte { margin-top: 12px; margin-bottom: 28px; font-size: 18px; color: var(--jo-encre-2); }
+
+/* articles de la même catégorie, sur navy */
+.jo-lies { padding: 104px 0 128px; background: var(--surface-abyss); color: var(--text-inverse); }
+.jo-lies .jo-titre-grille { color: var(--text-inverse); }
+
+/* ---------- mouvement ---------- */
+@keyframes jo-monte { from { transform: translateY(105%); } }
+@keyframes jo-rideau { from { transform: translateY(24%) scale(1.18); } }
+@keyframes jo-pose { from { transform: scale(1.1); } }
+@keyframes jo-leve { from { opacity: 0; transform: translateY(56px); } }
+@keyframes jo-entre { from { opacity: 0; transform: translateY(96px); } }
+@keyframes jo-trace { from { transform: scaleX(0); } }
+@keyframes jo-fondu { from { opacity: 0; } }
+/* au défilement, sans JS, un motif par section : cartes de la grille (liste), trait des intertitres (corps), cartes des
+   articles liés (bas de l'article). Hallmark F8 (« un motif par page ») cède à la règle de Kevin : un mouvement par section. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 40rem) {
+  @supports (animation-timeline: view()) {
+    .jo-grille .jo-carte, .jo-lies .jo-carte { animation: jo-entre linear both; animation-timeline: view(); animation-range: entry 0% entry 75%; }
+    .jo-h2-trait { animation: jo-trace linear both; animation-timeline: view(); animation-range: entry 30% cover 45%; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jo *, .jo *::before, .jo *::after { animation: none !important; transition: none !important; }
+  /* mouvement réduit : un fondu court à l'ouverture, aucun déplacement */
+  .jo .jo-couv-titre, .jo .jo-une .jo-carte-photo { animation: jo-fondu 0.5s var(--jo-sortie) backwards !important; }
+}
+
+/* ---------- tablette ---------- */
+@media (max-width: 1023px) {
+  .jo-tete { padding-top: 144px; }
+  .jo-une, .jo-seule { grid-template-columns: minmax(0, 1fr); }
+  .jo-une-zone { padding-bottom: 80px; }
+  .jo-rangee-large, .jo-rangee-moyenne { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 24px; }
+  .jo-rangee-moyenne > :nth-child(2) { margin-top: 0; }
+  .jo-grille { gap: 56px; }
+  .jo-grille-zone, .jo-vide { padding: 80px 0 104px; }
+  .jo-vide-grille { grid-template-columns: minmax(0, 1fr); }
+  .jo-lies { padding: 80px 0 96px; }
+}
+
+/* ---------- téléphone : tout s'empile, la couverture est montrée entière sous l'en-tête, le titre dessous ---------- */
+@media (max-width: 639px) {
+  .jo { font-size: 16px; }
+  .jo-tete { padding: 120px 0 56px; }
+  .jo-filtres ul { gap: 0 24px; }
+  .jo-une-zone { padding-top: 40px; padding-bottom: 64px; }
+  .jo-rangee-large, .jo-rangee-moyenne { grid-template-columns: minmax(0, 1fr); gap: 56px; }
+  .jo-carte-photo, .jo-moyenne .jo-carte-photo, .jo-une .jo-carte-photo, .jo-seule .jo-carte-photo { aspect-ratio: 4 / 3; }
+  .jo-titre-grille { margin-bottom: 40px; }
+  .jo-pages { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 72px; }
+  .jo-page-n { grid-column: 1 / -1; grid-row: 1; }
+  .jo-couv { padding-top: 84px; }
+  .jo-couv-nue { padding-top: 0; }
+  .jo-couv-photo { height: auto; }
+  .jo-couv-photo img { position: static; height: auto; }
+  .jo-couv-photo::after { content: none; }
+  .jo-couv-texte { position: static; padding: 28px 0 40px; }
+  .jo-couv-nue .jo-couv-texte { padding: 128px 0 48px; }
+  .jo-page { padding-top: 32px; padding-bottom: 88px; }
+  .jo-corps { margin-top: 44px; font-size: 18px; }
+  .jo-corps > p:first-child::first-letter { font-size: 3.6em; }
+  .jo-cta { margin-top: 72px; }
+}

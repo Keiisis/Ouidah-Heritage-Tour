@@ -1,0 +1,92 @@
+import { LANGUES_MSG, LIMITES_COURRIEL, type LangueMsg, REPERES, type Variable, VARIABLES } from "@/content/espace-messages";
+
+// Rendu des e-mails du lot « messages », partagé par l'aperçu (navigateur) et l'envoi (serveur) : le même texte dans les
+// deux. Aucun secret, aucun accès à la base, aucune dépendance serveur : le navigateur peut embarquer ce fichier. Le
+// serveur ne reçoit du navigateur que l'objet et le message tapés ; les valeurs des champs variables, il les relit lui-même.
+
+export type Valeurs = Partial<Record<Variable, string>>;
+/** Ce que le serveur sait d'un client pour remplir les champs variables (jamais saisi dans le navigateur). */
+export type Faits = { prenom: string; sejour: { arrivee: string; depart: string } | null; reference: string | null; lien: string | null };
+
+export const estLangue = (v: unknown): v is LangueMsg => typeof v === "string" && (LANGUES_MSG as readonly string[]).includes(v);
+export const CLE = /^[a-z0-9][a-z0-9-]{1,39}$/;
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+// dates écrites dans la langue de l'e-mail ; créoles : format français (même choix que la maquette E)
+const LOC: Record<LangueMsg, string> = { FR: "fr-FR", EN: "en-GB", ES: "es-ES", DE: "de-DE", PT: "pt-PT", HT: "fr-FR", GCF: "fr-FR" };
+
+export function datesEn(s: Faits["sejour"], langue: LangueMsg): string | null {
+  if (!s) return null;
+  const f = new Intl.DateTimeFormat(LOC[langue], { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  const a = new Date(`${s.arrivee}T12:00:00Z`), b = new Date(`${s.depart}T12:00:00Z`);
+  return s.arrivee === s.depart ? f.format(a) : f.formatRange(a, b);
+}
+
+export const valeursDe = (f: Faits, langue: LangueMsg): Valeurs => ({
+  prenom: f.prenom || undefined,
+  dates: datesEn(f.sejour, langue) ?? undefined,
+  lien: f.lien ?? undefined,
+  reference: f.reference ?? undefined,
+});
+
+// ---------- clés réservées aux e-mails automatiques du site (session oht-ce) ----------
+/** Lues par les e-mails automatiques (repli sur leurs textes par défaut) ; jamais dans le composeur ni dans la liste des
+ * modèles de l'équipe. Seul un admin les écrit, dans le groupe « E-mails automatiques ». */
+export const AUTO_CLES = ["auto-billets", "auto-demande", "auto-devis-pret", "auto-boutique", "auto-lettre", "auto-code", "auto-relance"] as const;
+export type CleAuto = (typeof AUTO_CLES)[number];
+export const estAuto = (cle: string) => cle.startsWith("auto-");
+export const autoConnue = (cle: string): cle is CleAuto => (AUTO_CLES as readonly string[]).includes(cle);
+/** Jetons « {…} » qui ne sont pas l'un des quatre champs variables (refusés dans un e-mail automatique). */
+export const jetonsInconnus = (t: string) => [...new Set((t.match(/\{[^{}\n]{0,40}\}/g) ?? []).filter((j) => !(Object.values(VARIABLES) as string[]).includes(j)))];
+/** Champs variables connus absents du texte (avertissement, jamais bloquant). */
+export const variablesAbsentes = (t: string) => (Object.entries(VARIABLES) as [Variable, string][]).filter(([, j]) => !t.includes(j)).map(([k]) => k);
+
+/** Valeurs de l'aperçu d'un modèle et de son test à soi-même : le prénom de l'admin connecté (il reçoit le test), les
+ * autres champs en repères traduits (REPERES). Jamais les données d'un client, jamais une donnée inventée. */
+export const valeursApercu = (prenom: string, langue: LangueMsg): Valeurs => ({ prenom, ...REPERES[langue] });
+
+/** Texte une fois les champs variables remplacés, et les champs employés sans valeur (laissés tels quels). */
+export function remplir(texte: string, v: Valeurs): { texte: string; manque: Variable[] } {
+  const manque: Variable[] = [];
+  let t = texte;
+  for (const [k, jeton] of Object.entries(VARIABLES) as [Variable, string][]) {
+    if (!t.includes(jeton)) continue;
+    const val = v[k];
+    if (val) t = t.replaceAll(jeton, val);
+    else manque.push(k);
+  }
+  return { texte: t, manque };
+}
+
+/** Texte sur une ligne (objet) : caractères de contrôle retirés, espaces ramenées à une. */
+export const uneLigne = (v: unknown) => (typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim() : "");
+/** Texte sur plusieurs lignes (message) : retours unifiés, autres caractères de contrôle retirés. */
+export const plusieursLignes = (v: unknown) => (typeof v === "string" ? v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, "").trim() : "");
+export const paragraphes = (t: string) => t.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+
+const echapper = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+/** Paragraphe HTML : texte échappé, retours en <br>, adresses http(s) cliquables. */
+const para = (t: string, couleur = "#0f162d") =>
+  `<p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:${couleur}">${echapper(t)
+    .replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u}" style="color:#122460">${u}</a>`)
+    .replace(/\n/g, "<br>")}</p>`;
+
+/** E-mail complet (HTML et texte), du corps déjà rempli : paragraphes, documents liés, signature, pied éventuel. */
+export function composer(m: { corps: string; pieces?: string[]; signature?: string | null; pied?: string | null }) {
+  const blocs = [...paragraphes(m.corps), ...(m.pieces ?? [])];
+  const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#ffffff"><div style="max-width:560px;margin:0 auto">${blocs.map((b) => para(b)).join("")}${m.signature ? para(m.signature, "#3f4863") : ""}${m.pied ? `<hr style="border:0;border-top:1px solid #dde1ea;margin:24px 0 16px">${para(m.pied, "#5a6379")}` : ""}</div></body></html>`;
+  const texte = [...blocs, ...(m.signature ? [m.signature] : []), ...(m.pied ? ["—", m.pied] : [])].join("\n\n");
+  return { html, texte };
+}
+
+/** Objet et message saisis relus selon les limites ; « objet » et « corps » en champs refusés. */
+export function lireTexte(objet: unknown, corps: unknown, objetRequis: boolean) {
+  const o = uneLigne(objet), c = plusieursLignes(corps);
+  const champs: ("objet" | "corps")[] = [];
+  if ((objetRequis && !o) || o.length > LIMITES_COURRIEL.objet) champs.push("objet");
+  if (typeof corps !== "string" || c.length > LIMITES_COURRIEL.corps) champs.push("corps");
+  return { objet: o, corps: c, champs };
+}
+
+/** Adresse masquée pour la page publique (« a***@exemple.com »). */
+export const masquer = (email: string) => email.replace(/^(.)[^@]*(@.*)$/, "$1***$2");

@@ -1,0 +1,553 @@
+{
+  "_note": "Pages légales (mentions, confidentialité et cookies, CGV), en français, éditables depuis l'admin (à venir) : chaque information de la société a une valeur et un interrupteur « visible » ; une information masquée ou vide disparaît de toutes les pages (ligne de fiche, phrase qui la cite). Sources : RCCM, carte professionnelle APIEx, annonce légale (11-12/06/2026) ; Code du numérique du Bénin (loi 2017-20), art. 328 : capital social et adresse du siège sont des mentions obligatoires ; décret 2023-493 art. 38 : référence de la licence obligatoire. Références : Assets OHT/Pages-legales/recherches/REFERENCES.md. Blocs : p (texte, liens [texte](adresse), {clé} de la société), liste, fiche, tableau, composant.",
+  "miseAJour": "6 novembre 2026",
+  "societe": {
+    "denomination": {
+      "libelle": "Dénomination",
+      "valeur": "OUIDAH HERITAGE TOUR",
+      "visible": true
+    },
+    "forme": {
+      "libelle": "Forme",
+      "valeur": "Société par actions simplifiée (SAS)",
+      "visible": true
+    },
+    "capital": {
+      "libelle": "Capital social",
+      "valeur": "1 000 000 FCFA",
+      "visible": true
+    },
+    "siege": {
+      "libelle": "Siège social",
+      "valeur": "Îlot 1158, parcelle F, maison Sikiratou Moustapha Lawani, quartier Haie Vive-Cocotiers, 12e arrondissement, Cotonou (Littoral), Bénin",
+      "visible": true
+    },
+    "quartier": {
+      "libelle": "Quartier du siège (public)",
+      "valeur": "Haie Vive-Cocotiers",
+      "visible": true
+    },
+    "ville": {
+      "libelle": "Ville du siège (public)",
+      "valeur": "Cotonou",
+      "visible": true
+    },
+    "agence": {
+      "libelle": "Agence à Ouidah",
+      "valeur": null,
+      "visible": true
+    },
+    "rccm": {
+      "libelle": "RCCM",
+      "valeur": "RB/COT/26 B 43278 du 11 juin 2026, Tribunal de commerce de Cotonou",
+      "visible": true
+    },
+    "ifu": {
+      "libelle": "IFU",
+      "valeur": "3202629321372",
+      "visible": true
+    },
+    "carte": {
+      "libelle": "Carte professionnelle",
+      "valeur": "Carte professionnelle de commerçant n° 1310CPC26, délivrée par l'APIEx, valable jusqu'au 12 juin 2028",
+      "visible": true
+    },
+    "licence": {
+      "libelle": "Licence d'agence de voyages",
+      "valeur": null,
+      "visible": true
+    },
+    "activite": {
+      "libelle": "Activité",
+      "valeur": "Tourisme et événementiel, activités artistiques et culturelles",
+      "visible": true
+    },
+    "presidente": {
+      "libelle": "Direction de la publication",
+      "valeur": "Mme Nathalie Rosine RIFFERT, Présidente",
+      "visible": true
+    },
+    "telephones": {
+      "libelle": "Téléphone",
+      "valeur": [
+        "+229 01 98 87 36 36",
+        "+229 01 94 35 50 50"
+      ],
+      "visible": true
+    },
+    "email": {
+      "libelle": "E-mail",
+      "valeur": "contact@ouidahheritagetour.bj",
+      "visible": true
+    }
+  },
+  "pages": {
+    "/mentions-legales": {
+      "titre": "Mentions légales",
+      "metaTitre": "Mentions légales — Ouidah Heritage Tour",
+      "metaDescription": "Éditeur, hébergement, propriété des contenus, crédits photos et accessibilité du site Ouidah Heritage Tour.",
+      "intro": "Qui édite ce site, qui l'héberge et à qui écrire.",
+      "sections": [
+        {
+          "id": "editeur",
+          "titre": "L'éditeur",
+          "blocs": [
+            {
+              "fiche": [
+                "denomination",
+                "forme",
+                "capital",
+                "siege",
+                "agence",
+                "rccm",
+                "ifu",
+                "carte",
+                "licence",
+                "activite",
+                "telephones",
+                "email"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "publication",
+          "titre": "Direction de la publication",
+          "blocs": [
+            {
+              "p": "{presidente}."
+            }
+          ]
+        },
+        {
+          "id": "hebergement",
+          "titre": "Hébergement",
+          "blocs": [
+            {
+              "fiche": [
+                [
+                  "Site",
+                  "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis · [vercel.com](https://vercel.com)"
+                ],
+                [
+                  "Base de données",
+                  "Supabase Pte. Ltd., 65 Chulia Street #38-02/03, OCBC Centre, Singapour 049513 · [supabase.com](https://supabase.com)"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "propriete",
+          "titre": "Textes, photos et logo",
+          "blocs": [
+            {
+              "p": "Le logo, les textes, les illustrations et la mise en page de ce site appartiennent à OUIDAH HERITAGE TOUR ou à leurs auteurs. Pour les reprendre, même en partie, demandez-nous d'abord un accord écrit à {email}."
+            },
+            {
+              "p": "Les photos publiées sous licence libre sont utilisées selon leurs conditions et leurs auteurs sont cités dans les crédits ci-dessous. Les fonds de carte sont © les contributeurs d'OpenStreetMap, sous licence ODbL."
+            }
+          ]
+        },
+        {
+          "id": "credits",
+          "titre": "Crédits photos",
+          "blocs": [
+            {
+              "composant": "credits"
+            }
+          ]
+        },
+        {
+          "id": "accessibilite",
+          "titre": "Accessibilité",
+          "blocs": [
+            {
+              "p": "Nous voulons que chacun puisse lire ce site et préparer son voyage. Il se parcourt au clavier, les images portent une description, les textes sont contrastés et les animations s'effacent quand votre appareil demande moins de mouvement."
+            },
+            {
+              "p": "Un passage difficile à lire ou un bouton qui ne répond pas ? Écrivez-nous à {email} en indiquant la page : nous vous répondons et nous corrigeons."
+            }
+          ]
+        },
+        {
+          "id": "liens",
+          "titre": "Liens vers d'autres sites",
+          "blocs": [
+            {
+              "p": "Le site renvoie parfois vers des sites officiels ou des partenaires, par exemple pour le visa ou un événement. Leur contenu relève de leurs éditeurs."
+            }
+          ]
+        },
+        {
+          "id": "droit",
+          "titre": "Droit applicable",
+          "blocs": [
+            {
+              "p": "Ce site est soumis au droit béninois. Pour une réservation ou une commande, les [conditions générales de vente](/conditions-generales-de-vente#litiges) précisent comment régler un désaccord."
+            }
+          ]
+        }
+      ]
+    },
+    "/politique-de-confidentialite": {
+      "titre": "Confidentialité et cookies",
+      "metaTitre": "Confidentialité et cookies — Ouidah Heritage Tour",
+      "metaDescription": "Les données que recueille Ouidah Heritage Tour, pourquoi, combien de temps, ce que le site garde dans votre navigateur et comment exercer vos droits.",
+      "intro": "Ce que nous recueillons, pourquoi, combien de temps, et comment exercer vos droits. Nous ne vendons aucune donnée et le site n’affiche aucune publicité. La mesure des visites ne démarre qu’avec votre accord.",
+      "sections": [
+        {
+          "id": "responsable",
+          "titre": "Qui est responsable de vos données",
+          "blocs": [
+            {
+              "p": "{denomination}, {forme}, dont le siège social est {siege}."
+            },
+            {
+              "p": "Pour toute question sur vos données, écrivez à {email} avec l'objet « Données personnelles », ou par courrier au siège."
+            }
+          ]
+        },
+        {
+          "id": "donnees",
+          "titre": "Ce que nous recueillons et pourquoi",
+          "blocs": [
+            {
+              "p": "Seulement ce que vous nous confiez dans un formulaire, et seulement pour la raison indiquée."
+            },
+            {
+              "tableau": {
+                "colonnes": [
+                  "Quand",
+                  "Données",
+                  "Pourquoi",
+                  "Combien de temps"
+                ],
+                "lignes": [
+                  [
+                    "Vous demandez un devis (« Créer mon voyage »)",
+                    "Nom, e-mail, WhatsApp si vous le donnez, pays, langue du guide, votre voyage (dates, lieux, services choisis), votre message",
+                    "Répondre à votre demande et préparer votre devis, à votre demande",
+                    "3 ans après notre dernier échange si aucune réservation ne suit"
+                  ],
+                  [
+                    "Vous gardez votre demande pour la reprendre plus tard",
+                    "Votre voyage et vos réponses, sans vos coordonnées",
+                    "Vous envoyer le lien de reprise et retrouver votre demande",
+                    "Le lien vaut 30 jours ; un brouillon jamais envoyé est effacé 90 jours après sa création"
+                  ],
+                  [
+                    "Vous réservez un billet ou un séjour",
+                    "Nom, e-mail, téléphone, pays, langue, formule, nombre de places, montant, moyen de paiement et référence de la transaction",
+                    "Établir votre réservation, votre billet et votre facture",
+                    "10 ans, durée de conservation des pièces comptables"
+                  ],
+                  [
+                    "Vous commandez à la boutique",
+                    "Prénom, nom, e-mail, téléphone, pays, adresse de livraison si vous choisissez la livraison, articles et options, votre message",
+                    "Confirmer, préparer et livrer votre commande",
+                    "10 ans, durée de conservation des pièces comptables"
+                  ],
+                  [
+                    "Vous vous inscrivez à la Lettre de Ouidah",
+                    "E-mail, langue, thèmes choisis, date de votre accord",
+                    "Vous envoyer la lettre, avec votre accord",
+                    "Jusqu'à votre désinscription, possible à tout moment depuis chaque lettre ou par e-mail"
+                  ],
+                  [
+                    "Vous envoyez un formulaire",
+                    "Une empreinte chiffrée de votre adresse IP, jamais l'adresse elle-même",
+                    "Limiter les envois automatisés et protéger le service",
+                    "La même durée que la demande à laquelle elle est attachée"
+                  ]
+                ]
+              }
+            },
+            {
+              "p": "Les formulaires de rendez-vous et de candidature partenaire recueillent vos coordonnées et les renseignements que vous saisissez pour que notre équipe organise le rendez-vous ou examine votre candidature. Les échanges reçus par courriel peuvent être rattachés à votre demande pour en assurer le suivi."
+            }
+          ]
+        },
+        {
+          "id": "paiement",
+          "titre": "Paiement",
+          "blocs": [
+            {
+              "p": "Vous payez chez la passerelle de paiement que vous choisissez parmi celles proposées : Kkiapay, FedaPay, Stripe, Flutterwave ou Paystack. Nous ne voyons ni ne gardons vos numéros de carte ou vos codes Mobile Money : nous recevons le montant, le statut du paiement et sa référence."
+            }
+          ]
+        },
+        {
+          "id": "destinataires",
+          "titre": "Qui reçoit vos données",
+          "blocs": [
+            {
+              "liste": [
+                "L'équipe de Ouidah Heritage Tour qui prépare votre voyage ou votre commande.",
+                "Nos prestataires techniques, pour ce seul service : Vercel (hébergement du site et, si vous l'acceptez, mesure d'audience, États-Unis), Supabase (base de données), notre messagerie {email}, hébergée par AfriRegister (envoi des e-mails de confirmation, des devis et des billets), la passerelle de paiement que vous choisissez et Groq, Inc. (assistant IA du site, États-Unis).",
+                "Les partenaires de votre séjour (hébergement, transport, guide), pour ce qu'il leur faut seulement : votre nom, vos dates et le nombre de voyageurs."
+              ]
+            },
+            {
+              "p": "Nous ne vendons ni ne louons vos données, et nous ne les utilisons pas pour de la publicité."
+            }
+          ]
+        },
+        {
+          "id": "transferts",
+          "titre": "Données hors du Bénin",
+          "blocs": [
+            {
+              "p": "Certains de nos prestataires sont installés hors du Bénin, notamment aux États-Unis et à Singapour. Nous ne leur confions que ce qui est nécessaire au service rendu, dans le cadre de leurs engagements contractuels de protection des données."
+            }
+          ]
+        },
+        {
+          "id": "navigateur",
+          "titre": "Ce que le site garde dans votre navigateur",
+          "blocs": [
+            {
+              "p": "Pour que vous ne perdiez rien d'une page à l'autre, le site garde quelques informations dans votre navigateur. Elles restent sur votre appareil et ne nous parviennent que si vous envoyez un formulaire. Elles sont nécessaires au fonctionnement du site."
+            },
+            {
+              "liste": [
+                "Votre dossier de voyage : lieux, circuit, dates, services et billets choisis.",
+                "Votre demande de devis en cours, y compris le nom et l'e-mail que vous avez déjà saisis, pour ne pas les retaper.",
+                "La devise choisie et le panier de la boutique.",
+                "Le retour d'un paiement en cours, effacé à la fermeture de l'onglet.",
+                "L'ouverture du site déjà vue, effacée à la fermeture de l'onglet.",
+                "Vos choix sur les services facultatifs ci-dessous."
+              ]
+            },
+            {
+              "p": "Le site ne dépose aucun cookie publicitaire ni de mesure d'audience. Pour tout effacer, videz les données de ce site dans les réglages de votre navigateur."
+            }
+          ]
+        },
+        {
+          "id": "assistant",
+          "titre": "Assistant du site et discussion avec l’équipe",
+          "blocs": [
+            {
+              "p": "L’assistant IA d’OHT répond à vos questions d’après le seul contenu publié sur ce site. Pour produire chaque réponse, votre message et les derniers échanges de la conversation sont envoyés à notre sous-traitant Groq, Inc., aux États-Unis ; nous ne les lui envoyons pour rien d’autre. La conversation est effacée quand vous quittez la page, ou après 30 minutes sans activité. Si vous donnez à l’assistant des éléments sur lesquels notre équipe doit agir (projet de voyage, demande de devis, coordonnées, réclamation, question restée sans réponse), il en transmet un résumé à l’équipe : seul ce résumé est gardé, pendant 90 jours. Si vous choisissez d’écrire à une personne de l’équipe, la conversation et l’e-mail ou le numéro WhatsApp laissés pour être recontacté restent chez nous 90 jours, puis ils sont effacés ; une conversation transformée en demande suit la durée des demandes. Les questions auxquelles l’assistant n’a pas su répondre sont gardées sans votre adresse IP ni aucun identifiant, après retrait des e-mails, numéros et noms qu’elles contiennent, pour que notre équipe y réponde et complète ce que l’assistant sait. Votre adresse IP n’est gardée que sous forme d’empreinte, pour appliquer les limites d’usage (nombre de messages). Vous pouvez demander l’accès, la rectification ou l’effacement de vos données à {email}."
+            }
+          ]
+        },
+        {
+          "id": "cookies",
+          "titre": "Services facultatifs, à votre choix",
+          "blocs": [
+            {
+              "p": "Trois services transmettent des données à un tiers ou comptent vos visites. Ils ne démarrent qu'avec votre accord, et refuser ne vous prive d'aucune page."
+            },
+            {
+              "fiche": [
+                [
+                  "Cartes interactives",
+                  "Les fonds de carte viennent d'OpenFreeMap, qui reçoit votre adresse IP. Refusées : la carte s'affiche en image."
+                ],
+                [
+                  "Ville approximative",
+                  "Votre ville est déduite de votre adresse IP par notre hébergeur, Vercel ; à défaut, de votre fuseau horaire, par le service Open-Meteo. Elle sert à situer Ouidah par rapport à chez vous et reste dans votre navigateur. Refusée : vous la saisissez vous-même."
+                ],
+                [
+                  "Mesure d'audience",
+                  "Les pages vues, comptées sans cookie ni identifiant par le compteur d'OHT et par Vercel Web Analytics (États-Unis), pour savoir ce qui intéresse nos visiteurs. Refusée : rien n'est compté."
+                ]
+              ]
+            },
+            {
+              "p": "Vous pouvez changer d'avis à tout moment ici ou avec le lien « Cookies » en bas de chaque page."
+            },
+            {
+              "composant": "choixCookies"
+            }
+          ]
+        },
+        {
+          "id": "securite",
+          "titre": "Sécurité",
+          "blocs": [
+            {
+              "p": "Le site est servi en HTTPS. Nos bases ne sont accessibles qu'aux personnes qui en ont besoin. Les liens de reprise d'une demande et les billets sont signés ; nous ne gardons d'un lien que son empreinte, jamais le lien lui-même."
+            }
+          ]
+        },
+        {
+          "id": "droits",
+          "titre": "Vos droits",
+          "blocs": [
+            {
+              "p": "Vous pouvez à tout moment accéder à vos données, les faire corriger ou effacer, vous opposer à leur usage, en demander une copie dans un format lisible, et retirer votre accord pour la Lettre ou les services facultatifs."
+            },
+            {
+              "p": "Écrivez à {email} avec l'objet « Données personnelles ». Nous pouvons vous demander de confirmer votre identité, puis nous vous répondons sous 30 jours."
+            },
+            {
+              "p": "Si notre réponse ne vous satisfait pas, vous pouvez saisir l'Autorité de Protection des Données à caractère Personnel (APDP) : Rue 6.076, Aïdjèdo, immeuble El Marzouk Joël, 01 BP 04837 Cotonou, Bénin · +229 21 32 57 88 · contact@apdp.bj · [apdp.bj](https://apdp.bj)."
+            },
+            {
+              "p": "Vous pouvez aussi utiliser [Mes données](/mes-donnees) pour recevoir un lien personnel à votre adresse e-mail. Ce lien permet de télécharger vos données ou de transmettre une demande d’effacement à l’équipe. Les justificatifs nécessaires au suivi des paiements et à la comptabilité sont conservés."
+            }
+          ]
+        },
+        {
+          "id": "mineurs",
+          "titre": "Mineurs",
+          "blocs": [
+            {
+              "p": "Nos réservations s'adressent aux adultes. Un mineur de moins de 16 ans ne nous transmet ses données qu'avec l'accord d'un parent."
+            }
+          ]
+        },
+        {
+          "id": "modifications",
+          "titre": "Mises à jour",
+          "blocs": [
+            {
+              "p": "La date de la dernière mise à jour figure en haut de cette page. Si un changement touche une réservation en cours, nous vous écrivons."
+            }
+          ]
+        }
+      ]
+    },
+    "/conditions-generales-de-vente": {
+      "titre": "Conditions générales de vente",
+      "metaTitre": "Conditions générales de vente — Ouidah Heritage Tour",
+      "metaDescription": "Billets d'événements, séjours sur devis et boutique de Ouidah Heritage Tour : prix, paiement, rétractation, annulation, livraison, retours et litiges.",
+      "intro": "Les règles qui s'appliquent quand vous réservez un billet, un séjour ou commandez à la boutique. Un point n'est pas clair ? Écrivez-nous avant de réserver.",
+      "sections": [
+        {
+          "id": "champ",
+          "titre": "À quoi s'appliquent ces conditions",
+          "blocs": [
+            {
+              "p": "Elles s'appliquent aux ventes de {denomination}, {forme} (voir les [mentions légales](/mentions-legales)) :"
+            },
+            {
+              "liste": [
+                "les billets des événements que nous organisons ;",
+                "les séjours, circuits et accompagnements établis sur devis, y compris autour d'un événement organisé par d'autres ;",
+                "les articles de la boutique."
+              ]
+            },
+            {
+              "p": "Vous les acceptez en confirmant votre réservation ou votre commande. La version en vigueur ce jour-là reste la vôtre."
+            }
+          ]
+        },
+        {
+          "id": "prix",
+          "titre": "Prix et paiement",
+          "blocs": [
+            {
+              "liste": [
+                "Les prix sont indiqués toutes taxes comprises, en francs CFA (XOF). L'affichage en euros suit le taux fixe 1 € = 655,957 FCFA.",
+                "Pour la boutique, les frais de livraison s'ajoutent au prix des articles et vous sont indiqués avant tout paiement.",
+                "Vous payez en une fois, sans acompte, auprès de l'une des passerelles proposées au moment du paiement. Nous ne recevons jamais vos données de carte."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "retractation",
+          "titre": "Votre droit de rétractation",
+          "blocs": [
+            {
+              "p": "Vous disposez de 15 jours ouvrables pour changer d'avis, sans avoir à vous justifier : à compter de votre paiement pour un billet ou un séjour, de la réception pour un article. Écrivez-nous à {email} ; nous vous remboursons la totalité sous 14 jours, par le moyen de paiement utilisé."
+            },
+            {
+              "p": "Ce droit ne s'applique plus à un billet ou à un séjour déjà entièrement réalisé, ni aux articles faits sur mesure ou personnalisés à votre demande."
+            }
+          ]
+        },
+        {
+          "id": "billets",
+          "titre": "Billets d'événements",
+          "blocs": [
+            {
+              "liste": [
+                "Vous réservez dans l'agenda du site : formule, nombre de places et coordonnées, puis paiement.",
+                "Votre billet, à votre nom et muni d'un code QR, vous est envoyé par e-mail dès que la passerelle nous confirme le paiement. Présentez-le sur votre téléphone ou imprimé ; chaque code QR ouvre l'entrée une fois.",
+                "Vous ne pouvez pas venir ? Après le délai de rétractation, nous vous remboursons la totalité jusqu'à 30 jours avant l'événement et la moitié entre 30 et 8 jours avant. Plus tard, offrez votre place : nous mettons le billet au nom de la personne de votre choix, sans frais, jusqu'à 48 heures avant.",
+                "Si nous annulons ou reportons l'événement, vous choisissez entre le remboursement intégral et votre place à la nouvelle date."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sejours",
+          "titre": "Séjours et accompagnements sur devis",
+          "blocs": [
+            {
+              "liste": [
+                "Votre demande de devis est gratuite et ne vous engage pas. Le devis détaille les prestations, les dates, ce qui est compris et le prix total. Il reste valable 15 jours.",
+                "Votre réservation est ferme quand vous acceptez le devis et payez son montant en une fois. Nous vous envoyons alors la confirmation écrite de votre voyage.",
+                "Pour un séjour autour d'un événement organisé par d'autres, comme les Vodun Days, nous vendons le séjour, pas l'événement. Son programme dépend de ses organisateurs ; s'il change, nous adaptons votre séjour avec vous.",
+                "Vous souhaitez modifier vos dates ou vos services ? Dites-le-nous : nous ajustons selon les disponibilités, et l'écart de prix s'ajoute ou vous est remboursé.",
+                "Après le délai de rétractation, si vous annulez, nous vous remboursons la totalité jusqu'à 45 jours avant l'arrivée, déduction faite des frais déjà engagés auprès de nos partenaires et non remboursables, que nous vous justifions ; la moitié entre 45 et 15 jours avant ; moins de 15 jours avant, nous vous proposons de reporter votre séjour selon les disponibilités.",
+                "Si nous devons annuler, nous vous remboursons la totalité ou vous proposons un autre séjour, à votre choix.",
+                "Le passeport, le visa et le certificat de vaccination contre la fièvre jaune sont à votre charge : la rubrique « Préparer votre voyage » vous guide. Une assurance voyage, rapatriement compris, est vivement conseillée.",
+                "Nous répondons de la bonne exécution des prestations que nous vendons. Les vols que vous réservez vous-même restent hors de notre champ."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "boutique",
+          "titre": "Boutique",
+          "blocs": [
+            {
+              "liste": [
+                "Votre commande est d'abord une demande. Sous 2 jours ouvrés, nous vous confirmons par e-mail la disponibilité, le mode de remise et le montant total, frais compris.",
+                "Vous payez en une fois après cette confirmation ; la vente est conclue à réception du paiement.",
+                "Les articles sur mesure ou personnalisés sont réalisés après le paiement, dans le délai indiqué dans la confirmation."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "livraison",
+          "titre": "Livraison et retours",
+          "blocs": [
+            {
+              "liste": [
+                "Retrait à Ouidah, sans frais : le lieu et les horaires figurent dans la confirmation.",
+                "Livraison au Bénin et dans les pays proposés à la commande. Les frais dépendent du pays et du colis ; ils vous sont indiqués avant le paiement.",
+                "Délais indicatifs à compter de l'expédition : 2 à 5 jours ouvrés au Bénin, 5 à 10 en Afrique de l'Ouest, 7 à 21 ailleurs. Nous vous transmettons le suivi du colis.",
+                "Hors du Bénin, les droits et taxes d'importation éventuels sont à la charge du destinataire.",
+                "Retour d'un article : dans les 15 jours ouvrables suivant sa réception, dans son état d'origine. Nous vous remboursons l'article et les frais de livraison d'origine sous 14 jours après l'avoir reçu ; les frais du retour sont à votre charge. Un échange de taille ou de coloris est possible dans le même délai, selon le stock.",
+                "Article abîmé ou différent de votre commande : signalez-le-nous dans les 7 jours suivant la réception, photos à l'appui. Nous l'échangeons, le réparons ou vous le remboursons, frais à notre charge.",
+                "Les articles sur mesure ou personnalisés ne sont ni repris ni échangés, sauf défaut."
+              ]
+            }
+          ]
+        },
+        {
+          "id": "donnees",
+          "titre": "Vos données",
+          "blocs": [
+            {
+              "p": "Ce que nous faisons de vos coordonnées est décrit dans la page [Confidentialité et cookies](/politique-de-confidentialite)."
+            }
+          ]
+        },
+        {
+          "id": "litiges",
+          "titre": "Réclamations et litiges",
+          "blocs": [
+            {
+              "p": "Pour toute réclamation, contactez-nous : {telephones} · {email}. Nous vous répondons sous 7 jours ouvrés et cherchons d'abord une solution amiable avec vous."
+            },
+            {
+              "p": "Vous pouvez aussi adresser une réclamation à l'administration béninoise chargée du tourisme."
+            },
+            {
+              "p": "Ces conditions sont soumises au droit béninois ; à défaut d'accord, le Tribunal de commerce de Cotonou est compétent. Si vous résidez hors du Bénin, vous gardez les protections que vous accorde la loi de votre pays, dont le droit de saisir le juge de votre domicile lorsqu'elle le prévoit."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

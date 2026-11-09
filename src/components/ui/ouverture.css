@@ -1,0 +1,8 @@
+/* Ouverture « Dangbé » : aplat soleil dès le premier affichage, au-dessus de l'en-tête et du bandeau des cookies.
+   Déjà vue dans la session, ou mouvement réduit : jamais affichée (attribut posé par le script de <head>). */
+.ov { position: fixed; inset: 0; z-index: 100; overflow: hidden; background: var(--accent-sun); animation: ov-secours 0.4s 6s forwards; }
+.ov-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+html[data-ouverture="vue"] .ov { display: none; }
+/* dernier filet sans JavaScript : si rien n'a démarré au bout de 6 s, l'ouverture s'efface d'elle-même */
+@keyframes ov-secours { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .ov { display: none; } }

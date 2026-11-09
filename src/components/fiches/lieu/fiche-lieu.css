@@ -1,0 +1,184 @@
+/* Fiche lieu, piste A « Hier, aujourd'hui » (Kevin, 30/10/2026). Haut de page abysse sous l'en-tête fixe (comme .lg-bandeau),
+   scène navy (diptyque, curseur ou carte à anneaux), corps sur blanc pur, encres froides tirées du navy (règle du 23/10 :
+   jamais de brun ni de beige sur blanc). Mouvement : transform et opacity seulement, coupé par « mouvement réduit » ; un seul
+   mouvement par section (entrée d'aujourd'hui, ou onde des anneaux ; rideau des gravures au défilement). Préfixe fl-. */
+@property --fl-x {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.5;
+}
+.fl {
+  --fl-encre: #121a33; --fl-encre-2: #3f4863; --fl-encre-3: #5a6379;
+  --fl-ivoire-82: rgb(247 241 232 / 0.82); --fl-ivoire-62: rgb(247 241 232 / 0.62); --fl-ivoire-40: rgb(247 241 232 / 0.4);
+  --fl-blanc-24: rgb(255 255 255 / 0.24); --fl-ombre-photo: rgb(0 0 0 / 0.45);
+  --fl-courbe: cubic-bezier(0.625, 0.05, 0, 1);
+  background: #fff; color: var(--fl-encre); font-size: 17px; line-height: 1.65;
+}
+.fl :focus-visible:not(.oht-btn) { outline: 2px solid var(--accent-sun); outline-offset: 4px; border-radius: 4px; }
+.fl h1, .fl h2, .fl h3 { text-wrap: balance; }
+
+/* haut de page : titre, type, bouton d'ajout */
+.fl-tete { background: var(--surface-abyss); color: var(--text-inverse); padding: 168px 0 48px; }
+.fl-tete-grille { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 16px 48px; }
+.fl-retour { grid-column: 1 / -1; color: var(--fl-ivoire-82); }
+.fl-tete h1 { font: 600 clamp(40px, 5.6vw, 84px)/1 var(--font-display); letter-spacing: -0.02em; max-width: 20ch; }
+.fl-sous-titre { margin-top: 12px; font: 500 clamp(20px, 2vw, 26px)/1.35 var(--font-display); color: var(--fl-ivoire-82); }
+.fl-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.fl-ajout { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+/* le bouton « Pastille double » garde 54 px à droite : la pastille s'y déploie au survol (globals.css), l'espace reste réservé */
+@media (max-width: 639px) { .fl-ajout { width: 100%; } }
+
+/* scène : hier et aujourd'hui côte à côte ; aujourd'hui entre par la droite, une fois */
+.fl-scene { background: var(--surface-abyss); color: var(--text-inverse); }
+.fl-diptyque { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; }
+.fl-panneau { position: relative; height: clamp(420px, calc(100svh - 300px), 720px); margin: 0; overflow: hidden; background: var(--surface-inverse); }
+.fl-entree { position: absolute; inset: 0; animation: fl-entree 1.4s var(--fl-courbe) 0.2s backwards; }
+.fl-panneau.fl-seule { height: clamp(420px, calc(100svh - 260px), 760px); }
+.fl-panneau img, .fl-couche img { object-fit: cover; }
+.fl-marque { position: absolute; left: 32px; bottom: 32px; font: 600 clamp(36px, 5vw, 80px)/0.95 var(--font-display); letter-spacing: -0.02em; color: #fff; text-shadow: 0 2px 24px var(--fl-ombre-photo); }
+.fl-legendes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; padding-top: 16px; padding-bottom: 20px; color: var(--fl-ivoire-82); font-size: 15px; line-height: 1.5; }
+.fl-legendes p:last-child { text-align: right; }
+.fl-legendes p:only-child { grid-column: 1 / -1; text-align: left; }
+@keyframes fl-entree { from { transform: translateX(100%); } }
+
+/* curseur (même cadrage seulement) : le partage --fl-x glisse de 1 à 0,5 à l'ouverture */
+.fl-cadre { position: relative; height: clamp(420px, calc(100svh - 300px), 720px); overflow: hidden; background: var(--surface-inverse); animation: fl-partage 1.5s var(--fl-courbe) 0.2s backwards; }
+.fl-couche { position: absolute; inset: 0; }
+.fl-volet { position: absolute; inset: 0; overflow: hidden; transform: translateX(calc(var(--fl-x) * 100%)); }
+.fl-volet > .fl-couche { transform: translateX(calc(var(--fl-x) * -100%)); }
+.fl-marque-auj { left: auto; right: 32px; text-align: right; }
+.fl-curseur { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; appearance: none; }
+.fl-poignee { position: absolute; inset: 0; z-index: 1; pointer-events: none; transform: translateX(calc(var(--fl-x) * 100%)); }
+.fl-trait { position: absolute; top: 0; bottom: 0; left: -1px; width: 2px; background: #fff; }
+.fl-prise { position: absolute; top: 50%; left: -28px; display: grid; place-items: center; width: 56px; height: 56px; margin-top: -28px; border-radius: 50%; background: var(--accent-sun); color: var(--surface-abyss); box-shadow: 0 8px 24px var(--fl-ombre-photo); }
+.fl-prise svg { width: 24px; height: 24px; }
+.fl-curseur:focus-visible + .fl-poignee .fl-prise { outline: 3px solid #fff; outline-offset: 4px; }
+@keyframes fl-partage { from { --fl-x: 1; } }
+
+/* carte à anneaux (SVG, unités = pixels du format ; la taille des textes est donnée par le SVG) */
+.fl-carte { display: block; width: 100%; height: auto; }
+.fl-scene .fl-carte { max-height: min(720px, calc(100svh - 200px)); margin-inline: auto; }
+.fl-vue-moyen, .fl-vue-etroit { display: none; }
+.fl-carte .fl-tous { fill: var(--fl-blanc-24); }
+.fl-carte .fl-route { fill: none; stroke: var(--fl-ivoire-40); stroke-width: 3; stroke-dasharray: 3 9; stroke-linecap: round; }
+.fl-anneau circle { fill: none; stroke: var(--fl-ivoire-40); stroke-width: 2; }
+.fl-anneau text { font-family: var(--font-text); font-weight: 600; fill: var(--fl-ivoire-82); text-anchor: middle; }
+.fl-points circle { fill: var(--accent-sun); stroke: var(--surface-abyss); stroke-width: 3; }
+.fl-centre-bord { fill: none; stroke: #fff; stroke-width: 6; }
+.fl-centre-plein { fill: var(--brand-primary); stroke: #fff; stroke-width: 5; }
+.fl-noms text { font-family: var(--font-text); font-weight: 700; fill: #fff; stroke: var(--surface-abyss); stroke-width: 0.3em; paint-order: stroke; stroke-linejoin: round; dominant-baseline: central; }
+.fl-carte .fl-nord { font-family: var(--font-text); font-weight: 700; fill: var(--fl-ivoire-82); }
+.fl-onde .fl-anneau circle { transform-box: fill-box; transform-origin: center; animation: fl-anneau 1.1s var(--fl-courbe) backwards; animation-delay: calc(var(--i) * 180ms); }
+.fl-onde .fl-anneau text, .fl-onde .fl-points, .fl-onde .fl-noms { animation: fl-apparait 0.5s ease 0.7s backwards; }
+.fl-onde .fl-centre { animation: fl-apparait 0.7s ease backwards; }
+@keyframes fl-anneau { from { opacity: 0; transform: scale(0); } }
+@keyframes fl-apparait { from { opacity: 0; } }
+
+/* corps : chapeau et récit à gauche, fiche pratique à droite */
+.fl-corps { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 48px; padding-top: 24px; padding-bottom: 96px; }
+.fl-corps.fl-seul { grid-template-columns: minmax(0, 1fr); }
+.fl-chapeau { padding-top: 48px; max-width: 60ch; font-size: 21px; font-weight: 500; line-height: 1.6; color: var(--fl-encre); }
+.fl-recit { padding-top: 48px; max-width: 68ch; }
+.fl-recit h2 { font: 600 clamp(32px, 3.4vw, 48px)/1.1 var(--font-display); letter-spacing: -0.01em; color: var(--fl-encre); }
+.fl-repere { margin-top: 12px; font: 500 20px/1.3 var(--font-display); color: var(--brand-primary); }
+.fl-texte { margin-top: 28px; }
+.fl-texte p { color: var(--fl-encre-2); }
+.fl-texte p + p { margin-top: 20px; }
+.fl-archive { margin: 48px 0 0; }
+.fl-tirage { position: relative; overflow: hidden; border-radius: 4px; background: var(--surface-abyss); }
+.fl-tirage img { display: block; width: 100%; height: auto; }
+.fl-rideau { position: absolute; inset: 0; background: var(--surface-abyss); transform: scaleX(0); transform-origin: 100% 50%; }
+.fl-archive figcaption { margin-top: 12px; font-size: 15px; line-height: 1.5; color: var(--fl-encre-3); }
+.fl-suite { margin-top: 32px; color: var(--fl-encre); }
+/* écho : le rideau des gravures s'ouvre au défilement (animation liée au défilement ; navigateurs sans : gravure visible) */
+@supports (animation-timeline: view()) {
+  .fl-rideau { animation: fl-rideau linear both; animation-timeline: view(); animation-range: entry 10% cover 45%; }
+}
+@keyframes fl-rideau { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+.fl-fiche { position: sticky; top: 112px; align-self: start; margin-top: 48px; padding: 32px; border-radius: 24px; background: var(--surface-abyss); color: var(--text-inverse); }
+.fl-seul .fl-fiche { position: static; }
+.fl-fiche h2 { font: 600 28px/1.2 var(--font-display); }
+.fl-fiche dl { display: grid; gap: 8px; margin: 20px 0 24px; }
+.fl-seul .fl-fiche dl { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); column-gap: 48px; }
+.fl-ligne { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 56px; padding: 8px 0 8px 56px; }
+.fl-ligne .oht-objet { position: absolute; left: 0; top: 50%; margin-top: -20px; }
+.fl-ligne dt { font-size: 15px; line-height: 1.4; color: var(--fl-ivoire-62); }
+.fl-ligne dd { margin: 0; font-weight: 700; line-height: 1.45; overflow-wrap: anywhere; }
+.fl-ligne dd a { color: var(--text-inverse); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.fl-ligne dd a:hover { text-decoration-thickness: 2px; }
+.fl-ligne dd .fl-aller { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent-sun); }
+
+/* circuits qui passent ici */
+.fl-circuits { padding: 96px 0; background: var(--surface-abyss); color: var(--text-inverse); scroll-margin-top: 80px; }
+.fl-circuits h2, .fl-autour h2 { font: 600 clamp(32px, 3.4vw, 48px)/1.1 var(--font-display); letter-spacing: -0.01em; }
+.fl-liste-circuits { list-style: none; padding: 0; margin: 40px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 48px; }
+.fl-carte-circuit { display: grid; grid-template-rows: auto 1fr; height: 100%; border-radius: 24px; overflow: hidden; background: var(--surface-brand); color: var(--text-inverse); text-decoration: none; transition: background-color 0.3s; }
+.fl-carte-circuit:hover, .fl-carte-circuit:focus-visible { background: var(--brand-primary); }
+.fl-carte-circuit:active { background: var(--surface-inverse); }
+.fl-photo-circuit { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.fl-photo-circuit img { object-fit: cover; }
+.fl-texte-circuit { padding: 24px 28px 28px; }
+.fl-texte-circuit h3 { font: 600 28px/1.15 var(--font-display); }
+.fl-tag { margin-top: 8px; font-size: 15px; line-height: 1.4; color: var(--fl-ivoire-82); }
+.fl-etapes { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 8px; counter-reset: fl-e; }
+.fl-etapes li { counter-increment: fl-e; display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: baseline; color: var(--fl-ivoire-82); font-size: 16px; line-height: 1.4; }
+.fl-etapes li::before { content: counter(fl-e); font: 600 16px/1 var(--font-display); color: var(--fl-ivoire-62); }
+.fl-etapes li.fl-ici { color: #fff; font-weight: 700; }
+.fl-etapes li.fl-ici::before { color: var(--accent-sun); }
+.fl-liste-circuits li:only-child .fl-carte-circuit:has(.fl-photo-circuit) { grid-template-rows: none; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.fl-liste-circuits li:only-child .fl-photo-circuit { aspect-ratio: auto; min-height: 360px; }
+.fl-liste-circuits li:only-child .fl-texte-circuit { padding: 40px; align-self: center; }
+
+/* autour : petit plan à anneaux et blocs compacts par famille (3 voisins au plus) */
+.fl-autour { padding: 96px 0 120px; }
+.fl-note { margin-top: 12px; color: var(--fl-encre-3); font-size: 16px; }
+.fl-autour-grille { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; margin-top: 40px; align-items: start; }
+.fl-autour-grille.fl-sans-plan { grid-template-columns: minmax(0, 1fr); }
+.fl-plan { border-radius: 24px; overflow: hidden; background: var(--surface-inverse); }
+.fl-blocs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }
+.fl-bloc { padding: 24px; border-radius: 20px; background: var(--surface-abyss); color: var(--text-inverse); }
+.fl-bloc h3 { font: 600 22px/1.2 var(--font-display); }
+.fl-bloc ol { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 4px; }
+.fl-bloc a, .fl-voisin { display: grid; min-height: 44px; padding: 8px 0; color: var(--text-inverse); text-decoration: none; }
+.fl-bloc a .fl-n { text-decoration: underline; text-decoration-color: var(--accent-sun); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.fl-bloc a:hover .fl-n { color: var(--accent-sun); }
+.fl-n { font-weight: 700; line-height: 1.35; }
+.fl-d { font-size: 15px; line-height: 1.4; color: var(--fl-ivoire-62); }
+
+@media (max-width: 1023px) {
+  .fl-tete-grille { grid-template-columns: minmax(0, 1fr); }
+  .fl-vue-large { display: none; }
+  .fl-vue-moyen { display: block; }
+  .fl-corps { grid-template-columns: minmax(0, 1fr); gap: 0; padding-bottom: 0; }
+  /* fiche pleine largeur collée aux circuits navy : pas de bande blanche entre deux aplats navy (marges = celles de .container-oht) */
+  .fl-fiche { position: static; margin-inline: -40px; border-radius: 0; padding: 40px; }
+  .fl-fiche dl { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  .fl-autour-grille { grid-template-columns: minmax(0, 1fr); }
+  .fl-plan { max-width: 560px; }
+}
+@media (max-width: 767px) {
+  .fl-fiche { margin-inline: -24px; padding: 40px 24px; }
+}
+@media (max-width: 639px) {
+  .fl { font-size: 16px; }
+  .fl-tete { padding: 128px 0 32px; }
+  .fl-vue-moyen, .fl-vue-pas-etroit { display: none; }
+  .fl-vue-etroit { display: block; }
+  .fl-diptyque { grid-template-columns: minmax(0, 1fr); }
+  .fl-panneau { height: max(280px, 72vw); }
+  .fl-cadre { height: min(118vw, 520px); }
+  .fl-marque { left: 16px; bottom: 20px; font-size: 36px; }
+  .fl-marque-auj { left: auto; right: 16px; }
+  .fl-legendes { grid-template-columns: minmax(0, 1fr); gap: 4px; padding-top: 12px; padding-bottom: 16px; }
+  .fl-legendes p:last-child { text-align: left; }
+  .fl-chapeau { padding-top: 32px; font-size: 18px; }
+  .fl-fiche dl { grid-template-columns: minmax(0, 1fr); }
+  .fl-circuits, .fl-autour { padding: 64px 0; }
+  .fl-liste-circuits li:only-child .fl-carte-circuit:has(.fl-photo-circuit) { grid-template-columns: minmax(0, 1fr); }
+  .fl-liste-circuits li:only-child .fl-photo-circuit { min-height: 0; aspect-ratio: 16 / 10; }
+  .fl-liste-circuits li:only-child .fl-texte-circuit { padding: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fl *, .fl *::before, .fl *::after { animation: none !important; transition: none !important; }
+}

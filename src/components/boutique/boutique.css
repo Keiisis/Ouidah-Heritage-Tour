@@ -1,0 +1,720 @@
+/* Hallmark · checked: 2026-10-26 · genre: modern-minimal · theme: Ouidah · surface: absolute · built: the project · v2.0.0 */
+/* Boutique OHT (maquette I : b-i-boutique.html, b-i-fiche.html, boutique-i.css, tiroir de commun.js / variables.css).
+   Tout est rangé sous .bq, l'enveloppe des pages /boutique : rien ne fuit vers le reste du site.
+   Fonds : blanc pur, navy, aplat franc ou vraie photo, jamais de beige. Encres et filets neutres froids tirés du navy
+   (Kevin, 23/10 : les bruns et sables du site font « délavé » ici), redéfinis sur l'enveloppe seulement.
+   Mouvement : MOTION-I.md. On n'anime que transform, opacity et clip-path ; couleurs et ombres changent sans transition. */
+
+/* jetons propres à la boutique (noms neufs : sans effet hors de .bq) */
+:root {
+  --bq-encre: #121a33;
+  --bq-encre-douce: #3f4863;
+  --bq-encre-pale: #5a6379;
+  --bq-filet: #dde1ea;
+  --bq-nuit: #0b1638;
+  --bq-ocean: #122460;
+  --bq-abysse: #0f162d;
+  --bq-laterite: #ac3215;
+  --bq-ocre: #df9410;
+  --bq-soleil: #fdbf28;
+  --bq-soleil-fonce: #f0a22a;
+  --bq-blanc: #ffffff;
+  --bq-nuit-88: rgba(11, 22, 56, 0.88);
+  --bq-nuit-70: rgba(11, 22, 56, 0.7);
+  --bq-nuit-45: rgba(11, 22, 56, 0.45);
+  --bq-nuit-0: rgba(11, 22, 56, 0);
+  --bq-ivoire-14: rgba(247, 241, 232, 0.14);
+}
+
+.bq {
+  /* encres et filets du site redéfinis dans la boutique seulement (utilitaires text-ink, border-hairline compris) */
+  --text-primary: var(--bq-encre);
+  --text-secondary: var(--bq-encre-douce);
+  --text-muted: var(--bq-encre-pale);
+  --border-default: var(--bq-filet);
+  --ink: var(--text-primary);
+  --ink-soft: var(--text-secondary);
+  --ink-muted: var(--text-muted);
+  --hairline: var(--border-default);
+  --night: var(--bq-nuit);
+  --ocean: var(--bq-ocean);
+  --abyss: var(--bq-abysse);
+  --laterite: var(--bq-laterite);
+  --ochre: var(--bq-ocre);
+  --sun: var(--bq-soleil);
+  --sun-deep: var(--bq-soleil-fonce);
+  --blanc: var(--bq-blanc);
+  --night-88: var(--bq-nuit-88);
+  --night-70: var(--bq-nuit-70);
+  --night-45: var(--bq-nuit-45);
+  --night-0: var(--bq-nuit-0);
+  --ivory-14: var(--bq-ivoire-14);
+  --f-texte: var(--font-manrope), "Noto Sans", system-ui, sans-serif;
+  --f-titre: var(--font-fraunces), "Noto Serif", Georgia, serif;
+  /* jetons de mouvement (MOTION-I 1) : 200 ms survols, sorties, popover, menus ; 300 ms deuxième vue, tiroirs ; 600 ms grille, hero, zoom */
+  --d-court: 200ms;
+  --d-moyen: 300ms;
+  --d-long: 600ms;
+  --c-arrivee: cubic-bezier(0, 0, 0.3, 1);
+  --c-etat: cubic-bezier(0.4, 0, 0.2, 1);
+  --c-depart: cubic-bezier(0.4, 0, 1, 1);
+  /* hauteur de l'en-tête du site (replié) et de la barre boutique, pour les colonnes collantes */
+  --tete-site: 72px;
+  --tete-bq: 112px;
+
+  background: var(--blanc);
+  color: var(--ink);
+  font-family: var(--f-texte);
+
+  & [hidden] { display: none !important; }
+  & .bq-invisible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  & svg { flex: none; }
+  & .bq-trait { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  & :is(button, input, select, textarea) { font-family: var(--f-texte); color: inherit; }
+  & :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 3px solid var(--ocean); outline-offset: 2px; }
+  & :is(.tete, .sous-nav, .menu-tout-tete, .hero, .bq-bande) :focus-visible { outline-color: var(--sun); }
+  & .tete :is(.mega, .suggestions, .popover-ajout) :focus-visible { outline-color: var(--ocean); }
+  & :where(.b-soleil, .btn-soleil, .btn-contour, .ajouter, .qte-c button, .coeur, .cat-b, .tout-btn, .dev, .panier-btn, .rech-ok, .lien-b, .b-ocean, .b-fav):active { transform: scale(0.97); }
+  & h1, & h2, & h3 { text-wrap: balance; }
+
+  /* bande navy sous l'en-tête fixe du site (il est transparent en haut de page) */
+  & .bq-bande { height: 80px; background: var(--abyss); }
+
+  /* cadre photo : vraie photo en cover, ou cadre blanc à filet tant que la photo manque */
+  & .photo-vide { display: block; width: 100%; height: 100%; background: var(--blanc); }
+  & :is(.sug-image, .ajoute-image, .mega-image, .ar-image, .tiroir-image) { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid var(--hairline); border-radius: 6px; background: var(--blanc); }
+  & :is(.sug-image, .ajoute-image, .mega-image, .ar-image, .tiroir-image) img { object-fit: cover; }
+
+  /* ---------- boutons (MOTION-I 2.4) : un aplat --sun-deep monte depuis le bas au survol, appui à .97 ---------- */
+  & .b-soleil { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 28px; border: 0; border-radius: 999px; background: var(--sun); color: var(--ocean); font: 700 16px/1 var(--f-texte); cursor: pointer; }
+  & .b-soleil svg { width: 18px; height: 18px; }
+  & .btn-soleil { display: grid; place-items: center; min-height: 52px; padding: 0 28px; border: 0; border-radius: 999px; background: var(--sun); color: var(--ocean); font: 700 16px/1 var(--f-texte); cursor: pointer; }
+  & .btn-soleil:disabled { cursor: progress; }
+  & .btn-contour, & .ajoute-actions .btn-soleil { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 999px; font: 700 14px/1 var(--f-texte); cursor: pointer; }
+  & .btn-contour { border: 1px solid var(--ocean); background: var(--blanc); color: var(--ocean); }
+  & .btn-contour:hover { background: var(--ocean); color: var(--blanc); }
+  & :is(.ajouter, .b-soleil, .btn-soleil) { position: relative; isolation: isolate; overflow: clip; transition: transform 100ms var(--c-etat); }
+  & :is(.ajouter, .b-soleil, .btn-soleil)::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--sun-deep); transform: translateY(101%); transition: transform var(--d-court) var(--c-etat); }
+  & .b-soleil svg { transition: transform var(--d-court) var(--c-etat); }
+  @media (hover: hover) and (pointer: fine) {
+    & :is(.ajouter, .b-soleil, .btn-soleil):not(:disabled, [aria-disabled="true"], .pris):hover::before { transform: none; }
+    & .b-soleil:hover svg { transform: translateX(3px); }
+  }
+  & .lib { display: inline-flex; align-items: center; gap: 8px; }
+  & .lib svg { width: 18px; height: 18px; }
+  & .lien-b { min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--ocean); font: 700 14px/1 var(--f-texte); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  & .rech-ok:hover { background: var(--sun-deep); }
+
+  /* ---------- 1. barre Océan, collante sous l'en-tête du site ---------- */
+  & .tete-boutique { position: sticky; top: var(--tete-site); z-index: 40; }
+  & .tete { position: relative; background: var(--ocean); color: var(--blanc); }
+  & .tete-in { display: flex; align-items: center; gap: 16px; min-height: 68px; padding-block: 8px; }
+  & .bq-nom { display: inline-flex; align-items: center; min-height: 44px; flex: none; color: var(--blanc); font: 600 18px/1 var(--f-texte); }
+  & .burger { display: none; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 999px; background: none; color: var(--blanc); cursor: pointer; }
+  & .burger svg { width: 24px; height: 24px; }
+  & .recherche { position: relative; flex: 1; display: flex; min-width: 0; height: 48px; border-radius: 8px; background: var(--blanc); }
+  & .recherche:focus-within { box-shadow: 0 0 0 3px var(--sun); }
+  & .rech-cat { position: relative; display: flex; align-items: center; border-right: 1px solid var(--hairline); }
+  & .rech-cat select { height: 100%; max-width: 188px; padding: 0 32px 0 16px; border: 0; border-radius: 8px 0 0 8px; background: var(--blanc); color: var(--ink); font: 600 14px/1 var(--f-texte); cursor: pointer; appearance: none; }
+  & .rech-cat svg { position: absolute; right: 10px; width: 16px; height: 16px; color: var(--ink-muted); pointer-events: none; }
+  & .recherche input { flex: 1; min-width: 0; padding: 0 16px; border: 0; background: var(--blanc); color: var(--ink); font: 500 16px/1 var(--f-texte); }
+  & .recherche input::placeholder { color: var(--ink-muted); }
+  & .recherche input::-webkit-search-cancel-button { display: none; }
+  & .recherche :is(input, select):focus-visible { outline: 3px solid var(--ocean); outline-offset: -3px; }
+  & .rech-ok { flex: 0 0 56px; display: grid; place-items: center; border: 0; border-radius: 0 8px 8px 0; background: var(--sun); color: var(--ocean); cursor: pointer; }
+  & .rech-ok svg { width: 24px; height: 24px; }
+
+  /* suggestions pendant la frappe (H) : entrée à l'ouverture seulement (2.7), puis les résultats changent sans animation */
+  & .suggestions { position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 60; max-height: min(70vh, 540px); overflow-y: auto; margin: 0; padding: 8px; border-radius: 12px; background: var(--blanc); color: var(--ink); box-shadow: 0 12px 28px rgb(15 22 45 / 0.18); list-style: none; animation: bq-sug var(--d-court) var(--c-arrivee); }
+  & .suggestions li { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 56px; padding: 4px 12px; border-radius: 8px; cursor: pointer; }
+  & .suggestions li[aria-selected="true"], & .suggestions li:hover { box-shadow: inset 3px 0 0 var(--sun); }
+  & .suggestions li[aria-selected="true"] .sug-nom { color: var(--laterite); }
+  & .sug-nom { display: block; font: 600 15px/1.3 var(--f-texte); }
+  & .sug-nom mark { background: none; color: inherit; text-decoration: underline; text-decoration-color: var(--sun); text-decoration-thickness: 3px; }
+  & .sug-meta { display: block; font: 500 13px/1.3 var(--f-texte); color: var(--ink-muted); }
+  & .sug-prix { font: 700 15px/1 var(--f-texte); color: var(--ocean); }
+  & .suggestions li.sug-tout { display: block; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--hairline); border-radius: 0; font: 700 14px/1.3 var(--f-texte); color: var(--ocean); }
+  & .suggestions li.sug-vide { display: block; color: var(--ink-soft); cursor: default; box-shadow: none; font: 500 14px/1.5 var(--f-texte); }
+
+  /* devise, panier, mention de retrait */
+  & .tete-act { display: flex; align-items: center; gap: 8px; flex: none; }
+  & .dev { display: inline-flex; gap: 2px; padding: 4px; border: 1px solid var(--ivory-14); border-radius: 999px; background: none; color: var(--blanc); cursor: pointer; }
+  & .dev span { display: grid; place-items: center; min-width: 40px; min-height: 36px; padding: 0 12px; border-radius: 999px; font: 700 13px/1 var(--f-texte); }
+  & .dev span.on { background: var(--sun); color: var(--ocean); }
+  /* dès 640 px l'en-tête du site montre déjà la devise (même réglage, lib/devise) : pas de second sélecteur */
+  @media (min-width: 640px) {
+    & .dev { display: none; }
+  }
+  & .panier-zone { position: relative; }
+  & .panier-btn { display: flex; align-items: flex-end; gap: 4px; min-height: 48px; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--blanc); font: 700 14px/1 var(--f-texte); cursor: pointer; }
+  & .panier-btn:hover { box-shadow: inset 0 0 0 1px var(--blanc); }
+  & .panier-ico { position: relative; display: block; }
+  & .panier-ico svg { width: 40px; height: 32px; }
+  & .panier-n { position: absolute; top: -4px; left: 16px; min-width: 24px; height: 24px; padding: 0 4px; overflow: clip; border-radius: 999px; background: var(--sun); color: var(--ocean); font: 600 13px/24px var(--f-texte); text-align: center; }
+  & .panier-n > span { display: inline-block; }
+  & .panier-btn .txt { padding-bottom: 4px; }
+  & .retrait { display: flex; align-items: center; gap: 8px; margin: 0; padding-left: 8px; font: 500 12px/1.3 var(--f-texte); white-space: nowrap; }
+  & .retrait svg { width: 22px; height: 22px; color: var(--sun); }
+  & .retrait b { display: block; font: 700 14px/1.3 var(--f-texte); }
+
+  /* popover « Ajouté au panier », sous le panier : entrée 200 ms --c-arrivee, sortie 200 ms --c-depart (2.3) */
+  & .popover-ajout { position: absolute; top: calc(100% + 12px); right: 0; z-index: 60; width: 344px; padding: 20px 16px 16px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--blanc); color: var(--ink); box-shadow: 0 12px 28px rgb(15 22 45 / 0.18); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity var(--d-court) var(--c-depart), transform var(--d-court) var(--c-depart), visibility 0s var(--d-court); }
+  & .popover-ajout.ouvert { opacity: 1; visibility: visible; transform: none; transition: opacity var(--d-court) var(--c-arrivee), transform var(--d-court) var(--c-arrivee); }
+  & .popover-ajout::before { content: ""; position: absolute; top: -7px; right: 32px; width: 12px; height: 12px; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); background: var(--blanc); transform: rotate(45deg); }
+  & .ajoute-tete { display: flex; align-items: center; gap: 8px; margin: 0; padding-right: 40px; font: 700 16px/1.3 var(--f-texte); color: var(--ocean); }
+  & .ajoute-tete .rond { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--ocean); color: var(--blanc); }
+  & .ajoute-tete.refus .rond { background: var(--laterite); }
+  & .ajoute-tete .rond svg { width: 16px; height: 16px; stroke-width: 2.4; }
+  & .ajoute-x { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 999px; background: none; color: var(--ink); cursor: pointer; }
+  & .ajoute-x svg { width: 16px; height: 16px; }
+  & .ajoute-ligne { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; margin-block: 12px 16px; }
+  & .ajoute-ligne p { margin: 0; }
+  & .ajoute-nom { font: 600 15px/1.35 var(--f-texte); }
+  & .ajoute-extra, & .ajoute-qte, & .ajoute-refus { font: 500 13px/1.4 var(--f-texte); color: var(--ink-soft); }
+  & .ajoute-prix { font: 700 18px/1.3 var(--f-texte); color: var(--ocean); }
+  & .ajoute-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+
+  /* ---------- 2. sous-navigation Nuit, méga-menus ---------- */
+  & .sous-nav { position: relative; background: var(--night); }
+  & .sous-nav-in { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; min-height: 44px; margin-left: -12px; }
+  & .tout-btn, & .cat-b { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid transparent; border-radius: 4px; background: none; color: var(--blanc); font: 600 14px/1 var(--f-texte); cursor: pointer; }
+  & .tout-btn:hover, & .cat-b:hover, & .cat-b[aria-expanded="true"] { border-color: var(--blanc); }
+  & .tout-btn { font-weight: 700; }
+  & .tout-btn svg { width: 20px; height: 20px; }
+  & .cat-b svg { width: 14px; height: 14px; transition: transform var(--d-court) var(--c-etat); }
+  & .cat-b[aria-expanded="true"] svg { transform: rotate(180deg); }
+  & .sous-nav .vrai { margin: 0 0 0 auto; padding-inline: 8px; font: 600 13px/1.3 var(--f-texte); color: var(--sun); }
+
+  /* méga-menu (H) : fondu + 8 px (2.7) ; d'un menu à l'autre, l'ancien disparaît d'un coup */
+  /* fermé : retiré de l'affichage. Entrée depuis @starting-style ; à la fermeture, .sortie le garde affiché le temps du fondu (200 ms, joué par le script).
+     D'un menu à l'autre, l'ancien disparaît d'un coup (pas de .sortie). */
+  & .mega { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--blanc); color: var(--ink); border-bottom: 1px solid var(--hairline); box-shadow: 0 30px 40px -20px var(--night-45); transition: opacity var(--d-court) var(--c-depart), transform var(--d-court) var(--c-depart); }
+  & .mega.ouvert { display: block; transition-timing-function: var(--c-arrivee); }
+  @starting-style {
+    & .mega.ouvert { opacity: 0; transform: translateY(-8px); }
+  }
+  & .mega.sortie { display: block; pointer-events: none; } /* le fondu de sortie est joué par le script (Cadre.tsx) */
+  & .mega-in { display: grid; grid-template-columns: 220px 240px minmax(0, 1fr) minmax(0, 1.25fr); gap: 40px; padding-block: 32px 40px; }
+  & .mega-titre { margin: 0 0 12px; font: 700 15px/1.3 var(--f-texte); color: var(--ocean); }
+  & .mega ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  & .mega-lien { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 40px; padding: 0; border: 0; background: none; color: var(--ink); font: 500 15px/1.3 var(--f-texte); text-align: left; cursor: pointer; }
+  & .mega-lien:hover { color: var(--laterite); }
+  & .mega-lien .n { color: var(--ink-muted); font-weight: 600; }
+  & .mega-lien.fort { margin-top: 8px; font-weight: 700; color: var(--ocean); }
+  & .mega-vignettes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-content: start; }
+  & .mega-vignette { display: grid; gap: 8px; }
+  & .mega-vignette:hover > span:not(.mega-image) { color: var(--laterite); }
+  & .mega-vignette > span { font: 600 14px/1.3 var(--f-texte); }
+  & .mega-vignette b { font: 700 16px/1 var(--f-texte); color: var(--ocean); }
+  & .mega-photo { position: relative; min-height: 260px; margin: 0; overflow: hidden; border-radius: 12px; background: var(--ocean); }
+  & .mega-photo img { object-fit: cover; }
+  & .mega-photo figcaption { position: absolute; left: 12px; bottom: 12px; padding: 8px 16px; border-radius: 999px; background: var(--night-88); color: var(--blanc); font: 600 13px/1 var(--f-texte); }
+
+  /* tiroir « Tout » : catégories en accordéon ; voile en opacité, panneau en translation, entrée 300 ms, sortie 200 ms (2.5) */
+  & .menu-tout { position: fixed; inset: 0; z-index: 90; visibility: hidden; transition: visibility 0s var(--d-court); }
+  & .menu-tout.ouvert { visibility: visible; transition: none; }
+  & .menu-tout::before { content: ""; position: absolute; inset: 0; background: var(--night-70); opacity: 0; transition: opacity var(--d-court) var(--c-depart); }
+  & .menu-tout.ouvert::before { opacity: 1; transition: opacity var(--d-moyen) var(--c-arrivee); }
+  & .menu-tout-in { position: absolute; top: 0; bottom: 0; left: 0; width: min(380px, 88vw); overflow-y: auto; background: var(--blanc); color: var(--ink); transform: translateX(-100%); transition: transform var(--d-court) var(--c-depart); }
+  & .menu-tout.ouvert .menu-tout-in { transform: none; transition: transform var(--d-moyen) var(--c-arrivee); }
+  & .menu-tout-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 12px 12px 20px; background: var(--ocean); color: var(--blanc); }
+  & .menu-tout-tete h2 { margin: 0; font: 700 19px/1.3 var(--f-texte); letter-spacing: 0; }
+  & .menu-x { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--ivory-14); border-radius: 999px; background: none; color: var(--blanc); cursor: pointer; }
+  & .menu-x svg { width: 18px; height: 18px; }
+  & .menu-tout details { border-bottom: 1px solid var(--hairline); }
+  & .menu-tout summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 0 20px; cursor: pointer; font: 700 17px/1 var(--f-texte); list-style: none; }
+  & .menu-tout summary::-webkit-details-marker { display: none; }
+  & .menu-tout .n { margin-left: 8px; font-weight: 600; color: var(--ink-muted); }
+  & .menu-tout summary svg { width: 16px; height: 16px; transition: transform var(--d-court) var(--c-etat); }
+  & .menu-tout details[open] summary svg { transform: rotate(180deg); }
+  & .menu-tout ul { list-style: none; margin: 0; padding: 0 0 12px; }
+  & .menu-tout details .mega-lien { min-height: 44px; padding: 0 20px 0 32px; }
+  & .menu-tout .menu-bas { padding: 8px 0 24px; }
+  & .menu-tout .menu-bas .mega-lien { min-height: 44px; padding: 0 20px; }
+
+  /* ---------- 3. hero : photo pleine largeur, voile navy à gauche seulement ; titre par masque (2.8) ---------- */
+  & .hero { position: relative; isolation: isolate; display: flex; align-items: center; height: 480px; overflow: clip; background: var(--night); color: var(--blanc); }
+  & .hero-photo { z-index: -2; object-fit: cover; object-position: 50% 22%; }
+  & .hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--night-88) 0%, var(--night-45) 40%, var(--night-0) 66%); }
+  & .hero-in { display: grid; justify-items: start; gap: 20px; }
+  & .hero h1 { margin: 0; font: 400 clamp(44px, 4.8vw, 68px)/1.04 var(--f-titre); letter-spacing: -0.02em; color: var(--blanc); }
+  & .hero .titre-ligne { display: block; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+  & .hero .titre-ligne > span { display: block; animation: bq-masque var(--d-long) var(--c-arrivee) backwards; animation-delay: calc(var(--i, 0) * 75ms); }
+  & .hero-phrase { max-width: 40ch; margin: 0; font: 500 18px/1.55 var(--f-texte); color: var(--blanc); }
+  & .hero-phrase, & .hero-b { animation: bq-monte var(--d-long) var(--c-arrivee) backwards; }
+  & .hero-phrase { animation-delay: 150ms; }
+  & .hero-b { margin-top: 4px; animation-delay: 225ms; }
+
+  & .section { padding-block: 56px; }
+  & .section-tete { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 24px; }
+  & .section-tete h2 { margin: 0; font: 400 clamp(32px, 3.4vw, 48px)/1.04 var(--f-titre); letter-spacing: -0.01em; color: var(--ocean); }
+  & #boutique { scroll-margin-top: calc(var(--tete-site) + var(--tete-bq) + 8px); }
+  & #boutique:focus, & #compteur:focus { outline: none; }
+
+  /* ---------- 4. catégories : photo, aplat franc en bandeau du libellé, nombre réel de pièces ; cascade à l'arrivée (2.2) ---------- */
+  & .collections { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  & .collection { display: grid; padding: 0; border: 1px solid var(--hairline); border-radius: 12px; overflow: hidden; background: var(--blanc); color: inherit; text-align: left; cursor: pointer; animation: bq-monte-20 var(--d-long) var(--c-arrivee) backwards; animation-delay: calc(min(var(--i, 0), 3) * 75ms); }
+  & .collection:active { transform: scale(0.98); }
+  & .collection-photo { position: relative; display: block; aspect-ratio: 4 / 5; background: var(--blanc); }
+  & .collection-photo img { object-fit: cover; }
+  & .collection-bas { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; color: var(--blanc); }
+  & .c-laterite { background: var(--laterite); }
+  & .c-ocean { background: var(--ocean); }
+  & .c-sun { background: var(--sun); color: var(--ocean); }
+  & .c-ochre { background: var(--ochre); color: var(--night); }
+  & .collection-nom { display: block; font: 700 20px/1.15 var(--f-texte); }
+  & .collection-n { display: block; margin-top: 4px; font: 600 14px/1.3 var(--f-texte); }
+  & .collection-fleche { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; background: var(--blanc); color: var(--ocean); }
+  & .collection:hover .collection-fleche { background: var(--sun); }
+  & .collection-fleche svg { width: 18px; height: 18px; }
+
+  /* ---------- 5. toute la boutique : filtres déroulants, puces, tri, compteur, grille ---------- */
+  & .filtres { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-block: 16px; border-block: 1px solid var(--hairline); }
+  & .filtrer { display: none; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--ocean); border-radius: 999px; background: var(--blanc); color: var(--ocean); font: 700 15px/1 var(--f-texte); cursor: pointer; }
+  & .filtrer svg { width: 18px; height: 18px; }
+  & .panneau-filtres, & .pf-corps { display: flex; flex-wrap: wrap; gap: 12px; }
+  & .pf-tete, & .pf-pied { display: none; }
+  & .filtre { position: relative; }
+  & .filtre-b { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--hairline); border-radius: 999px; background: var(--blanc); color: var(--ink); font: 600 15px/1 var(--f-texte); cursor: pointer; }
+  & .filtre-b[aria-expanded="true"], & .filtre-b.actif { border-color: var(--ocean); box-shadow: inset 0 0 0 1px var(--ocean); }
+  & .filtre-b .nb { display: grid; place-items: center; min-width: 24px; height: 24px; border-radius: 999px; background: var(--ocean); color: var(--blanc); font: 600 12px/1 var(--f-texte); }
+  & .filtre-b svg { width: 14px; height: 14px; transition: transform var(--d-court) var(--c-etat); }
+  & .filtre-b[aria-expanded="true"] svg { transform: rotate(180deg); }
+  & .filtre-panneau { display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; min-width: 280px; padding: 12px; border-radius: 16px; background: var(--blanc); box-shadow: 0 12px 28px rgb(15 22 45 / 0.18); }
+  & .filtre.ouvert .filtre-panneau { display: block; }
+  & .filtre-panneau fieldset { display: grid; gap: 0; margin: 0; padding: 0; border: 0; }
+  & .filtre-panneau legend { padding: 4px 8px 8px; font: 700 14px/1.3 var(--f-texte); color: var(--ocean); }
+  & .option { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 8px; border-radius: 8px; cursor: pointer; font: 500 15px/1.2 var(--f-texte); }
+  & .option input { width: 20px; height: 20px; accent-color: var(--ocean); }
+  & .option .n { margin-left: auto; color: var(--ink-muted); font-weight: 600; }
+  & .option.zero { color: var(--ink-muted); }
+  & .pastille-c { width: 20px; height: 20px; border-radius: 999px; background: var(--c); box-shadow: inset 0 0 0 1px var(--hairline); }
+  & .panneau-pied { display: flex; justify-content: space-between; margin-top: 8px; padding: 8px 8px 0; border-top: 1px solid var(--hairline); }
+  & .filtres-droite { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  & .compteur { margin: 0; font: 700 15px/1 var(--f-texte); color: var(--ocean); }
+  & .tri { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 var(--f-texte); color: var(--ink-soft); }
+  & .tri select { min-height: 44px; padding: 0 36px 0 16px; border: 1px solid var(--hairline); border-radius: 999px; background-color: var(--blanc); background-image: linear-gradient(45deg, var(--night-0) 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, var(--night-0) 50%); background-position: right 18px center, right 13px center; background-size: 5px 5px; background-repeat: no-repeat; color: var(--ink); font: 600 15px/1 var(--f-texte); cursor: pointer; appearance: none; }
+  & .puces { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 16px; }
+  & .puce { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 8px 0 16px; border: 0; border-radius: 999px; background: var(--ocean); color: var(--blanc); font: 600 14px/1 var(--f-texte); cursor: pointer; }
+  & .puce:hover { background: var(--night); }
+  & .puce:active { transform: scale(0.97); }
+  & .puce .x { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--blanc); color: var(--ocean); }
+  & .puce .x svg { width: 14px; height: 14px; }
+  & .puce .rond-c { width: 14px; height: 14px; border-radius: 999px; background: var(--c); box-shadow: 0 0 0 1px var(--blanc); }
+  & #grille { margin-top: 28px; }
+  & .vide { display: grid; justify-items: center; gap: 12px; padding: 48px 0; text-align: center; }
+  & .vide p { margin: 0; font: 600 17px/1.5 var(--f-texte); color: var(--ink-soft); }
+
+  /* ---------- carte produit photo (H), grille de 4 aux rangées alignées (subgrid) ---------- */
+  & .grille { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 24px; margin: 0; padding: 0; list-style: none; }
+  & .carte { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 8px; }
+  & .carte p { margin: 0; }
+  & .carte-media { position: relative; }
+  & .carte-image { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid var(--hairline); border-radius: 8px; background: var(--blanc); }
+  & .carte-image img { object-fit: cover; }
+  /* survol (2.1) : la deuxième vue arrive en fondu 300 ms et zoome à 1.03 en 600 ms ; contour Océan par l'opacité d'un calque.
+     Sans deuxième vue, rien ne zoome. Pointeur fin seulement ; sur écran tactile, la deuxième vue n'est pas affichée. */
+  & .carte-image::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--ocean); opacity: 0; pointer-events: none; transition: opacity var(--d-court) var(--c-etat); }
+  & .carte-image .vue-2 { opacity: 0; transition: opacity var(--d-moyen) var(--c-etat), transform var(--d-long) var(--c-arrivee); }
+  @media (hover: hover) and (pointer: fine) {
+    & :is(.carte:hover, .carte:focus-within) .carte-image::after { opacity: 1; }
+    & :is(.carte:hover, .carte:focus-within) .carte-image .vue-2 { opacity: 1; transform: scale(1.03); }
+  }
+  @media not all and (hover: hover) and (pointer: fine) {
+    & .carte-image .vue-2 { display: none; }
+  }
+  & .carte-etiquette { position: absolute; bottom: 12px; left: 12px; padding: 8px 12px; border: 1px solid var(--hairline); border-radius: 999px; background: var(--blanc); color: var(--ocean); font: 700 12px/1 var(--f-texte); pointer-events: none; }
+  & .coeur { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--hairline); border-radius: 999px; background: var(--blanc); color: var(--ocean); cursor: pointer; transition: transform var(--d-court) var(--c-etat); }
+  & .coeur svg { width: 20px; height: 20px; }
+  @media (hover: hover) and (pointer: fine) {
+    & .coeur:hover { transform: scale(1.06); }
+  }
+  & .coeur[aria-pressed="true"] { color: var(--laterite); }
+  & .coeur[aria-pressed="true"] path, & .b-fav[aria-pressed="true"] path { fill: currentColor; }
+  & .carte-nom { margin: 4px 0 0; font: 600 16px/1.35 var(--f-texte); letter-spacing: 0; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  & .carte-nom a:hover { color: var(--laterite); text-decoration: underline; text-underline-offset: 3px; }
+  & .carte-meta { font: 600 13px/1.35 var(--f-texte); color: var(--ink-muted); }
+  & .carte-ligne { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  & .carte-prix { font: 700 24px/1 var(--f-texte); color: var(--ocean); letter-spacing: -0.01em; }
+  & .couleurs { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  & .couleurs li { width: 16px; height: 16px; border-radius: 999px; background: var(--c); box-shadow: inset 0 0 0 1px var(--hairline), 0 0 0 2px var(--blanc), 0 0 0 3px var(--hairline); }
+  & .ajout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-self: end; }
+  & .ajout.seul { grid-template-columns: minmax(0, 1fr); }
+  & .qte-c { display: inline-flex; align-items: center; justify-content: space-between; height: 48px; border: 1px solid var(--hairline); border-radius: 999px; }
+  & .qte-c button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 999px; background: none; color: var(--ocean); font: 600 20px/1 var(--f-texte); cursor: pointer; }
+  & .qte-c button:disabled { color: var(--hairline); cursor: default; }
+  & .qte-c output { min-width: 24px; text-align: center; font: 700 16px/1 var(--f-texte); }
+  & .ajouter { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--sun); color: var(--ocean); font: 600 15px/1 var(--f-texte); white-space: nowrap; cursor: pointer; }
+  & .ajouter svg { width: 18px; height: 18px; }
+  & .ajouter.pris { background: var(--blanc); color: var(--ocean); box-shadow: inset 0 0 0 1.5px var(--ocean); }
+  & .ajouter.pris::before { content: none; }
+
+  /* ---------- mise en avant (« Pour la maison ») : grande photo, deux cartes en ligne ---------- */
+  & .mise { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: stretch; }
+  & .mise-photo { position: relative; min-height: 540px; margin: 0; overflow: hidden; border-radius: 16px; background: var(--ocean); }
+  & .mise-photo img { object-fit: cover; }
+  & .mise-txt { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; }
+  & .mise-txt h2 { margin: 0; font: 400 clamp(32px, 3.4vw, 48px)/1.04 var(--f-titre); letter-spacing: -0.01em; color: var(--ocean); }
+  & .mise-txt > p { margin: 0; font: 500 17px/1.55 var(--f-texte); color: var(--ink-soft); }
+  & .lignes { display: grid; gap: 16px; width: 100%; margin: 0; padding: 0; list-style: none; }
+  & .lignes .carte { grid-row: auto; grid-template-rows: none; grid-template-columns: 96px minmax(0, 1fr); grid-template-areas: "media nom" "media meta" "media ligne" "ajout ajout"; column-gap: 20px; row-gap: 4px; align-items: center; padding: 16px; border: 1px solid var(--hairline); border-radius: 12px; }
+  & .lignes .carte-media { grid-area: media; align-self: start; }
+  & .lignes .carte-nom { grid-area: nom; }
+  & .lignes .carte-meta { grid-area: meta; }
+  & .lignes .carte-ligne { grid-area: ligne; }
+  & .lignes .ajout { grid-area: ajout; margin-top: 12px; }
+  & .lignes .carte-etiquette, & .lignes .coeur { display: none; }
+  & .lien-fleche { display: inline-flex; align-items: center; gap: 8px; }
+  & .lien-fleche svg { width: 18px; height: 18px; transition: transform var(--d-court) var(--c-etat); }
+  @media (hover: hover) and (pointer: fine) {
+    & .lien-fleche:hover svg { transform: translateX(3px); }
+  }
+
+  /* ---------- réassurance : trois objets 3D, que du vrai ---------- */
+  & .reassurance { margin-top: 64px; border-block: 1px solid var(--hairline); }
+  & .reassurance ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin: 0 auto; list-style: none; }
+  & .reassurance li { display: grid; justify-items: center; gap: 8px; text-align: center; }
+  & .reassurance img { margin-bottom: 8px; }
+  & .reassurance h3 { margin: 0; font: 700 18px/1.3 var(--f-texte); letter-spacing: 0; color: var(--ink); }
+  & .reassurance p { max-width: 34ch; margin: 0; font: 500 15px/1.55 var(--f-texte); color: var(--ink-soft); }
+
+  /* ---------- tiroirs (panier, ajout rapide) : modèle Dawn / Kith / COS du 23/10 ; voile et panneau en opacité / translation (2.5) ---------- */
+  & .tiroir { position: fixed; inset: 0; z-index: 90; pointer-events: none; visibility: hidden; transition: visibility 0s var(--d-court); }
+  & .tiroir::before { content: ""; position: absolute; inset: 0; background: var(--night-70); opacity: 0; transition: opacity var(--d-court) var(--c-depart); }
+  & .tiroir.ouvert { pointer-events: auto; visibility: visible; transition: none; }
+  & .tiroir.ouvert::before { opacity: 1; transition: opacity var(--d-moyen) var(--c-arrivee); }
+  & .tiroir-in { position: absolute; top: 0; right: 0; height: 100%; width: min(440px, 100%); background: var(--blanc); color: var(--ink); display: flex; flex-direction: column; transform: translateX(100%); transition: transform var(--d-court) var(--c-depart); }
+  & .tiroir.ouvert .tiroir-in { transform: none; transition: transform var(--d-moyen) var(--c-arrivee); }
+  & .tiroir-tete { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--hairline); }
+  & .tiroir-tete h2 { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 18px/1 var(--f-texte); letter-spacing: 0; color: var(--ink); }
+  & .tiroir-tete h2 span { font-weight: 500; color: var(--ink-muted); }
+  & .tiroir-x, & .tiroir-retour { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 8px; background: none; color: var(--ink); cursor: pointer; transition: transform 100ms var(--c-etat); }
+  & .tiroir-retour { margin-left: -12px; }
+  & .tiroir-x svg, & .tiroir-retour svg { width: 22px; height: 22px; }
+  & .tiroir-x:active, & .tiroir-retour:active { transform: scale(0.94); }
+  & .tiroir-corps { flex: 1; overflow-y: auto; padding: 0 24px; overscroll-behavior: contain; }
+  & .tiroir-liste { list-style: none; display: grid; margin: 0; padding: 0; }
+  & .tiroir-liste li { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--hairline); }
+  & .tiroir-liste li:last-child { border-bottom: 0; }
+  & .tiroir-image { width: 80px; height: 100px; aspect-ratio: auto; }
+  & .tiroir-info { display: grid; gap: 4px; align-content: start; }
+  & .tiroir-info p { margin: 0; }
+  & .tiroir-nom { font: 600 15px/1.35 var(--f-texte); color: var(--ink); }
+  & .tiroir-opt { font: 500 13px/1.4 var(--f-texte); color: var(--ink-muted); }
+  & .tiroir-prix { font: 700 15px/1.3 var(--f-texte); color: var(--ink); }
+  & .tiroir-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+  & .qte { display: inline-flex; align-items: center; height: 44px; border: 1px solid var(--hairline); border-radius: 8px; }
+  & .qte button { display: grid; place-items: center; width: 40px; height: 44px; border: 0; background: none; color: var(--ink); cursor: pointer; }
+  & .qte button:disabled { color: var(--hairline); cursor: default; }
+  & .qte button svg { width: 16px; height: 16px; }
+  & .qte :is(span, output) { min-width: 24px; text-align: center; font: 600 15px/1 var(--f-texte); }
+  & .tiroir-unique { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border: 1px solid var(--hairline); border-radius: 6px; font: 600 13px/1 var(--f-texte); color: var(--ink-soft); }
+  & .tiroir-retirer { min-height: 44px; padding: 0; border: 0; background: none; font: 500 13px/1 var(--f-texte); color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  & .tiroir-pied { position: sticky; bottom: 0; display: grid; gap: 12px; padding: 20px 24px 24px; border-top: 1px solid var(--hairline); background: var(--blanc); }
+  & .tiroir-pied p { margin: 0; }
+  & .tiroir-total { display: flex; justify-content: space-between; align-items: baseline; font: 600 16px/1 var(--f-texte); color: var(--ink); }
+  & .tiroir-total strong { font: 700 20px/1 var(--f-texte); }
+  & .tiroir-note { font: 500 13px/1.5 var(--f-texte); color: var(--ink-muted); }
+  & .tiroir-continuer { justify-self: center; min-height: 44px; padding: 0; border: 0; background: none; font: 600 14px/1 var(--f-texte); color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  & .tiroir-vide { flex: 1; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 40px 24px; text-align: center; }
+  & .tiroir-vide p { margin: 0; }
+  & .tiroir-vide > svg { width: 40px; height: 40px; margin-bottom: 8px; color: var(--ocean); }
+  & .tiroir-vide-titre { font: 700 18px/1.3 var(--f-texte); color: var(--ink); }
+  & .tiroir-vide-texte { font: 500 15px/1.5 var(--f-texte); color: var(--ink-soft); }
+  & .tiroir-vide .btn-soleil { margin-top: 16px; }
+
+  /* formulaire d'options (tiroir d'ajout rapide et encadré de la fiche) */
+  & .ar-piece { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: center; padding-block: 20px; border-bottom: 1px solid var(--hairline); }
+  & .ar-piece p { margin: 0; }
+  & .ar-nom { font: 600 17px/1.35 var(--f-texte); }
+  & .ar-prix { margin-top: 8px !important; font: 700 24px/1 var(--f-texte); color: var(--ocean); }
+  & .ar-form { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  & .ar-form > .tiroir-corps { display: grid; gap: 20px; align-content: start; padding-bottom: 24px; }
+  & .choix-options { display: grid; gap: 16px; }
+  & .choix-options fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  & .choix-options legend, & .champ > span, & .lib-qte { display: block; margin-bottom: 8px; padding: 0; font: 700 15px/1.3 var(--f-texte); color: var(--ink); }
+  & .pilules { display: flex; flex-wrap: wrap; gap: 8px; }
+  & .pilule { position: relative; }
+  & .pilule input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  & .pilule > span { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 48px; min-height: 44px; padding: 0 16px; border: 1px solid var(--hairline); border-radius: 999px; font: 600 15px/1 var(--f-texte); cursor: pointer; }
+  & .pilule:hover > span { border-color: var(--ink); }
+  & .pilule input:checked + span { border-color: var(--ocean); background: var(--ocean); color: var(--blanc); }
+  & .pilule input:focus-visible + span { outline: 3px solid var(--ocean); outline-offset: 2px; }
+  & .pilule .rond-c { width: 16px; height: 16px; flex: none; border-radius: 999px; background: var(--c); box-shadow: 0 0 0 1px var(--hairline); }
+  & .pilule input:checked + span .rond-c { box-shadow: 0 0 0 1.5px var(--blanc); }
+  & .sur-mesure { display: grid; gap: 8px; padding: 12px 16px 16px; border: 1px solid var(--hairline); border-radius: 8px; animation: bq-monte-4 var(--d-moyen) var(--c-arrivee); }
+  & .sur-mesure p { margin: 0; }
+  & .choix { display: flex; align-items: center; gap: 12px; min-height: 44px; font: 600 15px/1.3 var(--f-texte); color: var(--ink); cursor: pointer; }
+  & .choix input { width: 20px; height: 20px; flex: none; accent-color: var(--ocean); }
+  & .champ { display: block; }
+  & .champ :is(input, textarea, select) { width: 100%; padding: 12px 16px; border: 1px solid var(--ink-muted); border-radius: 8px; background: var(--blanc); color: var(--ink); font: 500 16px/1.5 var(--f-texte); }
+  & .champ :is(input, select) { height: 48px; padding-block: 0; }
+  & .champ textarea { min-height: 96px; resize: vertical; }
+  & .champ :is(input, textarea)::placeholder { color: var(--ink-muted); }
+  & .champ :is(input, textarea, select):focus-visible { outline: 3px solid var(--ocean); outline-offset: 0; }
+  & .champ [aria-invalid="true"] { border-color: var(--laterite); box-shadow: inset 0 0 0 1px var(--laterite); }
+  & .champ-erreur { margin: 4px 0 0; font: 600 14px/1.4 var(--f-texte); color: var(--laterite); }
+  & .aide, & .compteur-c { margin: 0; font: 500 14px/1.5 var(--f-texte); color: var(--ink-soft); }
+  & .compteur-c { margin-top: 8px; text-align: right; font-weight: 600; color: var(--ink-muted); }
+  & .apercu { display: grid; gap: 8px; margin-top: 8px; }
+  & .apercu-lib { font: 600 13px/1.4 var(--f-texte); color: var(--ink-muted); }
+  & .apercu-tissu { display: grid; place-items: center; min-height: 72px; padding: 16px; border-radius: 8px; background: var(--ocean); }
+  & .apercu-texte { margin: 0; font: 700 22px/1.2 var(--f-texte); color: var(--sun); text-align: center; overflow-wrap: anywhere; }
+  & .achat-msg { margin: 0; font: 600 14px/1.5 var(--f-texte); color: var(--ink-soft); }
+  & .achat-msg:empty { display: none; }
+  & .achat-msg.alerte { color: var(--laterite); }
+
+  /* étape « Commander » du tiroir panier */
+  & .commande { display: grid; gap: 20px; padding-block: 20px 24px; }
+  & .commande fieldset { display: grid; gap: 12px; min-width: 0; margin: 0; padding: 0; border: 0; }
+  & .commande legend { margin-bottom: 4px; padding: 0; font: 700 16px/1.3 var(--f-texte); color: var(--ink); }
+  & .commande .duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  & .commande .recap { margin: 0; padding: 12px 16px; border: 1px solid var(--hairline); border-radius: 8px; font: 600 14px/1.5 var(--f-texte); color: var(--ink-soft); }
+  & .commande .recap b { color: var(--ink); }
+  & .piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  & .commande-erreur { margin: 0; padding: 12px 16px; border-radius: 8px; background: var(--laterite); color: var(--blanc); font: 600 14px/1.5 var(--f-texte); }
+  & .merci { flex: 1; display: grid; align-content: center; gap: 12px; padding: 40px 24px; }
+  & .merci p { margin: 0; }
+  & .merci-titre { font: 700 22px/1.3 var(--f-texte); color: var(--ocean); }
+  & .merci-ref { font: 700 18px/1.4 var(--f-texte); color: var(--ink); }
+  & .merci-texte { font: 500 16px/1.55 var(--f-texte); color: var(--ink-soft); }
+  & .merci-suivi { display: inline-flex; align-items: center; min-height: 44px; font: 700 15px/1 var(--f-texte); color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  & .merci .btn-soleil { margin-top: 12px; }
+
+  /* ---------- fiche produit (b-i-fiche) ---------- */
+  & .fiche-page { padding-bottom: 24px; }
+  & .ariane ol { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin: 0; padding: 4px 0 8px; list-style: none; font: 500 14px/1.4 var(--f-texte); color: var(--ink-muted); }
+  & .ariane li + li::before { content: "›"; margin-right: 8px; }
+  & .ariane a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-soft); text-decoration: underline; text-decoration-color: var(--hairline); text-underline-offset: 3px; }
+  & .ariane a:hover { color: var(--ocean); text-decoration-color: currentColor; }
+  & .ariane [aria-current] { color: var(--ink); font-weight: 600; }
+  & .fiche { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; grid-template-areas: "gal tete achat" "gal corps achat"; gap: 0 40px; align-items: start; }
+  & .galerie { grid-area: gal; position: sticky; top: calc(var(--tete-site) + var(--tete-bq) + 16px); display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; }
+  & .galerie.seule { grid-template-columns: minmax(0, 1fr); }
+  & .tete-fiche { grid-area: tete; }
+  & .corps { grid-area: corps; }
+  & .vignettes { display: grid; gap: 12px; align-content: start; }
+  & .vignette { position: relative; width: 64px; aspect-ratio: 4 / 5; padding: 0; overflow: hidden; border: 1px solid var(--hairline); border-radius: 6px; background: var(--blanc); cursor: pointer; }
+  & .vignette img { object-fit: cover; }
+  & .vignette::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--ocean); opacity: 0; transition: opacity var(--d-court) var(--c-etat); }
+  & .vignette[aria-pressed="true"]::after { opacity: 1; }
+  & .piste { display: grid; }
+  & .vue { grid-area: 1 / 1; position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; padding: 0; overflow: hidden; border: 1px solid var(--hairline); border-radius: 8px; background: var(--blanc); cursor: zoom-in; opacity: 0; visibility: hidden; transition: opacity 0s var(--d-moyen), visibility 0s var(--d-moyen); }
+  /* fondu enchaîné : la nouvelle photo apparaît au-dessus, l'ancienne reste dessous puis s'efface sans fondu */
+  & .vue.active { z-index: 1; opacity: 1; visibility: visible; transition: opacity var(--d-moyen) var(--c-etat); }
+  & .vue img { object-fit: cover; transform-origin: 0 0; transition: transform var(--d-moyen) var(--c-etat); -webkit-user-select: none; user-select: none; }
+  & .vue.zoom img { transition-duration: var(--d-court); transition-timing-function: var(--c-arrivee); }
+  & .vue .photo-vide { position: absolute; inset: 0; }
+  & .indice { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px 0 0; font: 500 14px/1.4 var(--f-texte); color: var(--ink-muted); }
+  & .indice svg { width: 18px; height: 18px; }
+  & .points { display: none; }
+  & .point { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+  & .point span { width: 8px; height: 8px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--ink-muted); transition: transform var(--d-moyen) var(--c-etat); }
+  & .point[aria-pressed="true"] span { background: var(--ocean); box-shadow: none; transform: scale(1.25); }
+  & .titre { margin: 0; font: 700 28px/1.25 var(--f-texte); letter-spacing: -0.01em; color: var(--ink); }
+  & .titre:focus { outline: none; }
+  & .liens-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin: 4px 0 0; font: 500 15px/1.4 var(--f-texte); color: var(--ink-soft); }
+  & .liens-meta a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ocean); font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  & .liens-meta a:hover { text-decoration-thickness: 2px; }
+  & .filet { margin-block: 8px 16px; border: 0; border-top: 1px solid var(--hairline); }
+  & .prix-grand { margin: 0; font: 700 36px/1.1 var(--f-texte); letter-spacing: -0.01em; color: var(--ocean); }
+  & .prix-note { margin: 8px 0 0; font: 500 14px/1.5 var(--f-texte); color: var(--ink-muted); }
+  & .etiquette { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0 0; font: 500 15px/1.4 var(--f-texte); color: var(--ink-soft); }
+  & .etiquette b { padding: 8px 12px; border: 1px solid var(--hairline); border-radius: 999px; font: 700 13px/1 var(--f-texte); color: var(--ocean); }
+  & .carac { margin-top: 28px; }
+  & .corps h2 { margin: 0 0 8px; font: 700 18px/1.3 var(--f-texte); letter-spacing: 0; color: var(--ink); }
+  & .tab { width: 100%; border-collapse: collapse; font: 400 15px/1.5 var(--f-texte); }
+  & .tab th { width: 42%; padding: 8px 12px 8px 0; text-align: left; vertical-align: top; font-weight: 700; color: var(--ink); }
+  & .tab td { padding: 8px 0; color: var(--ink-soft); }
+  & .tab tr + tr > * { border-top: 1px solid var(--hairline); }
+  & .afournir { color: var(--ink-muted); }
+  & .blocs { margin-top: 28px; border-bottom: 1px solid var(--hairline); }
+  & .bloc { border-top: 1px solid var(--hairline); }
+  & .bloc summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; list-style: none; cursor: pointer; font: 700 17px/1.3 var(--f-texte); color: var(--ink); }
+  & .bloc summary::-webkit-details-marker { display: none; }
+  & .bloc summary:hover { color: var(--ocean); }
+  & .bloc summary svg { width: 16px; height: 16px; transition: transform var(--d-moyen) var(--c-etat); }
+  & .bloc[open] summary svg { transform: rotate(180deg); }
+  & .bloc-txt { display: grid; gap: 8px; max-width: 62ch; padding-bottom: 20px; font: 400 16px/1.6 var(--f-texte); color: var(--ink-soft); white-space: pre-line; }
+  & .bloc-txt p { margin: 0; }
+
+  /* encadré d'achat collant ; s'il dépasse la hauteur de l'écran, il défile seul */
+  & .achat { grid-area: achat; position: sticky; top: calc(var(--tete-site) + var(--tete-bq) + 16px); display: grid; gap: 16px; max-height: calc(100dvh - var(--tete-site) - var(--tete-bq) - 32px); overflow-y: auto; padding: 20px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--blanc); }
+  & .achat p { margin: 0; }
+  & .achat-prix { font: 700 28px/1.1 var(--f-texte); letter-spacing: -0.01em; color: var(--ocean); }
+  & .achat-ligne { display: flex; align-items: flex-start; gap: 8px; font: 600 15px/1.45 var(--f-texte); color: var(--ink); }
+  & .achat-ligne svg { width: 20px; height: 20px; color: var(--laterite); }
+  & .achat-form { display: grid; gap: 16px; }
+  & .qte-achat { width: 148px; }
+  & :is(.achat, .barre) .ajouter { width: 100%; min-height: 52px; font-size: 16px; }
+  & :is(.achat, .barre) .ajouter[aria-disabled="true"] { background: var(--blanc); color: var(--ink-muted); box-shadow: inset 0 0 0 1px var(--hairline); cursor: not-allowed; }
+  & :is(.achat, .barre) .ajouter[aria-disabled="true"]::before { content: none; }
+  & .b-ocean { position: relative; isolation: isolate; overflow: clip; display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 52px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--ocean); color: var(--blanc); font: 600 16px/1 var(--f-texte); cursor: pointer; transition: transform 100ms var(--c-etat); }
+  & .b-ocean::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--night); transform: translateY(101%); transition: transform var(--d-court) var(--c-etat); }
+  @media (hover: hover) and (pointer: fine) {
+    & .b-ocean:hover::before { transform: none; }
+  }
+  & .achat-info { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font: 500 14px/1.5 var(--f-texte); color: var(--ink-soft); }
+  & .achat .filet { margin-block: 0; }
+  & .b-fav { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--blanc); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hairline); font: 700 15px/1 var(--f-texte); cursor: pointer; transition: transform 100ms var(--c-etat); }
+  & .b-fav svg { width: 20px; height: 20px; transition: transform var(--d-court) var(--c-etat); }
+  & .b-fav[aria-pressed="true"] { color: var(--laterite); box-shadow: inset 0 0 0 1.5px var(--laterite); }
+  @media (hover: hover) and (pointer: fine) {
+    & .b-fav:hover { box-shadow: inset 0 0 0 1px var(--ink); }
+    & .b-fav:hover svg { transform: scale(1.06); }
+  }
+
+  /* « Vous aimerez aussi » : 4 cartes */
+  & .aimerez { margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--hairline); }
+  & .aimerez-tete { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 24px; }
+  & .aimerez h2 { margin: 0; font: 400 clamp(30px, 3vw, 40px)/1.04 var(--f-titre); letter-spacing: -0.01em; color: var(--ocean); }
+  & .voir-tout { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--ocean); font: 700 16px/1 var(--f-texte); text-decoration: underline; text-underline-offset: 6px; }
+  & .voir-tout svg { width: 18px; height: 18px; transition: transform var(--d-court) var(--c-etat); }
+  @media (hover: hover) and (pointer: fine) {
+    & .voir-tout:hover svg { transform: translateX(3px); }
+  }
+
+  /* agrandissement plein écran (dialog modal, Échap natif) */
+  & .loupe { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; background: var(--night); color: var(--blanc); overflow: hidden; }
+  & .loupe[open] { display: grid; grid-template-rows: auto minmax(0, 1fr); animation: bq-fondu var(--d-moyen) var(--c-arrivee); }
+  & .loupe-tete { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 16px 12px 24px; }
+  & .loupe-titre { margin: 0; font: 600 15px/1.4 var(--f-texte); color: var(--blanc); }
+  & .loupe-x, & .loupe-nav { display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 999px; background: var(--ocean); color: var(--blanc); cursor: pointer; }
+  & .loupe-x svg, & .loupe-nav svg { width: 20px; height: 20px; }
+  & .loupe :focus-visible { outline-color: var(--sun); }
+  & .loupe-scene { position: relative; min-height: 0; }
+  & .loupe-scene img { position: absolute; inset: 0 88px 24px; width: auto; height: auto; max-width: calc(100% - 176px); max-height: calc(100% - 24px); margin: auto; border-radius: 4px; background: var(--blanc); }
+  & .loupe-nav { position: absolute; top: calc(50% - 36px); }
+  & .loupe-nav.prec { left: 24px; }
+  & .loupe-nav.suiv { right: 24px; }
+
+  /* barre d'achat collante (mobile) */
+  & .barre { display: none; }
+
+  /* ---------- réactif ---------- */
+  @media (max-width: 1199px) {
+    & .fiche { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr; grid-template-areas: "gal tete" "gal achat" "gal corps"; gap: 0 32px; }
+    & .galerie { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    & .vignettes { order: 2; display: flex; gap: 8px; }
+    & .achat { position: static; max-height: none; overflow: visible; margin-top: 24px; }
+  }
+  @media (max-width: 1180px) {
+    & .retrait { display: none; }
+    & .grille { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    & .mega-in { grid-template-columns: 200px 210px minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+  }
+  @media (max-width: 960px) {
+    --tete-bq: 172px;
+    & .sous-nav .vrai { display: none; }
+    & .tete-in { flex-wrap: wrap; gap: 8px 16px; padding-block: 8px 12px; }
+    & .bq-nom { margin-right: auto; }
+    & .recherche { order: 9; flex-basis: 100%; }
+    & .ajout { grid-template-columns: minmax(0, 1fr); }
+    & .mega-in { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    & .mega-photo { display: none; }
+    & .collections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    & .aimerez .grille { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    & .mise { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+    & .mise-photo { min-height: 0; aspect-ratio: 4 / 3; }
+  }
+  /* mobile 390 : bouton menu, devise et panier, puis la recherche en pleine largeur ; méga-menu dans le tiroir « Tout » ;
+     hero 4:5, catégories 2×2, filtres en panneau « Filtrer (n) », grille de 2, galerie à points et balayage */
+  @media (max-width: 700px) {
+    --tete-bq: 116px;
+    & .tete-in { gap: 8px 4px; }
+    & .burger { display: grid; margin-left: -8px; }
+    & .bq-nom { font-size: 16px; }
+    & .sous-nav { display: none; }
+    & .panier-btn { padding: 0 4px; }
+    & .rech-cat, & .panier-btn .txt { display: none; }
+    & .recherche input { border-radius: 8px 0 0 8px; }
+    & .tete-act { gap: 4px; }
+    & .dev span { min-width: 36px; padding: 0 8px; }
+    & .panier-zone { position: static; }
+    & .popover-ajout { top: calc(100% - 4px); left: 12px; right: 12px; width: auto; }
+    & .popover-ajout::before { right: 28px; }
+    & .mega { display: none; }
+    & .section { padding-block: 48px; }
+    & .hero { height: auto; aspect-ratio: 4 / 5; align-items: flex-end; padding-bottom: 32px; }
+    & .hero::before { background: linear-gradient(0deg, var(--night-88) 0%, var(--night-45) 50%, var(--night-0) 80%); }
+    & .hero-photo { object-position: 50% 30%; }
+    & .hero h1 { font-size: 42px; }
+    & .hero-phrase { font-size: 16px; }
+    & .collections { gap: 12px; }
+    & .collection-bas { padding: 12px 16px; }
+    & .collection-nom { font-size: 17px; }
+    & .collection-fleche { display: none; }
+    & .filtres-droite { order: -1; width: 100%; justify-content: space-between; margin-left: 0; }
+    & .filtrer { display: inline-flex; flex: 1 1 100%; }
+    & .tri-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    & .panneau-filtres { display: none; position: fixed; inset: 0; z-index: 95; flex-direction: column; flex-wrap: nowrap; gap: 0; background: var(--blanc); transform: translateY(100%); transition: transform var(--d-court) var(--c-depart), display var(--d-court) allow-discrete; }
+    & .panneau-filtres.ouvert { display: flex; transform: none; transition: transform var(--d-moyen) var(--c-arrivee), display var(--d-moyen) allow-discrete; }
+    @starting-style {
+      & .panneau-filtres.ouvert { transform: translateY(100%); }
+    }
+    & .pf-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px 8px 20px; border-bottom: 1px solid var(--hairline); }
+    & .pf-titre { margin: 0; font: 700 19px/1.3 var(--f-texte); }
+    & .pf-x { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--hairline); border-radius: 999px; background: none; color: var(--ink); cursor: pointer; }
+    & .pf-x svg { width: 18px; height: 18px; }
+    & .pf-corps { flex: 1; display: block; overflow-y: auto; padding: 0 20px 20px; }
+    & .pf-pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; border-top: 1px solid var(--hairline); }
+    & .filtre-b, & .panneau-pied { display: none; }
+    & .filtre-panneau { display: block; position: static; min-width: 0; padding: 16px 0 12px; border-bottom: 1px solid var(--hairline); border-radius: 0; box-shadow: none; }
+    & .filtre-panneau legend { padding-inline: 0; font-size: 16px; }
+    & .option { padding: 0; }
+    & .grille { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 12px; }
+    & .carte-nom { font-size: 15px; }
+    & .carte-prix { font-size: 22px; }
+    & .carte-ligne { flex-direction: column; align-items: flex-start; gap: 8px; }
+    & .ajouter { padding: 0 8px; font-size: 14px; }
+    & .carte .ajouter svg { display: none; }
+    & .carte-etiquette { bottom: 8px; left: 8px; }
+    & .reassurance { margin-top: 48px; }
+    & .reassurance ul { grid-template-columns: minmax(0, 1fr); }
+    & .commande .duo { grid-template-columns: minmax(0, 1fr); }
+    /* fiche */
+    & .fiche-page { padding-bottom: 88px; }
+    & .fiche { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "gal" "tete" "achat" "corps"; gap: 16px; }
+    & .galerie { position: static; display: block; margin-inline: -24px; }
+    & .vignettes, & .indice { display: none; }
+    & .piste { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+    & .piste::-webkit-scrollbar { display: none; }
+    & .vue { flex: 0 0 100%; border-width: 0 0 1px; border-radius: 0; opacity: 1; visibility: visible; scroll-snap-align: start; transition: none; }
+    & .points { display: flex; justify-content: center; }
+    & .titre { font-size: 24px; }
+    & .prix-grand { font-size: 32px; }
+    & .achat { margin-top: 8px; }
+    & .aimerez { margin-top: 48px; padding-top: 40px; }
+    & .aimerez-tete { flex-direction: column; align-items: flex-start; gap: 4px; }
+    & .loupe-scene img { inset: 0 12px 88px; max-width: calc(100% - 24px); max-height: calc(100% - 88px); }
+    & .loupe-nav { top: auto; bottom: 20px; }
+    & .loupe-nav.prec { left: calc(50% - 56px); }
+    & .loupe-nav.suiv { right: calc(50% - 56px); }
+    & .barre { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--hairline); background: var(--blanc); transition: transform var(--d-moyen) var(--c-arrivee); }
+    & .barre.cache { transform: translateY(110%); transition: transform var(--d-court) var(--c-depart); }
+    & .barre-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    & .barre-txt { min-width: 0; }
+    & .barre-txt p { margin: 0; }
+    & .barre-nom { overflow: hidden; font: 600 13px/1.3 var(--f-texte); color: var(--ink-soft); white-space: nowrap; text-overflow: ellipsis; }
+    & .barre-prix { font: 700 22px/1.2 var(--f-texte); color: var(--ocean); }
+    & .barre .ajouter { flex: none; width: auto; min-height: 48px; padding: 0 20px; font-size: 15px; }
+  }
+  @media (hover: none) {
+    & .indice { display: none; }
+  }
+
+  /* mouvement réduit (MOTION-I 4) : plus d'animation ni de transition ; ce qui s'ouvre apparaît d'un coup.
+     La deuxième vue remplace la première sans fondu (c'est une information) ; l'appui à .97 reste, instantané. */
+  @media (prefers-reduced-motion: reduce) {
+    &, & *, & *::before, & *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    & .coeur:hover, & .b-soleil:hover svg, & .b-fav:hover svg, & .voir-tout:hover svg { transform: none; }
+    & .carte .vue-2 { transform: none !important; }
+  }
+}
+
+@keyframes bq-masque { from { transform: translateY(105%); } }
+@keyframes bq-monte { from { opacity: 0; transform: translateY(12px); } }
+@keyframes bq-monte-20 { from { opacity: 0; transform: translateY(20px); } }
+@keyframes bq-monte-4 { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes bq-sug { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes bq-fondu { from { opacity: 0; } }

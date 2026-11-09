@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "empreinte": "SHA-256 UTF-8 LF",
+  "migrations": [
+    {
+      "fichier": "20261023_demandes_lettre.sql",
+      "sha256": "50ffb579be733b084d0d2c4765ee9e51a89d70b66d9917e76f64ee4891de3d52"
+    },
+    {
+      "fichier": "20261026_boutique.sql",
+      "sha256": "b64f57941d24fc721f4f5a7d5363a972b96e1ac29bd545301c657a668209c4ab"
+    },
+    {
+      "fichier": "20261027_reservations.sql",
+      "sha256": "6f80898145e4d5da5635ed11f60955ef870e95670baf4ce25155463cc56126ba"
+    },
+    {
+      "fichier": "20261030_equipe.sql",
+      "sha256": "491185467b2829495f1fcc14e6f3703bec0b1034388f8551a3c68d592dbc3033"
+    },
+    {
+      "fichier": "20261102_documents.sql",
+      "sha256": "d42cffd7da469f09c6bb469967c6b69994658db07392baf4d6623b4141080f16"
+    },
+    {
+      "fichier": "20261102_dossiers.sql",
+      "sha256": "c3b66afc207870847e8cbc4fdc9334acd63b0679a99df32c95e5932f13e35544"
+    },
+    {
+      "fichier": "20261103_assistant.sql",
+      "sha256": "d596eb20a51e05bf9d638a51f963936d47bb53566b39fa9c812241786338edb9"
+    },
+    {
+      "fichier": "20261103_documents_suppression.sql",
+      "sha256": "549d8495b28f8f9afc4b1fb8fae1e18ace79e2a2b7f08ff9b9766343b92a5bcb"
+    },
+    {
+      "fichier": "20261103_finances.sql",
+      "sha256": "7749db02bb2d5d0b3a49046d3037c7aae1008ec06116bc7a0360e0ae52a65690"
+    },
+    {
+      "fichier": "20261103_messages.sql",
+      "sha256": "caacf7a443c6180e1c37ca1032e630fee132422f020458128297897c36fdb71e"
+    },
+    {
+      "fichier": "20261103_notifications_types.sql",
+      "sha256": "fcb4a93a969c28caf109f14646607aea8da5e2ee0b0330c245864fb27659a6d1"
+    },
+    {
+      "fichier": "20261103_pilotage.sql",
+      "sha256": "7e4f1971407b763550b7e149db32dd568a39011b5aeb12df73b9b8ee8876a650"
+    },
+    {
+      "fichier": "20261103_reglages.sql",
+      "sha256": "7bd3c0876baf6bff428ede5eafce237111357c4dd9d49e578fd430308a8f46c0"
+    },
+    {
+      "fichier": "20261103_securite.sql",
+      "sha256": "e2285dd105385142f1df2e71c8604b1d5182c885d9227d48da41d4277426e713"
+    },
+    {
+      "fichier": "20261103_signatures.sql",
+      "sha256": "1fc543ea560f78a1831e510ac27c117e8583b3b428451212f2c340d4db43538e"
+    },
+    {
+      "fichier": "20261103_terrain.sql",
+      "sha256": "940d0257f7f7febcff2660ed7b90369103f4eb5fd360563855c76b92e87b8898"
+    },
+    {
+      "fichier": "20261104_assistant_base.sql",
+      "sha256": "a630c0e5a5f8a092c041035c2d24f27070c6af8b08973258af3dcedaf0fbd612"
+    },
+    {
+      "fichier": "20261104_assistant_transmission.sql",
+      "sha256": "20317d9721bd5017bebbc63bda7548191c17951885dc8e026c350295c7bc5b96"
+    },
+    {
+      "fichier": "20261104_audience.sql",
+      "sha256": "db469b35a3f41cfd222421bba2ee233c8d29b4c185361db97f2e9e4713bf748d"
+    },
+    {
+      "fichier": "20261104_commande_xof.sql",
+      "sha256": "e9327320778791bf642e4d4e1872feaea08cfd01d98e47d51f11a4c159f9615e"
+    },
+    {
+      "fichier": "20261104_contenu_site.sql",
+      "sha256": "4d9b085bf87e94709b256b468caa505768adb0d51165e001af5b925f5d7c8a6a"
+    },
+    {
+      "fichier": "20261104_devis_courriel.sql",
+      "sha256": "c42988758d09fbd62bfe72afc36b2ba1cdc42e8750577f861d14e8d8410002c7"
+    },
+    {
+      "fichier": "20261104_prix_xof.sql",
+      "sha256": "405095d5becdaedbfb1f6e8cef5468a0a6e65d4634e9b8439cb07c807577fad0"
+    },
+    {
+      "fichier": "20261104_taux_usd.sql",
+      "sha256": "7e2e12276826eb68725c1972d0be1c98cd2cfa791d6c3df1bcd8508d60da95e1"
+    },
+    {
+      "fichier": "20261105_blog.sql",
+      "sha256": "7d53b8f3a90ef9141d3e6ab7f0cb8ea0a74357c1300cdecdc21ba3842dc102e7"
+    },
+    {
+      "fichier": "20261105_mode_eco.sql",
+      "sha256": "8ac3e6a03d9608d0c5b99eafdbe9d84ae953f40f85c3fe97d67018d866767f98"
+    },
+    {
+      "fichier": "20261106_boutique_chiffrage.sql",
+      "sha256": "935080f2fd53ef56ef3ef7d5c0bb424cec8d56a24393adf4173cddbbe798d1ae"
+    },
+    {
+      "fichier": "20261106_boutique_gestion.sql",
+      "sha256": "4999f7b02ec9904a57df86bb79176010050d4ade477e9014e7607f9c2e404616"
+    },
+    {
+      "fichier": "20261106_finances_comptabilite.sql",
+      "sha256": "e6aca23e49e5e55cd582ef53362c6f43bf9f86dbfd750ca718e6eedf284b519d"
+    },
+    {
+      "fichier": "20261106_relances.sql",
+      "sha256": "ca5f5b15e8a9d9408f1e5466858cd707a5069ab441ac459f01013411f2aa7f71"
+    },
+    {
+      "fichier": "20261106_taux.sql",
+      "sha256": "7d9fee5e3a5a551e51f10864b77a0f6673206967ff22e8a3ac2853ec21abf450"
+    },
+    {
+      "fichier": "20261106_taxe_commission.sql",
+      "sha256": "d72517464b58e27a82918045227fb77118add1f63bc6823ad16c60e08f5e6f9c"
+    },
+    {
+      "fichier": "20261107_langues_boutique.sql",
+      "sha256": "6350e8b59bd86360b672a089aa9b8fde3088736af533a6d266969bbddcd117ba"
+    },
+    {
+      "fichier": "20261107_langues_contenu.sql",
+      "sha256": "c006b2d6840f95e0259e4942316cf3009cfa227b9ffa9460ae5a531ac1eeef25"
+    },
+    {
+      "fichier": "20261107_services_publics.sql",
+      "sha256": "dfa31a0d66949f28f3d969961223836eeeb8d3bae2d5f2abb271757641747434"
+    },
+    {
+      "fichier": "20261107_traductions_initiales.sql",
+      "sha256": "cd274a1ab50d70fbcc1bc661ecd05073f105644404a1369cf6fd64919898d93e"
+    },
+    {
+      "fichier": "20261107_transversal_services.sql",
+      "sha256": "e24912434aec58ee39cda38d26f1ce5ac7c11f6cb2d635cc164ed8886c0f31b9"
+    },
+    {
+      "fichier": "20261108_transversal_purge_sauvegardes.sql",
+      "sha256": "5117525194111b5d3d4d2df6345ce7b0454b31e9a57adfcd1df05f90636d4223"
+    },
+    {
+      "fichier": "20261109_traduction_auto.sql",
+      "sha256": "623f848054b61495f51bf67c8cd613eb52810614b3bb17c252ebaf8ecc5c935b"
+    },
+    {
+      "fichier": "20261110_production_stockage.sql",
+      "sha256": "869f79d258dd670b9fa1a469efb750c9a563d1b441ba9e7214c896e79ef5be5c"
+    },
+    {
+      "fichier": "20261111_emcf_connecteur.sql",
+      "sha256": "2537f90171011b707c1d4051098912851d2282b8c0a238a56a8165c6a29679b7"
+    },
+    {
+      "fichier": "20261112_boutique_paiement_en_ligne.sql",
+      "sha256": "9a561b78be13fa4d4a006b7f1178aa40b227c31f35fdbe13317c87cecaec27ef"
+    },
+    {
+      "fichier": "20261113_boutique_paiement_immediat.sql",
+      "sha256": "6d7704d58ce68ab08ee78ce3058ffa556cdf54aa82c2db0c1c390b0a1b54ebe8"
+    }
+  ]
+}

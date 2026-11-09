@@ -1,0 +1,138 @@
+/* Écrans du lot « reglages » (vague 2) : passerelles, devises, e-mail d'envoi, documents, e-MECeF, assistant,
+   maintenance (admins) ; profil et carte de visite (agents). Tout sous .esp .esp-reglages. Mouvement : transform, opacity
+   et clip-path seulement, en fill « backwards » ; aucune transition de couleur ni de fond ; rien en mouvement réduit. */
+
+.esp .esp-reglages { display: grid; gap: 20px; }
+.esp .esp-reglages .esp-grille { align-items: start; }
+.esp .esp-reglages .emcf-operation { display: grid; gap: 16px; min-width: 0; padding: 18px; border: 1px solid var(--filet-fort); border-radius: 14px; }
+.esp .esp-reglages .emcf-operation h3 { margin: 0; overflow-wrap: anywhere; }
+.esp .esp-reglages .emcf-operation :is(.bouton, .bouton-2) { white-space: normal; padding-block: 10px; }
+
+/* boutons secondaires (repris des écrans Équipe et Finances) */
+.esp .esp-reglages .bouton-2 { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--filet-fort); border-radius: 14px; background: var(--surface); color: var(--encre); font-weight: 700; white-space: nowrap; cursor: pointer; text-decoration: none; transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-reglages .bouton-2:hover { border-color: var(--encre-3); transform: translateY(-2px); }
+.esp .esp-reglages .bouton-2:active { transform: translateY(1px); }
+.esp .esp-reglages .bouton-petit { min-height: 44px; padding: 0 12px; font-size: 14px; }
+.esp .esp-reglages :is(.bouton, .bouton-2):disabled { background: var(--survol); border-color: var(--filet); color: var(--encre-3); cursor: not-allowed; transform: none; }
+.esp .esp-reglages :is(.bouton, .bouton-2)[aria-busy="true"] { cursor: progress; }
+
+/* formulaires */
+.esp .esp-reglages .reg-form { display: grid; gap: 16px; min-width: 0; }
+.esp .esp-reglages .champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
+.esp .esp-reglages .champ { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.esp .esp-reglages .champ.large { grid-column: 1 / -1; }
+.esp .esp-reglages .champ > label, .esp .esp-reglages fieldset > legend { color: var(--encre); font: 700 14px/1.3 var(--f-texte); }
+.esp .esp-reglages .aide, .esp .esp-reglages .mention { color: var(--encre-2); font-size: 13px; line-height: 1.5; }
+.esp .esp-reglages .mention { font-size: 14px; }
+.esp .esp-reglages :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-reglages textarea { min-height: 88px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.esp .esp-reglages input[type="file"] { max-width: 100%; min-height: 48px; padding: 10px 0; color: var(--encre-2); font: 600 14px/1.3 var(--f-texte); }
+.esp .esp-reglages input:read-only:not([type="file"]) { background: var(--survol); color: var(--encre-2); }
+.esp .esp-reglages :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--accent-agent-texte); box-shadow: inset 0 0 0 1px var(--accent-agent-texte); }
+.esp .esp-reglages fieldset { display: grid; gap: 10px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.esp .esp-reglages .cases { display: flex; flex-wrap: wrap; gap: 8px; }
+.esp .esp-reglages .case { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; font-weight: 600; cursor: pointer; }
+.esp .esp-reglages .case input { width: 20px; height: 20px; margin: 0; accent-color: var(--ocean); }
+.esp[data-theme="sombre"] .esp-reglages .case input { accent-color: var(--soleil); }
+.esp .esp-reglages .reg-pied { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* retour d'un envoi : réussite ou refus du serveur */
+.esp .esp-reglages .reg-retour:empty { display: none; }
+.esp .esp-reglages .reg-retour { display: grid; gap: 4px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--filet-fort); color: var(--encre); font-weight: 600; font-size: 14px; animation: reg-retour var(--d-moyen) var(--c-arrivee) backwards; }
+.esp .esp-reglages .reg-retour[data-ton="erreur"] { border-color: var(--accent-agent-texte); box-shadow: inset 4px 0 0 var(--accent-agent-texte); }
+.esp .esp-reglages .reg-retour[data-ton="ok"] { box-shadow: inset 4px 0 0 var(--ok); }
+.esp .esp-reglages .reg-retour ul { margin: 0; padding-left: 18px; font-weight: 500; }
+.esp .esp-reglages .reg-bouton { display: inline-grid; gap: 6px; justify-items: start; }
+@keyframes reg-retour {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+/* états : configurée, manquante, active, coupée, mode test */
+.esp .esp-reglages .etat { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border: 1px solid var(--filet-fort); border-radius: 14px; color: var(--encre-2); font: 700 12px/1 var(--f-texte); white-space: nowrap; }
+.esp .esp-reglages .etat:is([data-e="active"], [data-e="configuree"], [data-e="allume"]) { background: var(--ok); border-color: var(--ok); color: var(--fond); }
+.esp .esp-reglages .etat:is([data-e="manquante"], [data-e="ferme"]) { color: var(--accent-agent-texte); border-color: var(--accent-agent-texte); }
+.esp .esp-reglages .etat:is([data-e="test"], [data-e="attente"]) { color: var(--attente); border-color: var(--attente); }
+.esp .esp-reglages .etat:is([data-e="coupee"], [data-e="eteint"], [data-e="desactivee"]) { color: var(--encre-3); border-style: dashed; }
+
+/* valeurs lues : une liste libellé / valeur */
+.esp .esp-reglages .valeurs { display: grid; gap: 10px; margin: 0; }
+.esp .esp-reglages .valeurs > div { display: grid; grid-template-columns: minmax(140px, 220px) minmax(0, 1fr); gap: 4px 16px; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--filet); }
+.esp .esp-reglages .valeurs > div:last-child { border-bottom: 0; padding-bottom: 0; }
+.esp .esp-reglages .valeurs dt { color: var(--encre-2); font-size: 13px; font-weight: 700; }
+.esp .esp-reglages .valeurs dd { margin: 0; color: var(--encre); font-weight: 600; overflow-wrap: anywhere; }
+.esp .esp-reglages .grand { font: 400 30px/1.15 var(--f-titre); color: var(--encre); font-variant-numeric: tabular-nums; }
+
+/* tableaux : empilés en 390 */
+.esp .esp-reglages .tableau-defile { overflow-x: auto; }
+.esp .esp-reglages .tableau td .bouton-2 { min-height: 44px; }
+.esp .esp-reglages .tableau .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.esp .esp-reglages .passerelle-nom { display: flex; align-items: center; gap: 12px; }
+.esp .esp-reglages .ligne-arrivee { animation: reg-ligne 520ms var(--c-glisse) backwards; animation-delay: calc(var(--k, 0) * 50ms); }
+@keyframes reg-ligne {
+  from { clip-path: inset(0 100% 0 0); opacity: 0; }
+}
+
+/* interrupteur affiché désactivé (e-MECeF) : l'état seulement, jamais un bouton qui ferait semblant */
+.esp .esp-reglages .interrupteur { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.esp .esp-reglages .interrupteur [role="switch"] { position: relative; flex: none; width: 52px; height: 32px; padding: 0; border: 1px dashed var(--filet-fort); border-radius: 16px; background: var(--survol); cursor: not-allowed; }
+.esp .esp-reglages .interrupteur [role="switch"]::before { content: ""; position: absolute; top: 5px; left: 5px; width: 20px; height: 20px; border-radius: 50%; background: var(--encre-3); }
+.esp .esp-reglages .interrupteur b { font-weight: 700; }
+
+/* textes par langue (repli natif) */
+.esp .esp-reglages .langue { border: 1px solid var(--filet); border-radius: 14px; }
+.esp .esp-reglages .langue > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px; font-weight: 700; cursor: pointer; list-style: none; }
+.esp .esp-reglages .langue > summary::-webkit-details-marker { display: none; }
+.esp .esp-reglages .langue > summary .ic { transition: transform var(--d-moyen) var(--c-glisse); }
+.esp .esp-reglages .langue[open] > summary .ic { transform: rotate(180deg); }
+.esp .esp-reglages .langue-corps { display: grid; gap: 14px; padding: 0 14px 16px; }
+.esp .esp-reglages .langue[open] .langue-corps { animation: reg-ouvre 360ms var(--c-glisse) backwards; }
+.esp .esp-reglages .langues { display: grid; gap: 8px; }
+@keyframes reg-ouvre {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; }
+}
+
+/* images de la signature et du cachet */
+.esp .esp-reglages .images { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.esp .esp-reglages .apercu-image { display: grid; place-items: center; min-height: 120px; padding: 12px; border: 1px solid var(--filet); border-radius: 14px; background: var(--blanc); }
+.esp .esp-reglages .apercu-image img { width: auto; max-width: 100%; height: auto; max-height: 96px; object-fit: contain; }
+
+/* sessions du profil */
+.esp .esp-reglages .sessions li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 12px 0; border-bottom: 1px solid var(--filet); }
+.esp .esp-reglages .sessions li:last-child { border-bottom: 0; }
+.esp .esp-reglages .sessions .texte { display: grid; gap: 2px; min-width: 0; }
+.esp .esp-reglages .sessions .meta { color: var(--encre-2); font-size: 13px; font-weight: 600; }
+
+/* carte de visite : plaque navy, emblème rond, QR sur blanc */
+.esp .esp-reglages .carte-visite { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 24px; border-radius: 20px; background: var(--abyss); color: var(--sur-nuit); animation: reg-carte 620ms var(--c-glisse) backwards; }
+.esp .esp-reglages .carte-visite .identite { display: grid; gap: 14px; min-width: 0; }
+.esp .esp-reglages .carte-visite .embleme { width: 56px; height: 56px; border-radius: 50%; }
+.esp .esp-reglages .carte-visite h2 { color: var(--sur-nuit); font: 400 32px/1.1 var(--f-titre); }
+.esp .esp-reglages .carte-visite .role { color: var(--soleil); font-weight: 700; letter-spacing: 0.02em; }
+.esp .esp-reglages .carte-visite dl { display: grid; gap: 8px; margin: 0; }
+.esp .esp-reglages .carte-visite dl div { display: grid; gap: 2px; }
+.esp .esp-reglages .carte-visite dt { color: var(--sur-nuit-2); font-size: 12px; font-weight: 700; }
+.esp .esp-reglages .carte-visite dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.esp .esp-reglages .carte-visite .qr { display: block; width: 216px; max-width: 100%; padding: 10px; border-radius: 14px; background: var(--blanc); }
+.esp .esp-reglages .carte-visite .qr svg { display: block; width: 100%; height: auto; }
+@keyframes reg-carte {
+  from { clip-path: inset(0 0 0 100% round 20px); opacity: 0; transform: translateY(8px); }
+}
+
+@media (max-width: 760px) {
+  .esp .esp-reglages .tableau thead { display: none; }
+  .esp .esp-reglages .tableau, .esp .esp-reglages .tableau tbody, .esp .esp-reglages .tableau tr, .esp .esp-reglages .tableau td { display: block; width: 100%; }
+  .esp .esp-reglages .tableau tr { padding: 12px 0; border-bottom: 1px solid var(--filet); }
+  .esp .esp-reglages .tableau tr:last-child { border-bottom: 0; }
+  .esp .esp-reglages .tableau td { padding: 4px 0; border: 0; text-align: left; }
+  .esp .esp-reglages .tableau td[data-col]::before { content: attr(data-col); display: block; color: var(--encre-2); font: 700 12px/1.3 var(--f-texte); }
+  .esp .esp-reglages .tableau .actions { justify-content: flex-start; }
+  .esp .esp-reglages .valeurs > div { grid-template-columns: minmax(0, 1fr); }
+  .esp .esp-reglages .carte-visite { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  .esp .esp-reglages .carte-visite .qr { justify-self: center; width: min(240px, 100%); }
+  .esp .esp-reglages .carte-visite h2 { font-size: 28px; }
+  .esp .esp-reglages .grand { font-size: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esp .esp-reglages *, .esp .esp-reglages *::before { animation: none !important; transition: none !important; }
+}

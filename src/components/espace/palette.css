@@ -1,0 +1,20 @@
+/* Palette « Chercher ou aller à » (Ctrl K) de l'espace. Tout sous .esp (la boîte modale reste dans l'arbre de .esp). */
+
+.esp .esp-palette { width: min(640px, calc(100% - 32px)); margin: 12vh auto auto; padding: 0; border: 1px solid var(--filet); border-radius: 20px; background: var(--surface); color: var(--encre); box-shadow: 0 32px 80px var(--ombre-forte); }
+.esp .esp-palette::backdrop { background: var(--voile); }
+.esp .esp-palette[open] { animation: esp-palette 260ms var(--c-arrivee) backwards; }
+@keyframes esp-palette {
+  from { transform: translateY(-12px) scale(0.98); opacity: 0; }
+}
+.esp .palette-champ { display: flex; align-items: center; gap: 12px; padding: 0 20px; border-bottom: 1px solid var(--filet); color: var(--encre-3); }
+.esp .palette-champ input { flex: 1; min-width: 0; height: 60px; border: 0; background: none; font-size: 17px; color: var(--encre); }
+.esp .palette-champ input:focus-visible { outline: none; }
+.esp .esp-palette ul { list-style: none; margin: 0; padding: 8px; max-height: 360px; overflow-y: auto; }
+.esp .esp-palette li { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+.esp .esp-palette li small { margin-left: auto; color: var(--encre-3); font-size: 13px; font-weight: 600; }
+.esp .esp-palette li[aria-selected="true"] { background: var(--survol); box-shadow: inset 3px 0 0 var(--accent); }
+.esp .esp-palette .rien { color: var(--encre-2); cursor: default; }
+
+@media (max-width: 760px) {
+  .esp .esp-palette { margin-top: 16px; }
+}

@@ -1,0 +1,275 @@
+/* Hallmark · checked: 2026-10-29 · genre: modern-minimal · theme: Ouidah · surface: absolute · built: the project · v2.0.0 */
+/* Connexion de l'équipe (/agents, /admins), maquette G « Le porte-badge » (c-g-porte-badge.html) : la pochette de verre est
+   posée une fois pour toutes sur la vraie photo de la paillote ; l'accréditation est la carte glissée dedans. À chaque étape,
+   la carte remonte par la fente et la suivante se loge sous le verre. Le reflet qui traverse la pochette dit l'attente, puis
+   scelle la réussite.
+   Tout est rangé sous .eq, l'enveloppe de l'écran : aucun sélecteur ne fuit vers le reste du site. Les règles de body de la
+   maquette vont sur .eq ; ce que la maquette cachait sous .js l'est ici d'emblée (l'écran est rendu par React).
+   Mouvement : seulement transform, opacity et clip-path ; prefers-reduced-motion donne l'état final. */
+
+.eq {
+  --ocean: #122460;
+  --abyss: #0b1638;
+  --nuit: #0f162d;
+  --laterite: #ac3215;
+  --soleil: #fdbf28;
+  --safran: #df9410;
+  --blanc: #ffffff;
+  --encre: #121a33;
+  --encre-2: #3f4863;
+  --encre-3: #5a6379;
+  --filet: #dde1ea;
+  --accent: var(--laterite);
+  --accent-encre: #ffffff;
+  --f-titre: var(--font-fraunces), Georgia, serif;
+  --f-texte: var(--font-manrope), system-ui, sans-serif;
+  --d-court: 200ms;
+  --d-moyen: 320ms;
+  --d-long: 600ms;
+  --c-arrivee: cubic-bezier(0, 0, 0.3, 1);
+  --c-etat: cubic-bezier(0.4, 0, 0.2, 1);
+  --c-depart: cubic-bezier(0.4, 0, 1, 1);
+  --c-ressort: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --c-carte: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --verre: rgba(255, 255, 255, 0.08);
+  --verre-bord: rgba(255, 255, 255, 0.34);
+  --reflet: rgba(255, 255, 255, 0.42);
+  --ombre: rgba(0, 0, 0, 0.45);
+  --voile-bas: rgba(11, 22, 56, 0.82);
+  --voile-haut: rgba(11, 22, 56, 0.12);
+  --texte-photo: rgba(247, 241, 232, 0.9);
+  --filet-survol: #c3c9d6;
+  --halo: rgba(18, 36, 96, 0.14);
+  --erreur-fond: #fbeae6;
+  --erreur-encre: #7a210d;
+  --cordon-anneau: #c9cfdb;
+  --espace-fond: #f3f5f9;
+  --barre-nav: rgba(255, 255, 255, 0.14);
+  --halo-soleil: rgba(253, 191, 40, 0.32);
+  --volet-trait: rgba(255, 255, 255, 0.16);
+  --volet-rabat: #1a2550;
+  --guilloche: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0 20c10-12 30-12 40 0M0 30c10-12 30-12 40 0M0 10c10-12 30-12 40 0' fill='none' stroke='%23fff' stroke-width='.8'/%3E%3C/svg%3E");
+
+  /* règles de body de la maquette */
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 84px 16px 40px;
+  background: var(--abyss);
+  color: var(--encre);
+  font: 500 16px/1.5 var(--f-texte);
+  -webkit-font-smoothing: antialiased;
+
+  &[data-role="admins"] { --accent: var(--soleil); --accent-encre: var(--ocean); }
+  & :is(button, input) { font: inherit; color: inherit; }
+  & :focus-visible { outline: 3px solid var(--soleil); outline-offset: 3px; border-radius: 6px; }
+  & .eq-invisible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  & [hidden] { display: none !important; }
+
+  /* ---------- la vraie photo : la paillote, toit de chaume et bande de mer ---------- */
+  & .photo { position: fixed; inset: 0; z-index: 0; margin: 0; overflow: hidden; }
+  & .photo img { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 40%; }
+  & .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--voile-haut) 0%, var(--voile-haut) 45%, var(--voile-bas) 100%); }
+  & .legende { position: fixed; left: 24px; bottom: 20px; z-index: 1; margin: 0; font: 600 13px/1.4 var(--f-texte); color: var(--texte-photo); }
+
+  /* ---------- le porte-badge : pochette de verre fixe, cordon, encoche ---------- */
+  & .scene { position: relative; z-index: 2; width: min(480px, 100%); }
+  & .cordon { position: absolute; left: 50%; bottom: calc(100% - 22px); z-index: 1; width: 26px; height: 100vh; margin-left: -13px; border-radius: 0 0 6px 6px; background: var(--accent); background-image: var(--guilloche); background-size: 26px 26px; }
+  & .cordon::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 34px; height: 18px; margin-left: -17px; border: 3px solid var(--cordon-anneau); border-radius: 6px; background: var(--abyss); }
+  & .carte { position: relative; z-index: 2; padding: 34px 14px 14px; border: 1px solid var(--verre-bord); border-radius: 26px; background: var(--verre); -webkit-backdrop-filter: blur(6px) saturate(1.2); backdrop-filter: blur(6px) saturate(1.2); box-shadow: inset 0 1px 0 var(--reflet), 0 40px 80px -40px var(--ombre); transform-origin: 50% 0; transition: transform var(--d-long) var(--c-arrivee), opacity var(--d-long) var(--c-arrivee); }
+  /* fente du clip et encoche pour le pouce, au bord haut de la pochette */
+  & .carte::before { content: ""; position: absolute; left: 50%; top: 12px; width: 72px; height: 10px; margin-left: -36px; border-radius: 999px; background: var(--abyss); box-shadow: inset 0 1px 0 var(--reflet); }
+  /* le reflet : un dégradé fixe qui traverse le verre en translate (aucun filter animé) */
+  & .reflet { position: absolute; inset: 0; z-index: 5; border-radius: 26px; overflow: hidden; pointer-events: none; }
+  & .reflet::before { content: ""; position: absolute; top: -40%; bottom: -40%; left: -60%; width: 40%; background: linear-gradient(100deg, transparent 0%, var(--reflet) 50%, transparent 100%); transform: translateX(0) rotate(14deg); opacity: 0; }
+  & .scene:has([aria-busy="true"]) .reflet::before { animation: eq-reflet 1400ms var(--c-etat) infinite; }
+  & .scene.succes .reflet::before { animation: eq-reflet 1600ms 700ms var(--c-etat) 1 both; }
+
+  /* l'insert : la carte d'accréditation glissée dans la pochette */
+  & .insert { position: relative; z-index: 3; border-radius: 16px; background: var(--blanc); box-shadow: 0 10px 30px -18px var(--ombre); transition: transform var(--d-moyen) var(--c-etat); }
+  & .insert.sort { animation: eq-sort 380ms var(--c-depart) both; }
+  & .insert.entre { animation: eq-entre 760ms var(--c-carte) both; }
+  & .insert.recrache { animation: eq-recrache 620ms var(--c-carte) both; }
+  & .scene:has([aria-busy="true"]) .insert { transform: translateY(10px); }
+
+  & .bandeau { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 22px; border-radius: 16px 16px 0 0; background: var(--accent); color: var(--accent-encre); font: 700 13px/1.2 var(--f-texte); }
+  & .bandeau::before { content: ""; position: absolute; inset: 0; background: var(--guilloche) center/40px 40px; opacity: 0.18; }
+  & .bandeau > * { position: relative; }
+  & .bandeau .serie { font-weight: 600; opacity: 0.9; }
+  & .corps { position: relative; padding: 22px 24px 20px; }
+  & .entete { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  & .entete img { height: 48px; width: 48px; }
+  & .heure { margin: 0; font: 600 13px/1.3 var(--f-texte); color: var(--encre-3); text-align: right; }
+  & .heure b { color: var(--encre); font-weight: 700; font-variant-numeric: tabular-nums; }
+  & h1 { margin: 0 0 6px; font: 400 30px/1.08 var(--f-titre); letter-spacing: -0.01em; color: var(--ocean); }
+  & .sous { margin: 0 0 20px; color: var(--encre-2); font-size: 15px; }
+  & .etape { display: none; }
+  & .etape.on { display: block; }
+  & fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+
+  & .champ { display: grid; gap: 6px; margin-bottom: 14px; }
+  & .champ label { font: 700 14px/1.3 var(--f-texte); color: var(--encre); }
+  & .saisie { position: relative; }
+  & .saisie input { width: 100%; height: 50px; padding: 0 16px; border: 1.5px solid var(--filet); border-radius: 12px; background: var(--blanc); transition: border-color var(--d-court) var(--c-etat); }
+  & .saisie input:hover { border-color: var(--filet-survol); }
+  & .saisie input:focus { border-color: var(--ocean); outline: none; box-shadow: 0 0 0 3px var(--halo); }
+  & .saisie input[aria-invalid="true"] { border-color: var(--laterite); }
+  & .oeil { position: absolute; top: 3px; right: 3px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 10px; background: none; color: var(--encre-2); cursor: pointer; }
+  & .oeil svg { width: 20px; height: 20px; }
+  & .maj { margin: 4px 0 0; font: 600 13px/1.4 var(--f-texte); color: var(--laterite); }
+  & .suggestion { display: inline-flex; align-items: center; justify-self: start; gap: 6px; min-height: 36px; margin: 6px 0 0; padding: 0 12px; border: 1px solid var(--filet); border-radius: 999px; background: var(--blanc); color: var(--ocean); font: 700 13px/1 var(--f-texte); cursor: pointer; }
+  & .souvenir { margin: 6px 0 0; font: 600 13px/1.4 var(--f-texte); color: var(--encre-3); }
+  & .souvenir button { min-height: 32px; padding: 0; border: 0; background: none; color: var(--ocean); font: 700 13px/1 var(--f-texte); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  & .liens { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; margin: 2px 0 18px; }
+  & .lien { min-height: 44px; padding: 0; border: 0; background: none; color: var(--ocean); font: 700 14px/1 var(--f-texte); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  & .lien:disabled { color: var(--encre-3); text-decoration: none; cursor: default; }
+  & .lien.fort { color: var(--laterite); text-decoration-thickness: 2px; }
+  /* bouton billet : libellé, perforation, carré à flèche */
+  & .bouton { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 56px; align-items: stretch; width: 100%; min-height: 54px; padding: 0; border: 0; border-radius: 14px; background: var(--ocean); color: var(--blanc); font: 800 16px/1 var(--f-texte); cursor: pointer; overflow: hidden; transition: transform 100ms var(--c-etat); }
+  & .bouton > span:first-child:not(.roue) { display: grid; place-items: center; padding: 0 16px; }
+  & .bouton > svg { align-self: center; justify-self: center; width: 20px; height: 20px; transition: transform var(--d-court) var(--c-etat); }
+  & .bouton::after { content: ""; position: absolute; top: 8px; bottom: 8px; right: 56px; border-left: 2px dashed var(--volet-trait); }
+  & .bouton::before { content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 56px; background: var(--accent); transition: transform var(--d-court) var(--c-etat); }
+  &[data-role="admins"] .bouton > svg { color: var(--ocean); }
+  & .bouton > * { position: relative; z-index: 1; }
+  & .bouton:hover > svg { transform: translateX(3px); }
+  & .bouton:active { transform: scale(0.97); }
+  & .bouton[aria-busy="true"] { pointer-events: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+  & .bouton[aria-busy="true"]::before, & .bouton[aria-busy="true"]::after { display: none; }
+  & .roue { width: 18px; height: 18px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: eq-tour 0.7s linear infinite; }
+  & .message { display: flex; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--erreur-fond); color: var(--erreur-encre); font: 600 14px/1.45 var(--f-texte); }
+  & .message svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+  & .retour { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: -8px 0 6px -4px; padding: 0 4px; border: 0; background: none; color: var(--encre-2); font: 700 14px/1 var(--f-texte); cursor: pointer; }
+  & .retour svg { width: 16px; height: 16px; }
+  & .messagerie { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin: -10px 0 12px; color: var(--ocean); font: 700 14px/1 var(--f-texte); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- code : volets du tableau des départs, 3 + 3 ---------- */
+  & .volets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 10px repeat(3, minmax(0, 1fr)); gap: 8px; margin: 4px 0 12px; }
+  & .volets::before { content: ""; grid-column: 4; grid-row: 1; align-self: center; height: 2px; border-radius: 2px; background: var(--filet); }
+  & .volet { position: relative; aspect-ratio: 3 / 4; perspective: 360px; transition: transform 420ms var(--c-etat); }
+  & .volets .volet:nth-child(1) { grid-column: 1; }
+  & .volets .volet:nth-child(2) { grid-column: 2; }
+  & .volets .volet:nth-child(3) { grid-column: 3; }
+  & .volets .volet:nth-child(4) { grid-column: 5; }
+  & .volets .volet:nth-child(5) { grid-column: 6; }
+  & .volets .volet:nth-child(6) { grid-column: 7; }
+  & .volet input { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; color: transparent; caret-color: transparent; text-align: center; font-size: 28px; }
+  & .volet input:focus { outline: none; }
+  & .volet input::selection { background: transparent; }
+  & .volet .face { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 10px; background: var(--nuit); color: var(--blanc); font: 600 28px/1 var(--f-titre); font-variant-numeric: tabular-nums; overflow: hidden; }
+  & .volet .face::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--volet-trait); }
+  & .volet .face span:empty::before { content: "0"; opacity: 0.18; }
+  & .volet .rabat { position: absolute; left: 0; right: 0; top: 0; z-index: 2; height: 50%; border-radius: 10px 10px 0 0; background: var(--volet-rabat); transform-origin: 50% 100%; backface-visibility: hidden; transform: rotateX(-180deg); }
+  & .volet.tombe .rabat { animation: eq-rabat 360ms var(--c-depart) both; }
+  & .volet.actif .face { box-shadow: 0 0 0 2px var(--accent); }
+  & .volets.secoue { animation: eq-secoue 380ms var(--c-etat); }
+  /* vérification : les deux groupes se resserrent jusqu'à se toucher, la carte s'enfonce, le reflet scelle */
+  & .volets.defile .volet:nth-child(-n+3) { transform: translateX(9px); }
+  & .volets.defile .volet:nth-child(n+4) { transform: translateX(-9px); }
+  & .volets.defile .face span { animation: eq-defile 140ms linear infinite; }
+  & .code-info { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 6px; font: 600 13px/1.4 var(--f-texte); color: var(--encre-3); }
+  & .validite { height: 3px; margin: 0 0 16px; border-radius: 3px; background: var(--filet); overflow: hidden; }
+  & .validite i { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; transition: transform 1s linear; }
+  & .coller { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; margin: 0 0 14px; padding: 0 12px; border: 1px solid var(--filet); border-radius: 999px; background: var(--blanc); color: var(--ocean); font: 700 13px/1 var(--f-texte); cursor: pointer; }
+
+  /* exigences : les trous du talon, poinçonnés quand ils sont remplis */
+  & .exigences { display: grid; gap: 6px; margin: -2px 0 18px; padding: 0; list-style: none; font: 600 14px/1.35 var(--f-texte); color: var(--encre-3); }
+  & .exigences li { display: flex; align-items: center; gap: 10px; }
+  & .exigences li::before { content: ""; flex: none; width: 16px; height: 16px; border: 1.5px dashed var(--filet-survol); border-radius: 50%; }
+  & .exigences li.ok { color: var(--encre); }
+  & .exigences li.ok::before { border: 0; background: var(--soleil); animation: eq-poincon 260ms var(--c-ressort) both; }
+
+  & .perfo { position: relative; height: 0; margin: 0 16px; border-top: 2px dashed var(--filet); }
+  & .perfo::before, & .perfo::after { content: ""; position: absolute; top: -11px; width: 20px; height: 20px; border-radius: 50%; background: var(--abyss); }
+  & .perfo::before { left: -26px; }
+  & .perfo::after { right: -26px; }
+  & .talon { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 24px 16px; font: 600 12px/1.4 var(--f-texte); color: var(--encre-3); }
+  & .talon strong { color: var(--encre); font-weight: 700; }
+
+  /* ---------- réussite : tampon OHT sur la carte, anneau soleil, reflet qui scelle ---------- */
+  & .tampon { position: absolute; right: 26px; top: 96px; z-index: 4; display: grid; place-items: center; width: 124px; height: 124px; border: 3px solid var(--ocean); border-radius: 50%; color: var(--ocean); text-align: center; pointer-events: none; transform: rotate(-14deg) scale(1.5); opacity: 0; }
+  & .tampon::before { content: ""; position: absolute; inset: 7px; border: 1.5px solid var(--ocean); border-radius: 50%; }
+  & .tampon b { display: block; font: 600 28px/1 var(--f-titre); }
+  & .tampon span { display: block; margin-top: 4px; font: 800 12px/1.2 var(--f-texte); }
+  & .tampon i { position: absolute; inset: -9px; border: 3px solid var(--soleil); border-radius: 50%; box-shadow: 0 0 0 6px var(--halo-soleil); transform: scale(0.6); opacity: 0; }
+  /* le tampon frappe la carte « Accès accordé » une fois logée (sortie 380 ms + entrée 760 ms), jamais la carte sortante */
+  & .succes .tampon { animation: eq-frappe 520ms 1000ms var(--c-ressort) both; }
+  & .succes .tampon i { animation: eq-anneau 520ms 1360ms var(--c-ressort) both; }
+  & .etape-succes { min-height: 200px; }
+
+  /* ---------- arrivée : la pochette remonte par le cordon, rideau, l'espace se construit ---------- */
+  & .rideau { position: fixed; inset: 0; z-index: 4; background: var(--accent); pointer-events: none; clip-path: inset(100% 0 0 0); }
+  & .espace { position: fixed; inset: 0; z-index: 5; display: grid; grid-template-columns: 240px minmax(0, 1fr); background: var(--espace-fond); opacity: 0; pointer-events: none; transition: opacity var(--d-long) var(--c-arrivee); }
+  & .espace aside { display: grid; align-content: start; gap: 12px; padding: 24px 20px; background: var(--abyss); }
+  & .espace aside img { height: 30px; width: auto; margin-bottom: 20px; }
+  & .espace .tableau { display: grid; align-content: start; gap: 20px; padding: 32px; }
+  & .espace h2 { margin: 0; font: 400 36px/1.1 var(--f-titre); color: var(--ocean); }
+  & .espace h2 span + span { color: var(--encre-3); }
+  & .bloc { border-radius: 16px; background: var(--blanc); box-shadow: 0 1px 0 var(--filet); }
+  & .barre-lien { height: 14px; border-radius: 8px; background: var(--barre-nav); }
+  & .barre-lien:first-of-type { background: var(--accent); }
+  & .grille { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  & .grille .bloc { height: 128px; }
+  & .large { height: 280px; }
+  & .ligne-blocs { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  & .ligne-blocs .bloc { height: 220px; }
+  &.arrivee .scene { transform: translateY(-120vh); transition: transform 700ms var(--c-depart); }
+  &.arrivee .rideau { animation: eq-rideau 900ms var(--c-etat) both; }
+  &.arrivee .espace { opacity: 1; pointer-events: auto; transition-delay: 380ms; }
+  &.arrivee .construit { animation: eq-construit var(--d-long) var(--c-arrivee) both; animation-delay: calc(var(--i) * 80ms + 600ms); }
+
+  @media (max-width: 700px) {
+    & { place-items: start center; padding: 64px 12px 20px; }
+    & .photo img { object-position: 50% 30%; }
+    & .carte { padding: 30px 10px 10px; border-radius: 22px; }
+    & .corps { padding: 18px 18px 16px; }
+    & h1 { font-size: 27px; }
+    & .volets { gap: 6px; grid-template-columns: repeat(3, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)); }
+    & .tampon { width: 104px; height: 104px; right: 16px; top: 92px; }
+    & .tampon b { font-size: 24px; }
+    & .talon { flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 18px 14px; }
+    & .legende { top: auto; bottom: 14px; left: 16px; }
+    & .espace { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+    & .espace aside { display: flex; align-items: center; gap: 16px; padding: 16px 20px; }
+    & .espace aside img { margin: 0; }
+    & .espace aside .barre-lien { display: none; }
+    & .espace .tableau { padding: 20px 16px; }
+    & .espace h2 { font-size: 28px; }
+    & .grille, & .ligne-blocs { grid-template-columns: minmax(0, 1fr); }
+    & .grille .bloc { height: 96px; }
+  }
+
+  /* mouvement réduit : chaque mouvement se joue en 1 ms, donc l'état final s'affiche d'un coup (le tampon reste posé) */
+  @media (prefers-reduced-motion: reduce) {
+    &, & *, & *::before, & *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; transition-delay: 0ms !important; }
+    & .volets.defile .face span { animation: none !important; }
+  }
+}
+
+@keyframes eq-reflet { 0% { opacity: 0; transform: translateX(0) rotate(14deg); } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(420%) rotate(14deg); } }
+@keyframes eq-sort { to { transform: translateY(-118%); opacity: 0; } }
+@keyframes eq-entre { 0% { transform: translateY(-110%); opacity: 0; } 25% { opacity: 1; } 80% { transform: translateY(8px); } 100% { transform: none; opacity: 1; } }
+@keyframes eq-recrache { 0% { transform: none; } 35% { transform: translateY(-28px); } 60% { transform: translateY(0) translateX(-8px); } 75% { transform: translateX(7px); } 90% { transform: translateX(-3px); } 100% { transform: none; } }
+@keyframes eq-tour { to { transform: rotate(360deg); } }
+@keyframes eq-rabat { from { transform: rotateX(0deg); } to { transform: rotateX(-180deg); } }
+@keyframes eq-secoue { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes eq-defile { from { transform: translateY(-30%); opacity: 0.4; } to { transform: translateY(30%); opacity: 1; } }
+@keyframes eq-poincon { from { transform: scale(0); } to { transform: none; } }
+@keyframes eq-frappe { 0% { opacity: 0; transform: rotate(-14deg) scale(1.5); } 60% { opacity: 1; transform: rotate(-10deg) scale(0.94); } 100% { opacity: 1; transform: rotate(-12deg) scale(1); } }
+@keyframes eq-anneau { to { transform: none; opacity: 1; } }
+@keyframes eq-rideau { 0% { clip-path: inset(100% 0 0 0); } 45% { clip-path: inset(0 0 0 0); } 100% { clip-path: inset(0 0 100% 0); } }
+@keyframes eq-construit { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+/* ---------- accueil provisoire une fois connecté (Accueil.tsx), en attendant le tableau de bord E (lot L2) ---------- */
+.eq-ouvert {
+  min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: #0b1638; color: #ffffff;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  & .bloc { width: min(100%, 440px); display: grid; gap: 14px; padding: 32px 28px; border-radius: 22px; background: #122460; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.45); }
+  & .role { justify-self: start; padding: 4px 12px; border-radius: 999px; background: #fdbf28; color: #0f162d; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  & h1 { margin: 0; font: 600 clamp(28px, 6vw, 36px)/1.1 var(--font-fraunces), Georgia, serif; overflow-wrap: anywhere; }
+  & p { margin: 0; color: rgba(247, 241, 232, 0.9); line-height: 1.5; }
+  & button { justify-self: start; margin-top: 8px; padding: 12px 20px; border: 1px solid rgba(255, 255, 255, 0.34); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+  & button:hover { background: rgba(255, 255, 255, 0.08); }
+  & button:focus-visible { outline: 3px solid #fdbf28; outline-offset: 3px; }
+  & button[aria-busy="true"] { cursor: progress; opacity: 0.7; }
+}
