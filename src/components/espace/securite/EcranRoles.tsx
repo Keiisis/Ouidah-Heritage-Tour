@@ -23,8 +23,8 @@ export async function EcranRoles() {
   const s = await exigerRole("admins");
   if (!s) redirect("/admins");
   const membres = await lireMembres();
-  const agents = membres?.filter((m) => m.role === "agent") ?? [];
-  const admins = membres?.filter((m) => m.role === "admin") ?? [];
+  const agents = membres?.filter((m) => m.role === "agent" && m.etat !== "supprime") ?? [];
+  const admins = membres?.filter((m) => m.role === "admin" && m.etat !== "supprime") ?? [];
   return (
     <Enveloppe role="admins" session={s} actif="roles" minute={minuteServeur()}>
       <Tete titre={R.titre} sous={R.sous} />

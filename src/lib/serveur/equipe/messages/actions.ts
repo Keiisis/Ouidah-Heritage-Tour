@@ -7,9 +7,10 @@ import { base } from "../../base";
 import { effacer } from "../dossiers";
 import { journaliser } from "../journal";
 import { exigerRole, type Session } from "../session";
-import { emailDe, partir, voie } from "./envoi";
+import { apercuAuto } from "./auto";
+import { emailDe, origine, partir, voie } from "./envoi";
 import { type ClientCourrier, clientsChoisis } from "./lectures";
-import { autoConnue, CLE, composer, estAuto, estLangue, jetonsInconnus, lireTexte, remplir, UUID, valeursApercu, valeursDe } from "./rendu";
+import { autoConnue, CLE, type CleAuto, composer, estAuto, estLangue, jetonsInconnus, lireAdresses, lireTexte, remplir, uneLigne, UUID, type Valeurs, valeursApercu, valeursDe, variablesHors } from "./rendu";
 
 // Écritures du lot « messages » : rédiger un e-mail (brouillon, test à soi-même, envoi), modèles d'e-mails (admin),
 // notifications lues. Actions serveur (contrôle d'origine de Next) joignables par une requête forgée : CHAQUE appel relit
@@ -17,25 +18,38 @@ import { autoConnue, CLE, composer, estAuto, estLangue, jetonsInconnus, lireText
 // le sien est refusé et rien n'est écrit ni envoyé. Le navigateur n'envoie que l'objet et le message tapés ; les champs
 // variables, les documents liés et la signature sont relus ici. Chaque envoi part par la voie commune (envoi.ts) avec une
 // clé unique (Message-ID stable), et va au journal sans adresse ni texte. refresh() renvoie l'écran à jour.
+// Mode « adresse » : adresse(s) saisie(s) à la main, sans fiche client (client_id null) : une seule pour un agent, au plus
+// LIMITES_COURRIEL.adresses pour un admin ; seul {prénom} (saisi) y a une valeur, {dates} {lien} {référence} sont refusés.
 
 export type RefusMessages = "refuse" | "champs" | "panne" | "smtp" | "envoi" | "variables" | "etat" | "confirmer";
 export type RetourMessages =
-  | { ok: true; id?: string; envoyes?: number; echecs?: number; a?: string; fini?: boolean; total?: number }
+  | { ok: true; id?: string; envoyes?: number; echecs?: number; a?: string; fini?: boolean; total?: number; sujet?: string; html?: string }
   | { erreur: RefusMessages; champs?: string[]; manque?: Variable[]; total?: number };
 
-type Saisie = { mode: "un" | "groupe"; ids: string[]; langue: LangueMsg; modele: string | null; objet: string; corps: string; devis: boolean; brouillon: string | null };
+type Saisie = { mode: "un" | "groupe" | "adresse"; ids: string[]; adresses: string[]; prenom: string; langue: LangueMsg; modele: string | null; objet: string; corps: string; devis: boolean; brouillon: string | null };
 const objet = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
 const maintenant = () => new Date().toISOString();
 
-/** Saisie du composeur relue : destinataire(s), langue, modèle, objet, message, devis lié, brouillon repris. */
-function lireSaisie(brut: unknown, s: Session, objetRequis: boolean): { ok: true; v: Saisie } | { ok: false; champs: string[]; refuse?: boolean } {
+/** Saisie du composeur relue : destinataire(s), langue, modèle, objet, message, devis lié, brouillon repris. Sans
+ * `destRequis` (test à soi-même), le destinataire peut manquer. */
+function lireSaisie(brut: unknown, s: Session, objetRequis: boolean, destRequis = true): { ok: true; v: Saisie } | { ok: false; champs: string[]; refuse?: boolean } {
   const o = objet(brut);
-  const mode = o.mode === "groupe" ? "groupe" : "un";
+  const mode = o.mode === "groupe" ? "groupe" : o.mode === "adresse" ? "adresse" : "un";
   if (mode === "groupe" && s.role !== "admin") return { ok: false, champs: [], refuse: true }; // le groupe est réservé à l'admin
-  const ids = mode === "un" ? (typeof o.client === "string" && o.client ? [o.client] : []) : Array.isArray(o.clients) ? [...new Set(o.clients)] : [];
+  const ids = mode === "un" ? (typeof o.client === "string" && o.client ? [o.client] : []) : mode === "groupe" && Array.isArray(o.clients) ? [...new Set(o.clients)] : [];
   const champs: string[] = [];
-  if (!ids.length) champs.push(mode === "un" ? "dest" : "groupe");
-  else if (ids.length > LIMITES_COURRIEL.groupe || !ids.every((i) => typeof i === "string" && UUID.test(i))) champs.push(mode === "un" ? "dest" : "groupe");
+  let adresses: string[] = [];
+  if (mode === "adresse") {
+    // une seule adresse pour un agent (comme « un client »), plusieurs pour un admin (comme « un groupe »)
+    const vide = typeof o.adresses !== "string" || !o.adresses.trim();
+    const l = vide ? null : lireAdresses(o.adresses, s.role === "admin" ? LIMITES_COURRIEL.adresses : 1);
+    if (l) adresses = l;
+    else if (destRequis || !vide) champs.push("adresses");
+  } else if (!ids.length) {
+    if (destRequis) champs.push(mode === "un" ? "dest" : "groupe");
+  } else if (ids.length > LIMITES_COURRIEL.groupe || !ids.every((i) => typeof i === "string" && UUID.test(i))) champs.push(mode === "un" ? "dest" : "groupe");
+  const prenom = mode === "adresse" ? uneLigne(o.prenom) : "";
+  if (prenom.length > LIMITES_COURRIEL.prenom) champs.push("prenom");
   if (!estLangue(o.langue)) champs.push("langue");
   const modele = typeof o.modele === "string" && o.modele && o.modele !== "libre" ? o.modele : null;
   // une clé « auto-… » appartient aux e-mails automatiques du site : jamais un modèle du composeur
@@ -43,21 +57,23 @@ function lireSaisie(brut: unknown, s: Session, objetRequis: boolean): { ok: true
   const t = lireTexte(o.objet, o.corps, objetRequis);
   champs.push(...t.champs);
   const devis = o.devis === true;
-  if (devis && mode === "groupe") champs.push("pieces");
+  if (devis && mode !== "un") champs.push("pieces");
   const brouillon = typeof o.brouillon === "string" && o.brouillon ? o.brouillon : null;
   if (brouillon !== null && !UUID.test(brouillon)) champs.push("brouillon");
   if (champs.length) return { ok: false, champs };
-  return { ok: true, v: { mode, ids: ids as string[], langue: o.langue as LangueMsg, modele, objet: t.objet, corps: t.corps, devis, brouillon } };
+  return { ok: true, v: { mode, ids: ids as string[], adresses, prenom, langue: o.langue as LangueMsg, modele, objet: t.objet, corps: t.corps, devis, brouillon } };
 }
 
-/** L'e-mail d'un destinataire, rempli avec SES données ; `manque` : champs variables sans valeur pour lui. */
-function rendre(c: ClientCourrier, v: Pick<Saisie, "langue" | "objet" | "corps" | "devis">, s: Session) {
-  const vals = valeursDe(c.faits, v.langue);
+/** L'e-mail d'un destinataire, rempli avec SES valeurs ; `manque` : champs variables sans valeur pour lui. */
+function rendre(vals: Valeurs, devis: ClientCourrier["devis"], v: Pick<Saisie, "objet" | "corps" | "devis">, s: Session) {
   const sujet = remplir(v.objet, vals), corps = remplir(v.corps, vals);
-  const pieces = v.devis && c.devis ? [`${msg.courrier.pieceDevis(c.devis.numero)} : ${c.devis.url}`] : [];
+  const pieces = v.devis && devis ? [`${msg.courrier.pieceDevis(devis.numero)} : ${devis.url}`] : [];
   const { html, texte } = composer({ corps: corps.texte, pieces, signature: msg.signature(s.prenom, s.nom) });
-  return { sujet: sujet.texte, corps: corps.texte, html, texte, manque: [...new Set([...sujet.manque, ...corps.manque])], pieces: v.devis && c.devis ? [{ type: "devis", numero: c.devis.numero }] : [] };
+  return { sujet: sujet.texte, corps: corps.texte, html, texte, manque: [...new Set([...sujet.manque, ...corps.manque])], pieces: v.devis && devis ? [{ type: "devis", numero: devis.numero }] : [] };
 }
+
+/** Destinataire sans fiche client : seul le prénom saisi remplit un champ variable. */
+const valeursAdresse = (prenom: string): Valeurs => ({ prenom: prenom || undefined });
 
 async function ecrire<R>(chemin: string, method: "POST" | "PATCH", corps: unknown, prefer = "return=representation"): Promise<R[] | null> {
   try {
@@ -94,44 +110,57 @@ export async function enregistrerBrouillon(brut: unknown): Promise<RetourMessage
   return { ok: true, id: r[0].id };
 }
 
-/** Test à soi-même : l'e-mail tel que le (premier) destinataire le recevra, envoyé à l'adresse du compte connecté. */
+/** Test à soi-même : l'e-mail tel que le (premier) destinataire le recevra, envoyé à l'adresse du compte connecté. Sans
+ * destinataire choisi : les valeurs de l'aperçu des modèles (prénom du compte, repères entre crochets). */
 export async function envoyerTest(brut: unknown): Promise<RetourMessages> {
   const s = await exigerRole("agents");
   if (!s) return { erreur: "refuse" };
-  const lu = lireSaisie(brut, s, true);
+  const lu = lireSaisie(brut, s, true, false);
   if (!lu.ok) return lu.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: lu.champs };
-  const c = await clientsChoisis(s, lu.v.ids.slice(0, 1));
-  if (c === "refuse") return { erreur: "refuse" };
-  if (!c?.[0]) return { erreur: "panne" };
-  const e = rendre(c[0], lu.v, s);
+  let vals = valeursApercu(s.prenom, lu.v.langue), devis: ClientCourrier["devis"] = null, cible: string | undefined;
+  if (lu.v.adresses.length) vals = valeursAdresse(lu.v.prenom);
+  else if (lu.v.ids.length) {
+    const c = await clientsChoisis(s, lu.v.ids.slice(0, 1));
+    if (c === "refuse") return { erreur: "refuse" };
+    if (!c?.[0]) return { erreur: "panne" };
+    [vals, devis, cible] = [valeursDe(c[0].faits, lu.v.langue), c[0].devis, c[0].id];
+  }
+  const e = rendre(vals, devis, lu.v, s);
   if (e.manque.length) return { erreur: "variables", manque: e.manque };
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };
   if (!a) return { erreur: "panne" };
   const parti = await partir({ a, sujet: `${msg.prefixeTest}${e.sujet}`, html: e.html, texte: e.texte, cle: `courrier-test-${randomUUID()}` }, v.boite);
-  await journaliser("courriel.test", s.profilId, null, { cible: c[0].id, langue: lu.v.langue, ...(parti ? {} : { motif: "envoi" as const }) });
+  await journaliser("courriel.test", s.profilId, null, { ...(cible ? { cible } : {}), ...(lu.v.mode === "adresse" ? { mode: "adresse" } : {}), langue: lu.v.langue, ...(parti ? {} : { motif: "envoi" as const }) });
   return parti ? { ok: true, a } : { erreur: "envoi" };
 }
 
-/** Envoi à un client, ou à un groupe (admin) : un e-mail par destinataire, rempli avec ses données, noté envoyé ou échec. */
+/** Envoi à un client, à une ou plusieurs adresses saisies, ou à un groupe (admin) : un e-mail par destinataire, rempli
+ * avec ses données, noté envoyé ou échec. */
 export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
   const s = await exigerRole("agents");
   if (!s) return { erreur: "refuse" };
   const lu = lireSaisie(brut, s, true);
   if (!lu.ok) return lu.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: lu.champs };
-  const clients = await clientsChoisis(s, lu.v.ids);
-  if (clients === "refuse") {
-    await journaliser("courriel.refus", s.profilId, null, { motif: "champs" });
-    return { erreur: "refuse" };
+  let dests: { id: string | null; email: string; vals: Valeurs; devis: ClientCourrier["devis"] }[];
+  if (lu.v.mode === "adresse") dests = lu.v.adresses.map((a) => ({ id: null, email: a, vals: valeursAdresse(lu.v.prenom), devis: null }));
+  else {
+    const clients = await clientsChoisis(s, lu.v.ids);
+    if (clients === "refuse") {
+      await journaliser("courriel.refus", s.profilId, null, { motif: "champs" });
+      return { erreur: "refuse" };
+    }
+    if (!clients) return { erreur: "panne" };
+    dests = clients.map((c) => ({ id: c.id, email: c.email, vals: valeursDe(c.faits, lu.v.langue), devis: c.devis }));
   }
-  if (!clients) return { erreur: "panne" };
-  if (lu.v.devis && !clients[0]?.devis) return { erreur: "champs", champs: ["pieces"] };
-  const rendus = clients.map((c) => ({ c, e: rendre(c, lu.v, s) }));
+  if (lu.v.devis && !dests[0]?.devis) return { erreur: "champs", champs: ["pieces"] };
+  const rendus = dests.map((c) => ({ c, e: rendre(c.vals, c.devis, lu.v, s) }));
   const manque = [...new Set(rendus.flatMap((r) => r.e.manque))];
   if (manque.length) return { erreur: "variables", manque };
   const v = await voie();
   if (!v) return { erreur: "smtp" };
-  const lot = lu.v.mode === "groupe" ? randomUUID() : null;
+  const seul = lu.v.mode !== "groupe" && dests.length === 1;
+  const lot = seul ? null : randomUUID();
   let envoyes = 0, echecs = 0;
   for (const { c, e } of rendus) {
     // la ligne est posée avant l'envoi : sa clé donne le Message-ID, et rien ne part sans trace
@@ -146,9 +175,10 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
     if (parti) envoyes++;
     else echecs++;
   }
-  await journaliser("courriel.envoi", s.profilId, null, { ...(lu.v.mode === "un" ? { cible: clients[0].id } : {}), langue: lu.v.langue, nombre: envoyes, ...(lu.v.modele ? { modele: lu.v.modele } : {}), ...(echecs ? { motif: "envoi" as const } : {}) });
+  // journal sans adresse ni texte : la fiche visée (un client), ou le mode « adresse » et le nombre
+  await journaliser("courriel.envoi", s.profilId, null, { ...(lu.v.mode === "un" && dests[0].id ? { cible: dests[0].id } : {}), ...(lu.v.mode === "adresse" ? { mode: "adresse" } : {}), langue: lu.v.langue, nombre: envoyes, ...(lu.v.modele ? { modele: lu.v.modele } : {}), ...(echecs ? { motif: "envoi" as const } : {}) });
   refresh();
-  if (lu.v.mode === "un" && echecs) return { erreur: "envoi" };
+  if (seul && echecs) return { erreur: "envoi" };
   return { ok: true, envoyes, echecs };
 }
 
@@ -165,6 +195,8 @@ function lireModele(brut: unknown) {
   if (t.champs.includes("objet")) champs.push("sujet");
   if (t.champs.includes("corps") || !t.corps) champs.push("corps");
   if (estAuto(cle) && jetonsInconnus(`${t.objet} ${t.corps}`).length) champs.push("jetons");
+  // un champ que cet e-mail ne remplit pas ferait repartir le texte par défaut sans bruit (courriels/commun.ts) : refusé
+  if (autoConnue(cle) && variablesHors(cle, `${t.objet} ${t.corps}`).length) champs.push("variables");
   return champs.length ? ({ ok: false, champs } as const) : ({ ok: true, v: { cle, langue: o.langue as LangueMsg, sujet: t.objet, corps: t.corps } } as const);
 }
 
@@ -194,14 +226,44 @@ export async function retirerModele(cle: unknown, langue: unknown): Promise<Reto
   return { ok: true };
 }
 
+/** Vrai rendu d'un e-mail automatique (gabarit « la lettre illustrée ») avec les données d'exemple ; null si impossible. */
+async function rendreAuto(cle: CleAuto, langue: LangueMsg, modele: { sujet: string; corps: string } | null, s: Session) {
+  try {
+    return apercuAuto(cle, langue, modele, s.prenom, (await origine()) ?? "");
+  } catch {
+    return null;
+  }
+}
+
+/** Aperçu réel d'un e-mail automatique pendant la saisie : le texte tapé s'il est valable, sinon le texte par défaut. */
+export async function apercuModele(brut: unknown): Promise<RetourMessages> {
+  const s = await exigerRole("admins");
+  if (!s) return { erreur: "refuse" };
+  const o = objet(brut);
+  const cle = typeof o.cle === "string" ? o.cle : "";
+  if (!autoConnue(cle) || !estLangue(o.langue)) return { erreur: "champs" };
+  const t = lireTexte(o.sujet, o.corps, false), tout = `${t.objet} ${t.corps}`;
+  const valable = !t.champs.length && t.objet && t.corps && !jetonsInconnus(tout).length && !variablesHors(cle, tout).length;
+  const r = await rendreAuto(cle, o.langue, valable ? { sujet: t.objet, corps: t.corps } : null, s);
+  return r ? { ok: true, sujet: r.sujet, html: r.html } : { erreur: "panne" };
+}
+
 export async function testerModele(brut: unknown): Promise<RetourMessages> {
   const s = await exigerRole("admins");
   if (!s) return { erreur: "refuse" };
   const lu = lireModele(brut);
   if (!lu.ok) return { erreur: "champs", champs: [...lu.champs] };
-  const vals = valeursApercu(s.prenom, lu.v.langue);
-  const sujet = remplir(lu.v.sujet, vals).texte, corps = remplir(lu.v.corps, vals).texte;
-  const { html, texte } = composer({ corps, signature: msg.signature(s.prenom, s.nom) });
+  let sujet: string, html: string, texte: string;
+  if (autoConnue(lu.v.cle)) {
+    // e-mail automatique : le vrai gabarit, tel que le client le recevra (données d'exemple)
+    const r = await rendreAuto(lu.v.cle, lu.v.langue, { sujet: lu.v.sujet, corps: lu.v.corps }, s);
+    if (!r) return { erreur: "panne" };
+    ({ sujet, html, texte } = r);
+  } else {
+    const vals = valeursApercu(s.prenom, lu.v.langue);
+    sujet = remplir(lu.v.sujet, vals).texte;
+    ({ html, texte } = composer({ corps: remplir(lu.v.corps, vals).texte, signature: msg.signature(s.prenom, s.nom) }));
+  }
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };
   if (!a) return { erreur: "panne" };

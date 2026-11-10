@@ -36,14 +36,38 @@ export const AUTO_CLES = ["auto-billets", "auto-demande", "auto-devis-pret", "au
 export type CleAuto = (typeof AUTO_CLES)[number];
 export const estAuto = (cle: string) => cle.startsWith("auto-");
 export const autoConnue = (cle: string): cle is CleAuto => (AUTO_CLES as readonly string[]).includes(cle);
+/** Champs variables que chaque e-mail automatique remplit (valeurs passées à `textes()` par son module d'envoi) : un
+ * modèle qui en emploie un autre est refusé à l'enregistrement, au lieu de retomber sans bruit sur le texte par défaut. */
+export const VARIABLES_AUTO: Record<CleAuto, readonly Variable[]> = {
+  "auto-billets": ["prenom", "dates", "lien", "reference"],
+  "auto-demande": ["prenom", "dates", "lien", "reference"],
+  "auto-devis-pret": ["prenom", "dates", "lien", "reference"],
+  "auto-boutique": ["prenom", "lien", "reference"],
+  "auto-lettre": ["lien"],
+  "auto-code": ["prenom"],
+  "auto-relance": ["prenom", "lien", "reference"],
+};
 /** Jetons « {…} » qui ne sont pas l'un des quatre champs variables (refusés dans un e-mail automatique). */
 export const jetonsInconnus = (t: string) => [...new Set((t.match(/\{[^{}\n]{0,40}\}/g) ?? []).filter((j) => !(Object.values(VARIABLES) as string[]).includes(j)))];
-/** Champs variables connus absents du texte (avertissement, jamais bloquant). */
-export const variablesAbsentes = (t: string) => (Object.entries(VARIABLES) as [Variable, string][]).filter(([, j]) => !t.includes(j)).map(([k]) => k);
+/** Champs variables employés dans le texte que cet e-mail automatique ne remplit pas (refusés). */
+export const variablesHors = (cle: CleAuto, t: string) => (Object.entries(VARIABLES) as [Variable, string][]).filter(([k, j]) => t.includes(j) && !VARIABLES_AUTO[cle].includes(k)).map(([k]) => k);
+/** Champs variables connus (parmi `parmi`) absents du texte (avertissement, jamais bloquant). */
+export const variablesAbsentes = (t: string, parmi: readonly Variable[] = Object.keys(VARIABLES) as Variable[]) => parmi.filter((k) => !t.includes(VARIABLES[k]));
 
 /** Valeurs de l'aperçu d'un modèle et de son test à soi-même : le prénom de l'admin connecté (il reçoit le test), les
  * autres champs en repères traduits (REPERES). Jamais les données d'un client, jamais une donnée inventée. */
 export const valeursApercu = (prenom: string, langue: LangueMsg): Valeurs => ({ prenom, ...REPERES[langue] });
+
+// adresse saisie à la main : partie locale (caractères permis par la RFC 5322, sans guillemets ni espaces, points
+// isolés), domaine en labels DNS et extension alphabétique ; comparée en minuscules
+const ADRESSE = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
+/** Adresses saisies à la main (séparées par une virgule ou un point-virgule), en minuscules, sans doublon ; null si l'une
+ * n'est pas valable, s'il n'y en a aucune ou s'il y en a plus de `max`. */
+export function lireAdresses(v: unknown, max: number): string[] | null {
+  if (typeof v !== "string" || v.length > 260 * max) return null;
+  const l = [...new Set(v.split(/[,;]/).map((x) => x.trim().toLowerCase()).filter(Boolean))];
+  return l.length && l.length <= max && l.every((a) => a.length <= 254 && a.indexOf("@") <= 64 && ADRESSE.test(a)) ? l : null;
+}
 
 /** Texte une fois les champs variables remplacés, et les champs employés sans valeur (laissés tels quels). */
 export function remplir(texte: string, v: Valeurs): { texte: string; manque: Variable[] } {

@@ -10,6 +10,8 @@ export const contenu = {
   sections: "Sections du contenu",
   rubriques: "Rubriques de la section",
   enAttente: "brouillon",
+  archives: "Archives, en lecture seule",
+  langues: "Langue du contenu",
   verrouille: "Lecture seule : cette rubrique ne se modifie pas dans l’éditeur.",
   protege: "Section protégée : son dessin ne change pas, les textes ont des limites plus courtes et le nombre d'images est fixe.",
   indisponible: "La base ne répond pas : l'éditeur ne peut pas s'ouvrir. Réessayez dans un instant.",

@@ -1,5 +1,5 @@
 /* Écran Équipe des admins (lot L3, maquette E ?role=admins&ecran=equipe) : compteurs qui filtrent, tableau des membres
-   (cartes sous 1100 px), petite course du soleil de chaque membre actif, panneau « Ajouter un agent » (plein écran en
+   (cartes sous 1100 px), petite course du soleil de chaque membre actif, panneau « Ajouter un membre » (plein écran en
    390), annonce. Tout sous .esp. Mouvement : transform, opacity et clip-path seulement ; aucune transition de couleur ni
    de fond ; mouvement réduit ramené à l'état final par jetons.css. */
 
@@ -48,7 +48,7 @@
 .esp .esp-equipe .mini-arc .moment { fill: var(--surface); stroke: var(--ocean); stroke-width: 2; } /* un point par moment du jour (lot L4) */
 .esp[data-theme="sombre"] .esp-equipe .mini-arc .moment { stroke: var(--soleil); }
 
-/* panneau « Ajouter un agent » : tiroir à droite, plein écran en 390 */
+/* panneau « Ajouter un membre » : tiroir à droite, plein écran en 390 */
 .esp .esp-tiroir { position: fixed; inset: 0 0 0 auto; width: min(640px, 100%); height: 100dvh; max-width: none; max-height: none; margin: 0 0 0 auto; padding: 0; border: 0; border-radius: 24px 0 0 24px; background: var(--surface); color: var(--encre); box-shadow: -24px 0 64px var(--ombre-forte); overflow: hidden; }
 .esp .esp-tiroir::backdrop { background: var(--voile); }
 .esp .esp-tiroir[open] { animation: esp-tiroir 560ms var(--c-glisse) backwards; }

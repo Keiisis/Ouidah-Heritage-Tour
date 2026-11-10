@@ -7,7 +7,7 @@ import type { Profil } from "./outils";
 // des JWT. Sources : doc Supabase « API keys » (supabase.com/docs/guides/api/api-keys) ; appels /auth/v1/admin/… avec le
 // seul en-tête apikey : doc « Configure Passkey Authentication » (supabase.com/docs/guides/self-hosting/self-hosted-passkeys) ;
 // points d'entrée POST /token?grant_type=password, PUT /admin/users/<id>, POST /logout : README de github.com/supabase/auth.
-function auth(chemin: string, corps: unknown, init: { method?: "POST" | "PUT"; jwt?: string } = {}) {
+function auth(chemin: string, corps: unknown, init: { method?: "POST" | "PUT" | "DELETE"; jwt?: string } = {}) {
   const entetes: Record<string, string> = { apikey: process.env.SUPABASE_SECRET_KEY ?? "", "content-type": "application/json" };
   if (init.jwt) entetes.authorization = `Bearer ${init.jwt}`; // jeton d'accès de l'utilisateur (un vrai JWT), jamais la clé
   return fetch(`${process.env.SUPABASE_URL}/auth/v1/${chemin}`, { method: init.method ?? "POST", headers: entetes, body: JSON.stringify(corps), cache: "no-store" });
@@ -41,6 +41,21 @@ export async function changerMotDePasse(id: string, mdp: string) {
 export async function bannir(id: string, oui: boolean) {
   try {
     return (await auth(`admin/users/${encodeURIComponent(id)}`, { ban_duration: oui ? "876000h" : "none" }, { method: "PUT" })).ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Supprime le compte Supabase Auth en mode « soft delete » : adresse et téléphone rendus illisibles, mot de passe et
+ * sessions Supabase effacés, la ligne auth.users gardée, donc aucune cascade vers equipe_profils. Vrai aussi si le compte
+ * n'existe plus (404 « user_not_found ») : une suppression interrompue se reprend. Source github.com/supabase/auth, internal/api/admin.go
+ * (adminUserDelete, should_soft_delete) et internal/models/user.go (SoftDeleteUser), lue le 09/11/2026. */
+export async function supprimerAuth(id: string) {
+  try {
+    const r = await auth(`admin/users/${encodeURIComponent(id)}`, { should_soft_delete: true }, { method: "DELETE" });
+    if (r.ok) return true;
+    const j = (await r.json().catch(() => ({}))) as { error_code?: unknown };
+    return r.status === 404 && j.error_code === "user_not_found";
   } catch {
     return false;
   }

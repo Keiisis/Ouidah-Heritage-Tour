@@ -1,11 +1,11 @@
 "use client";
 
-import { useId, useRef, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { espace as T } from "@/content/espace";
-import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, MODELES_DEPART, msg, VARIABLES } from "@/content/espace-messages";
-import { enregistrerModele, retirerModele, type RetourMessages, testerModele } from "@/lib/serveur/equipe/messages/actions";
+import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, MODELES_DEPART, msg, type Variable, VARIABLES } from "@/content/espace-messages";
+import { apercuModele, enregistrerModele, retirerModele, type RetourMessages, testerModele } from "@/lib/serveur/equipe/messages/actions";
 import type { Modele } from "@/lib/serveur/equipe/messages/lectures";
-import { CLE, estAuto, jetonsInconnus, remplir, valeursApercu, variablesAbsentes } from "@/lib/serveur/equipe/messages/rendu";
+import { autoConnue, CLE, type CleAuto, estAuto, jetonsInconnus, remplir, valeursApercu, VARIABLES_AUTO, variablesAbsentes, variablesHors } from "@/lib/serveur/equipe/messages/rendu";
 import { Bloc } from "../Bloc";
 import { Picto } from "../Picto";
 import { Apercu, texteRefus, useAnnonce } from "./Apercu";
@@ -14,8 +14,38 @@ import { Apercu, texteRefus, useAnnonce } from "./Apercu";
 // l'éditeur avec ses champs variables, l'aperçu et le test à soi-même : {prénom} = l'admin connecté, les autres champs en
 // repères traduits entre crochets (aucune donnée inventée). Le serveur relit tout.
 // Second groupe « E-mails automatiques » : les clés réservées au site (rendu.ts, AUTO_CLES), jamais dans le composeur ;
-// seuls les quatre champs variables y sont acceptés, et l'écran signale ceux qui manquent.
+// l'éditeur s'ouvre sur le texte par défaut que le site envoie, n'accepte que les champs variables que cet e-mail remplit
+// (VARIABLES_AUTO), et l'aperçu est le vrai e-mail (gabarit « la lettre illustrée », données d'exemple) en iframe isolée.
 const M = msg.modeles;
+
+/** Vrai rendu d'un e-mail automatique, demandé au serveur 400 ms après la dernière frappe, dans une iframe sans script. */
+function ApercuReel({ cle, langue, sujet, corps }: { cle: CleAuto; langue: LangueMsg; sujet: string; corps: string }) {
+  const [rendu, setRendu] = useState<{ sujet: string; html: string } | "indispo" | null>(null);
+  useEffect(() => {
+    let perime = false;
+    const minuteur = setTimeout(async () => {
+      try {
+        const r = await apercuModele({ cle, langue, sujet, corps });
+        if (!perime) setRendu("ok" in r && r.html ? { sujet: r.sujet ?? "", html: r.html } : "indispo");
+      } catch {
+        if (!perime) setRendu("indispo");
+      }
+    }, 400);
+    return () => {
+      perime = true;
+      clearTimeout(minuteur);
+    };
+  }, [cle, langue, sujet, corps]);
+  if (rendu === "indispo") return <p className="aide">{M.apercuIndispo}</p>;
+  return (
+    <div className="apercu-reel" aria-busy={!rendu}>
+      <p className="aide" id="apercu-reel-objet">
+        {msg.courrier.objet} : {rendu?.sujet ?? "…"}
+      </p>
+      {rendu && <iframe id="apercu-reel" title={M.apercuReel} sandbox="" referrerPolicy="no-referrer" srcDoc={rendu.html} />}
+    </div>
+  );
+}
 
 export function Modeles({ modeles, auto, moi }: { modeles: Modele[]; auto: Modele[]; moi: { prenom: string; nom: string } }) {
   const uid = useId();
@@ -77,14 +107,18 @@ export function Modeles({ modeles, auto, moi }: { modeles: Modele[]; auto: Model
     });
   const saisie = () => ({ cle: sel.cle, langue: sel.langue, sujet, corps });
   const verifier = () => {
-    const e = [...(sujet.trim() ? [] : ["sujet"]), ...(corps.trim() ? [] : ["corps"]), ...(inconnus.length ? ["jetons"] : [])];
+    const e = [...(sujet.trim() ? [] : ["sujet"]), ...(corps.trim() ? [] : ["corps"]), ...(inconnus.length ? ["jetons"] : []), ...(hors.length ? ["variables"] : [])];
     setErreurs(e);
     return !e.length;
   };
   const nom = m?.nom ?? sel.cle;
   const vals = valeursApercu(moi.prenom, sel.langue);
+  const cleAuto = m?.auto && autoConnue(sel.cle) ? sel.cle : null;
+  // champs proposés : ceux que cet e-mail automatique remplit, sinon les quatre
+  const offerts: readonly Variable[] = cleAuto ? VARIABLES_AUTO[cleAuto] : (Object.keys(VARIABLES) as Variable[]);
   const inconnus = m?.auto ? jetonsInconnus(`${sujet} ${corps}`) : [];
-  const absentes = m?.auto && (sujet.trim() || corps.trim()) ? variablesAbsentes(`${sujet} ${corps}`) : [];
+  const hors = cleAuto ? variablesHors(cleAuto, `${sujet} ${corps}`) : [];
+  const absentes = cleAuto && (sujet.trim() || corps.trim()) ? variablesAbsentes(`${sujet} ${corps}`, offerts) : [];
   const groupe = (id: string, l: Modele[]) => (
     <div id={id}>
       {l.map((x) => (
@@ -149,15 +183,17 @@ export function Modeles({ modeles, auto, moi }: { modeles: Modele[]; auto: Model
                 <span className="erreur">{erreurs.includes("corps") ? M.erreurs.corps : ""}</span>
                 <div className="puces" role="group" aria-label={msg.courrier.variables}>
                   <span className="aide">{msg.courrier.variables}</span>
-                  {Object.values(VARIABLES).map((v) => (
+                  {offerts.map((k) => VARIABLES[k]).map((v) => (
                     <button key={v} type="button" className="puce" data-var={v} aria-label={msg.courrier.inserer(v)} onClick={() => inserer(v)}>
                       {v}
                     </button>
                   ))}
                 </div>
                 {t?.source === "depart" && A_RELIRE.includes(sel.langue) && <span className="aide">{M.aRelire}</span>}
-                {m.auto && <span className="aide">{M.autoVariables}</span>}
+                {cleAuto && <span className="aide" id="variables-auto">{M.autoVariables(offerts.map((k) => VARIABLES[k]))}</span>}
+                {cleAuto && M.autoNotes[cleAuto] && <span className="aide">{M.autoNotes[cleAuto]}</span>}
                 {inconnus.length > 0 && <span className="erreur" id="jetons-inconnus">{M.inconnus(inconnus)}</span>}
+                {hors.length > 0 && <span className="erreur" id="variables-hors">{M.horsListe(hors.map((k) => VARIABLES[k]))}</span>}
                 {absentes.length > 0 && <span className="mention-manque" id="variables-absentes">{M.absentes(absentes.map((v) => VARIABLES[v]))}</span>}
               </div>
             </div>
@@ -165,10 +201,12 @@ export function Modeles({ modeles, auto, moi }: { modeles: Modele[]; auto: Model
               {t?.source === "base" && (
                 <button type="button" className="bouton-2" id="retirer-modele" disabled={occupe} onClick={() => lancer(() => retirerModele(sel.cle, sel.langue), () => {
                   annoncer(M.retire(nom, sel.langue));
-                  // le texte de départ reprend sa place ; sans texte de départ, la langue redevient « à écrire »
+                  // le texte de départ (ou, pour un e-mail automatique, le texte par défaut du site) reprend sa place ;
+                  // sans lui, la langue redevient « à écrire »
                   const d = MODELES_DEPART[sel.cle as keyof typeof MODELES_DEPART];
-                  setSujet(d?.sujet[sel.langue] ?? "");
-                  setCorps(d?.corps[sel.langue] ?? "");
+                  const defaut = m.defauts?.[sel.langue];
+                  setSujet(defaut?.sujet ?? d?.sujet[sel.langue] ?? "");
+                  setCorps(defaut?.corps ?? d?.corps[sel.langue] ?? "");
                 })}>
                   {m.auto ? M.retirerAuto : m.depart ? M.retirer : M.supprimer}
                 </button>
@@ -184,7 +222,11 @@ export function Modeles({ modeles, auto, moi }: { modeles: Modele[]; auto: Model
           </form>
         )}
         <h3 className="sous-titre">{M.apercu}</h3>
-        <Apercu a={`${moi.prenom} ${moi.nom}`} objet={remplir(sujet, vals).texte} corps={remplir(corps, vals).texte} signature={msg.signature(moi.prenom, moi.nom)} />
+        {cleAuto ? (
+          <ApercuReel cle={cleAuto} langue={sel.langue} sujet={sujet} corps={corps} />
+        ) : (
+          <Apercu a={`${moi.prenom} ${moi.nom}`} objet={remplir(sujet, vals).texte} corps={remplir(corps, vals).texte} signature={msg.signature(moi.prenom, moi.nom)} />
+        )}
       </Bloc>
       {vue}
     </div>

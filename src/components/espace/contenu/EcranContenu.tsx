@@ -41,9 +41,12 @@ export async function EcranContenu({ role, section: fixe, recherche }: { role: R
   const langue = normaliserLangue(un(q.langue));
   const bases = (Object.keys(REGISTRE) as CleContenu[]).filter((c) => REGISTRE[c].section === section);
   const cles = bases.map((c) => cleEdition(c, traduisible(c) ? langue : "FR"));
+  // rubriques verrouillées (sans rendu public ou lues par le code) : repliées sous « Archives », jamais ouvertes d'office
+  const archives = cles.filter((c) => REGISTRE[decomposerCle(c).cle].verrouille);
+  const actives = cles.filter((c) => !archives.includes(c));
   const voulue = un(q.cle);
   const baseVoulue = estCleEdition(voulue) ? decomposerCle(voulue).cle : null;
-  const cle: CleEdition = baseVoulue && bases.includes(baseVoulue) ? cleEdition(baseVoulue, traduisible(baseVoulue) ? langue : "FR") : cles[0];
+  const cle: CleEdition = baseVoulue && bases.includes(baseVoulue) ? cleEdition(baseVoulue, traduisible(baseVoulue) ? langue : "FR") : (actives[0] ?? cles[0]);
   const nom = (c: CleEdition) => C.rubriquesNoms[decomposerCle(c).cle] ?? decomposerCle(c).cle;
   const entree = REGISTRE[decomposerCle(cle).cle];
   const adresse = (c: CleEdition) => (role === "admins" ? `/admins/${section}?cle=${encodeURIComponent(c)}&langue=${langue}` : `/agents/contenu?section=${section}&cle=${encodeURIComponent(c)}&langue=${langue}`);
@@ -51,6 +54,14 @@ export async function EcranContenu({ role, section: fixe, recherche }: { role: R
   const x = sectionDe(role, actif);
   const [ligne, versions, brouillons, edition] = await Promise.all([lireLigne(cle), lireVersions(cle), lireBrouillons(cles), preparerEdition(cle)]);
   const minute = minuteServeur();
+  const rubrique = (c: CleEdition) => (
+    <li key={c}>
+      <Link href={adresse(c)} aria-current={c === cle ? "page" : undefined} data-cle={c}>
+        <span>{nom(c)}</span>
+        {brouillons.has(c) && <span className="ct-pastille">{C.enAttente}</span>}
+      </Link>
+    </li>
+  );
 
   const forme = edition?.forme ?? formeDe(decomposerCle(cle).cle);
   const publiee = ligne && edition ? fusionEdition(cle, ligne.valeur, edition.source) : null;
@@ -74,21 +85,20 @@ export async function EcranContenu({ role, section: fixe, recherche }: { role: R
             </ul>
           </nav>
         )}
-        <nav className="ct-onglets" aria-label="Langue du contenu">
-          <ul>{LANGUES.map((l) => <li key={l}><Link href={`${role === "admins" ? `/admins/${section}` : `/agents/contenu?section=${section}`}${role === "admins" ? "?" : "&"}cle=${encodeURIComponent(decomposerCle(cle).cle)}&langue=${l}`} aria-current={l === langue ? "page" : undefined} hrefLang="fr">{l}</Link></li>)}</ul>
-        </nav>
+        {traduisible(decomposerCle(cle).cle) && (
+          <nav className="ct-onglets" aria-label={C.langues}>
+            <ul>{LANGUES.map((l) => <li key={l}><Link href={`${role === "admins" ? `/admins/${section}` : `/agents/contenu?section=${section}`}${role === "admins" ? "?" : "&"}cle=${encodeURIComponent(decomposerCle(cle).cle)}&langue=${l}`} aria-current={l === langue ? "page" : undefined} hrefLang="fr">{l}</Link></li>)}</ul>
+          </nav>
+        )}
         <div className="ct-grille">
           <nav className="ct-rubriques" aria-label={C.rubriques}>
-            <ul>
-              {cles.map((c) => (
-                <li key={c}>
-                  <Link href={adresse(c)} aria-current={c === cle ? "page" : undefined} data-cle={c}>
-                    <span>{nom(c)}</span>
-                    {brouillons.has(c) && <span className="ct-pastille">{C.enAttente}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <ul>{actives.map(rubrique)}</ul>
+            {archives.length > 0 && (
+              <details className="ct-archives" open={archives.includes(cle)}>
+                <summary>{C.archives}</summary>
+                <ul>{archives.map(rubrique)}</ul>
+              </details>
+            )}
           </nav>
           {!ligne || publiee === null || courante === null ? (
             <section className="ct-editeur" aria-label={nom(cle)}>

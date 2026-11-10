@@ -11,6 +11,7 @@ import { actualiserTauxAutomatique, modifierTaux } from "../../taux";
 import { courrielConfigure, echapper, envoyerCourriel } from "../../courriel";
 import { empreinteIp } from "../../garde";
 import { passerelle } from "../../paiement";
+import { chargerCles, ecrireCle, effacerCleBase, estChamp, estPorteur, lireValeur, saisiePossible } from "../../paiement/cles";
 import { PASSERELLES, type NomPasserelle } from "../../paiement/types";
 import { champsDe } from "../finances/regles";
 import { changerMotDePasse, lireProfil as lireCompte, verifierMotDePasse } from "../comptes";
@@ -29,7 +30,7 @@ import { lireImage, lireMaintenance, lireMentions, lireModeEco, lireMotDePasse, 
 // seulement, jamais un identifiant de compte lu du navigateur. Chaque écriture va au journal (objet touché, jamais une clé,
 // un mot de passe ni le texte saisi). refresh() renvoie l'écran à jour dans la même réponse.
 
-export type RefusReg = "refuse" | "admin" | "champs" | "panne" | "cles" | "cle" | "smtp" | "envoi" | "trop_tot" | "ancien" | "verrou" | "image" | "message" | "courant" | "introuvable" | "taux_perime";
+export type RefusReg = "refuse" | "admin" | "champs" | "panne" | "cles" | "cle" | "smtp" | "envoi" | "trop_tot" | "ancien" | "verrou" | "image" | "message" | "courant" | "introuvable" | "taux_perime" | "sel";
 export type RetourReg = { ok: true; n?: number } | { erreur: RefusReg; champs?: string[] };
 
 const maintenant = () => new Date().toISOString();
@@ -75,7 +76,8 @@ export async function basculerPasserelle(nom: unknown, active: unknown): Promise
   const s = await admin();
   if ("erreur" in s) return s;
   if (typeof nom !== "string" || !(PASSERELLES as readonly string[]).includes(nom) || typeof active !== "boolean") return { erreur: "champs" };
-  // une passerelle sans ses clés sur le serveur ne s'active pas (même par une requête forgée)
+  // une passerelle sans ses clés (saisies ici ou variables du serveur) ne s'active pas (même par une requête forgée)
+  if (active) await chargerCles(true);
   if (active && !passerelle(nom as NomPasserelle).disponible()) {
     await journaliser("reglages.refus", s.profilId, null, { passerelle: nom, motif: "cles" });
     return { erreur: "cles" };
@@ -102,6 +104,34 @@ export async function deplacerPasserelle(nom: unknown, sens: unknown): Promise<R
     if (!(await modifier(`passerelles_paiement?nom=eq.${n}&select=nom`, { ordre: k + 1, modifie_le: maintenant() }))?.length) return { erreur: "panne" };
   }
   await journaliser("reglages.ordre", s.profilId, null, { passerelle: nom, nombre: noms.indexOf(nom) + 1 });
+  return fin(true);
+}
+
+// ---------- clés des passerelles et jeton e-MECeF (chiffrés en base, jamais relus vers le navigateur) ----------
+
+/** Pose ou remplace une clé d'une passerelle (ou du connecteur « emcf »). La valeur n'est ni renvoyée, ni journalisée,
+ * ni placée dans une erreur : le journal note la passerelle et le nom du champ. */
+export async function enregistrerCle(porteur: unknown, champ: unknown, brut: unknown): Promise<RetourReg> {
+  const s = await admin();
+  if ("erreur" in s) return s;
+  if (!estPorteur(porteur) || !estChamp(porteur, champ)) return { erreur: "champs" };
+  const valeur = lireValeur(champ, champsDe(brut).valeur);
+  if (valeur === null) return { erreur: "champs", champs: ["valeur"] };
+  if (!saisiePossible()) return { erreur: "sel" };
+  if (!(await ecrireCle(porteur, champ, valeur, s.profilId))) return { erreur: "panne" };
+  await journaliser(porteur === "emcf" ? "reglages.emcf" : "reglages.passerelle", s.profilId, null, { passerelle: porteur, cible: champ, mode: "saisie" });
+  updateTag("boutique"); // le catalogue mis en cache garde la présence d'une passerelle utilisable (lib/boutique.ts)
+  return fin(true);
+}
+
+/** Efface une clé saisie ici : la variable du serveur du même nom reprend la main (si elle existe). */
+export async function effacerCle(porteur: unknown, champ: unknown): Promise<RetourReg> {
+  const s = await admin();
+  if ("erreur" in s) return s;
+  if (!estPorteur(porteur) || !estChamp(porteur, champ)) return { erreur: "champs" };
+  if (!(await effacerCleBase(porteur, champ))) return { erreur: "panne" };
+  await journaliser(porteur === "emcf" ? "reglages.emcf" : "reglages.passerelle", s.profilId, null, { passerelle: porteur, cible: champ, mode: "effacement" });
+  updateTag("boutique");
   return fin(true);
 }
 

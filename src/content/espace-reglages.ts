@@ -7,15 +7,6 @@ import type { Langue } from "@/lib/serveur/equipe/partage";
 
 export const LANGUES_REGLAGES = ["FR", "EN", "ES", "DE", "PT", "HT", "GCF"] as const satisfies readonly Langue[];
 
-// Variables d'environnement attendues par passerelle (noms seulement, lus par lib/serveur/paiement)
-export const VARIABLES_PASSERELLES: Record<string, string[]> = {
-  kkiapay: ["KKIAPAY_PUBLIC_KEY", "KKIAPAY_PRIVATE_KEY", "KKIAPAY_SECRET_KEY", "KKIAPAY_WEBHOOK_SECRET"],
-  fedapay: ["FEDAPAY_SECRET_KEY", "FEDAPAY_WEBHOOK_SECRET"],
-  stripe: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"],
-  flutterwave: ["FLUTTERWAVE_SECRET_KEY", "FLUTTERWAVE_SECRET_HASH"],
-  paystack: ["PAYSTACK_SECRET_KEY"],
-};
-
 const plur = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? plusieurs : un}`;
 
 export const reglages = {
@@ -25,7 +16,8 @@ export const reglages = {
     admin: "Action réservée aux admins.",
     champs: "Quelques champs sont à corriger.",
     panne: "La base ne répond pas : rien n’a été modifié. Réessayez dans un moment.",
-    cles: "Clés manquantes sur le serveur : cette passerelle ne peut pas être activée.",
+    cles: "Clés manquantes : saisissez-les dans « Clés des passerelles » avant d’activer cette passerelle.",
+    sel: "Saisie fermée : le serveur n’a pas de quoi chiffrer la clé (EQUIPE_SEL de 32 caractères au moins, base). Rien n’a été enregistré.",
     cle: "Aucune clé de fournisseur sur le serveur : l’assistant ne peut pas être activé.",
     smtp: "L’e-mail d’envoi d’OHT (SMTP) n’est pas configuré : rien n’est parti.",
     envoi: "L’e-mail n’est pas parti. Réessayez dans un moment.",
@@ -65,6 +57,7 @@ export const reglages = {
     nouveau: "Nouveau mot de passe : 12 caractères au moins, différent de votre adresse e-mail et de l’actuel.",
     confirmation: "Confirmation : identique au nouveau mot de passe.",
     taux_usd: "Taux du dollar : entre 100 et 5 000 FCFA, avec trois décimales au plus.",
+    valeur: "Valeur : une seule ligne, 4 096 caractères au plus (mode et environnement : un choix de la liste).",
   } as Record<string, string>,
   envoi: "Envoi…",
   enregistrer: "Enregistrer",
@@ -77,11 +70,13 @@ export const reglages = {
   // ---------- passerelles ----------
   passerelles: {
     titre: "Passerelles et paiements",
-    sous: "Le site ne propose que les passerelles actives dont les clés sont posées sur le serveur, dans l’ordre choisi ici.",
+    sous: "Le site ne propose que les passerelles actives dont les clés sont posées (saisies ici ou sur le serveur), dans l’ordre choisi ici.",
     liste: "Les 5 passerelles",
     cols: { passerelle: "Passerelle", cles: "Clés", mode: "Mode", etat: "État", ordre: "Ordre", actions: "Actions" },
-    clesAide: "Les clés se posent dans les variables d’environnement du serveur (Vercel), jamais ici. L’écran dit seulement si elles sont là.",
-    variables: (noms: string[]) => `Variables attendues : ${noms.join(", ")}.`,
+    clesAide: "Les clés se saisissent dans « Clés des passerelles », plus bas. Une variable du serveur (Vercel) du même nom sert tant que rien n’est saisi. L’écran dit seulement si elles sont là, jamais leur valeur.",
+    manquantes: (n: number) => plur(n, "clé manquante", "clés manquantes"),
+    clesTitre: "Clés des passerelles",
+    clesSous: "Chaque valeur est chiffrée par le serveur avant d’être enregistrée et ne se relit jamais ici. Une valeur saisie passe avant la variable du serveur du même nom.",
     sandbox: "Mode test",
     reel: "Paiements réels",
     sansMode: "—",
@@ -237,7 +232,7 @@ export const reglages = {
     nimAide: "Numéro attribué par la DGI. Il doit correspondre au jeton et à l’IFU enregistré dans Documents.",
     nimVide: "Non renseigné",
     jeton: "Jeton de l’API e-MECeF",
-    jetonAide: "Le jeton se pose dans la variable EMCF_JETON du serveur, jamais ici. L’écran dit seulement s’il est là.",
+    jetonAide: "Le jeton se saisit ci-dessous, chiffré par le serveur ; sans saisie, la variable EMCF_JETON du serveur sert. Il ne se relit jamais : l’écran dit seulement s’il est là. La production DGI reste fermée tant que le serveur ne l’autorise pas (EMCF_PRODUCTION_AUTORISEE).",
     enregistre: "NIM enregistré.",
     connexion: "Connexion à la DGI",
     verifier: "Vérifier la connexion",
@@ -289,6 +284,41 @@ export const reglages = {
       incoherence: "Les données retournées par la DGI ne correspondent pas à la demande conservée.",
       incertaine: "Résultat incertain. Ne renvoyez pas cette demande ; faites vérifier l’opération auprès de la DGI.",
     },
+  },
+
+  // ---------- saisie des clés (passerelles et e-MECeF) : jamais de valeur affichée ----------
+  cles: {
+    libelles: {
+      KKIAPAY_PUBLIC_KEY: "Clé publique",
+      KKIAPAY_PRIVATE_KEY: "Clé privée",
+      KKIAPAY_SECRET_KEY: "Clé secrète",
+      KKIAPAY_WEBHOOK_SECRET: "Secret du webhook",
+      KKIAPAY_SANDBOX: "Mode",
+      FEDAPAY_SECRET_KEY: "Clé secrète",
+      FEDAPAY_WEBHOOK_SECRET: "Secret du webhook",
+      FEDAPAY_SANDBOX: "Mode",
+      STRIPE_SECRET_KEY: "Clé secrète (sk_live_ ou sk_test_)",
+      STRIPE_WEBHOOK_SECRET: "Secret du webhook (whsec_)",
+      FLUTTERWAVE_SECRET_KEY: "Clé secrète",
+      FLUTTERWAVE_SECRET_HASH: "Secret hash du webhook",
+      PAYSTACK_SECRET_KEY: "Clé secrète (sk_live_ ou sk_test_)",
+      EMCF_JETON: "Jeton de l’API e-MECeF",
+      EMCF_ENVIRONNEMENT: "Environnement DGI",
+    } as Record<string, string>,
+    source: { admin: "Saisie ici", vercel: "Variable du serveur (Vercel)" } as Record<string, string>,
+    nouvelle: "Nouvelle valeur",
+    nouvelleAide: "Jamais pré-remplie ni relue. Enregistrer remplace la valeur précédente.",
+    choisir: "Choisir",
+    choix: { true: "Mode test (bac à sable)", false: "Paiements réels", test: "Bac à sable DGI", production: "Production DGI" } as Record<string, string>,
+    choixDe: (champ: string) => (champ === "EMCF_ENVIRONNEMENT" ? ["test", "production"] : ["true", "false"]),
+    enregistrer: "Enregistrer",
+    enregistrerDe: (n: string) => `Enregistrer ${n}`,
+    enregistree: "Clé enregistrée.",
+    effacer: "Effacer",
+    effacerDe: (n: string) => `Effacer ${n} saisie ici`,
+    effacerConfirmer: "Effacer la valeur saisie ici ? La variable du serveur du même nom, si elle existe, reprend la main.",
+    effacee: "Clé effacée.",
+    sansSel: "Saisie fermée sur ce serveur : EQUIPE_SEL (32 caractères au moins) ou la base manque. Les variables du serveur restent lues.",
   },
 
   // ---------- assistant ----------

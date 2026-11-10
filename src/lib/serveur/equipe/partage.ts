@@ -64,6 +64,20 @@ export function refusSuspension(acteurId: string, cible: { id: string; role: Rol
   return null;
 }
 
+/** Motif de refus d'une suppression, ou null : mêmes gardes que la suspension (jamais soi-même, jamais le dernier admin
+ * actif), et seulement un compte invité ou suspendu (un compte actif se suspend d'abord). */
+export function refusSuppression(acteurId: string, cible: { id: string; role: RoleCompte; etat: string }, adminsActifs: number): "soi" | "dernier_admin" | "etat" | null {
+  return refusSuspension(acteurId, cible, adminsActifs) ?? (cible.etat === "invite" || cible.etat === "suspendu" ? null : "etat");
+}
+
+/** Motif de refus d'un changement de rôle, ou null : jamais soi-même, jamais un compte supprimé ni le rôle qu'il a déjà,
+ * jamais le dernier admin actif rendu agent. */
+export function refusRole(acteurId: string, cible: { id: string; role: RoleCompte; etat: string }, vers: RoleCompte, adminsActifs: number): "soi" | "etat" | "dernier_admin" | null {
+  if (cible.id === acteurId) return "soi";
+  if (cible.etat === "supprime" || cible.role === vers) return "etat";
+  return vers === "agent" ? refusSuspension(acteurId, cible, adminsActifs) : null;
+}
+
 export type Acces = { url: string; cle: string };
 
 /** Mot de passe de 64 caractères tiré au hasard, jamais affiché ni gardé : le compte choisit le sien à la première connexion. */

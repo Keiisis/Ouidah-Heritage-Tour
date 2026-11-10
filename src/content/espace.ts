@@ -1,7 +1,7 @@
 // Textes de l'espace de l'équipe une fois connecté (/agents, /admins) : tableau de bord E « La course du soleil »
 // (maquette t-e-soleil.html, objet TXT), en français. Rien d'inventé ici : aucun chiffre, aucun nom, aucune donnée
 // d'exemple. Les données viennent du serveur (lib/serveur/equipe/espace.ts) ; ce fichier ne garde que les mots.
-// SECTIONS (23 agent, 44 admin) sert à la navigation, à la palette Ctrl K, à generateStaticParams et aux tests.
+// SECTIONS sert à la navigation, à la palette Ctrl K, aux titres des pages (metadata) et aux tests.
 import type { Role } from "./equipe";
 
 export type Picto =
@@ -61,8 +61,8 @@ export const GROUPES: Record<Role, Groupe[]> = {
     ["Pilotage", [
       ["accueil", "Accueil", "maison", "Encaissé et à confirmer|Réservations à venir|Demandes en attente|Activité récente"],
       ["statistiques", "Statistiques", "courbe", "Visites|Conversions|Pays|Sources"],
-      ["direct", "En direct", "soleil", "Visiteurs en ligne|Pages vues|Sans donnée personnelle"],
-      ["rapport", "Rapport hebdomadaire", "document", "Synthèse de la semaine, envoyée chaque lundi"],
+      ["direct", "En direct", "soleil", "Équipe connectée|Pages vues du jour"],
+      ["rapport", "Rapport hebdomadaire", "document", "Synthèse de la semaine|Envoyée chaque lundi si l’envoi est activé"],
     ]],
     ["Ventes", [
       ["demandes", "Demandes et dossiers", "plateau", "Toutes les demandes|Attribution à un agent"],
@@ -78,14 +78,13 @@ export const GROUPES: Record<Role, Groupe[]> = {
     ]],
     ["Site", [
       ["pages", "Pages", "crayon", "Textes et visuels de chaque section|7 langues|Brouillon puis publication"],
-      ["lieux", "Lieux", "repere", "Musée d’histoire, Temple des Pythons, Route des Esclaves, Porte du Non-Retour, Forêt sacrée de Kpassè"],
+      ["lieux", "Lieux", "repere", "Fiches des lieux, photos, textes"],
       ["circuits", "Circuits et expériences", "carte", "Programme jour par jour|Prix affiché ou non"],
       ["evenements", "Événements", "calendrier", "OHT : billets|Externes comme Vodun Days : séjours"],
       ["conciergerie", "Conciergerie", "voiture", "Navette, hôtel, véhicule"],
       ["histoire", "Histoire", "livre", "Page Histoire de Ouidah"],
       ["medias", "Galerie et médias", "image", "Photos, point focal, texte alternatif"],
       ["temoignages", "Témoignages", "bulle", "Témoignages réels seulement"],
-      ["partenaires", "Partenaires", "personnes", "Hôtels, chauffeurs, artisans"],
       ["traductions", "Traductions", "bulle", "7 langues|Relecture par un locuteur"],
       ["legales", "Pages légales", "document", "Mentions, confidentialité, cookies"],
       ["navigation", "Navigation et pied de page", "carte", "Menu, liens, pied de page"],
@@ -94,14 +93,14 @@ export const GROUPES: Record<Role, Groupe[]> = {
     ["Boutique", [["boutique", "Boutique", "sac", "Produits, catégories, matières|Stocks|Commandes, retraits et livraisons"]]],
     ["Clients et messages", [
       ["clients", "Clients", "personnes", "Tous les clients et leurs dossiers"],
-      ["services", "Rendez-vous et candidatures", "calendrier", "Disponibilités et rendez-vous|Candidatures partenaires|Demandes d’effacement"],
+      ["services", "Rendez-vous et candidatures", "calendrier", "Disponibilités et rendez-vous|Candidatures partenaires"],
       ["boite", "Boîte de réception", "bulle", "Messages du site et réponses des clients"],
       ["courrier", "Rédiger un e-mail", "courrier", "À un client ou à un groupe|Modèle, langue, pièce jointe, aperçu"],
       ["modeles", "Modèles d’e-mails", "courrier", "E-mails automatiques par langue|Aperçu et envoi de test"],
       ["lettre", "La lettre de Ouidah", "courrier", "Abonnés et envoi"],
     ]],
     ["Équipe", [
-      ["equipe", "Agents", "personnes", "Ajouter, suspendre, réinviter"],
+      ["equipe", "Équipe", "personnes", "Ajouter un agent ou un admin|Suspendre, réinviter, supprimer|Changer le rôle"],
       ["roles", "Rôles et droits", "cle", "Ce que chaque rôle peut voir et faire"],
       ["perfs", "Performances par agent", "courbe", "Dossiers traités, délai de réponse, encaissé"],
       ["wiki", "Wiki", "livre", "Procédures, fiches des lieux, réponses types"],
@@ -109,14 +108,14 @@ export const GROUPES: Record<Role, Groupe[]> = {
     ["Sécurité", [
       ["securite", "Pare-feu et sessions", "bouclier", "Pare-feu : attaques, IP bloquées, règles, journal|Journal d’activité|Sessions ouvertes"],
       ["sauvegardes", "Sauvegardes", "dossier", "Export par table|Date de la dernière sauvegarde"],
-      ["donnees", "Protection des données", "cle", "Registre des traitements|Demandes d’accès et d’effacement|Procédure de violation sous 72 h|Consentements"],
+      ["donnees", "Protection des données", "cle", "Registre des traitements|Demandes d’effacement reçues par /mes-donnees|Demandes d’accès et d’effacement|Procédure de violation sous 72 h|Consentements"],
     ]],
     ["Réglages", [
-      ["passerelles", "Passerelles et paiements", "caisse", "Les 5 passerelles, clés et activation|Coordonnées bancaires et numéros Mobile Money de l’agence, pour le virement et le paiement direct|Modifiables par un admin, chaque modification au journal"],
+      ["passerelles", "Passerelles et paiements", "caisse", "Les 5 passerelles, saisie des clés et activation|Coordonnées bancaires et numéros Mobile Money de l’agence, pour le virement et le paiement direct|Modifiables par un admin, chaque modification au journal"],
       ["devises", "Devises", "caisse", "FCFA et €, taux fixe de 655,957"],
       ["envoi", "E-mail d’envoi", "courrier", "contact@ouidahheritagetour.bj|Test d’envoi|Le mot de passe n’apparaît jamais"],
       ["docs", "Documents", "document", "En-tête, pied, mentions légales, signature"],
-      ["emcf", "Normalisation e-MCF", "document", "Désactivée tant que le comptable n’a pas confirmé"],
+      ["emcf", "Normalisation e-MECeF", "document", "Désactivée tant que le comptable n’a pas confirmé"],
       ["assistant", "Assistant d’écriture", "crayon", "Aide à rédiger, jamais d’envoi sans relecture"],
       ["maintenance", "Maintenance", "reglages", "Mettre le site en maintenance"],
     ]],
@@ -159,7 +158,7 @@ export const espace = {
   // barre du bas sur téléphone : quatre accès directs (id de section, libellé court)
   bas: {
     agents: [["accueil", "Aujourd’hui"], ["demandes", "Demandes"], ["billets", "Billets"], ["courrier", "E-mail"]],
-    admins: [["accueil", "Accueil"], ["equipe", "Agents"], ["finances", "Finances"], ["securite", "Sécurité"]],
+    admins: [["accueil", "Accueil"], ["equipe", "Équipe"], ["finances", "Finances"], ["securite", "Sécurité"]],
   } satisfies Record<Role, [string, string][]>,
   theme: { clair: "Mode clair", sombre: "Mode sombre" },
   deconnexion: "Se déconnecter",
@@ -169,9 +168,6 @@ export const espace = {
   palette: { titre: "Chercher ou aller à", place: "Un écran, une fonction…", rien: "Aucun résultat.", action: "Action" },
   onglets: "Rubriques de l’accueil",
   voirTout: "Tout voir",
-
-  // fiche d'une section sans écran détaillé
-  fiche: { fonctions: "Fonctions", mention: "Cet écran arrive bientôt : ses fonctions sont listées ci-dessus.", retour: "Retour à l’accueil" },
 
   // en-tête de l'accueil, à l'heure de Ouidah
   salut: (minutes: number) => (minutes >= 18 * 60 || minutes < 5 * 60 ? "Bonsoir" : "Bonjour"),
@@ -301,8 +297,8 @@ export const espace = {
   // écran Équipe (lot L3, maquette E ?ecran=equipe) : les comptes viennent de la base, jamais d'ici
   equipe: {
     titre: "Équipe",
-    sous: "Vous créez les comptes : chaque agent reçoit une invitation de première connexion.",
-    ajouter: "Ajouter un agent",
+    sous: "Vous créez les comptes : chaque membre, agent ou admin, reçoit une invitation de première connexion.",
+    ajouter: "Ajouter un membre",
     cols: { qui: "Membre", role: "Rôle", langues: "Langues", jour: "Aujourd’hui", etat: "État", actions: "Actions" },
     etats: { actif: "Actif", invite: "Invité", suspendu: "Suspendu" },
     roles: { agent: "Agent", admin: "Admin" },
@@ -310,11 +306,16 @@ export const espace = {
     filtres: "Filtrer par état",
     resume: { tous: (n: number) => (n > 1 ? "membres" : "membre"), actif: (n: number) => (n > 1 ? "actifs" : "actif"), invite: (n: number) => (n > 1 ? "invités" : "invité"), suspendu: (n: number) => (n > 1 ? "suspendus" : "suspendu") },
     filtreVide: "Aucun membre dans cet état.",
-    vide: ["Aucun agent pour l’instant.", "Ajoutez le premier : il recevra une invitation de première connexion."],
+    vide: ["Aucun agent dans l’équipe : les comptes listés sont des admins.", "Ajoutez un membre avec le rôle Agent : il recevra une invitation de première connexion."],
     moi: "Vous",
     suspendre: "Suspendre",
     reactiver: "Réactiver",
     reinviter: "Réinviter",
+    supprimer: "Supprimer",
+    confirmer: "Confirmer la suppression",
+    garder: "Garder",
+    confirmation: (qui: string) => `Supprimer le compte de ${qui} ? Il ne pourra plus se connecter ; son historique reste au journal, sans son nom ni son adresse.`,
+    devenir: { admin: "Passer admin", agent: "Passer agent" },
     actionDe: (action: string, qui: string) => `${action} : ${qui}`,
     // petite course du soleil de chaque membre actif : ses moments du jour arrivent avec les dossiers voyage (lot L4)
     jourVide: "Rien de prévu",
@@ -328,7 +329,7 @@ export const espace = {
     instant: "à l’instant",
     le: (date: string) => `le ${date}`,
     form: {
-      titre: "Ajouter un agent",
+      titre: "Ajouter un membre",
       sous: "Il recevra un e-mail d’invitation pour choisir son mot de passe.",
       prenom: "Prénom",
       nom: "Nom",
@@ -362,6 +363,8 @@ export const espace = {
       suspendu: (qui: string) => `Compte de ${qui} suspendu : plus aucune connexion possible.`,
       reactive: (qui: string) => `Compte de ${qui} réactivé.`,
       reinvite: (qui: string) => `Nouvelle invitation envoyée à ${qui}.`,
+      supprime: (qui: string) => `Compte de ${qui} supprimé : son adresse peut être invitée de nouveau.`,
+      role: (qui: string, role: string) => `${qui} est maintenant ${role.toLowerCase()} : ses sessions ont été fermées.`,
     },
     erreurs: {
       refuse: "Action réservée aux admins connectés.",
@@ -371,7 +374,7 @@ export const espace = {
       envoi: "Le compte est créé, mais l’e-mail n’est pas parti : utilisez « Réinviter ».",
       panne: "La base ne répond pas : rien n’a été modifié. Réessayez dans un moment.",
       trop_tot: (s: number) => `Une invitation vient de partir : réessayez dans ${s} s.`,
-      soi: "Vous ne pouvez pas suspendre votre propre compte.",
+      soi: "Action impossible sur votre propre compte.",
       dernier_admin: "Impossible : c’est le dernier admin actif.",
       etat: "Ce compte a changé d’état entre-temps : la liste est à jour.",
       reseau: "La connexion a échoué. Vérifiez votre réseau, puis réessayez.",

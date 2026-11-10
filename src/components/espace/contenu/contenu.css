@@ -12,6 +12,9 @@
 .esp .esp-contenu :is(.ct-onglets, .ct-rubriques) a[aria-current="page"] { border-color: var(--encre); box-shadow: inset 4px 0 0 var(--ocean); font-weight: 700; }
 .esp[data-theme="sombre"] .esp-contenu :is(.ct-onglets, .ct-rubriques) a[aria-current="page"] { box-shadow: inset 4px 0 0 var(--soleil); }
 .esp .esp-contenu .ct-rubriques { position: sticky; top: 16px; }
+.esp .esp-contenu .ct-archives { margin-top: 14px; }
+.esp .esp-contenu .ct-archives summary { min-height: 44px; display: flex; align-items: center; color: var(--encre-3); font-weight: 600; cursor: pointer; }
+.esp .esp-contenu .ct-archives ul { margin-top: 6px; }
 .esp .esp-contenu .ct-rubriques ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; max-height: calc(100vh - 140px); overflow-y: auto; }
 .esp .esp-contenu .ct-pastille { flex: none; padding: 2px 8px; border: 1px solid var(--attente); border-radius: 10px; color: var(--attente); font: 700 11px/1.4 var(--f-texte); }
 

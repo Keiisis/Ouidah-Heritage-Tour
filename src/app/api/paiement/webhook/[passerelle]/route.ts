@@ -2,6 +2,7 @@ import { baseConfiguree } from "@/lib/serveur/base";
 import { finaliser, lireReservation } from "@/lib/serveur/paiement/finaliser";
 import { envoyerBillets } from "@/lib/serveur/paiement/courriel";
 import { passerelle } from "@/lib/serveur/paiement";
+import { chargerCles } from "@/lib/serveur/paiement/cles";
 import { finaliserLienWebhook } from "@/lib/serveur/paiement/lien";
 import { origineSite } from "@/lib/serveur/paiement/outils";
 import { PASSERELLES, type Reservation } from "@/lib/serveur/paiement/types";
@@ -16,6 +17,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ passere
   const nom = PASSERELLES.find((p) => p === demandee);
   if (!nom) return new Response(null, { status: 404 });
   const p = passerelle(nom);
+  await chargerCles(); // clés saisies dans l'admin (sinon variables du serveur), relues au plus toutes les 60 s
   if (!p.disponible() || !baseConfiguree()) return new Response(null, { status: 503 });
   const brut = await req.text();
   if (brut.length > 64_000) return new Response(null, { status: 413 });

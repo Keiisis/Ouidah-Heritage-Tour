@@ -5,7 +5,7 @@ import { Fragment, useId, useRef, useState, useTransition, type FormEvent } from
 import { espace as T } from "@/content/espace";
 import { useMouvementReduit } from "@/lib/mouvement";
 import type { EtatCompte, Membre } from "@/lib/serveur/equipe/agents";
-import { ajouterAgent, changerAgent, type Retour } from "@/lib/serveur/equipe/gestion";
+import { ajouterAgent, changerAgent, changerRole, type Retour, supprimerAgent } from "@/lib/serveur/equipe/gestion";
 import { type ChampInvalide, type Langue, LANGUES, lireInvitation } from "@/lib/serveur/equipe/partage";
 import { Bloc, Vide } from "./Bloc";
 import { useMinute } from "./Cadre";
@@ -14,7 +14,8 @@ import { Picto } from "./Picto";
 import "./agents.css";
 
 // Écran Équipe (lot L3, maquette E ?ecran=equipe) : la liste réelle des comptes (compteurs qui filtrent par état, petite
-// course du soleil de chaque membre actif), le panneau « Ajouter un agent » et les actions de ligne. Les champs sont
+// course du soleil de chaque membre actif), le panneau « Ajouter un membre » et les actions de ligne (suspendre,
+// réactiver, réinviter, supprimer après confirmation dans la ligne, changer le rôle). Les champs sont
 // relus ici avec les règles partagées (partage.ts) puis par le serveur, qui seul décide. Après chaque action, le serveur
 // renvoie la liste à jour (refresh) : rien n'est inventé côté navigateur. Mouvement signature : la ligne de l'agent invité
 // arrive dans la liste (clip-path et transform) et les autres se replacent en FLIP (motion, layout) ; rien en mouvement
@@ -23,7 +24,7 @@ import "./agents.css";
 const E = T.equipe;
 const ETATS: EtatCompte[] = ["actif", "invite", "suspendu"];
 type Filtre = "tous" | EtatCompte;
-type Quoi = "suspendre" | "reactiver" | "reinviter";
+type Quoi = "suspendre" | "reactiver" | "reinviter" | "supprimer" | "role";
 type Echec = Exclude<Retour, { ok: true }>;
 const GLISSE = [0.625, 0.05, 0, 1] as const;
 
@@ -93,6 +94,7 @@ export function Equipe({ membres }: { membres: Membre[] }) {
   const titreId = useId();
   const [filtre, setFiltre] = useState<Filtre>("tous");
   const [occupe, setOccupe] = useState<string | null>(null);
+  const [aSupprimer, setASupprimer] = useState<string | null>(null); // ligne dont la suppression attend confirmation
   const [annonce, setAnnonce] = useState<{ texte: string; erreur: boolean } | null>(null);
   const [cle, setCle] = useState(0); // un formulaire neuf à chaque ouverture du panneau
   // seul le membre qui vient d'être invité joue l'arrivée ; un changement de filtre ne rejoue rien (lignes posées d'un coup)
@@ -137,12 +139,16 @@ export function Equipe({ membres }: { membres: Membre[] }) {
   const agir = (m: Membre, quoi: Quoi) => {
     if (occupe) return;
     setOccupe(`${m.id}:${quoi}`);
+    setASupprimer(null);
     const qui = `${m.prenom} ${m.nom}`;
+    const vers = m.role === "admin" ? "agent" : "admin";
     demarrer(async () => {
       try {
-        const r = await changerAgent(m.id, quoi);
-        if ("ok" in r) annoncer({ suspendre: E.annonces.suspendu, reactiver: E.annonces.reactive, reinviter: E.annonces.reinvite }[quoi](qui));
-        else annoncer(texteErreur(r), true);
+        const r = quoi === "supprimer" ? await supprimerAgent(m.id) : quoi === "role" ? await changerRole(m.id, vers) : await changerAgent(m.id, quoi);
+        if (!("ok" in r)) annoncer(texteErreur(r), true);
+        else if (quoi === "supprimer") annoncer(E.annonces.supprime(qui));
+        else if (quoi === "role") annoncer(E.annonces.role(qui, E.roles[vers]));
+        else annoncer({ suspendre: E.annonces.suspendu, reactiver: E.annonces.reactive, reinviter: E.annonces.reinvite }[quoi](qui));
       } catch {
         annoncer(E.erreurs.reseau, true);
       }
@@ -258,12 +264,27 @@ export function Equipe({ membres }: { membres: Membre[] }) {
                       <div className="actions-ligne">
                         {m.moi ? (
                           <span className="meta">{E.moi}</span>
-                        ) : m.etat === "suspendu" ? (
-                          action(m, "reactiver", E.reactiver)
+                        ) : aSupprimer === m.id ? (
+                          <>
+                            <span className="meta" role="alert">
+                              {E.confirmation(`${m.prenom} ${m.nom}`)}
+                            </span>
+                            {action(m, "supprimer", E.confirmer)}
+                            <button type="button" className="bouton-2 bouton-petit" onClick={() => setASupprimer(null)}>
+                              {E.garder}
+                            </button>
+                          </>
                         ) : (
                           <>
+                            {m.etat === "suspendu" && action(m, "reactiver", E.reactiver)}
                             {m.etat === "invite" && action(m, "reinviter", E.reinviter, "courrier")}
-                            {action(m, "suspendre", E.suspendre, "pause")}
+                            {m.etat !== "suspendu" && action(m, "suspendre", E.suspendre, "pause")}
+                            {action(m, "role", E.devenir[m.role === "admin" ? "agent" : "admin"])}
+                            {m.etat !== "actif" && (
+                              <button type="button" className="bouton-2 bouton-petit" data-act="demander-suppression" aria-label={E.actionDe(E.supprimer, `${m.prenom} ${m.nom}`)} disabled={Boolean(occupe)} onClick={() => setASupprimer(m.id)}>
+                                {E.supprimer}
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
@@ -306,7 +327,7 @@ const TEXTES: [ChampTexte, string, number, boolean][] = [
   ["telephone", "tel", 32, true],
 ];
 
-/** Panneau « Ajouter un agent ». La première langue de la liste envoyée sert aux e-mails du compte. */
+/** Panneau « Ajouter un membre ». La première langue de la liste envoyée sert aux e-mails du compte. */
 function Formulaire({ titreId, fermer, fini }: { titreId: string; fermer: () => void; fini: (qui: string, r: Retour) => void }) {
   const F = E.form;
   const id = useId();

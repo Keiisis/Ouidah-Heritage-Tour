@@ -1,4 +1,5 @@
 import { lireContenu } from "@/lib/contenu";
+import { chargerCles, cle } from "./cles";
 import { appel, json, libelle, lireJson, signatureHorodatee } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -7,7 +8,7 @@ import type { Constat, Passerelle } from "./types";
 // métadonnées = notre réservation, expiration 31 min. Relecture : GET /v1/checkout/sessions/{id} ; payé si
 // payment_status = paid. Webhook : en-tête Stripe-Signature « t=…,v1=… », HMAC-SHA256 de `${t}.${corps brut}` avec le
 // secret whsec_ du point de terminaison, seul le schéma v1 compte, 5 min de tolérance. Sans SDK (fetch seul).
-const env = () => ({ secrete: process.env.STRIPE_SECRET_KEY, webhook: process.env.STRIPE_WEBHOOK_SECRET });
+const env = () => ({ secrete: cle("stripe", "STRIPE_SECRET_KEY"), webhook: cle("stripe", "STRIPE_WEBHOOK_SECRET") });
 const auth = () => `Basic ${Buffer.from(`${env().secrete}:`).toString("base64")}`;
 const LOCALES: Record<string, string> = { FR: "fr", EN: "en", ES: "es", DE: "de", PT: "pt", HT: "fr", GCF: "fr" };
 
@@ -17,6 +18,7 @@ export const stripe: Passerelle = {
   nom: "stripe",
   disponible: () => Boolean(env().secrete && env().webhook),
   async lancer(r, retour) {
+    await chargerCles();
     const evenements = await lireContenu("fr.evenements");
     const succes = new URL(retour);
     succes.searchParams.set("session", "{CHECKOUT_SESSION_ID}");
@@ -42,6 +44,7 @@ export const stripe: Passerelle = {
   },
   async constater(transaction) {
     if (!transaction || !/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(transaction)) return null;
+    await chargerCles();
     const s = await json<Session>(await appel(`https://api.stripe.com/v1/checkout/sessions/${transaction}`, { headers: { authorization: auth() } }));
     if (!s?.id) return null;
     const etat: Constat["etat"] = s.payment_status === "paid" ? "reussi" : s.status === "expired" ? "echoue" : "en_cours";

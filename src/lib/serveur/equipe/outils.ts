@@ -11,7 +11,7 @@ export const SESSION_MAX_MS = 7 * 24 * 3600_000;
 export const JETON_CODE_MS = 10 * 60_000;
 
 export type RoleCompte = "agent" | "admin";
-export type Profil = { id: string; prenom: string; email: string; role: RoleCompte; etat: "invite" | "actif" | "suspendu"; langues: string[] };
+export type Profil = { id: string; prenom: string; email: string; role: RoleCompte; etat: "invite" | "actif" | "suspendu" | "supprime"; langues: string[] };
 
 const sel = () => process.env.EQUIPE_SEL ?? "";
 export const selConfigure = () => sel().length >= 32;

@@ -7,7 +7,7 @@ import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, msg, VARIABLES
 import { useMouvementReduit } from "@/lib/mouvement";
 import { enregistrerBrouillon, envoyerCourrier, envoyerTest, type RetourMessages } from "@/lib/serveur/equipe/messages/actions";
 import type { ClientCourrier, Envoi, Modele } from "@/lib/serveur/equipe/messages/lectures";
-import { estLangue, remplir, valeursDe } from "@/lib/serveur/equipe/messages/rendu";
+import { estLangue, lireAdresses, remplir, type Valeurs, valeursDe } from "@/lib/serveur/equipe/messages/rendu";
 import { Rediger } from "../assistant/Rediger";
 import { Bloc, Vide } from "../Bloc";
 import { useMinute } from "../Cadre";
@@ -18,10 +18,11 @@ import { Apercu, texteRefus, useAnnonce } from "./Apercu";
 // Rédiger un e-mail (maquette E ?ecran=courrier) : destinataire tiré des clients (l'agent : les siens ; l'admin : tous, ou
 // un groupe d'une même langue), modèle et langue du client, champs variables, devis lié, aperçu, brouillon, test à soi-même,
 // envoi. L'aperçu montre ce que le serveur enverra : même rendu (rendu.ts), mêmes valeurs ; le serveur les relit à l'envoi.
+// Mode « Une adresse » : adresse(s) tapée(s) à la main, sans fiche (agent : une ; admin : plusieurs), prénom facultatif.
 const C = msg.courrier;
-type Erreurs = Partial<Record<"dest" | "groupe" | "objet" | "langue" | "corps", string>>;
+type Erreurs = Partial<Record<"dest" | "groupe" | "adresses" | "prenom" | "objet" | "langue" | "corps", string>>;
 
-export function Courrier({ role, admin, clients, modeles, envois, moi, initial, redaction = false }: { role: Role; admin: boolean; clients: ClientCourrier[]; modeles: Modele[]; envois: Envoi[]; moi: { prenom: string; nom: string }; initial: { client: string | null; modele: string | null }; redaction?: boolean }) {
+export function Courrier({ role, admin, clients, modeles, envois, moi, initial, redaction = false }: { role: Role; admin: boolean; clients: ClientCourrier[]; modeles: Modele[]; envois: Envoi[]; moi: { prenom: string; nom: string }; initial: { client: string | null; modele: string | null; adresse?: string | null }; redaction?: boolean }) {
   const uid = useId();
   const reduit = useMouvementReduit();
   const minute = useMinute();
@@ -36,9 +37,11 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
   const modeleDepart = initial.modele && modeles.some((m) => m.cle === initial.modele) ? initial.modele : "libre";
   const t0 = depart && modeleDepart !== "libre" ? texteDe(modeleDepart, depart.langue) : null;
 
-  const [mode, setMode] = useState<"un" | "groupe">("un");
+  const [mode, setMode] = useState<"un" | "adresse" | "groupe">(initial.adresse && !depart ? "adresse" : "un");
   const [client, setClient] = useState(depart?.id ?? "");
   const [groupe, setGroupe] = useState<string[]>([]);
+  const [adresses, setAdresses] = useState(initial.adresse ?? "");
+  const [prenom, setPrenom] = useState("");
   const [langue, setLangue] = useState<LangueMsg | "">(depart?.langue ?? "");
   const [modele, setModele] = useState(modeleDepart);
   const [objet, setObjet] = useState(t0?.sujet ?? "");
@@ -49,10 +52,13 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
 
   const choisi = clients.find((c) => c.id === client) ?? null;
   const candidats = langue ? clients.filter((c) => c.langue === langue) : [];
-  const temoin = mode === "un" ? choisi : (clients.find((c) => c.id === groupe[0]) ?? null);
-  const vals = temoin ? valeursDe(temoin.faits, langue || temoin.langue) : {};
+  const temoin = mode === "un" ? choisi : mode === "groupe" ? (clients.find((c) => c.id === groupe[0]) ?? null) : null;
+  const maxAdresses = admin ? LIMITES_COURRIEL.adresses : 1;
+  const liste = mode === "adresse" ? (lireAdresses(adresses, maxAdresses) ?? []) : [];
+  // sans fiche client, seul le prénom saisi remplit un champ variable (comme au serveur)
+  const vals: Valeurs = mode === "adresse" ? { prenom: prenom.trim() || undefined } : temoin ? valeursDe(temoin.faits, langue || temoin.langue) : {};
   const sujetRempli = remplir(objet, vals), corpsRempli = remplir(corps, vals);
-  const manque = temoin ? [...new Set([...sujetRempli.manque, ...corpsRempli.manque])] : [];
+  const manque = temoin || liste.length ? [...new Set([...sujetRempli.manque, ...corpsRempli.manque])] : [];
 
   const appliquer = (cle: string, l: LangueMsg | "") => {
     if (cle === "libre" || !l) return;
@@ -91,18 +97,21 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
     });
   };
 
-  const verifier = () => {
+  /** `destRequis` faux (test à soi-même) : le destinataire peut manquer, mais une adresse tapée doit être valable. */
+  const verifier = (destRequis = true) => {
     const e: Erreurs = {};
-    if (mode === "un" && !client) e.dest = C.erreurs.dest;
-    if (mode === "groupe" && !groupe.length) e.groupe = C.erreurs.groupe;
+    if (destRequis && mode === "un" && !client) e.dest = C.erreurs.dest;
+    if (destRequis && mode === "groupe" && !groupe.length) e.groupe = C.erreurs.groupe;
+    if (mode === "adresse" && (destRequis || adresses.trim()) && !liste.length) e.adresses = C.erreurs.adresses;
+    if (mode === "adresse" && prenom.trim().length > LIMITES_COURRIEL.prenom) e.prenom = C.erreurs.prenom;
     if (!objet.trim()) e.objet = C.erreurs.objet;
     if (!langue) e.langue = C.erreurs.langue;
     setErreurs(e);
-    const premier = (["dest", "groupe", "langue", "objet"] as const).find((k) => e[k]);
+    const premier = (["dest", "groupe", "adresses", "prenom", "langue", "objet"] as const).find((k) => e[k]);
     if (premier) formulaire.current?.querySelector<HTMLElement>(`[data-champ="${premier}"]`)?.focus();
     return !premier;
   };
-  const saisie = () => ({ mode, client, clients: groupe, langue, modele, objet, corps, devis: mode === "un" && devis, brouillon });
+  const saisie = () => ({ mode, client, clients: groupe, adresses, prenom, langue, modele, objet, corps, devis: mode === "un" && devis, brouillon });
   const repondre = (r: RetourMessages, ok: () => void) => {
     if ("ok" in r) return ok();
     if (r.erreur === "champs") {
@@ -130,25 +139,28 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
     });
   };
   const tester = () => {
-    if (verifier()) lancer(() => envoyerTest(saisie()), (r) => annoncer(C.testEnvoye(r.a ?? "")));
+    if (verifier(false)) lancer(() => envoyerTest(saisie()), (r) => annoncer(C.testEnvoye(r.a ?? "")));
   };
   const envoyer = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (occupe || !verifier()) return;
-    const nom = choisi?.nom ?? "";
+    const nom = mode === "adresse" ? (liste[0] ?? "") : (choisi?.nom ?? "");
+    const seul = mode === "un" || (mode === "adresse" && liste.length === 1);
     lancer(() => envoyerCourrier(saisie()), (r) => {
-      annoncer(mode === "un" ? C.envoye(nom) : C.envoyes(r.envoyes ?? 0, r.echecs ?? 0));
+      annoncer(seul ? C.envoye(nom) : C.envoyes(r.envoyes ?? 0, r.echecs ?? 0));
       // signature : l'aperçu se replie comme une lettre glissée, puis le formulaire repart à vide
       const f = feuille.current;
       if (f && !reduit) f.animate([{ clipPath: "inset(0)", transform: "none", opacity: 1 }, { clipPath: "inset(0 0 100% 0)", transform: "translateY(-24px) scale(.96)", opacity: 0 }], { duration: 640, easing: "cubic-bezier(.4,0,1,1)" });
       setClient("");
       setGroupe([]);
+      setAdresses("");
+      setPrenom("");
       setObjet("");
       setCorps("");
       setDevis(false);
       setBrouillon(null);
       setModele("libre");
-      if (mode === "un") setLangue("");
+      if (mode !== "groupe") setLangue("");
     });
   };
   const reprendre = (x: Envoi) => {
@@ -166,7 +178,8 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
   };
 
   const pieces = mode === "un" && devis && choisi?.devis ? [C.pieceDevis(choisi.devis.numero)] : [];
-  const aEcrire = temoin ? `${temoin.nom} <${temoin.email}>` : "";
+  const aEcrire = mode === "adresse" ? liste.join(", ") : temoin ? `${temoin.nom} <${temoin.email}>` : "";
+  const modes = admin ? (["un", "adresse", "groupe"] as const) : (["un", "adresse"] as const);
 
   return (
     <div className="esp-grille esp-messages esp-courrier">
@@ -180,16 +193,30 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
             <b>{msg.expediteur}</b>
           </div>
           <div className="champs">
-            {admin && (
-              <div className="champ large">
-                <div className="bascule" role="group" aria-label={C.a}>
-                  {(["un", "groupe"] as const).map((m) => (
-                    <button key={m} type="button" aria-pressed={mode === m} data-mode={m} onClick={() => { setMode(m); setBrouillon(null); setErreurs({}); }}>
-                      {C.mode[m]}
-                    </button>
-                  ))}
-                </div>
+            <div className="champ large">
+              <div className="bascule" role="group" aria-label={C.a}>
+                {modes.map((m) => (
+                  <button key={m} type="button" aria-pressed={mode === m} data-mode={m} onClick={() => { setMode(m); setBrouillon(null); setErreurs({}); }}>
+                    {C.mode[m]}
+                  </button>
+                ))}
               </div>
+            </div>
+            {mode === "adresse" && (
+              <>
+                <div className="champ large">
+                  <label htmlFor={`${uid}-adresses`}>{C.adresses}</label>
+                  <input type="text" inputMode="email" id={`${uid}-adresses`} name="adresses" data-champ="adresses" autoComplete="off" spellCheck={false} maxLength={260 * maxAdresses} value={adresses} required aria-invalid={Boolean(erreurs.adresses)} aria-describedby={`${uid}-aadresses ${uid}-eadresses`} onChange={(e) => setAdresses(e.target.value)} />
+                  <span className="aide" id={`${uid}-aadresses`}>{C.adressesAide(maxAdresses)}</span>
+                  <span className="erreur" id={`${uid}-eadresses`}>{erreurs.adresses}</span>
+                </div>
+                <div className="champ">
+                  <label htmlFor={`${uid}-prenom`}>{C.prenom}</label>
+                  <input type="text" id={`${uid}-prenom`} name="prenom" data-champ="prenom" autoComplete="off" maxLength={LIMITES_COURRIEL.prenom} value={prenom} aria-invalid={Boolean(erreurs.prenom)} aria-describedby={`${uid}-aprenom ${uid}-eprenom`} onChange={(e) => setPrenom(e.target.value)} />
+                  <span className="aide" id={`${uid}-aprenom`}>{C.prenomAide}</span>
+                  <span className="erreur" id={`${uid}-eprenom`}>{erreurs.prenom}</span>
+                </div>
+              </>
             )}
             {mode === "un" ? (
               <div className="champ large">

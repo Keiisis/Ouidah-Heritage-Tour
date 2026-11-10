@@ -40,11 +40,12 @@ export type Constat = {
 
 export type Passerelle = {
   nom: NomPasserelle;
-  disponible: () => boolean; // clés présentes dans l'environnement
+  disponible: () => boolean; // clés présentes (cles.ts : chargerCles() attendu avant)
   // transaction : identifiant créé chez la passerelle dès le lancement (s'il existe), noté sur la réservation
   lancer: (r: Reservation, retour: string) => Promise<{ lancement: Lancement; transaction: string | null } | null>;
   // relit une transaction ; sans identifiant connu, la passerelle peut chercher par notre référence (réservation)
   constater: (transaction: string | null, r?: Reservation) => Promise<Constat | null>;
   // corps brut + en-têtes : null si l'authentification échoue ; « ignorer » pour un événement authentique mais sans objet
+  // secret lu par cles.ts : chargerCles() attendu avant
   lireWebhook: (brut: string, entetes: Headers) => { transaction: string } | "ignorer" | null;
 };

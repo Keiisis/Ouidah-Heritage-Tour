@@ -231,7 +231,7 @@ export async function lireClients(s: Session): Promise<FicheClient[] | null> {
   // adresses citées entre guillemets doubles dans le filtre in.() (PostgREST) ; une adresse avec un guillemet est écartée
   const filtre = voitTout(s) ? "" : `&email=in.(${emails.filter((e) => !/["\\]/.test(e)).map((e) => `"${encodeURIComponent(e)}"`).join(",")})`;
   const clients = await lire<BrutClient>(`clients?select=id,nom,email,pays,langue,telephone,notes${filtre}&order=nom.asc&limit=2000`);
-  return clients ? clients.map((c) => ({ ...c, dossiers: parEmail.get(c.email) ?? [] })) : null;
+  return clients ? clients.map((c) => ({ ...c, dossiers: parEmail.get(c.email.toLowerCase()) ?? [] })) : null;
 }
 
 /** Une fiche client si cette session y a droit (admin : toutes ; agent : celles de ses dossiers), sinon notFound(). */

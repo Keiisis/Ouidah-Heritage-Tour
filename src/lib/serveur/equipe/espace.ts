@@ -4,6 +4,7 @@ import { espace as T, type Mode } from "@/content/espace";
 import { iso, jourOuidah, prochaine } from "@/lib/jours";
 import { base } from "../base";
 import { passerelle } from "../paiement";
+import { chargerCles } from "../paiement/cles";
 import { PASSERELLES, type NomPasserelle } from "../paiement/types";
 import { momentsDuJour, type MomentJour } from "./dossiers";
 import { exigerDroit } from "./securite/droits";
@@ -163,6 +164,7 @@ export async function donneesAdmin(): Promise<DonneesAdmin | null> {
     momentsDuJour(s, ms, true),
     lireContenu("fr.evenements"),
     calculerMois(moisCourant(ms)),
+    chargerCles(),
   ]);
 
   const type = (intention: string) => T.admin.demandes.types[intention] ?? intention;

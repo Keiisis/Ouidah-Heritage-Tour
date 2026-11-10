@@ -1,3 +1,4 @@
+import { chargerCles, cle } from "./cles";
 import { appel, egal, hmac, json, lireJson } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -7,7 +8,7 @@ import type { Constat, Passerelle } from "./types";
 // Webhook : en-tête x-paystack-signature = HMAC-SHA512 hex du corps brut avec la clé secrète, comparé à temps constant.
 // Comptes marchands : Nigeria, Ghana, Kenya, Afrique du Sud, Côte d'Ivoire (pas le Bénin) : à activer seulement si OHT
 // dispose d'un compte.
-const env = () => ({ secrete: process.env.PAYSTACK_SECRET_KEY });
+const env = () => ({ secrete: cle("paystack", "PAYSTACK_SECRET_KEY") });
 const API = "https://api.paystack.co";
 const entetes = () => ({ authorization: `Bearer ${env().secrete}`, "content-type": "application/json" });
 const SOUS_UNITES = 100;
@@ -18,6 +19,7 @@ export const paystack: Passerelle = {
   nom: "paystack",
   disponible: () => Boolean(env().secrete),
   async lancer(r, retour) {
+    await chargerCles();
     const p = await json<{ status?: boolean; data?: { authorization_url?: string; reference?: string } }>(await appel(`${API}/transaction/initialize`, {
       method: "POST",
       headers: entetes(),
@@ -29,6 +31,7 @@ export const paystack: Passerelle = {
   async constater(transaction, r) {
     const reference = transaction ?? r?.id ?? null;
     if (!reference || !/^[A-Za-z0-9.=-]{1,100}$/.test(reference)) return null;
+    await chargerCles();
     const v = await json<{ status?: boolean; data?: Donnees }>(await appel(`${API}/transaction/verify/${encodeURIComponent(reference)}`, { headers: entetes() }));
     const d = v?.status ? v.data : null;
     if (!d?.status) return null;

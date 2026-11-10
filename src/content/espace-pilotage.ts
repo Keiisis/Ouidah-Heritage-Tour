@@ -292,6 +292,8 @@ export const pilotage = {
     "equipe.reactivation": "Compte réactivé",
     "equipe.reinvitation": "Invitation renvoyée",
     "equipe.refus": "Action d’équipe refusée",
+    "equipe.suppression": "Compte supprimé",
+    "equipe.role": "Rôle changé",
     "dossier.attribution": "Dossier attribué",
     "dossier.etape": "Étape d’un dossier changée",
     "dossier.note": "Note de dossier",

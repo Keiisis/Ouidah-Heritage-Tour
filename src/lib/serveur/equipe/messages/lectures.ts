@@ -6,8 +6,9 @@ import { base } from "../../base";
 import { jetonSuivi } from "../../documents/jeton";
 import { type FicheClient, lireClients } from "../dossiers";
 import type { Session } from "../session";
+import { defautAuto } from "./auto";
 import { origine } from "./envoi";
-import { AUTO_CLES, estAuto, type Faits } from "./rendu";
+import { AUTO_CLES, autoConnue, estAuto, type Faits } from "./rendu";
 
 // Lectures du lot « messages », par le serveur seulement avec la clé secrète (elle contourne RLS : le cloisonnement tient
 // ICI). Un agent ne lit que les clients de ses dossiers (lireClients, lot L4), ses propres e-mails, les questions de ses
@@ -46,7 +47,7 @@ async function faitsDes(s: Session, fiches: FicheClient[]): Promise<ClientCourri
   const numero = new Map(numeros.map((n) => [n.source_id, n.numero]));
   const o = await origine();
   return fiches.map((c) => {
-    const liste = parEmail.get(c.email) ?? [];
+    const liste = parEmail.get(c.email.toLowerCase()) ?? [];
     // UN seul dossier donne tous les faits (dates, référence, lien, devis), jamais un mélange de deux : le plus récent qui
     // a des dates de séjour, sinon le plus récent (une question posée après coup n'efface pas le voyage préparé)
     const d = liste.find((x) => Number.isInteger(x.sejour?.arrivee) && Number.isInteger(x.sejour?.depart)) ?? liste[0];
@@ -113,18 +114,18 @@ export async function envoisRecents(s: Session): Promise<Envoi[] | null> {
 
 // ---------- modèles ----------
 
-export type TexteModele = { sujet: string; corps: string; source: "base" | "depart" };
-export type Modele = { cle: string; nom: string; depart: boolean; auto: boolean; textes: Partial<Record<LangueMsg, TexteModele>> };
+export type TexteModele = { sujet: string; corps: string; source: "base" | "depart" | "defaut" };
+/** `defauts` : textes par défaut du site d'un e-mail automatique (repris quand l'admin retire son texte). */
+export type Modele = { cle: string; nom: string; depart: boolean; auto: boolean; textes: Partial<Record<LangueMsg, TexteModele>>; defauts?: Partial<Record<LangueMsg, { sujet: string; corps: string }>> };
+type LigneModele = { cle: string; langue: LangueMsg; sujet: string; corps: string };
 
 /**
- * Modèles lus en base, en deux groupes. `equipe` : ceux du composeur (textes enregistrés par un admin, sinon les textes de
- * départ de content/espace-messages.ts) ; aucune clé « auto-… » n'y entre. `auto` : les clés réservées aux e-mails
- * automatiques du site (AUTO_CLES, session oht-ce), toujours listées ; une langue sans texte en base garde le texte par
- * défaut du site. Une autre clé « auto-… » trouvée en base n'est montrée nulle part.
+ * Modèles en deux groupes, d'après les lignes lues en base. `equipe` : ceux du composeur (textes enregistrés par un admin,
+ * sinon les textes de départ de content/espace-messages.ts) ; aucune clé « auto-… » n'y entre. `auto` : les clés réservées
+ * aux e-mails automatiques du site (AUTO_CLES), toujours listées ; une langue sans texte en base montre le texte par défaut
+ * que le site envoie (auto.ts, source « defaut »). Une autre clé « auto-… » trouvée en base n'est montrée nulle part.
  */
-export async function lireModeles(): Promise<{ equipe: Modele[]; auto: Modele[] } | null> {
-  const l = await lire<{ cle: string; langue: LangueMsg; sujet: string; corps: string }>("modeles_courriels?select=cle,langue,sujet,corps&order=cle.asc&limit=1000");
-  if (!l) return null;
+function grouper(l: LigneModele[]): { equipe: Modele[]; auto: Modele[] } {
   const textes = (cle: string) => {
     const d = MODELES_DEPART[cle as keyof typeof MODELES_DEPART];
     const t: Modele["textes"] = {};
@@ -132,15 +133,25 @@ export async function lireModeles(): Promise<{ equipe: Modele[]; auto: Modele[] 
       const b = l.find((x) => x.cle === cle && x.langue === langue);
       if (b) t[langue] = { sujet: b.sujet, corps: b.corps, source: "base" };
       else if (d) t[langue] = { sujet: d.sujet[langue], corps: d.corps[langue], source: "depart" };
+      else if (autoConnue(cle)) t[langue] = { ...defautAuto(cle, langue), source: "defaut" };
     }
     return t;
   };
   const cles = [...new Set([...CLES_DEPART, ...l.map((x) => x.cle)])].filter((c) => !estAuto(c));
   return {
     equipe: cles.map((cle) => ({ cle, nom: MODELES_DEPART[cle as keyof typeof MODELES_DEPART]?.nom ?? cle, depart: cle in MODELES_DEPART, auto: false, textes: textes(cle) })),
-    auto: AUTO_CLES.map((cle) => ({ cle, nom: msg.modeles.autoNoms[cle], depart: false, auto: true, textes: textes(cle) })),
+    auto: AUTO_CLES.map((cle) => ({ cle, nom: msg.modeles.autoNoms[cle], depart: false, auto: true, textes: textes(cle), defauts: Object.fromEntries(LANGUES_MSG.map((g) => [g, defautAuto(cle, g)])) })),
   };
 }
+
+/** Modèles lus en base ; null = la base ne répond pas (l'écran se replie alors sur modelesDeDepart). */
+export async function lireModeles(): Promise<{ equipe: Modele[]; auto: Modele[] } | null> {
+  const l = await lire<LigneModele>("modeles_courriels?select=cle,langue,sujet,corps&order=cle.asc&limit=1000");
+  return l ? grouper(l) : null;
+}
+
+/** Les mêmes groupes sans aucune ligne en base : textes de départ et textes par défaut du site. */
+export const modelesDeDepart = () => grouper([]);
 
 // ---------- boîte de réception (source 1 : questions posées sur le site) ----------
 
@@ -153,7 +164,7 @@ export async function lireBoite(s: Session): Promise<Message[] | null> {
   const emails = [...new Set(q.flatMap((x) => (x.email && !/["\\]/.test(x.email) ? [x.email.toLowerCase()] : [])))];
   const fiches = emails.length ? await lire<{ id: string; email: string }>(`clients?select=id,email&email=in.(${emails.map((e) => `"${encodeURIComponent(e)}"`).join(",")})&limit=500`) : [];
   if (!fiches) return null;
-  const fiche = new Map(fiches.map((f) => [f.email, f.id]));
+  const fiche = new Map(fiches.map((f) => [f.email.toLowerCase(), f.id]));
   return q.map((x) => ({
     id: x.id,
     recu: x.cree_le,

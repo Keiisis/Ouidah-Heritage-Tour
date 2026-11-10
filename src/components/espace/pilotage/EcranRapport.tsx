@@ -70,7 +70,7 @@ export async function EcranRapport() {
                   </p>
                 )}
                 <p className="mention">{X.rapport.auto}</p>
-                {reglages && <ReglageTache nom="rapport_actif" actif={reglages.rapport_actif} libelle={X.rapport.activer} />}
+                {reglages ? <ReglageTache nom="rapport_actif" actif={reglages.rapport_actif} libelle={X.rapport.activer} /> : <p className="aide" data-reglage="indisponible">{T.vides.indisponible}</p>}
                 <h3>{X.rapport.historique}</h3>
                 {envois?.length ? <ul>{envois.map((e) => <li key={e.id}>{e.destinataire} : {X.rapport.etats[e.etat]}</li>)}</ul> : <p className="aide">{envois ? X.rapport.jamais : T.vides.indisponible}</p>}
               </Bloc>

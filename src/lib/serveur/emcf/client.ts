@@ -1,4 +1,5 @@
 import "server-only";
+import { chargerCles, cle } from "../paiement/cles";
 
 // Contrat DGI : https://developper.impots.bj/sygmef-emcf/swagger/v1/swagger.json
 // Aucun SDK tiers ni nouvelle tentative implicite sur les écritures fiscales.
@@ -63,11 +64,13 @@ export class ErreurEmcf extends Error {
   }
 }
 
+// Jeton et environnement : saisis dans l'admin (/admins/emcf, chiffrés en base), sinon variables du serveur (cles.ts).
+// EMCF_PRODUCTION_AUTORISEE reste une variable du serveur seulement : la production ne s'ouvre jamais depuis l'admin.
 export function lireConfigurationEmcf() {
-  const valeur = process.env.EMCF_ENVIRONNEMENT?.trim() || "test";
+  const valeur = cle("emcf", "EMCF_ENVIRONNEMENT")?.trim() || "test";
   const environnement: EnvironnementEmcf = valeur === "production" ? "production" : "test";
   const valide = valeur === "test" || valeur === "production";
-  const jeton = process.env.EMCF_JETON?.trim();
+  const jeton = cle("emcf", "EMCF_JETON")?.trim();
   const productionAutorisee = process.env.EMCF_PRODUCTION_AUTORISEE === "1";
   return {
     environnement,
@@ -75,6 +78,12 @@ export function lireConfigurationEmcf() {
     configure: Boolean(valide && jeton && !/[\r\n]/.test(jeton) && (environnement === "test" || productionAutorisee)),
     productionAutorisee,
   };
+}
+
+/** Configuration après relecture des valeurs saisies dans l'admin (au plus toutes les 60 s). */
+export async function configurationEmcf() {
+  await chargerCles();
+  return lireConfigurationEmcf();
 }
 
 function objet(v: unknown): v is Record<string, unknown> { return Boolean(v && typeof v === "object" && !Array.isArray(v)); }
@@ -115,7 +124,7 @@ function listeAttente(v: unknown) {
 }
 
 async function requete<T>(chemin: string, methode: "GET" | "POST" | "PUT", valide: (v: unknown) => boolean, corps?: DemandeFactureEmcf): Promise<T> {
-  const configuration = lireConfigurationEmcf();
+  const configuration = await configurationEmcf();
   if (!configuration.configure) throw new ErreurEmcf("configuration");
   const mutation = methode !== "GET";
   let reponse: Response;
@@ -123,7 +132,7 @@ async function requete<T>(chemin: string, methode: "GET" | "POST" | "PUT", valid
   try {
     reponse = await fetch(`${configuration.origine}/api/${chemin}`, {
       method: methode, cache: "no-store", redirect: "error", signal: AbortSignal.timeout(15000),
-      headers: { Authorization: `Bearer ${process.env.EMCF_JETON!.trim()}`, Accept: "application/json", ...(corps ? { "Content-Type": "application/json" } : {}) },
+      headers: { Authorization: `Bearer ${cle("emcf", "EMCF_JETON")!.trim()}`, Accept: "application/json", ...(corps ? { "Content-Type": "application/json" } : {}) },
       ...(corps ? { body: JSON.stringify(corps) } : {}),
     });
     if (!reponse.ok) throw new ErreurEmcf("http", mutation && reponse.status >= 500, reponse.status);

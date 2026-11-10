@@ -6,14 +6,16 @@ import { lireContenu } from "@/lib/contenu";
 import { base } from "../../base";
 import { courrielConfigure } from "../../courriel";
 import { passerelle } from "../../paiement";
+import { chargerCles, cle, etatCles, saisiePossible, sourceCle, type SourceCle } from "../../paiement/cles";
 import { PASSERELLES, type NomPasserelle } from "../../paiement/types";
 import { exigerRole, type Session } from "../session";
-import { cleAssistant, cleEmcf } from "./public";
+import { cleAssistant } from "./public";
 import { depuisBytea, type Mentions, type Textes, type ThemeProfil, vcard } from "./regles";
 
 // Lectures du lot « reglages », par le serveur seulement avec la clé secrète (elle contourne RLS : le contrôle tient ICI).
 // Chaque lecture relit la session et le rôle : les réglages sont réservés aux admins, le profil et la carte ne lisent que
-// le compte connecté. Les clés et mots de passe ne sont jamais lus que pour savoir s'ils existent (Boolean). Aucun
+// le compte connecté. Les clés et mots de passe ne sont jamais lus que pour savoir s'ils existent (Boolean, ou leur source
+// « admin » / « vercel » pour les clés des passerelles et le jeton e-MECeF, paiement/cles.ts). Aucun
 // « use cache » : tout est lu à la requête. Une lecture qui échoue rend null (« données indisponibles »).
 
 async function lire<L>(chemin: string): Promise<L[] | null> {
@@ -33,28 +35,37 @@ const admin = async () => {
 
 // ---------- passerelles ----------
 
-export type LignePasserelle = { nom: NomPasserelle; active: boolean; ordre: number; cles: boolean; test: boolean | null; modifie_le: string };
+export type EtatCle = { champ: string; source: SourceCle };
+export type LignePasserelle = { nom: NomPasserelle; active: boolean; ordre: number; cles: boolean; champs: EtatCle[]; test: boolean | null; modifie_le: string };
 
-/** Les 5 passerelles dans l'ordre choisi, avec l'état de leurs clés (présentes ou non, jamais leur valeur). Mode test
- * connu seulement là où une variable non secrète le dit (KKIAPAY_SANDBOX, FEDAPAY_SANDBOX). */
+/** Les 5 passerelles dans l'ordre choisi, avec l'état de leurs clés (champ par champ : saisie ici, variable du serveur ou
+ * manquante ; jamais leur valeur). Mode test : réglage sandbox (KkiaPay, FedaPay) ou préfixe sk_test_ (Stripe, Paystack),
+ * rendu en booléen seulement. */
 export async function lirePasserelles(): Promise<LignePasserelle[] | null> {
   if (!(await admin())) return null;
-  const l = await lire<{ nom: string; active: boolean; ordre: number; modifie_le: string }>("passerelles_paiement?select=nom,active,ordre,modifie_le&order=ordre.asc,nom.asc");
+  const [l] = await Promise.all([lire<{ nom: string; active: boolean; ordre: number; modifie_le: string }>("passerelles_paiement?select=nom,active,ordre,modifie_le&order=ordre.asc,nom.asc"), chargerCles(true)]);
   if (!l) return null;
-  const test: Partial<Record<NomPasserelle, boolean>> = { kkiapay: process.env.KKIAPAY_SANDBOX === "true", fedapay: process.env.FEDAPAY_SANDBOX === "true" };
-  return l.filter((x): x is typeof x & { nom: NomPasserelle } => (PASSERELLES as readonly string[]).includes(x.nom)).map((x) => ({ ...x, cles: passerelle(x.nom).disponible(), test: test[x.nom] ?? null }));
+  const testCle = (v: string | undefined) => (v ? v.trim().startsWith("sk_test_") : null);
+  const test: Partial<Record<NomPasserelle, boolean | null>> = {
+    kkiapay: cle("kkiapay", "KKIAPAY_SANDBOX") === "true",
+    fedapay: cle("fedapay", "FEDAPAY_SANDBOX") === "true",
+    stripe: testCle(cle("stripe", "STRIPE_SECRET_KEY")),
+    paystack: testCle(cle("paystack", "PAYSTACK_SECRET_KEY")),
+  };
+  return l.filter((x): x is typeof x & { nom: NomPasserelle } => (PASSERELLES as readonly string[]).includes(x.nom)).map((x) => ({ ...x, cles: passerelle(x.nom).disponible(), champs: etatCles(x.nom), test: test[x.nom] ?? null }));
 }
 
 // ---------- réglages généraux (taux, e-MECeF, assistant) ----------
 
-export type Site = { taux: number; tauxUsd: number | null; tauxUsdLe: string | null; emcfActif: boolean; nim: string | null; jetonEmcf: boolean; assistantActif: boolean; cleAssistant: boolean; modifie_le: string; par: string | null };
+export type Site = { taux: number; tauxUsd: number | null; tauxUsdLe: string | null; emcfActif: boolean; nim: string | null; jetonEmcf: boolean; emcfCles: EtatCle[]; saisieCles: boolean; assistantActif: boolean; cleAssistant: boolean; modifie_le: string; par: string | null };
 
 export async function lireSite(): Promise<Site | null> {
   if (!(await admin())) return null;
+  await chargerCles(true);
   const l = await lire<{ taux_eur: string | number; taux_usd: string | number | null; taux_usd_le: string | null; emcf_actif: boolean; emcf_nim: string | null; assistant_actif: boolean; modifie_le: string; par: Par }>("reglages_site?select=taux_eur,taux_usd,taux_usd_le,emcf_actif,emcf_nim,assistant_actif,modifie_le,par:equipe_profils(prenom,nom)&limit=1");
   const x = l?.[0];
   if (!x) return null;
-  return { taux: Number(x.taux_eur), tauxUsd: x.taux_usd === null ? null : Number(x.taux_usd), tauxUsdLe: x.taux_usd_le, emcfActif: x.emcf_actif, nim: x.emcf_nim, jetonEmcf: cleEmcf(), assistantActif: x.assistant_actif, cleAssistant: cleAssistant(), modifie_le: x.modifie_le, par: nomDe(x.par) };
+  return { taux: Number(x.taux_eur), tauxUsd: x.taux_usd === null ? null : Number(x.taux_usd), tauxUsdLe: x.taux_usd_le, emcfActif: x.emcf_actif, nim: x.emcf_nim, jetonEmcf: sourceCle("emcf", "EMCF_JETON") !== null, emcfCles: etatCles("emcf"), saisieCles: saisiePossible(), assistantActif: x.assistant_actif, cleAssistant: cleAssistant(), modifie_le: x.modifie_le, par: nomDe(x.par) };
 }
 
 // ---------- e-mail d'envoi ----------

@@ -1,4 +1,5 @@
 import { lireContenu } from "@/lib/contenu";
+import { chargerCles, cle } from "./cles";
 import { appel, json, libelle, lireJson, prenomNom, signatureHorodatee } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -7,7 +8,7 @@ import type { Constat, Passerelle } from "./types";
 // paiement hébergé (POST /v1/transactions/{id}/token). Relecture : GET /v1/transactions/{id} ; succès = approved ou
 // transferred (declined et canceled ne sont pas définitifs). Webhook : en-tête X-FEDAPAY-SIGNATURE « t=…,s=… »,
 // HMAC-SHA256 hex de `${t}.${corps brut}` avec le secret du point de terminaison, 5 min de tolérance.
-const env = () => ({ secrete: process.env.FEDAPAY_SECRET_KEY, webhook: process.env.FEDAPAY_WEBHOOK_SECRET, sandbox: process.env.FEDAPAY_SANDBOX === "true" });
+const env = () => ({ secrete: cle("fedapay", "FEDAPAY_SECRET_KEY"), webhook: cle("fedapay", "FEDAPAY_WEBHOOK_SECRET"), sandbox: cle("fedapay", "FEDAPAY_SANDBOX") === "true" });
 const api = () => (env().sandbox ? "https://sandbox-api.fedapay.com/v1" : "https://api.fedapay.com/v1");
 const entetes = () => ({ authorization: `Bearer ${env().secrete}`, "content-type": "application/json" });
 
@@ -30,6 +31,7 @@ export const fedapay: Passerelle = {
   nom: "fedapay",
   disponible: () => Boolean(env().secrete && env().webhook),
   async lancer(r, retour) {
+    await chargerCles();
     const evenements = await lireContenu("fr.evenements");
     const { prenom, nom } = prenomNom(r.nom);
     const t = transactionDe(await json(await appel(`${api()}/transactions`, {
@@ -44,6 +46,7 @@ export const fedapay: Passerelle = {
   },
   async constater(transaction) {
     if (!transaction || !/^\d{1,20}$/.test(transaction)) return null;
+    await chargerCles();
     const t = transactionDe(await json(await appel(`${api()}/transactions/${transaction}`, { headers: entetes() })));
     if (!t?.status) return null;
     const etat: Constat["etat"] = t.status === "approved" || t.status === "transferred" ? "reussi" : t.status === "refunded" ? "rembourse" : t.status === "expired" ? "echoue" : "en_cours";

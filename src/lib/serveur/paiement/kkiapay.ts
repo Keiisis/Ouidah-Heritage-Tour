@@ -1,3 +1,4 @@
+import { chargerCles, cle } from "./cles";
 import { appel, egal, json, lireJson } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -7,11 +8,11 @@ import type { Constat, Passerelle } from "./types";
 // devise. Webhook : en-tête x-kkiapay-secret = « secret hash » choisi dans le tableau de bord, comparé à temps constant
 // (la doc ne publie ni algorithme ni signature du corps : la transaction est toujours relue). À contrôler au premier test.
 const env = () => ({
-  publique: process.env.KKIAPAY_PUBLIC_KEY,
-  privee: process.env.KKIAPAY_PRIVATE_KEY,
-  secrete: process.env.KKIAPAY_SECRET_KEY,
-  webhook: process.env.KKIAPAY_WEBHOOK_SECRET,
-  sandbox: process.env.KKIAPAY_SANDBOX === "true",
+  publique: cle("kkiapay", "KKIAPAY_PUBLIC_KEY"),
+  privee: cle("kkiapay", "KKIAPAY_PRIVATE_KEY"),
+  secrete: cle("kkiapay", "KKIAPAY_SECRET_KEY"),
+  webhook: cle("kkiapay", "KKIAPAY_WEBHOOK_SECRET"),
+  sandbox: cle("kkiapay", "KKIAPAY_SANDBOX") === "true",
 });
 const api = () => (env().sandbox ? "https://api-sandbox.kkiapay.me" : "https://api.kkiapay.me");
 
@@ -25,6 +26,7 @@ export const kkiapay: Passerelle = {
     return Boolean(e.publique && e.privee && e.secrete && e.webhook);
   },
   async lancer(r, retour) {
+    await chargerCles();
     const e = env();
     return {
       transaction: null, // l'identifiant n'existe qu'après le paiement, rendu par le widget ou le webhook
@@ -36,6 +38,7 @@ export const kkiapay: Passerelle = {
   },
   async constater(transaction) {
     if (!transaction) return null;
+    await chargerCles();
     const e = env();
     const s = await json<Statut>(await appel(`${api()}/api/v1/transactions/status`, { method: "POST", headers: { "x-api-key": e.publique!, "x-private-key": e.privee!, "x-secret-key": e.secrete!, "content-type": "application/json" }, body: JSON.stringify({ transactionId: transaction }) }));
     if (!s?.status) return null;

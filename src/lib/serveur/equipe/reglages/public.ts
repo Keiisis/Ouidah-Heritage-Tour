@@ -9,8 +9,6 @@ import type { Textes } from "./regles";
 
 /** Au moins une clé Groq posée sur le serveur (GROQ_API_KEYS, clés séparées par des virgules ; présence seulement). */
 export const cleAssistant = () => (process.env.GROQ_API_KEYS ?? "").split(",").some((k) => k.trim().length > 0);
-/** Jeton de l'API e-MECeF de la DGI posé sur le serveur (présence seulement). */
-export const cleEmcf = () => Boolean(process.env.EMCF_JETON);
 
 export type TauxPublics = { eur: number; usd: number | null; usdLe: string | null; usdSource: SourceTaux | null; ancien: boolean };
 let memoTaux: { t: number; v: TauxPublics } | null = null;

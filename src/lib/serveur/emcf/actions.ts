@@ -7,7 +7,7 @@ import { exigerRole, type Session } from "../equipe/session";
 import { journaliser } from "../equipe/journal";
 import { factureAccessible } from "../equipe/finances/lectures";
 import { UUID } from "../equipe/finances/regles";
-import { ErreurEmcf, annulerFactureEmcf, confirmerFactureEmcf, lireConfigurationEmcf, lireFactureEmcf, lireGroupesTaxesEmcf, lireStatutEmcf, soumettreFactureEmcf, type GroupeTaxeEmcf, type TypePaiementEmcf } from "./client";
+import { ErreurEmcf, annulerFactureEmcf, configurationEmcf, confirmerFactureEmcf, lireFactureEmcf, lireGroupesTaxesEmcf, lireStatutEmcf, soumettreFactureEmcf, type GroupeTaxeEmcf, type TypePaiementEmcf } from "./client";
 import { creerOperation, enregistrerResultat, lireOperation, lireOperationDocument, prendreOperation, type OperationEmcf } from "./operations";
 import { demandeDepuisFacture, memeDemande } from "./regles";
 
@@ -37,7 +37,7 @@ async function compteConforme(ifu: string, nim: string) {
 
 export async function verifierConnexionEmcf(): Promise<RetourEmcf> {
   if (!await admin()) return { erreur: "refuse" };
-  if (!lireConfigurationEmcf().configure) return { erreur: "configuration" };
+  if (!(await configurationEmcf()).configure) return { erreur: "configuration" };
   try {
     const i = await identite(); if (!i) return { erreur: "identite" };
     const [s, groupes] = await Promise.all([compteConforme(i.ifu, i.nim), lireGroupesTaxesEmcf()]);
@@ -52,7 +52,7 @@ async function tracer(s: Session, op: OperationEmcf, etape: string) {
 /** Prépare une demande DGI depuis une facture figée ; jamais un prix fourni par le navigateur. */
 export async function preparerFactureEmcf(brut: unknown): Promise<RetourEmcf> {
   const s = await admin(); if (!s) return { erreur: "refuse" };
-  const conf = lireConfigurationEmcf(); if (!conf.configure) return { erreur: "configuration" };
+  const conf = await configurationEmcf(); if (!conf.configure) return { erreur: "configuration" };
   const v = objet(brut), factureId = texte(v.facture), avoirId = texte(v.avoir);
   if (!factureId || !UUID.test(factureId) || avoirId && !UUID.test(avoirId)) return { erreur: "saisie" };
   try {
@@ -85,7 +85,7 @@ export async function preparerFactureEmcf(brut: unknown): Promise<RetourEmcf> {
 /** L'action explicite réserve la mutation en base avant l'appel. Un état réservé n'est jamais rejoué. */
 export async function executerOperationEmcf(id: unknown, action: unknown): Promise<RetourEmcf> {
   const s = await admin(); if (!s) return { erreur: "refuse" };
-  const conf = lireConfigurationEmcf(); if (!conf.configure) return { erreur: "configuration" };
+  const conf = await configurationEmcf(); if (!conf.configure) return { erreur: "configuration" };
   if (typeof id !== "string" || !UUID.test(id) || !["envoyer", "confirmer", "annuler"].includes(String(action))) return { erreur: "saisie" };
   const commande = action as "envoyer" | "confirmer" | "annuler";
   const enCours = commande === "envoyer" ? "envoi" : commande === "confirmer" ? "confirmation" : "annulation";

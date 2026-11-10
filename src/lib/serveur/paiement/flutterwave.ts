@@ -1,4 +1,5 @@
 import { lireContenu } from "@/lib/contenu";
+import { chargerCles, cle } from "./cles";
 import { appel, egal, json, libelle, lireJson } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -8,7 +9,7 @@ import type { Constat, Passerelle } from "./types";
 // ou par notre référence (GET /v3/transactions/verify_by_reference?tx_ref=…) ; succès = status « successful ».
 // Webhook v3 : en-tête verif-hash = « secret hash » choisi dans le tableau de bord (pas une signature), comparé à temps
 // constant ; la transaction est toujours relue.
-const env = () => ({ secrete: process.env.FLUTTERWAVE_SECRET_KEY, hash: process.env.FLUTTERWAVE_SECRET_HASH });
+const env = () => ({ secrete: cle("flutterwave", "FLUTTERWAVE_SECRET_KEY"), hash: cle("flutterwave", "FLUTTERWAVE_SECRET_HASH") });
 const API = "https://api.flutterwave.com/v3";
 const entetes = () => ({ authorization: `Bearer ${env().secrete}`, "content-type": "application/json" });
 
@@ -18,6 +19,7 @@ export const flutterwave: Passerelle = {
   nom: "flutterwave",
   disponible: () => Boolean(env().secrete && env().hash),
   async lancer(r, retour) {
+    await chargerCles();
     const evenements = await lireContenu("fr.evenements");
     const p = await json<{ status?: string; data?: { link?: string } }>(await appel(`${API}/payments`, {
       method: "POST",
@@ -30,6 +32,7 @@ export const flutterwave: Passerelle = {
   async constater(transaction, r) {
     const url = transaction && /^\d{1,20}$/.test(transaction) ? `${API}/transactions/${transaction}/verify` : r ? `${API}/transactions/verify_by_reference?tx_ref=${encodeURIComponent(r.id)}` : null;
     if (!url) return null;
+    await chargerCles();
     const v = await json<{ status?: string; data?: Donnees }>(await appel(url, { headers: entetes() }));
     const d = v?.status === "success" ? v.data : null;
     if (!d?.id || !d.status) return null;

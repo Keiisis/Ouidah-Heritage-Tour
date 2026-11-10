@@ -7,7 +7,7 @@ import { base } from "../base";
 // details.cible = l'agent attribué ou la fiche client ; jamais le texte d'une note, un nom ni un montant.
 type Action =
   | "connexion" | "connexion.refus" | "deconnexion" | "code.envoye" | "code.echec" | "mot_de_passe.change"
-  | "equipe.ajout" | "equipe.suspension" | "equipe.reactivation" | "equipe.reinvitation" | "equipe.refus"
+  | "equipe.ajout" | "equipe.suspension" | "equipe.reactivation" | "equipe.reinvitation" | "equipe.refus" | "equipe.suppression" | "equipe.role"
   | "dossier.attribution" | "dossier.etape" | "dossier.note"
   | "moment.ajout" | "moment.deplacement" | "moment.suppression" | "moment.clos" | "moment.proposes"
   | "devis.brouillon" | "devis.pret" | "devis.refus" | "client.note" | "clients.remplis"
@@ -47,7 +47,7 @@ type Action =
   | "blog.creation" | "blog.enregistrement" | "blog.etat" | "blog.suppression" | "blog.restauration" | "blog.traduction" | "blog.aide" | "blog.refus";
 type Details = {
   role?: "agent" | "admin";
-  etat?: "invite" | "actif" | "suspendu";
+  etat?: "invite" | "actif" | "suspendu" | "supprime";
   motif?: "etat" | "role" | "envoi" | "session" | "soi" | "dernier_admin" | "bannissement" | "pages" | "champs" | "publie"
     | "falsifie" | "inconnu" | "autre" | "autreDate" | "non_paye" | "deja" | "edition" | "secret" // refus d'un billet (L5)
     | "doublon" | "mois_clos" | "justificatif" | "devis" | "passerelles" // refus des finances (L7)

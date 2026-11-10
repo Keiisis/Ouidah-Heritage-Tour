@@ -2,27 +2,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { espace as T, logoPasserelle } from "@/content/espace";
-import { reglages as R, VARIABLES_PASSERELLES } from "@/content/espace-reglages";
+import { reglages as R } from "@/content/espace-reglages";
 import { minuteServeur } from "@/lib/serveur/equipe/espace";
 import { basculerPasserelle, deplacerPasserelle } from "@/lib/serveur/equipe/reglages/actions";
 import { lirePasserelles } from "@/lib/serveur/equipe/reglages/lectures";
 import { exigerRole } from "@/lib/serveur/equipe/session";
+import { saisiePossible } from "@/lib/serveur/paiement/cles";
 import { Bloc, vars, Vide } from "../Bloc";
 import { Enveloppe } from "../Enveloppe";
 import { Tete } from "../Tete";
+import { Cles } from "./Cles";
 import { Etat } from "./commun";
 import { BoutonAction } from "./Envoi";
 import "./reglages.css";
 
 // Passerelles et paiements (lot « reglages ») : les 5 passerelles, leur ordre, leur activation et l'état de leurs clés
-// (« configurée » ou « manquante », jamais la clé ni un extrait). Une passerelle sans clés ne s'active pas : le bouton est
-// inactif ici et le serveur refuse la requête forgée. Admin seulement, sinon retour à l'entrée /admins.
+// (« configurée » ou « manquante », saisie ici ou variable du serveur, jamais la clé ni un extrait), puis leur saisie
+// (Cles.tsx, chiffrée par le serveur). Une passerelle sans clés ne s'active pas : le bouton est inactif ici et le serveur
+// refuse la requête forgée. Admin seulement, sinon retour à l'entrée /admins.
 const P = R.passerelles;
 
 export async function EcranPasserelles() {
   const s = await exigerRole("admins");
   if (!s) redirect("/admins");
   const l = await lirePasserelles();
+  const saisie = saisiePossible();
   const proposees = l?.filter((x) => x.active && x.cles).length ?? 0;
   return (
     <Enveloppe role="admins" session={s} actif="passerelles" minute={minuteServeur()}>
@@ -66,7 +70,7 @@ export async function EcranPasserelles() {
                             </td>
                             <td data-col={P.cols.cles}>
                               <Etat e={p.cles ? "configuree" : "manquante"} texte={p.cles ? R.configuree : R.manquante} />
-                              {!p.cles && <span className="sous-cell">{P.variables(VARIABLES_PASSERELLES[p.nom] ?? [])}</span>}
+                              {!p.cles && <span className="sous-cell">{P.manquantes(p.champs.filter((c) => !c.source && !c.champ.endsWith("_SANDBOX")).length)}</span>}
                             </td>
                             <td data-col={P.cols.mode}>{p.test === null ? P.sansMode : p.test ? <Etat e="test" texte={P.sandbox} /> : P.reel}</td>
                             <td data-col={P.cols.etat}>
@@ -96,7 +100,18 @@ export async function EcranPasserelles() {
               </>
             )}
           </Bloc>
-          <Bloc id="r-coo" titre={P.coordonnees} s={12} i={2}>
+          {l && (
+            <Bloc id="r-cles" titre={P.clesTitre} s={12} i={2}>
+              <p className="mention">{P.clesSous}</p>
+              {l.map((p) => (
+                <section key={p.nom} className="reg-cles-passerelle" aria-labelledby={`r-cles-${p.nom}`} data-passerelle-cles={p.nom}>
+                  <h3 id={`r-cles-${p.nom}`}>{T.modes[p.nom]}</h3>
+                  <Cles porteur={p.nom} champs={p.champs} saisie={saisie} nom={T.modes[p.nom]} />
+                </section>
+              ))}
+            </Bloc>
+          )}
+          <Bloc id="r-coo" titre={P.coordonnees} s={12} i={3}>
             <p className="mention">{P.coordonneesSous}</p>
             <div className="reg-pied">
               <Link className="bouton-2" href="/admins/manuels">

@@ -29,7 +29,7 @@ export async function lireEquipe(): Promise<Membre[] | null> {
   const s = await exigerRole("admins");
   if (!s) return null;
   try {
-    const r = await base("equipe_profils?select=id,prenom,nom,email,role,etat,langues,derniere_connexion&order=cree_le.desc&limit=500");
+    const r = await base("equipe_profils?select=id,prenom,nom,email,role,etat,langues,derniere_connexion&etat=neq.supprime&order=cree_le.desc&limit=500");
     if (!r.ok) return null;
     const lignes = (await r.json()) as Ligne[];
     const invites = lignes.filter((l) => l.etat === "invite").map((l) => l.id);

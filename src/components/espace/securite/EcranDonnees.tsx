@@ -9,6 +9,9 @@ import { declarerIncident, enregistrerTraitement, marquerIncident, retirerTraite
 import { type LigneRegistre, lireConsentements, lireDemandesDonnees, lireIncidents, lireMembres, lireRegistre } from "@/lib/serveur/equipe/securite/lectures";
 import { aujourdhui, BASES, CHAMPS_REGISTRE, jourDuIso, SUIVIS } from "@/lib/serveur/equipe/securite/regles";
 import { exigerRole } from "@/lib/serveur/equipe/session";
+import { lireContenu } from "@/lib/contenu";
+import { lireEffacements } from "@/lib/serveur/services/equipe";
+import { FileEffacements } from "@/components/services/FileEffacements";
 import { Bloc, vars, Vide } from "../Bloc";
 import { Enveloppe } from "../Enveloppe";
 import { Picto } from "../Picto";
@@ -69,7 +72,7 @@ export async function EcranDonnees() {
   if (!s) redirect("/admins");
   const minute = minuteServeur(); // heure de la requête, lue après la session
   const ms = minute * 60_000;
-  const [registre, demandes, incidents, consentements, membres, taches] = await Promise.all([lireRegistre(), lireDemandesDonnees(), lireIncidents(), lireConsentements(), lireMembres(), lireTaches()]);
+  const [registre, demandes, incidents, consentements, membres, taches, effacements, TS] = await Promise.all([lireRegistre(), lireDemandesDonnees(), lireIncidents(), lireConsentements(), lireMembres(), lireTaches(), lireEffacements(s), lireContenu("services.servicesEquipe")]);
   const nomDe = noms(membres);
   const R = S.registre, P = S.personnes, I = S.incidents, C = S.consentements;
   const maintenantOuidah = new Date(ms + 3_600_000).toISOString().slice(0, 16); // valeur par défaut « découvert le »
@@ -141,6 +144,11 @@ export async function EcranDonnees() {
               </summary>
               <FormSec action={enregistrerTraitement} args={[null]} bouton={R.ajouter} reussite={R.ajoute} nom={R.ajouter} enfants={<ChampsTraitement id="t-neuf" />} />
             </details>
+          </Bloc>
+
+          {/* file des demandes d'effacement envoyées depuis /mes-donnees */}
+          <Bloc id="d-eff" titre={TS.donnees} compte={effacements ? effacements.filter((e) => e.statut === "a_traiter").length : null} s={12} i={2}>
+            {effacements ? <FileEffacements effacements={effacements} T={TS} /> : indispo}
           </Bloc>
 
           {/* demandes des personnes */}

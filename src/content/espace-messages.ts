@@ -14,7 +14,8 @@ export const A_RELIRE: readonly LangueMsg[] = ["HT", "GCF"];
 export const VARIABLES = { prenom: "{prénom}", dates: "{dates}", lien: "{lien}", reference: "{référence}" } as const;
 export type Variable = keyof typeof VARIABLES;
 
-export const LIMITES_COURRIEL = { objet: 200, corps: 8000, groupe: 50, cle: 40, lot: 40 } as const;
+/** `adresses` : plafond des adresses saisies à la main (admin ; un agent : une seule) ; `prenom` : prénom saisi avec elles. */
+export const LIMITES_COURRIEL = { objet: 200, corps: 8000, groupe: 50, cle: 40, lot: 40, adresses: 10, prenom: 60 } as const;
 
 type Textes = Record<LangueMsg, string>;
 export type ModeleDepart = { nom: string; sujet: Textes; corps: Textes };
@@ -96,6 +97,26 @@ export const DESINSCRIPTION: Record<LangueMsg, { titre: string; texte: (email: s
   GCF: { titre: "Pa résévwa lèt a Ouidah ankò", texte: (e) => `Adrès ${e} pé ké résévwa lèt-la ankò.`, bouton: "Konfimé", envoi: "On ti moman…", fait: "Sa fèt : adrès-lasa pé ké résévwa lèt-la ankò.", deja: "Adrès-lasa ja pa ka résévwa lèt-la.", erreur: "Sa pa maché. Éséyé ankò adan on ti moman.", retour: "Routounen asi sit-la" },
 };
 
+/** Données d'exemple de l'aperçu réel des e-mails automatiques (écran Modèles) et de leur test à soi-même : jamais envoyées
+ * à un client. Le prénom est celui de l'admin connecté ; les thèmes de la lettre sont ceux du site. */
+export const EXEMPLE_AUTO = {
+  id: "00000000-0000-4000-8000-000000000000",
+  jeton: "exemple",
+  reference: "DEM-EXEMPLE",
+  commande: "OHT-B-EXEMPLE",
+  devis: "D-0000-000000",
+  ticket: "T-0000-000000",
+  facture: "F-0000-000000",
+  code: "000000",
+  evenement: "Événement d’exemple",
+  formule: "Formule d’exemple",
+  ligne: "Ligne d’exemple",
+  quantite: 2,
+  prix: 15000,
+  sejour: { arrivee: "2027-03-12", depart: "2027-03-19" },
+  valable: "2027-03-01",
+};
+
 const plur = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? plusieurs : un}`;
 
 export const msg = {
@@ -123,7 +144,11 @@ export const msg = {
     message: "Le message",
     de: "De",
     a: "À",
-    mode: { un: "Un client", groupe: "Un groupe" },
+    mode: { un: "Un client", adresse: "Une adresse", groupe: "Un groupe" },
+    adresses: "Adresse e-mail",
+    adressesAide: (n: number) => (n > 1 ? `Une ou plusieurs adresses séparées par une virgule, ${n} au plus, sans fiche client.` : "Une seule adresse, sans fiche client."),
+    prenom: "Prénom (facultatif)",
+    prenomAide: "Il remplace {prénom}. Sans fiche client, {dates}, {lien} et {référence} n’ont pas de valeur.",
     choisir: "Choisir un client",
     aucunClient: { agents: ["Aucun client pour l’instant.", "Les clients de vos dossiers apparaissent ici."], admins: ["Aucun client pour l’instant.", "Les fiches se remplissent depuis les demandes reçues."] },
     groupe: "Destinataires",
@@ -139,10 +164,10 @@ export const msg = {
     corps: "Message",
     variables: "Champs variables",
     inserer: (v: string) => `Insérer ${v}`,
-    pieces: "Pièces jointes",
+    pieces: "Document lié",
     aucunePiece: "Aucun document pour ce client.",
     choisirDabord: "Choisissez d’abord un client.",
-    pieceDevis: (n: string) => `Devis ${n} (PDF)`,
+    pieceDevis: (n: string) => `Devis ${n}`,
     pieceNote: "Le document part en lien sécurisé vers son PDF, dans la langue du client.",
     apercu: "Aperçu",
     apercuVide: "L’aperçu apparaît dès que vous écrivez.",
@@ -152,7 +177,7 @@ export const msg = {
     envoyer: "Envoyer",
     envoyerGroupe: (n: number) => `Envoyer à ${plur(n, "client", "clients")}`,
     envoi: "Envoi…",
-    erreurs: { dest: "Choisissez un destinataire.", objet: "Indiquez l’objet.", langue: "Choisissez la langue du client.", corps: "Le message est trop long.", groupe: "Cochez au moins un client." },
+    erreurs: { dest: "Choisissez un destinataire.", objet: "Indiquez l’objet.", langue: "Choisissez la langue du client.", corps: "Le message est trop long.", groupe: "Cochez au moins un client.", adresses: "Saisissez une adresse e-mail valable (ou plusieurs, dans la limite indiquée).", prenom: "Le prénom est trop long." },
     resume: "Trois champs sont obligatoires : destinataire, objet, langue.",
     testEnvoye: (a: string) => `Test envoyé à ${a}.`,
     brouillonOk: "Brouillon enregistré.",
@@ -168,7 +193,8 @@ export const msg = {
 
   modeles: {
     titre: "Modèles d’e-mails",
-    sous: "Les textes que le composeur propose, dans les 7 langues. Les e-mails automatiques des clients restent ceux du site.",
+    sous: "Les textes que le composeur propose, et ceux des e-mails que le site envoie de lui-même, dans les 7 langues.",
+    repli: "La liste des modèles enregistrés ne répond pas : les textes de départ s’affichent. Réessayez dans un moment avant d’enregistrer.",
     liste: "Modèles",
     nouveau: "Nouveau modèle",
     cle: "Identifiant",
@@ -191,11 +217,21 @@ export const msg = {
     vide: ["Rien d’écrit dans cette langue.", "Écrivez l’objet et le message, puis enregistrez."],
     oht: "Les e-mails envoyés automatiquement par le site ont leur propre groupe, plus bas.",
     auto: "E-mails automatiques",
-    autoSous: "Textes que le site envoie de lui-même. Une langue sans texte ici garde le texte par défaut du site.",
+    autoSous: "Textes que le site envoie de lui-même. Une langue sans texte enregistré part avec le texte par défaut du site, affiché dans l’éditeur.",
     autoNoms: { "auto-billets": "Billets d’un événement", "auto-demande": "Demande reçue", "auto-devis-pret": "Devis prêt", "auto-boutique": "Commande de la boutique", "auto-lettre": "La lettre de Ouidah", "auto-code": "Code de connexion de l’équipe", "auto-relance": "Relance d’une facture" } as Record<string, string>,
     defaut: "Texte par défaut du site",
     retirerAuto: "Revenir au texte par défaut du site",
-    autoVariables: "Seuls {prénom}, {dates}, {lien} et {référence} sont remplis dans un e-mail automatique.",
+    autoVariables: (v: string[]) => `Champs que cet e-mail remplit : ${v.join(", ")}. Tout autre champ est refusé à l’enregistrement.`,
+    horsListe: (v: string[]) => `Champs que cet e-mail ne remplit pas, refusés : ${v.join(", ")}.`,
+    autoNotes: {
+      "auto-billets": "Par défaut, l’objet reprend le nom de l’événement réservé (ici celui de l’exemple). Un objet enregistré ici sert pour tous les événements.",
+      "auto-demande": "Par défaut, une question posée sur le site reçoit un texte plus court, sans la phrase sur le devis. Un texte enregistré ici sert aux deux.",
+      "auto-lettre": "La liste des thèmes choisis par l’abonné suit toujours ce texte.",
+      "auto-code": "Par défaut, l’objet change entre la première connexion et le mot de passe oublié. Un objet enregistré ici sert aux deux.",
+      "auto-relance": "Par défaut, la salutation reprend le nom complet du client ; {prénom} ne donne que son prénom.",
+    } as Record<string, string>,
+    apercuReel: "Aperçu de l’e-mail tel qu’il part, avec des données d’exemple",
+    apercuIndispo: "Aperçu indisponible pour le moment.",
     inconnus: (j: string[]) => `Champs inconnus, refusés : ${j.join(", ")}.`,
     absentes: (v: string[]) => `Champs absents de ce texte : ${v.join(", ")}. Vérifiez que l’e-mail n’en a pas besoin.`,
   },

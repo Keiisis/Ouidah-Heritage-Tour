@@ -30,7 +30,7 @@ import { reglages } from "@/content/espace-reglages";
 // liste vide, dictionnaire de fiches, choix). Une rubrique « verrouillee » se lit dans l'éditeur sans se modifier
 // (adresses techniques lues par le code).
 
-export const SECTIONS_CONTENU = ["pages", "lieux", "circuits", "evenements", "conciergerie", "histoire", "medias", "temoignages", "partenaires", "traductions", "legales", "navigation"] as const;
+export const SECTIONS_CONTENU = ["pages", "lieux", "circuits", "evenements", "conciergerie", "histoire", "medias", "temoignages", "traductions", "legales", "navigation"] as const;
 export type SectionContenu = (typeof SECTIONS_CONTENU)[number];
 
 // Partenaire de l'agence (hôtels, chauffeurs, artisans) : aucune donnée dans le code, la liste part vide.
@@ -103,8 +103,9 @@ export const REGISTRE = {
   // se change dans la rubrique qui l'affiche
   "fr.IMG": e(fr.IMG, "medias", "/", { verrouille: true }),
   "fr.testimonials": e(fr.testimonials, "temoignages"),
-  // aucune section partenaires dans le dessin actuel : la rubrique et ses versions sont conservées en lecture seule
-  "site.partenaires": e([] as Partenaire[], "partenaires", "/a-propos", { verrouille: true }),
+  // aucune section partenaires dans le dessin actuel (les candidatures arrivent dans « Rendez-vous et candidatures ») :
+  // la rubrique et ses versions restent dans les archives de « Pages », en lecture seule
+  "site.partenaires": e([] as Partenaire[], "pages", "/a-propos", { verrouille: true }),
   "suivi.suivi": e(suivi.suivi, "traductions"),
   "suivi.signer": e(suivi.signer, "traductions"),
   "documents.copiesDocuments": e(copiesDocuments, "traductions"),

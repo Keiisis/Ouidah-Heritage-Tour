@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       // tout le travail propre aux comptes existants part après la réponse : même réponse, même délai pour une adresse inconnue
       after(async () => {
         const p = await lireProfil({ email });
-        if (!p || p.etat === "suspendu" || !autorise(p.role, role)) return;
+        if (!p || p.etat === "suspendu" || p.etat === "supprime" || !autorise(p.role, role)) return;
         const code = await emettreCode(p.id);
         const envoye = code ? await envoyerCode({ a: p.email, prenom: p.prenom, langue: p.langues[0], code, premiere: p.etat === "invite", boite: local.boite }) : false;
         await journaliser(envoye ? "code.envoye" : "code.echec", p.id, ipH, { etat: p.etat, ...(envoye ? {} : { motif: "envoi" as const }) });
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
     case "verifier": {
       const code = texte(c.code, 6);
       const p = await lireProfil({ email });
-      const r = p && p.etat !== "suspendu" && autorise(p.role, role) && /^\d{6}$/.test(code) ? await verifierCode(p.id, code) : "faux";
+      const r = p && p.etat !== "suspendu" && p.etat !== "supprime" && autorise(p.role, role) && /^\d{6}$/.test(code) ? await verifierCode(p.id, code) : "faux";
       if (r === "panne") return reponse({ erreur: "indisponible" }, 503);
       if (r === "faux") return reponse({ erreur: "code" }, 401);
       await essaiReussi(essai.id);
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
       store.set(COOKIE_CODE, "", optionsCookie(0, "strict"));
       const profilId = jeton ? await consommerJeton(jeton) : null;
       const p = profilId ? await lireProfil({ id: profilId }) : null;
-      if (!p || p.email !== email || p.etat === "suspendu" || !autorise(p.role, role)) return reponse({ erreur: "expire" }, 401);
+      if (!p || p.email !== email || p.etat === "suspendu" || p.etat === "supprime" || !autorise(p.role, role)) return reponse({ erreur: "expire" }, 401);
       // Les anciennes sessions doivent être fermées avant de changer le mot de passe. Si la base refuse,
       // l'ancien mot de passe reste valable et aucune nouvelle session n'est annoncée.
       if (!(await revoquerSessions(p.id))) return reponse({ erreur: "indisponible" }, 503);

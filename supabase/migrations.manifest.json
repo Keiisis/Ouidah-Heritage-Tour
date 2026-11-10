@@ -177,6 +177,14 @@
     {
       "fichier": "20261114_boutique_catalogue_vide.sql",
       "sha256": "5d21d5bfb8eb6fea768c7088640de837eaa4ca8adc7605ffd1822e4cf4d5271c"
+    },
+    {
+      "fichier": "20261115_equipe_suppression.sql",
+      "sha256": "64c5798942c2f4e36e23da627cee09cdddc0897885683eb4deba7a1c30f6ed6f"
+    },
+    {
+      "fichier": "20261115_passerelles_cles.sql",
+      "sha256": "18802460794586bcdd6c91700de20c04cd677f82d25629100615d7833f179c60"
     }
   ]
 }

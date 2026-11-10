@@ -133,6 +133,14 @@
   .esp .esp-reglages .grand { font-size: 26px; }
 }
 
+/* saisie des clés (passerelles, e-MECeF) */
+.esp .esp-reglages .reg-cles-passerelle { display: grid; gap: 12px; padding-top: 16px; border-top: 1px solid var(--filet); }
+.esp .esp-reglages .reg-cles-passerelle h3 { margin: 0; font: 700 16px/1.3 var(--f-texte); }
+.esp .esp-reglages .reg-cles { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+.esp .esp-reglages .reg-cles > li { display: grid; gap: 8px; min-width: 0; }
+.esp .esp-reglages .reg-cle-tete { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0; }
+.esp .esp-reglages .reg-cle-tete code { font-size: 12px; overflow-wrap: anywhere; }
+
 @media (prefers-reduced-motion: reduce) {
   .esp .esp-reglages *, .esp .esp-reglages *::before { animation: none !important; transition: none !important; }
 }

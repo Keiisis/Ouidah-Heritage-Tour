@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { Role } from "@/content/equipe";
+import { msg } from "@/content/espace-messages";
 import { transversal as T } from "@/content/transversal";
 import type { CourrielRecu } from "@/lib/serveur/equipe/messages/imap";
 import { releverBoite, rattacherCourriel } from "@/lib/serveur/equipe/messages/imap-actions";
@@ -20,6 +21,7 @@ export function Reception({ messages, role, dossiers }: { messages: CourrielRecu
   return <><ul className="liste">{messages.map((m) => <li key={m.id}><details className="message">
     <summary><strong>{m.objet || I.sansObjet}</strong><span className="meta">{m.nom || m.expediteur} · {new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeStyle: "short", timeZone: "Africa/Porto-Novo" }).format(new Date(m.recu_le))}</span></summary>
     <p className="meta">{m.expediteur}</p>
+    {m.expediteur && <Link className="bouton-2 bouton-petit" href={`/${role}/courrier?a=${encodeURIComponent(m.expediteur)}`} data-repondre-imap={m.id}>{msg.boite.repondre}</Link>}
     <div className="reception-texte">{m.volumineux ? I.tropGrand : m.texte}</div>
     {m.pieces.length > 0 && <><p className="aide">{I.pieces}</p><ul>{m.pieces.map((p, i) => <li key={i}>{p.nom} · {p.type}</li>)}</ul></>}
     {m.demande_id ? <Link className="lien" href={`/${role}/demandes/${m.demande_id}`}>{I.dossier}</Link> : <span className="aide">{I.nonAttribue}</span>}

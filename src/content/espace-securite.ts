@@ -121,7 +121,7 @@ export const securite = {
     // libellé de chaque action (une action inconnue s'affiche telle quelle)
     actions: {
       connexion: "Connexion", "connexion.refus": "Connexion refusée", deconnexion: "Déconnexion", "code.envoye": "Code envoyé", "code.echec": "Code non envoyé", "mot_de_passe.change": "Mot de passe changé",
-      "equipe.ajout": "Compte ajouté", "equipe.suspension": "Compte suspendu", "equipe.reactivation": "Compte réactivé", "equipe.reinvitation": "Invitation renvoyée", "equipe.refus": "Changement de compte refusé",
+      "equipe.ajout": "Compte ajouté", "equipe.suspension": "Compte suspendu", "equipe.reactivation": "Compte réactivé", "equipe.reinvitation": "Invitation renvoyée", "equipe.suppression": "Compte supprimé", "equipe.role": "Rôle changé", "equipe.refus": "Changement de compte refusé",
       "dossier.attribution": "Dossier attribué", "dossier.etape": "Étape du dossier", "dossier.note": "Note du dossier",
       "moment.ajout": "Moment ajouté", "moment.deplacement": "Moment déplacé", "moment.suppression": "Moment supprimé", "moment.clos": "Moment clos", "moment.proposes": "Moments proposés",
       "devis.brouillon": "Devis enregistré", "devis.pret": "Devis envoyé", "devis.refus": "Devis refusé", "client.note": "Fiche client modifiée", "clients.remplis": "Fiches clients remplies",
@@ -330,7 +330,7 @@ export const securite = {
       site: "Préparer les brouillons du contenu du site et rédiger ses articles de blog. Un admin valide leur publication.",
     } as Record<string, string>,
     membres: "Droits par membre",
-    vide: ["Aucun agent dans l’équipe.", "Les agents ajoutés dans « Agents » apparaissent ici."] as [string, string],
+    vide: ["Aucun agent dans l’équipe.", "Les agents ajoutés dans « Équipe » apparaissent ici."] as [string, string],
     cols: { qui: "Membre", droits: "Droits", action: "Action" },
     tous: "Tous les droits",
     enregistrer: "Enregistrer",
