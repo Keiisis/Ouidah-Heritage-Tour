@@ -1,21 +1,34 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Role } from "@/content/equipe";
 import { chemin, espace as T, GROUPES, logos, section } from "@/content/espace";
 import { droitsEffectifs } from "@/lib/serveur/equipe/securite/droits";
-import type { Session } from "@/lib/serveur/equipe/session";
+import { minuteServeur } from "@/lib/serveur/equipe/espace";
+import { exigerRole, type Session } from "@/lib/serveur/equipe/session";
 import { BasculeTheme, Cadre } from "./Cadre";
-import { Deconnexion, NavCadre, NavSoleil } from "./NavClient";
+import { Deconnexion, GroupeNav, LienSection, NavCadre, NavSoleil } from "./NavClient";
 import { Palette } from "./Palette";
 import { Picto } from "./Picto";
 import "./enveloppe.css";
 
-// Enveloppe de l'espace connecté (maquette E) : navigation latérale navy groupée, la petite course du soleil en tête,
-// le pied (thème, déconnexion, qui est connecté), la barre du bas en 390, la palette Ctrl K. Composant serveur rendu
-// sous <Suspense> par l'entrée ou la section, une fois la session lue : `minute` est l'heure de cette requête.
-export function Enveloppe({ role, session, actif, minute, children }: { role: Role; session: Session; actif: string; minute: number; children: ReactNode }) {
-  const courant = (id: string) => (id === actif ? ("page" as const) : undefined);
+// Coque de l'espace connecté (maquette E) : navigation latérale navy groupée, la petite course du soleil en tête,
+// le pied (thème, déconnexion, qui est connecté), la barre du bas en 390, la palette Ctrl K. Rendue par le layout de
+// /admins et /agents (sous <Suspense>, session lue à la requête) : elle reste en place d'une section à l'autre, seule la
+// zone de travail change (Kevin, 10/11 : plus d'impression de rechargement). Section courante lue dans l'adresse
+// (LienSection, GroupeNav). Sans session : la page seule (écran de connexion G).
+export async function Coque({ role, children }: { role: Role; children: ReactNode }) {
+  const session = await exigerRole(role);
+  if (!session) return children;
+  return <CoqueSession role={role} session={session} minute={minuteServeur()}>{children}</CoqueSession>;
+}
+
+// Écrans de section : la coque vient du layout ; Enveloppe ne fait que passer la zone de travail (ses props restent celles
+// des 47 écrans qui l'appellent : rôle, session et section courante sont relus par la coque).
+export function Enveloppe({ children }: { role: Role; session: Session; actif: string; minute: number; children: ReactNode }) {
+  return children;
+}
+
+function CoqueSession({ role, session, minute, children }: { role: Role; session: Session; minute: number; children: ReactNode }) {
   const initiales = `${session.prenom[0] ?? ""}${session.nom[0] ?? ""}`.toUpperCase();
   // « Blog » et « Articles de la boutique » n'apparaissent dans le menu d'un agent qu'avec le droit « site » ou « boutique »
   // (la page le revérifie : SansDroit sinon)
@@ -26,10 +39,10 @@ export function Enveloppe({ role, session, actif, minute, children }: { role: Ro
         bas={T.bas[role].map(([id, court]) => {
           const x = section(role, id);
           return x ? (
-            <Link key={id} href={chemin(role, id)} className="bas" aria-current={courant(id)}>
+            <LienSection key={id} href={chemin(role, id)} racine={id === "accueil"} className="bas">
               <Picto nom={x.picto} />
               <span>{court}</span>
-            </Link>
+            </LienSection>
           ) : null;
         })}
       >
@@ -37,7 +50,7 @@ export function Enveloppe({ role, session, actif, minute, children }: { role: Ro
         <NavSoleil />
         <div className="esp-groupes" id="esp-groupes" data-lenis-prevent>
           {GROUPES[role].map((g) => (
-            <details key={g.groupe} className="esp-groupe" open={g.sections.some((x) => x.id === actif) || undefined}>
+            <GroupeNav key={g.groupe} adresses={g.sections.map((x) => chemin(role, x.id))}>
               <summary>
                 <span>{g.groupe}</span>
                 <Picto nom="chevron" className="ic chev" />
@@ -45,14 +58,14 @@ export function Enveloppe({ role, session, actif, minute, children }: { role: Ro
               <ul>
                 {g.sections.filter((x) => !masquee(x.id)).map((x) => (
                   <li key={x.id}>
-                    <Link href={chemin(role, x.id)} aria-current={courant(x.id)}>
+                    <LienSection href={chemin(role, x.id)} racine={x.id === "accueil"}>
                       <Picto nom={x.picto} />
                       <span>{x.nom}</span>
-                    </Link>
+                    </LienSection>
                   </li>
                 ))}
               </ul>
-            </details>
+            </GroupeNav>
           ))}
         </div>
         <div className="esp-nav-pied">

@@ -88,21 +88,6 @@ export const uneLigne = (v: unknown) => (typeof v === "string" ? v.replace(/[\u0
 export const plusieursLignes = (v: unknown) => (typeof v === "string" ? v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, "").trim() : "");
 export const paragraphes = (t: string) => t.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 
-const echapper = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
-/** Paragraphe HTML : texte échappé, retours en <br>, adresses http(s) cliquables. */
-const para = (t: string, couleur = "#0f162d") =>
-  `<p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:${couleur}">${echapper(t)
-    .replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u}" style="color:#122460">${u}</a>`)
-    .replace(/\n/g, "<br>")}</p>`;
-
-/** E-mail complet (HTML et texte), du corps déjà rempli : paragraphes, documents liés, signature, pied éventuel. */
-export function composer(m: { corps: string; pieces?: string[]; signature?: string | null; pied?: string | null }) {
-  const blocs = [...paragraphes(m.corps), ...(m.pieces ?? [])];
-  const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#ffffff"><div style="max-width:560px;margin:0 auto">${blocs.map((b) => para(b)).join("")}${m.signature ? para(m.signature, "#3f4863") : ""}${m.pied ? `<hr style="border:0;border-top:1px solid #dde1ea;margin:24px 0 16px">${para(m.pied, "#5a6379")}` : ""}</div></body></html>`;
-  const texte = [...blocs, ...(m.signature ? [m.signature] : []), ...(m.pied ? ["—", m.pied] : [])].join("\n\n");
-  return { html, texte };
-}
-
 /** Objet et message saisis relus selon les limites ; « objet » et « corps » en champs refusés. */
 export function lireTexte(objet: unknown, corps: unknown, objetRequis: boolean) {
   const o = uneLigne(objet), c = plusieursLignes(corps);

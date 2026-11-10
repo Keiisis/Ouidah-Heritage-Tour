@@ -10,6 +10,7 @@ import { adresseCircuit, adresseLieu, cheminsIntro as CHEMINS_INTRO, cleType, de
 import { useContenu } from "@/components/ui/ContenuSite";
 import type { Circuit, LieuReleve } from "@/content/types";
 import { Icon } from "@/components/ui/Icon";
+import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
 import { Objet3D } from "@/components/ui/Objet3D";
 import { useEcranLarge, useMouvementReduit } from "@/lib/mouvement";
 import { distanceKm, leverCoucher } from "@/lib/soleil";
@@ -227,7 +228,9 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
   const vue: Vue = useMemo(() => (mode === "prets" ? { mode: "prets", etapes: circuit.stops, trace: circuit.trace } : { mode: "composer", gardes, ici: lieu?.slug ?? null }), [mode, circuit, gardes, lieu]);
   const gardesConnus = gardes.filter((id) => fiche(id));
   const lienDevis = T.trip.href; // la demande lit le dossier de voyage : aucun paramètre
-  const prix = (c: Circuit) => (c.priceVisible && c.price !== null && !c.draft ? toursIntro.from(c.price) : toursIntro.onRequest);
+  // prix par personne de la fiche du circuit, affiché dès que l'interrupteur « Afficher le prix sur le site » est mis
+  const prixPublic = (c: Circuit) => (c.priceVisible ? c.price : null);
+  const prix = (c: Circuit) => { const p = prixPublic(c); return p !== null ? toursIntro.from(p) : toursIntro.onRequest; };
   const vignette = destinations.find((d) => d.image)?.image;
 
   return (
@@ -429,6 +432,7 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
                                 <p className="mt-2 text-sm leading-[1.6] font-semibold text-abyss/60">{c.stops.map((s) => parSlug.get(s)?.name).filter(Boolean).join(" → ")}</p>
                                 <p className="mt-1 text-sm text-abyss/60">
                                   {c.duration ?? toursIntro.durationPending} · {prix(c)}
+                                  <EquivalentDevise xof={prixPublic(c)} />
                                 </p>
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   <Link href={adresseCircuit(c.slug, tours)} className="inline-flex min-h-11 items-center rounded-full bg-abyss px-5 text-sm font-bold text-white">

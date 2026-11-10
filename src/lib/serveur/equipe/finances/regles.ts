@@ -1,4 +1,4 @@
-import { CATEGORIES_GRILLE, type CategorieGrille, finances as F, MODES_DEPENSE, MODES_MANUELS, type ModeDepense, type ModeManuel } from "@/content/espace-finances";
+import { CATEGORIES_SAISIES, type CategorieSaisie, finances as F, MODES_DEPENSE, MODES_MANUELS, type ModeDepense, type ModeManuel } from "@/content/espace-finances";
 import { LIMITES_DEVIS } from "@/content/documents";
 import { dateDuJour, iso, jourDe, jourOuidah, minuitOuidah } from "@/lib/jours";
 
@@ -149,13 +149,13 @@ export function lireLien(brut: unknown): Lu<{ devis: string; jours: number }> {
   return champs.length || !devis ? { ok: false, champs } : { ok: true, v: { devis, jours } };
 }
 
-export type PrixSaisi = { id: string | null; categorie: CategorieGrille; libelle: string; unite: string | null; prix: number };
+export type PrixSaisi = { id: string | null; categorie: CategorieSaisie; libelle: string; unite: string | null; prix: number };
 export function lirePrix(brut: unknown): Lu<PrixSaisi> {
   const o = champsDe(brut);
   const champs: string[] = [];
   const id = typeof o.id === "string" && o.id ? o.id : null;
   if (id !== null && !UUID.test(id)) champs.push("id");
-  if (!dans(CATEGORIES_GRILLE, o.categorie)) champs.push("categorie");
+  if (!dans(CATEGORIES_SAISIES, o.categorie)) champs.push("categorie");
   const libelle = uneLigne(o.libelle);
   if (!libelle || libelle.length > LIMITES_DEVIS.libelle) champs.push("libelle");
   const unite = uneLigne(o.unite) || null;
@@ -164,7 +164,7 @@ export function lirePrix(brut: unknown): Lu<PrixSaisi> {
   const prix = /^\d{1,7}$/.test(s) ? Number(s) : NaN;
   if (!Number.isInteger(prix) || prix < 0 || prix > LIMITES_DEVIS.prixUnitaire) champs.push("prix");
   if (champs.length) return { ok: false, champs };
-  return { ok: true, v: { id, categorie: o.categorie as CategorieGrille, libelle, unite, prix } };
+  return { ok: true, v: { id, categorie: o.categorie as CategorieSaisie, libelle, unite, prix } };
 }
 
 export type Coordonnees = { titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile_money: string[]; relance_jours: number | null };

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ButtonPrimary, LinkLine } from "@/components/ui/Buttons";
+import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
 import { lireContenuPage as lireContenu } from "@/lib/serveur/contenu-page";
 import { CarteTrace } from "./CarteTrace";
 import type { Fiche, Photo } from "./fiche";
@@ -56,7 +57,10 @@ export async function FicheCircuit({ f }: { f: Fiche }) {
           <div>
             <p className="fc-resume">{f.resume}</p>
             {f.trajet ? <p className="fc-trajet">{f.trajet}</p> : null}
-            <p className="fc-conditions">{f.conditions}</p>
+            <p className="fc-conditions">
+              {f.conditions}
+              <EquivalentDevise xof={C.priceVisible ? C.price : null} />
+            </p>
             <Actions slug={C.slug} />
           </div>
         </div>
@@ -97,7 +101,10 @@ export async function FicheCircuit({ f }: { f: Fiche }) {
         <div className="container-oht fc-reserver-grille">
           <h2 id="fc-titre-reserver">{C.title}</h2>
           <div>
-            <p className="fc-conditions">{f.conditions}</p>
+            <p className="fc-conditions">
+              {f.conditions}
+              <EquivalentDevise xof={C.priceVisible ? C.price : null} />
+            </p>
             {f.marche ? <p className="fc-marche">{f.marche}</p> : null}
             <Actions slug={C.slug} clair />
             {f.chapitre ? (

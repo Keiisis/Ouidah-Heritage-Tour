@@ -60,6 +60,13 @@ const entier = (v: unknown) => (typeof v === "number" ? v : typeof v === "string
 /** Somme des lignes : le seul montant d'un devis (jamais d'acompte, jamais de montant libre). */
 export const totalDevis = (lignes: { quantite: number; prix_unitaire: number }[]) => lignes.reduce((t, l) => t + l.quantite * l.prix_unitaire, 0);
 
+/** Première ligne du devis d'un dossier avec circuit : le prix par personne saisi dans la fiche du circuit (contenu
+ * publié, FCFA), une par voyageur. Aucun prix saisi : null (rien d'inventé, la ligne reste à remplir). */
+export function ligneCircuit(c: { title: string; price: number | null } | null | undefined, voyageurs: number) {
+  if (!c || c.price === null) return null;
+  return { libelle: c.title.slice(0, LIMITES_DEVIS.libelle), quantite: Math.min(Math.max(1, voyageurs), LIMITES_DEVIS.quantite), prix_unitaire: c.price };
+}
+
 /**
  * Devis saisi relu selon LIMITES_DEVIS (content/documents.ts). Seuls libellé, quantité et prix unitaire de chaque ligne
  * sont gardés : tout autre champ (total, acompte…) est ignoré, et le montant est recalculé ici. `aujourdhui` : date du

@@ -6,7 +6,7 @@ import { lireContenu } from "@/lib/contenu";
 import { iso, jourOuidah, minuitOuidah } from "@/lib/jours";
 import { base } from "../base";
 import { jetonSuivi } from "../documents/jeton";
-import { type Etape, type TypeMoment, UUID } from "./dossiers-regles";
+import { type Etape, ligneCircuit, type TypeMoment, UUID } from "./dossiers-regles";
 import type { Session } from "./session";
 
 // Lectures des demandes et dossiers voyage (lot L4), par le serveur seulement avec la clé secrète. La clé contourne RLS :
@@ -104,6 +104,7 @@ export type VueDossier = {
   moments: MomentDossier[];
   lieuxPossibles: Lieu[];
   devis: DevisDossier | null;
+  ligneCircuit: DevisDossier["lignes"][number] | null; // prix du circuit (sa fiche), proposé au premier devis
   historique: Historique[];
   lienClient: string | null; // page de suivi du client (/suivi/<jeton>), qui montre le devis une fois prêt
 };
@@ -171,6 +172,8 @@ export async function lireDossier(s: Session, id: unknown): Promise<VueDossier |
   const sejour = d.dossier?.sejour ?? null;
   const lieux = lieuxDemande(d.circuit, d.dossier?.lieux, tours, destinations, releve);
   const jeton = jetonSuivi("d", d.id);
+  const voyageurs = { adultes: d.reponses?.adultes ?? 0, enfants: d.reponses?.enfants ?? 0 };
+  const tour = d.circuit ? tours.find((t) => t.slug === d.circuit) : undefined;
   return {
     id: d.id,
     reference: `DEM-${d.id.slice(0, 6).toUpperCase()}`,
@@ -178,8 +181,8 @@ export async function lireDossier(s: Session, id: unknown): Promise<VueDossier |
     intention: d.intention,
     client: { nom: d.nom ?? "", email: d.email ?? "", telephone: d.whatsapp || null, pays: d.pays, langue: d.langue },
     sejour: sejour ? { arrivee: iso(sejour.arrivee), depart: iso(sejour.depart), jours: sejour.depart - sejour.arrivee + 1 } : null,
-    voyageurs: { adultes: d.reponses?.adultes ?? 0, enfants: d.reponses?.enfants ?? 0 },
-    circuit: d.circuit ? (tours.find((t) => t.slug === d.circuit)?.title ?? null) : null,
+    voyageurs,
+    circuit: tour?.title ?? null,
     lieux,
     services: servicesDe(d.dossier?.services, conciergerie),
     message: d.message || null,
@@ -189,6 +192,7 @@ export async function lireDossier(s: Session, id: unknown): Promise<VueDossier |
     moments: moments.map((m) => ({ id: m.id, debut: Date.parse(m.debut), fin: Date.parse(m.fin), type: m.type, lieu: m.lieu_id ? lieuDe(m.lieu_id, destinations, releve) : null, note: m.note, fait: Boolean(m.fait_le) })),
     lieuxPossibles: lieuxPossibles(lieux, destinations),
     devis: v && v.statut !== "annule" ? { id: v.id, statut: v.statut, lignes: v.lignes, montant: v.montant, note: v.note, valable: v.valable_jusqu_au, publie: v.publie_le, numero, courriel: Boolean(v.publie_le && v.courriel_pret_pour && Date.parse(v.courriel_pret_pour) === Date.parse(v.publie_le)) } : null,
+    ligneCircuit: ligneCircuit(tour, voyageurs.adultes + voyageurs.enfants),
     historique: journal.map((j) => ({ quand: j.cree_le, action: j.action, qui: j.profil ? `${j.profil.prenom} ${j.profil.nom}` : "", details: { ...j.details, cible: j.details.cible ? (noms.get(j.details.cible) ?? undefined) : undefined } })),
     lienClient: jeton ? `/suivi/${jeton}` : null,
   };

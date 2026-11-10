@@ -206,7 +206,7 @@ export const contenu = {
     title: "Titre", titre: "Titre", text: "Texte", texte: "Texte", kicker: "Surtitre", label: "Libellé", libelle: "Libellé", href: "Lien",
     src: "Fichier de l'image", alt: "Texte alternatif", image: "Image", images: "Images", photo: "Photo", photos: "Photos", portrait: "Portrait",
     name: "Nom", nom: "Nom", slug: "Adresse (slug)", subtitle: "Sous-titre", sub: "Sous-titre", theme: "Thème", place: "Lieu", tag: "Catégorie",
-    duration: "Durée", price: "Prix (FCFA)", priceVisible: "Prix affiché", draft: "Brouillon, pas encore publié", stops: "Étapes (adresses des lieux)",
+    duration: "Durée", price: "Prix par personne (FCFA)", priceVisible: "Afficher le prix sur le site", draft: "Brouillon, pas encore publié", stops: "Étapes (adresses des lieux)",
     trace: "Tracé à pied", coords: "Coordonnées", short: "Titre court", court: "Titre court", intro: "Introduction", lead: "Accroche", accent: "Mots mis en valeur",
     link: "Lien", paragraphs: "Paragraphes", caption: "Légende", credit: "Crédit de la photo", category: "Catégorie", lieux: "Lieux ajoutés au chemin",
     next: "Jusqu'au lieu suivant", n: "Numéro", quand: "Dates", organisateur: "Organisateur", offre: "Offre", mois: "Mois", jour: "Jour",

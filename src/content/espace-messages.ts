@@ -75,6 +75,28 @@ export const REPERES: Record<LangueMsg, Record<"dates" | "reference" | "lien", s
   GCF: { dates: "[dat a vwayaj-la]", reference: "[référans a dosyé-la]", lien: "[lyen pèsonèl]" },
 };
 
+/** Pied d'un e-mail écrit par l'équipe (« Rédiger un e-mail »), dans la langue du destinataire. */
+export const RAISON_COURRIER: Record<LangueMsg, string> = {
+  FR: "Vous recevez cet e-mail de l’équipe Ouidah Heritage Tour. Répondez-y simplement pour nous écrire.",
+  EN: "You are receiving this email from the Ouidah Heritage Tour team. Just reply to write to us.",
+  ES: "Recibe este correo del equipo de Ouidah Heritage Tour. Basta con responder para escribirnos.",
+  DE: "Sie erhalten diese E-Mail vom Team von Ouidah Heritage Tour. Antworten Sie einfach, um uns zu schreiben.",
+  PT: "Recebe este e-mail da equipa Ouidah Heritage Tour. Basta responder para nos escrever.",
+  HT: "Ou resevwa imèl sa a nan men ekip Ouidah Heritage Tour. Reponn li pou ekri nou.",
+  GCF: "Ou ka résévwa imèl-lasa di lékip Ouidah Heritage Tour. Réponn-li pou ékri nou.",
+};
+
+/** Pied de chaque numéro de la lettre (raison) et libellé du lien de désinscription, dans la langue du numéro. */
+export const RAISON_LETTRE: Record<LangueMsg, { raison: string; lien: string }> = {
+  FR: { raison: "Vous recevez la lettre de Ouidah parce que vous vous y êtes inscrit.", lien: "Se désinscrire" },
+  EN: { raison: "You receive the Ouidah letter because you signed up for it.", lien: "Unsubscribe" },
+  ES: { raison: "Recibe la carta de Ouidah porque se suscribió.", lien: "Darse de baja" },
+  DE: { raison: "Sie erhalten den Brief aus Ouidah, weil Sie sich angemeldet haben.", lien: "Abmelden" },
+  PT: { raison: "Recebe a carta de Ouidah porque se inscreveu.", lien: "Cancelar a subscrição" },
+  HT: { raison: "Ou resevwa lèt Ouidah a paske ou te enskri.", lien: "Dezabòne" },
+  GCF: { raison: "Ou ka résévwa lèt a Ouidah paskè ou té enskri.", lien: "Pa résévwa-y ankò" },
+};
+
 /** Pied de chaque numéro de la lettre, dans la langue du numéro (lien de désinscription propre à l'abonné). */
 export const PIED_LETTRE: Record<LangueMsg, (lien: string) => string> = {
   FR: (l) => `Vous recevez la lettre de Ouidah parce que vous vous y êtes inscrit. Se désinscrire : ${l}`,

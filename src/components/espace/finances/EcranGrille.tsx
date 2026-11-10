@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Role } from "@/content/equipe";
 import { espace as T } from "@/content/espace";
-import { CATEGORIES_GRILLE, finances as F } from "@/content/espace-finances";
+import { CATEGORIES_SAISIES, finances as F } from "@/content/espace-finances";
+import { lireContenu } from "@/lib/contenu";
 import { minuteServeur } from "@/lib/serveur/equipe/espace";
 import { basculerPrix, enregistrerPrix } from "@/lib/serveur/equipe/finances/actions";
 import { lireGrille, type Prix } from "@/lib/serveur/equipe/finances/lectures";
@@ -13,8 +15,10 @@ import { Montant } from "./commun";
 import { BoutonAction, FormAction } from "./Envoi";
 import "./finances.css";
 
-// Grille tarifaire (lot L7) : prix des circuits, des entrées et de la conciergerie, en FCFA et en € (taux fixe). L'admin
-// édite (ajout, modification, retrait) ; l'agent lit les prix actifs. Rendu sous <Suspense> ; le serveur revérifie le rôle.
+// Grille tarifaire (lot L7) : prix des entrées et de la conciergerie, en FCFA et en € (taux fixe). L'admin édite (ajout,
+// modification, retrait) ; l'agent lit les prix actifs. Les circuits ne s'y saisissent plus (10/11) : leur prix par
+// personne vient de leur fiche (fr.tours publié) et s'affiche ici en lecture ; les anciennes lignes « circuit » restent en
+// base, ignorées. Rendu sous <Suspense> ; le serveur revérifie le rôle.
 const G = F.grille;
 
 function Champs({ p, uid }: { p?: Prix; uid: string }) {
@@ -27,7 +31,7 @@ function Champs({ p, uid }: { p?: Prix; uid: string }) {
           <option value="" disabled>
             {F.champs.categorie}
           </option>
-          {CATEGORIES_GRILLE.map((c) => (
+          {CATEGORIES_SAISIES.map((c) => (
             <option key={c} value={c}>
               {F.categories[c]}
             </option>
@@ -60,7 +64,7 @@ export async function EcranGrille({ role }: { role: Role }) {
   const s = await exigerRole(role);
   if (!s) redirect(`/${role}`);
   const admin = s.role === "admin" && role === "admins";
-  const prix = await lireGrille(admin);
+  const [prix, tours] = await Promise.all([lireGrille(admin), lireContenu("fr.tours")]);
   return (
     <Enveloppe role={role} session={s} actif="grille" minute={minuteServeur()}>
       <Tete titre={G.titre} sous={admin ? G.sousAdmin : G.sousAgent} />
@@ -71,19 +75,48 @@ export async function EcranGrille({ role }: { role: Role }) {
               <FormAction action={enregistrerPrix} nom={G.ajouter} bouton={G.enregistrer} reussite={G.enregistre} enfants={<Champs uid="g-nouveau" />} />
             </Bloc>
           )}
+          <Bloc id="g-circuit" titre={F.categories.circuit} compte={tours.length} s={12} i={2}>
+            <p className="mention">
+              {G.circuits.note} <Link href={role === "admins" ? "/admins/circuits" : "/agents/contenu?section=circuits"}>{G.circuits.lien}</Link>
+            </p>
+            <div className="tableau-defile">
+              <table className="tableau">
+                <thead>
+                  <tr>
+                    <th scope="col">{G.cols.libelle}</th>
+                    <th scope="col">{G.cols.unite}</th>
+                    <th scope="col">{G.cols.prix}</th>
+                    <th scope="col">{G.cols.etat}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tours.map((t) => (
+                    <tr key={t.slug} data-circuit={t.slug}>
+                      <td data-col={G.cols.libelle}>
+                        <b>{t.title}</b>
+                      </td>
+                      <td data-col={G.cols.unite}>{G.circuits.unite}</td>
+                      <td data-col={G.cols.prix}>{t.price === null ? G.circuits.sansPrix : <Montant n={t.price} />}</td>
+                      <td data-col={G.cols.etat}>{t.price !== null && t.priceVisible ? G.circuits.affiche : G.circuits.masque}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Bloc>
           {!prix ? (
-            <Bloc id="g-liste" titre={G.titre} s={12} i={2}>
+            <Bloc id="g-liste" titre={G.titre} s={12} i={3}>
               <Vide texte={[T.vides.indisponible, ""]} />
             </Bloc>
-          ) : !prix.length ? (
-            <Bloc id="g-liste" titre={G.titre} s={12} i={2}>
+          ) : !prix.some((p) => p.categorie !== "circuit") ? (
+            <Bloc id="g-liste" titre={G.titre} s={12} i={3}>
               <Vide texte={admin ? G.vide : G.videAgent} />
             </Bloc>
           ) : (
-            CATEGORIES_GRILLE.map((c, k) => {
+            CATEGORIES_SAISIES.map((c, k) => {
               const lignes = prix.filter((p) => p.categorie === c);
               return (
-                <Bloc key={c} id={`g-${c}`} titre={F.categories[c]} compte={lignes.length} s={12} i={2 + k}>
+                <Bloc key={c} id={`g-${c}`} titre={F.categories[c]} compte={lignes.length} s={12} i={3 + k}>
                   {lignes.length ? (
                     <div className="tableau-defile">
                       <table className="tableau">

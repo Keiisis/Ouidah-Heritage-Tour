@@ -13,6 +13,9 @@ export const MODES_DEPENSE = ["virement", "especes", "mobile_money", "cheque", "
 export type ModeDepense = (typeof MODES_DEPENSE)[number];
 export const CATEGORIES_GRILLE = ["circuit", "entree", "conciergerie"] as const;
 export type CategorieGrille = (typeof CATEGORIES_GRILLE)[number];
+/** Catégories saisies dans la grille. Les circuits n’y sont plus saisis : leur prix vient de leur fiche (fr.tours). */
+export const CATEGORIES_SAISIES = ["entree", "conciergerie"] as const satisfies readonly CategorieGrille[];
+export type CategorieSaisie = (typeof CATEGORIES_SAISIES)[number];
 
 export const finances = {
   // états
@@ -252,8 +255,16 @@ export const finances = {
   // ---------- grille tarifaire ----------
   grille: {
     titre: "Grille tarifaire",
-    sousAdmin: "Prix des circuits, des entrées et de la conciergerie, en FCFA et en €. L’éditeur de devis y pioche ses lignes.",
+    sousAdmin: "Prix des entrées et de la conciergerie, en FCFA et en €. Le prix d’un circuit se saisit dans sa fiche (Site, Circuits) : il s’affiche ici en lecture.",
     sousAgent: "Prix des circuits, des entrées et de la conciergerie, en lecture seule.",
+    circuits: {
+      note: "Prix par personne saisi dans la fiche de chaque circuit, repris tel quel dans le devis du dossier. Il se modifie dans la fiche, pas ici.",
+      lien: "Modifier les prix dans les circuits",
+      unite: "par personne",
+      sansPrix: "Non renseigné",
+      affiche: "Affiché sur le site",
+      masque: "Non affiché sur le site",
+    },
     vide: ["Aucun prix dans la grille.", "Un admin les saisit ici, ligne par ligne."] as [string, string],
     videAgent: ["Aucun prix dans la grille.", "Un admin les saisit : ils apparaîtront ici."] as [string, string],
     cols: { libelle: "Libellé", unite: "Unité", prix: "Prix", etat: "État", actions: "" },

@@ -2,14 +2,15 @@
 
 import { randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
-import { LIMITES_COURRIEL, type LangueMsg, msg, PIED_LETTRE } from "@/content/espace-messages";
+import { LIMITES_COURRIEL, type LangueMsg, msg, RAISON_LETTRE } from "@/content/espace-messages";
 import { lireContenu } from "@/lib/contenu";
 import { base, compter } from "../../base";
 import { journaliser } from "../journal";
 import { exigerRole } from "../session";
 import { emailDe, jetonLettre, origine, partir, voie } from "./envoi";
 import type { RetourMessages } from "./actions";
-import { composer, estLangue, lireTexte, UUID } from "./rendu";
+import { composer } from "./composer";
+import { estLangue, lireTexte, UUID } from "./rendu";
 
 // La lettre de Ouidah (admin) : brouillon d'un numéro, test à soi-même, envoi par lots aux abonnés réels. Chaque appel
 // relit la session et exige le rôle admin. L'envoi réel demande le nombre de destinataires annoncé à l'écran (recompté
@@ -61,7 +62,9 @@ async function lire<T>(chemin: string): Promise<T[] | null> {
   }
 }
 
-const rendre = (n: Numero, lien: string) => ({ sujet: n.objet, ...composer({ corps: n.corps, signature: SIGNATURE, pied: PIED_LETTRE[n.langue](lien) }) });
+// même gabarit que les autres e-mails (photo de la rue de la Basilique, comme la confirmation d'inscription) ; lien de
+// désinscription propre à l'abonné dans le pied
+const rendre = (n: Numero, lien: string, o: string) => composer({ langue: n.langue, origine: o, sujet: n.objet, corps: n.corps, signature: SIGNATURE, raison: RAISON_LETTRE[n.langue].raison, lien: { libelle: RAISON_LETTRE[n.langue].lien, href: lien }, photo: "rue-basilique" });
 
 /** Abonnés actifs de la langue qui ont choisi un des thèmes (nombre seulement). */
 async function cible(n: Numero): Promise<number | null> {
@@ -93,7 +96,7 @@ export async function testerNumero(brut: unknown): Promise<RetourMessages> {
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };
   if (!a) return { erreur: "panne" };
-  const e = rendre(lu.v, msg.lettre.lienExemple);
+  const e = rendre(lu.v, msg.lettre.lienExemple, (await origine()) ?? "");
   const parti = await partir({ a, sujet: `${msg.prefixeTest}${e.sujet}`, html: e.html, texte: e.texte, cle: `lettre-test-${randomUUID()}` }, v.boite);
   await journaliser("lettre.test", s.profilId, null, { langue: lu.v.langue, ...(lu.id ? { numero: lu.id } : {}), ...(parti ? {} : { motif: "envoi" as const }) });
   return parti ? { ok: true, a } : { erreur: "envoi" };
@@ -139,7 +142,7 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
     if (!reserve) return { erreur: "panne" };
     if (!reserve.length) continue; // déjà envoyé à cette adresse
     const jeton = jetonLettre(a.id);
-    const e = rendre(n, `${o}/lettre/desinscription/${jeton}`);
+    const e = rendre(n, `${o}/lettre/desinscription/${jeton}`, o ?? "");
     const parti = await partir({ a: a.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `lettre-${n.id}-${a.id}` }, v.boite);
     await ecrire(`lettre_envois?id=eq.${reserve[0].id}&select=id`, "PATCH", { statut: parti ? "envoye" : "echec" });
     partis++;

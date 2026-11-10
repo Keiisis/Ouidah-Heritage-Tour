@@ -45,7 +45,7 @@ const heureDe = (ms: number) => hm(minutesOuidah(Math.floor(ms / MIN)));
 const saisieDe = (d: VueDossier): SaisieDevis =>
   d.devis
     ? { lignes: d.devis.lignes.map((l) => ({ libelle: l.libelle, quantite: String(l.quantite), prix: String(l.prix_unitaire) })), note: d.devis.note ?? "", valable: d.devis.valable ?? "" }
-    : { lignes: d.intention === "question" ? [] : [ligneVide()], note: "", valable: "" };
+    : { lignes: d.ligneCircuit ? [{ libelle: d.ligneCircuit.libelle, quantite: String(d.ligneCircuit.quantite), prix: String(d.ligneCircuit.prix_unitaire) }] : d.intention === "question" ? [] : [ligneVide()], note: "", valable: "" };
 
 function messageRefus(e: Exclude<RetourDossier, { ok: true }>["erreur"]) {
   if (e === "pages" || e === "publie" || e === "pdf") return T.devis.erreurs[e];

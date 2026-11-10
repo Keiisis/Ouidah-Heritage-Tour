@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import type { Role } from "@/content/equipe";
 import { espace as T } from "@/content/espace";
@@ -83,5 +85,29 @@ export function Deconnexion({ role }: { role: Role }) {
       <Picto nom="sortie" />
       <span>{sortie ? T.sortie : T.deconnexion}</span>
     </button>
+  );
+}
+
+// section courante lue dans l'adresse : la coque reste montée d'une section à l'autre (layout), seul l'état change.
+// `racine` : l'accueil (/admins, /agents) n'est courant que sur sa propre adresse, pas sur celles de ses sections.
+const estCourante = (chemin: string, href: string, racine = false) => chemin === href || (!racine && chemin.startsWith(`${href}/`));
+
+export function LienSection({ href, racine, className, children }: { href: string; racine?: boolean; className?: string; children: ReactNode }) {
+  const chemin = usePathname();
+  return (
+    <Link href={href} className={className} aria-current={estCourante(chemin, href, racine) ? "page" : undefined}>
+      {children}
+    </Link>
+  );
+}
+
+/** Groupe du menu : ouvert d'office quand il contient la section courante (l'utilisateur garde la main ensuite). */
+export function GroupeNav({ adresses, children }: { adresses: string[]; children: ReactNode }) {
+  const chemin = usePathname();
+  const ici = adresses.some((a) => estCourante(chemin, a, a.split("/").length === 2));
+  return (
+    <details className="esp-groupe" open={ici || undefined}>
+      {children}
+    </details>
   );
 }
