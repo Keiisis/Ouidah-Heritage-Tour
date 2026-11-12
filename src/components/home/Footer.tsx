@@ -138,6 +138,7 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
               <span aria-hidden="true" className="size-1.5 rounded-full bg-sun" />
               {T.photos[actuelle].legende}
             </p>
+            {/* cibles de 44 px : au toucher, chaque puce s'élargit ; la hauteur passe par un pseudo-élément */}
             <div className={`flex h-9 items-center gap-0.5 rounded-full px-1.5 ${VERRE}`}>
               {T.photos.map((p, i) => (
                 <button
@@ -146,7 +147,7 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
                   aria-label={T.photosLabel(i + 1, T.photos.length)}
                   aria-current={i === actuelle || undefined}
                   onClick={() => setPhoto(i)}
-                  className="grid h-7 place-items-center px-1 focus-visible:outline-2 focus-visible:outline-sun"
+                  className="relative grid h-7 place-items-center px-1 before:absolute before:inset-x-0 before:-inset-y-2 focus-visible:outline-2 focus-visible:outline-sun pointer-coarse:min-w-11"
                 >
                   <span className={`block h-1.5 rounded-full transition-[width,background-color] duration-500 ${i === actuelle ? "w-[18px] bg-white" : "w-1.5 bg-white/45"}`} />
                 </button>
@@ -167,18 +168,14 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
           {vif(true)}
           <div className="xl:grid xl:grid-cols-[18.75rem_minmax(0,1fr)] xl:gap-8">
             <div className="md:mb-8 xl:mb-0">
-              {/* même logo que la barre de navigation (Kevin, 09/11) ; sans logo saisi : emblème sur pastille blanche */}
+              {/* même logo que la barre de navigation (Kevin, 09/11) : emblème rond original sur pastille blanche + nom (10/11) */}
               <p className="flex items-center gap-3">
-                {nav.logo ? (
-                  <Image src={nav.logo.src} alt={nav.logo.alt} width={168} height={48} className="h-10 w-auto object-contain md:h-12" />
-                ) : (
-                  <>
-                    <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white md:size-16">
-                      <Image src={nav.embleme.src} alt="" width={64} height={64} className="size-11 md:size-[52px]" />
-                    </span>
-                    <span className="font-display text-[20px]/[1.15] font-semibold md:text-[22px]">{nav.brand}</span>
-                  </>
-                )}
+                <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white md:size-16">
+                  <Image src={nav.embleme.src} alt="" width={64} height={64} className="size-11 md:size-[52px]" />
+                </span>
+                <span className="font-display text-[20px]/[1.15] font-semibold md:text-[22px]">
+                  {nav.wordmark[0]} <span className="text-sun">{nav.wordmark[1]}</span>
+                </span>
               </p>
               <p className="mt-2 max-w-60 text-[12px]/[1.55] text-white/72 md:mt-4 md:text-[13px]">{T.tagline}</p>
             </div>
@@ -191,7 +188,7 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
                   <ul className="mt-2">
                     {c.links.map((l) => (
                       <li key={l.href} className="text-[12px]/[2.15] whitespace-nowrap">
-                        <Link href={l.href} className="oht-pied-lien text-white/72 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-sun">
+                        <Link href={l.href} className="oht-pied-lien text-white/72 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-sun pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:items-center">
                           {l.label}
                         </Link>
                       </li>
@@ -211,8 +208,8 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
                   </summary>
                   <ul className="pb-3 pl-1">
                     {c.links.map((l) => (
-                      <li key={l.href} className="text-[14px]/[2.2]">
-                        <Link href={l.href} className="text-white/72 hover:text-white">
+                      <li key={l.href} className="text-[14px]">
+                        <Link href={l.href} className="flex min-h-11 items-center text-white/72 hover:text-white">
                           {l.label}
                         </Link>
                       </li>
@@ -240,14 +237,14 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
               {T.legal.map((l) => (
                 <span key={l.href} className="flex items-center gap-2.5">
                   <span aria-hidden="true" className="h-3 w-px bg-white/14" />
-                  <Link href={l.href} className="hover:text-white">
+                  <Link href={l.href} className="hover:text-white pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:items-center pointer-coarse:justify-center">
                     {l.label}
                   </Link>
                 </span>
               ))}
               <span className="flex items-center gap-2.5">
                 <span aria-hidden="true" className="h-3 w-px bg-white/14" />
-                <button type="button" onClick={ouvrirChoix} className="cursor-pointer hover:text-white">
+                <button type="button" onClick={ouvrirChoix} className="cursor-pointer hover:text-white pointer-coarse:min-h-11 pointer-coarse:min-w-11">
                   {consentement.lienPied}
                 </button>
               </span>
@@ -261,7 +258,7 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
                   aria-controls="pied-reglages"
                   aria-label={`${T.reglages} : ${langue.label}, ${monnaie.long}`}
                   onClick={() => setReglages((o) => !o)}
-                  className={`inline-flex h-8 w-full items-center justify-center gap-2 rounded-full px-3.5 text-[12px] font-semibold whitespace-nowrap text-white/94 focus-visible:outline-2 focus-visible:outline-sun md:w-auto ${VERRE}`}
+                  className={`relative inline-flex h-8 w-full items-center justify-center gap-2 rounded-full px-3.5 text-[12px] font-semibold whitespace-nowrap text-white/94 before:absolute before:inset-x-0 before:-inset-y-2 focus-visible:outline-2 focus-visible:outline-sun md:w-auto ${VERRE}`}
                 >
                   {T.pays} · {langue.label}
                   <span aria-hidden="true" className="opacity-50">
@@ -297,7 +294,7 @@ export function Footer({ year, blog }: { year: number; blog: boolean }) {
               <button
                 type="button"
                 onClick={() => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" })}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-semibold whitespace-nowrap text-white/94 focus-visible:outline-2 focus-visible:outline-sun ${VERRE}`}
+                className={`relative inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-semibold whitespace-nowrap text-white/94 before:absolute before:inset-x-0 before:-inset-y-2 focus-visible:outline-2 focus-visible:outline-sun ${VERRE}`}
               >
                 {T.haut}
                 <Icon name="arrow-right" className="size-3 -rotate-90" />

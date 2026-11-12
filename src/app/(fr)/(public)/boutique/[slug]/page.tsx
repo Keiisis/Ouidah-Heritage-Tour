@@ -1,4 +1,4 @@
-import { metadonneesPage } from "@/lib/serveur/seo";
+import { metadonneesIntrouvable, metadonneesPage } from "@/lib/serveur/seo";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { lireContenuPage as lireContenu, languePage } from "@/lib/serveur/contenu-page";
@@ -15,11 +15,11 @@ export async function generateStaticParams() {
   return slugs.length ? slugs.map((slug) => ({ slug })) : [{ slug: "__aucun-article__" }];
 }
 
-async function metadataContenu({ params }: PageProps<"/boutique/[slug]">): Promise<Metadata> {
+async function metadataContenu({ params }: PageProps<"/boutique/[slug]">): Promise<Metadata | null> {
   const { slug } = await params;
   const langue = await languePage();
   const [p, c, T] = await Promise.all([lireProduit(slug, langue), lireCatalogue(langue), lireContenu("boutique.boutique")]);
-  if (!p) return {};
+  if (!p) return null;
   const nom = (l: { slug: string; nom: string }[], s: string) => l.find((x) => x.slug === s)?.nom ?? "";
   return { title: T.meta.fiche(p.nom), description: T.meta.ficheDescription(p.nom, nom(c.categories, p.categorie), nom(c.matieres, p.matiere)) };
 }
@@ -33,5 +33,6 @@ export default async function Page({ params }: PageProps<"/boutique/[slug]">) {
 
 export async function generateMetadata(...args: Parameters<typeof metadataContenu>): Promise<Metadata> {
   const { slug } = await args[0].params;
-  return metadonneesPage("/boutique/[slug]".replace("[slug]", encodeURIComponent(slug)), await metadataContenu(...args));
+  const contenu = await metadataContenu(...args);
+  return contenu ? metadonneesPage("/boutique/[slug]".replace("[slug]", encodeURIComponent(slug)), contenu) : metadonneesIntrouvable();
 }

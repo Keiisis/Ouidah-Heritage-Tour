@@ -8,7 +8,10 @@ import { expediteurEquipe } from "@/content/courriels-equipe";
 import { reglages as R } from "@/content/espace-reglages";
 import { base } from "../../base";
 import { actualiserTauxAutomatique, modifierTaux } from "../../taux";
-import { courrielConfigure, echapper, envoyerCourriel } from "../../courriel";
+import { courrielConfigure, destinatairesAvis, echapper, envoyerAvis, envoyerCourriel, MAX_AVIS } from "../../courriel";
+import { avis, ligne } from "../../courriels/avis";
+import { origine } from "../messages/envoi";
+import { lireAdresses } from "../messages/rendu";
 import { empreinteIp } from "../../garde";
 import { passerelle } from "../../paiement";
 import { chargerCles, ecrireCle, effacerCleBase, estChamp, estPorteur, lireValeur, saisiePossible } from "../../paiement/cles";
@@ -30,7 +33,7 @@ import { lireImage, lireMaintenance, lireMentions, lireModeEco, lireMotDePasse, 
 // seulement, jamais un identifiant de compte lu du navigateur. Chaque écriture va au journal (objet touché, jamais une clé,
 // un mot de passe ni le texte saisi). refresh() renvoie l'écran à jour dans la même réponse.
 
-export type RefusReg = "refuse" | "admin" | "champs" | "panne" | "cles" | "cle" | "smtp" | "envoi" | "trop_tot" | "ancien" | "verrou" | "image" | "message" | "courant" | "introuvable" | "taux_perime" | "sel";
+export type RefusReg = "refuse" | "admin" | "champs" | "panne" | "cles" | "cle" | "smtp" | "envoi" | "trop_tot" | "ancien" | "verrou" | "image" | "message" | "courant" | "introuvable" | "taux_perime" | "sel" | "plein" | "vide";
 export type RetourReg = { ok: true; n?: number } | { erreur: RefusReg; champs?: string[] };
 
 const maintenant = () => new Date().toISOString();
@@ -164,6 +167,60 @@ export async function envoyerTest(): Promise<RetourReg> {
   if (!parti) return { erreur: "envoi" };
   refresh();
   return { ok: true };
+}
+
+// ---------- destinataires des avis à l'équipe (11/11) ----------
+// Liste tenue par l'admin dans reglages_transversaux.avis_equipe (10 adresses au plus, sans doublon, en minuscules) ;
+// vide : EMAIL_OHT en secours (courriel.ts destinatairesAvis). Le journal note le nombre, jamais une adresse.
+
+async function listeAvis(): Promise<string[] | null> {
+  const l = await lire<{ avis_equipe: string[] | null }>("reglages_transversaux?select=avis_equipe&id=eq.true&limit=1");
+  return l?.[0] ? (l[0].avis_equipe ?? []) : null;
+}
+async function ecrireAvis(s: Session, liste: string[], mode: "ajout" | "retrait"): Promise<RetourReg> {
+  const r = await modifier("reglages_transversaux?id=eq.true&select=id", { avis_equipe: liste });
+  if (r?.length) await journaliser("reglages.avis", s.profilId, null, { nombre: liste.length, mode });
+  return fin(Boolean(r?.length));
+}
+
+export async function ajouterAvis(brut: unknown): Promise<RetourReg> {
+  const s = await admin();
+  if ("erreur" in s) return s;
+  const a = lireAdresses(champsDe(brut).avis_adresse, 1)?.[0];
+  const liste = await listeAvis();
+  if (!liste) return { erreur: "panne" };
+  if (!a || liste.includes(a)) return { erreur: "champs", champs: ["avis_adresse"] };
+  if (liste.length >= MAX_AVIS) return { erreur: "plein" };
+  return ecrireAvis(s, [...liste, a], "ajout");
+}
+
+export async function retirerAvis(adresse: unknown): Promise<RetourReg> {
+  const s = await admin();
+  if ("erreur" in s) return s;
+  const liste = await listeAvis();
+  if (!liste) return { erreur: "panne" };
+  if (typeof adresse !== "string" || !liste.includes(adresse)) return { erreur: "champs" };
+  return ecrireAvis(s, liste.filter((x) => x !== adresse), "retrait");
+}
+
+/** Avis de test vers toute la liste (ou l'adresse de secours), un par minute et par admin. */
+export async function testerAvis(): Promise<RetourReg> {
+  const s = await admin();
+  if ("erreur" in s) return s;
+  if (!courrielConfigure()) return { erreur: "smtp" };
+  const dernier = await lire<{ cree_le: string }>(`equipe_journal?select=cree_le&action=eq.envoi.test&profil_id=eq.${s.profilId}&order=cree_le.desc&limit=1`);
+  if (!dernier) return { erreur: "panne" };
+  if (dernier[0] && Date.now() - Date.parse(dernier[0].cree_le) < 60_000) return { erreur: "trop_tot" };
+  const liste = await destinatairesAvis();
+  if (!liste.length) return { erreur: "vide" };
+  const p = await lireCompte({ id: s.profilId });
+  const E = R.envoiCourriel;
+  const m = avis({ sujet: E.avisSujetTest, apercu: E.avisTitreTest, titre: E.avisTitreTest, donnee: null, lignes: [ligne("Demandé par", p?.prenom), ligne("Destinataires", String(liste.length))], raison: E.avisRaisonTest }, (await origine()) ?? "");
+  const parti = await envoyerAvis({ sujet: m.sujet, html: m.html, texte: m.texte, cle: `avis-test-${randomUUID()}`, modele: "avis-test" });
+  await journaliser("envoi.test", s.profilId, null, parti ? { mode: "avis", nombre: liste.length } : { mode: "avis", motif: "envoi" });
+  if (!parti) return { erreur: "envoi" };
+  refresh();
+  return { ok: true, n: liste.length };
 }
 
 // ---------- mentions des documents ----------

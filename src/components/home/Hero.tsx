@@ -10,7 +10,8 @@ import { HeroFond } from "@/components/home/HeroFond";
 // photos en fondu enchaîné et Ken Burns, voile marine localisé derrière le texte (à gauche sur grand écran, en bas sur
 // téléphone), accroche en simple ligne, titre en deux tons (le jaune réservé au mot clé et au bouton Rechercher), barre de
 // recherche (destination, type, durée) envoyée en GET vers les circuits, une action secondaire, quatre repères chiffrés.
-// Retouche Unslop (heydamir/unslop, CC BY 4.0) validée par Kevin le 05/11/2026.
+// Retouche Unslop (heydamir/unslop, CC BY 4.0) validée par Kevin le 05/11/2026. Entre 768 et 1023 px, sans pastilles d'objet
+// et bouton réduit à la loupe : les choix n'y sont plus tronqués (Kevin, 10/11).
 export async function Hero() {
   const langue = await languePage();
   const [hero, places, tours, tourFilters] = await Promise.all([lireContenu("fr.hero"), lireContenu("fr.places"), lireContenu("fr.tours"), lireContenu("fr.tourFilters")]);
@@ -45,7 +46,7 @@ export async function Hero() {
           <form action={adresseLangue(search.action, langue)} method="get" role="search" aria-label={search.label} className="flex flex-col items-center gap-3 md:flex-row">
             {search.fields.map((f, i) => (
               <div key={f.name} className={`flex w-full items-center gap-3 px-4 py-2 md:flex-1 ${i < search.fields.length - 1 ? "border-b border-white/15 md:border-r md:border-b-0" : ""}`}>
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white"><Objet3D nom={f.objet} taille={26} /></span>
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white md:max-lg:hidden"><Objet3D nom={f.objet} taille={26} /></span>
                 <div className="flex w-full flex-col text-left">
                   <label htmlFor={`hero-${f.name}`} className="text-xs font-medium text-white/70">
                     {f.label}
@@ -67,10 +68,10 @@ export async function Hero() {
             ))}
             <button
               type="submit"
-              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-sun px-8 py-4 text-sm font-semibold text-abyss transition-colors duration-150 hover:bg-sun-deep focus-visible:outline-sun md:w-auto md:rounded-full"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-sun px-8 py-4 text-sm font-semibold text-abyss transition-colors duration-150 hover:bg-sun-deep focus-visible:outline-sun md:w-auto md:rounded-full md:max-lg:px-4"
             >
               <Icon name="search" className="size-4" />
-              <span>{search.submit}</span>
+              <span className="md:max-lg:sr-only">{search.submit}</span>
             </button>
           </form>
         </div>

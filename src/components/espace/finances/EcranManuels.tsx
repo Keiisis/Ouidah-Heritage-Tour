@@ -7,6 +7,7 @@ import { minuteServeur } from "@/lib/serveur/equipe/espace";
 import { confirmerPaiement, enregistrerCoordonnees, inverserPaiement, rejeterPaiement } from "@/lib/serveur/equipe/finances/actions";
 import { fileManuels, lireReglages, mesPaiements, type PaiementManuel, type Reglages } from "@/lib/serveur/equipe/finances/lectures";
 import { objetsPayables } from "@/lib/serveur/equipe/finances/objets";
+import { TRANSITIONS_PAIEMENT } from "@/lib/serveur/equipe/finances/regles";
 import { exigerRole, type Session } from "@/lib/serveur/equipe/session";
 import { Bloc, Vide } from "../Bloc";
 import { Enveloppe } from "../Enveloppe";
@@ -77,12 +78,12 @@ function Tableau({ lignes, admin, s }: { lignes: PaiementManuel[]; admin: "file"
                 </td>
                 {admin === "file" && (
                   <td className="actions">
-                    {p.saisi?.id === s.profilId ? (
+                    {!TRANSITIONS_PAIEMENT[p.etat].includes("confirme") ? null : p.saisi?.id === s.profilId ? (
                       <span className="sous-cell">{M.deuxPersonnes}</span>
                     ) : (
                       <BoutonAction action={confirmerPaiement} args={[p.id]} libelle={M.confirmer} nom={M.confirmerDe(quoi)} reussite={M.confirmeOk} secondaire={false} />
                     )}
-                    <FormAction
+                    {TRANSITIONS_PAIEMENT[p.etat].includes("rejete") && <FormAction
                       action={rejeterPaiement}
                       args={[p.id]}
                       nom={M.rejeterDe(quoi)}
@@ -97,7 +98,7 @@ function Tableau({ lignes, admin, s }: { lignes: PaiementManuel[]; admin: "file"
                           </span>
                         </div>
                       }
-                    />
+                    />}
                   </td>
                 )}
                 {admin === "traites" && (
@@ -203,7 +204,7 @@ export async function EcranManuels() {
                     </div>
                     <div className="champ">
                       <label htmlFor="co-rel">{M.relance}</label>
-                      <input id="co-rel" name="relance" inputMode="numeric" defaultValue={r.relance ?? ""} autoComplete="off" aria-describedby="co-rel-a" />
+                      <input id="co-rel" name="relance" inputMode="numeric" defaultValue={r.paliers?.join(", ") ?? ""} placeholder="7, 15, 30" autoComplete="off" aria-describedby="co-rel-a" />
                       <span className="aide" id="co-rel-a">
                         {R.aide}
                       </span>

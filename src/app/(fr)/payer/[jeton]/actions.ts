@@ -1,6 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
+import { after } from "next/server";
+import { envoyerRecuLien } from "@/lib/serveur/courriels/recu";
 import { lancerPaiementLien, verifierLien, type RetourLancement } from "@/lib/serveur/paiement/lien";
 
 // Actions de la page publique d'un lien de paiement. Joignables par une requête forgée : le jeton signé est revérifié à
@@ -28,5 +30,7 @@ export async function lancer(jeton: unknown, nom: unknown): Promise<RetourLancem
 
 export async function verifier(jeton: unknown, transaction: unknown): Promise<"paye" | "attente" | null> {
   if (typeof jeton !== "string" || !JETON.test(jeton)) return null;
-  return verifierLien(jeton, typeof transaction === "string" && TRANSACTION.test(transaction) ? transaction : null);
+  const o = await origine();
+  // payé : reçu et avis à l'équipe après la réponse, une seule fois même si le webhook arrive aussi (marques en base)
+  return verifierLien(jeton, typeof transaction === "string" && TRANSACTION.test(transaction) ? transaction : null, (id) => { if (o) after(() => envoyerRecuLien(id, o).catch(() => null)); });
 }

@@ -1,8 +1,13 @@
+import type { Transitions } from "../machines";
+
 // Contrat commun des passerelles de paiement. Une passerelle ne décide jamais seule qu'une réservation est payée : elle
 // lance le paiement, relit une transaction auprès de son API et authentifie ses webhooks ; `finaliser` tranche.
 export const PASSERELLES = ["kkiapay", "fedapay", "stripe", "flutterwave", "paystack"] as const;
 export type NomPasserelle = (typeof PASSERELLES)[number];
 export type Statut = "attente" | "paye" | "rembourse";
+/** reservations.statut. attente → paye : passerelle (finaliser) ou paiements manuels (reservation_recalculer_manuel) ;
+ * paye → rembourse : remboursement constaté par l'API ; paye → attente : écriture inverse d'un règlement manuel. */
+export const TRANSITIONS_RESERVATION: Transitions<Statut> = { attente: ["paye"], paye: ["rembourse", "attente"], rembourse: [] };
 
 export type Reservation = {
   id: string;

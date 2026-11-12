@@ -8,10 +8,12 @@ import { effacer } from "../dossiers";
 import { journaliser } from "../journal";
 import { exigerRole, type Session } from "../session";
 import { apercuAuto } from "./auto";
-import { emailDe, origine, partir, voie } from "./envoi";
+import { emailDe, languesDe, origine, partir, voie } from "./envoi";
 import { type ClientCourrier, clientsChoisis } from "./lectures";
 import { autoConnue, CLE, type CleAuto, estAuto, estLangue, jetonsInconnus, lireAdresses, lireTexte, remplir, uneLigne, UUID, type Valeurs, valeursApercu, valeursDe, variablesHors } from "./rendu";
-import { composer } from "./composer";
+import { type Agent, composer } from "./composer";
+import { peutPasser } from "../../machines";
+import { TRANSITIONS_COURRIEL } from "./regles";
 
 // Écritures du lot « messages » : rédiger un e-mail (brouillon, test à soi-même, envoi), modèles d'e-mails (admin),
 // notifications lues. Actions serveur (contrôle d'origine de Next) joignables par une requête forgée : CHAQUE appel relit
@@ -66,12 +68,15 @@ function lireSaisie(brut: unknown, s: Session, objetRequis: boolean, destRequis 
 }
 
 /** L'e-mail d'un destinataire, rempli avec SES valeurs ; `manque` : champs variables sans valeur pour lui. */
-function rendre(vals: Valeurs, devis: ClientCourrier["devis"], v: Pick<Saisie, "objet" | "corps" | "devis" | "langue">, s: Session, o: string) {
+function rendre(vals: Valeurs, devis: ClientCourrier["devis"], v: Pick<Saisie, "objet" | "corps" | "devis" | "langue">, agent: Agent, o: string) {
   const sujet = remplir(v.objet, vals), corps = remplir(v.corps, vals);
-  const pieces = v.devis && devis ? [{ libelle: msg.courrier.pieceDevis(devis.numero), href: devis.url }] : [];
-  const { html, texte } = composer({ langue: v.langue, origine: o, sujet: sujet.texte, corps: corps.texte, prenom: vals.prenom, pieces, signature: msg.signature(s.prenom, s.nom), raison: RAISON_COURRIER[v.langue] });
+  const document = v.devis && devis ? { numero: devis.numero, href: devis.url, valable: devis.valable } : null;
+  const { html, texte } = composer({ langue: v.langue, origine: o, sujet: sujet.texte, corps: corps.texte, agent, document, raison: RAISON_COURRIER[v.langue] });
   return { sujet: sujet.texte, corps: corps.texte, html, texte, manque: [...new Set([...sujet.manque, ...corps.manque])], pieces: v.devis && devis ? [{ type: "devis", numero: devis.numero }] : [] };
 }
+
+/** Signataire : le compte connecté, avec les langues cochées dans sa fiche. */
+const agentDe = async (s: Session): Promise<Agent> => ({ prenom: s.prenom, nom: s.nom, langues: await languesDe(s.profilId) });
 
 /** Destinataire sans fiche client : seul le prénom saisi remplit un champ variable. */
 const valeursAdresse = (prenom: string): Valeurs => ({ prenom: prenom || undefined });
@@ -126,7 +131,7 @@ export async function envoyerTest(brut: unknown): Promise<RetourMessages> {
     if (!c?.[0]) return { erreur: "panne" };
     [vals, devis, cible] = [valeursDe(c[0].faits, lu.v.langue), c[0].devis, c[0].id];
   }
-  const e = rendre(vals, devis, lu.v, s, (await origine()) ?? "");
+  const e = rendre(vals, devis, lu.v, await agentDe(s), (await origine()) ?? "");
   if (e.manque.length) return { erreur: "variables", manque: e.manque };
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };
@@ -155,8 +160,8 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
     dests = clients.map((c) => ({ id: c.id, email: c.email, vals: valeursDe(c.faits, lu.v.langue), devis: c.devis }));
   }
   if (lu.v.devis && !dests[0]?.devis) return { erreur: "champs", champs: ["pieces"] };
-  const o = (await origine()) ?? "";
-  const rendus = dests.map((c) => ({ c, e: rendre(c.vals, c.devis, lu.v, s, o) }));
+  const [o, agent] = [(await origine()) ?? "", await agentDe(s)];
+  const rendus = dests.map((c) => ({ c, e: rendre(c.vals, c.devis, lu.v, agent, o) }));
   const manque = [...new Set(rendus.flatMap((r) => r.e.manque))];
   if (manque.length) return { erreur: "variables", manque };
   const v = await voie();
@@ -173,7 +178,8 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
     if (!r) return { erreur: "panne" };
     if (!r[0]) return { erreur: "etat" };
     const parti = await partir({ a: c.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `courrier-${r[0].id}` }, v.boite);
-    await ecrire(`courriels_envoyes?id=eq.${r[0].id}&select=id`, "PATCH", { statut: parti ? "envoye" : "echec", envoye_le: maintenant(), modifie_le: maintenant() });
+    const issue = parti ? "envoye" : "echec";
+    if (peutPasser(TRANSITIONS_COURRIEL, "brouillon", issue)) await ecrire(`courriels_envoyes?id=eq.${r[0].id}&statut=eq.brouillon&select=id`, "PATCH", { statut: issue, envoye_le: maintenant(), modifie_le: maintenant() });
     if (parti) envoyes++;
     else echecs++;
   }
@@ -264,7 +270,7 @@ export async function testerModele(brut: unknown): Promise<RetourMessages> {
   } else {
     const vals = valeursApercu(s.prenom, lu.v.langue);
     sujet = remplir(lu.v.sujet, vals).texte;
-    ({ html, texte } = composer({ langue: lu.v.langue, origine: (await origine()) ?? "", sujet, prenom: vals.prenom, corps: remplir(lu.v.corps, vals).texte, signature: msg.signature(s.prenom, s.nom), raison: RAISON_COURRIER[lu.v.langue] }));
+    ({ html, texte } = composer({ langue: lu.v.langue, origine: (await origine()) ?? "", sujet, corps: remplir(lu.v.corps, vals).texte, agent: await agentDe(s), raison: RAISON_COURRIER[lu.v.langue] }));
   }
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };

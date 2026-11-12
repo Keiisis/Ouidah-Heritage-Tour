@@ -9,7 +9,9 @@ import { effacer } from "../equipe/dossiers";
 import { journaliser } from "../equipe/journal";
 import { iso } from "../equipe/outils";
 import { exigerRole, type Session } from "../equipe/session";
+import { peutPasser } from "../machines";
 import { EMAILS_PUBLICS } from "./connaissance";
+import { type EtatSource, TRANSITIONS_SOURCE } from "./regles";
 import { type Alerte, anonymiser, bloquants, controler, decouper, extraire, type GenreAlerte, type Morceau, nettoyer, nomDuFichier, normaliserQuestion, type RefusExtraction, retirerPassage, surligner, titreDuFichier } from "./extraction";
 
 // Base de connaissances de l'assistant public, nourrie par l'admin : documents (le TEXTE extrait seul est gardé, jamais
@@ -143,12 +145,13 @@ export async function publierSource(id: unknown, fd: unknown): Promise<RetourBas
   if ("erreur" in s) return s;
   if (!uuid(id)) return { erreur: "champs" };
   const [src, fiches] = await Promise.all([
-    lire<{ etat: string }>(`assistant_sources?select=etat&id=eq.${id}`),
+    lire<{ etat: EtatSource }>(`assistant_sources?select=etat&id=eq.${id}`),
     lire<{ texte: string }>(`assistant_fiches?select=texte&source_id=eq.${id}&limit=${L.morceaux}`),
   ]);
   if (!src || !fiches) return { erreur: "panne" };
   if (!src[0]) return { erreur: "introuvable" };
-  if (src[0].etat === "publie" || !fiches.length) return { erreur: "etat" };
+  const de = src[0].etat;
+  if (de === "publie" || !peutPasser(TRANSITIONS_SOURCE, de, "publie") || !fiches.length) return { erreur: "etat" };
   const reste = resteBloquant(fiches.map((f) => f.texte), fd);
   if (reste.length) return refusSensible(s, "source.publication", reste, id);
   const libre = await place(fiches.length);
@@ -159,7 +162,7 @@ export async function publierSource(id: unknown, fd: unknown): Promise<RetourBas
   }
   const t = maintenant();
   const f = await ecrire(`assistant_fiches?source_id=eq.${id}&select=id`, "PATCH", { publie: true, modifie_le: t, modifie_par: s.profilId });
-  const r = f && (await ecrire(`assistant_sources?id=eq.${id}&etat=neq.publie&select=id`, "PATCH", { etat: "publie", modifie_le: t }));
+  const r = f && (await ecrire(`assistant_sources?id=eq.${id}&etat=eq.${de}&select=id`, "PATCH", { etat: "publie", modifie_le: t }));
   if (!f || !r) return { erreur: "panne" };
   await journaliser("reglages.assistant", s.profilId, null, { type: "source.publication", cible: id, nombre: f.length });
   refresh();
@@ -171,6 +174,7 @@ export async function retirerSource(id: unknown): Promise<RetourBase> {
   const s = await admin();
   if ("erreur" in s) return s;
   if (!uuid(id)) return { erreur: "champs" };
+  if (!peutPasser(TRANSITIONS_SOURCE, "publie", "retire")) return { erreur: "etat" };
   const t = maintenant();
   const r = await ecrire(`assistant_sources?id=eq.${id}&etat=eq.publie&select=id`, "PATCH", { etat: "retire", modifie_le: t });
   if (!r) return { erreur: "panne" };

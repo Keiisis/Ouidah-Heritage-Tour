@@ -1,5 +1,6 @@
 import "server-only";
 import { codes, copies } from "@/content/courriels";
+import { copiesAuto } from "@/content/courriels-auto";
 import { copiesBillets } from "@/content/courriels-billets";
 import { copiesBoutique } from "@/content/courriels-boutique";
 import { copiesDevis } from "@/content/courriels-devis";
@@ -10,12 +11,17 @@ import { EXEMPLE_AUTO as E, type LangueMsg, VARIABLES } from "@/content/espace-m
 import { newsletter } from "@/content/fr";
 import { copiesRelance } from "@/content/relances";
 import { JOUR } from "@/lib/jours";
+import { messageAccuse } from "../../courriels/assistant";
 import { messageCommande } from "../../courriels/boutique";
 import { gabaritCode } from "../../courriels/code";
 import type { Modele } from "../../courriels/commun";
 import { messageDevisPret } from "../../courriels/devis";
 import type { Courriel } from "../../courriels/gabarit";
 import { messageLettre } from "../../courriels/lettre";
+import { messageLien } from "../../courriels/lien";
+import { messageRdv, messageRdvAnnule } from "../../courriels/rdv";
+import { messageRecu } from "../../courriels/recu";
+import { messageSignature } from "../../courriels/signature";
 import { copieVoyageur } from "../../messages";
 import { messageBillets } from "../../paiement/courriel";
 import { courrielRelance } from "../finances/relances-courriel";
@@ -37,6 +43,12 @@ const DEFAUTS: Record<CleAuto, (L: LangueMsg) => { sujet: string; corps: string[
   "auto-lettre": (L) => ({ sujet: copiesLettre[L].sujet, corps: [copiesLettre[L].intro(2)] }),
   "auto-code": (L) => ({ sujet: copiesCode[L].sujetPremiere, corps: [codes[L].corps(MINUTES_CODE), copiesCode[L].ignorer] }),
   "auto-relance": (L) => ({ sujet: copiesRelance[L].sujet(VARIABLES.reference), corps: [copiesFacture[L].bonjour(VARIABLES.prenom), copiesRelance[L].corps] }),
+  "auto-rdv": (L) => ({ sujet: copiesAuto[L].rdv.sujet, corps: [copiesAuto[L].rdv.corps] }),
+  "auto-rdv-annule": (L) => ({ sujet: copiesAuto[L].rdvAnnule.sujet, corps: [copiesAuto[L].rdvAnnule.corps] }),
+  "auto-recu": (L) => ({ sujet: copiesAuto[L].recu.sujet(VARIABLES.reference), corps: [copiesAuto[L].recu.corps] }),
+  "auto-signature": (L) => ({ sujet: copiesAuto[L].signature.sujet, corps: [copiesAuto[L].signature.corps] }),
+  "auto-assistant": (L) => ({ sujet: copiesAuto[L].assistant.sujet, corps: [copiesAuto[L].assistant.corps] }),
+  "auto-lien": (L) => ({ sujet: copiesAuto[L].lien.sujet(VARIABLES.reference), corps: [copiesAuto[L].lien.corps] }),
 };
 
 /** Texte par défaut d'un e-mail automatique, tel que l'éditeur le montre (paragraphes séparés par une ligne vide). */
@@ -81,5 +93,18 @@ export function apercuAuto(cle: CleAuto, L: LangueMsg, modele: Modele, prenom: s
       return gabaritCode(prenom, E.code, MINUTES_CODE, L, { premiere: true, origine, modele });
     case "auto-relance":
       return courrielRelance({ id: E.id, facture: E.id, numero: E.facture, client: { nom: prenom, email: "", langue: L }, montant, devis: E.devis }, origine, lien, null, modele);
+    case "auto-rdv":
+    case "auto-rdv-annule": {
+      const rdv = { id: E.id, nom: prenom, email: "", telephone: null, message: null, langue: L, debut: E.rdv.debut, fin: E.rdv.fin, mode: "sur_place" as const, lieu: E.lieu };
+      return cle === "auto-rdv" ? messageRdv(rdv, origine, modele) : messageRdvAnnule(rdv, origine, modele);
+    }
+    case "auto-recu":
+      return messageRecu({ langue: L, nom: prenom, email: "", montant, payeLe: E.rdv.debut, passerelle: E.passerelle, transaction: null, reference: E.devis, recu: E.recu, jeton: E.jeton, commande: false }, origine, { modele });
+    case "auto-signature":
+      return messageSignature({ nom: prenom, email: "", langue: L, signataire: prenom, signeLe: E.rdv.debut, jeton: E.jeton, numero: E.devis, reference: E.reference, montant, agent: null }, origine, modele);
+    case "auto-assistant":
+      return messageAccuse({ id: E.id, langue: L, passage: E.rdv.debut, resume: null, nom: prenom, email: "", whatsapp: null }, origine, modele);
+    case "auto-lien":
+      return messageLien({ nom: prenom, langue: L, jeton: E.jeton, montant, expire: E.valable, numero: E.devis, reference: E.reference }, origine, modele);
   }
 }

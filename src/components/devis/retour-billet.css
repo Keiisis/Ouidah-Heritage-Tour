@@ -1,0 +1,47 @@
+/* Pastille « Revenir à mon billet » (accueil) : bouton « Pastille double » du site, couleur Soleil comme « Créer mon
+   voyage » ; en bas à gauche, au-dessus du bandeau des choix tant qu'il est affiché (--oht-reserve-bas, Consentement.tsx).
+   Le lanceur de l'assistant reste en bas à droite. */
+.rb-retour {
+  --oht-btn-fond: var(--accent-sun);
+  --oht-btn-texte: var(--surface-abyss);
+  position: fixed;
+  left: 16px;
+  bottom: calc(16px + var(--oht-reserve-bas, 0px) + env(safe-area-inset-bottom));
+  z-index: 61;
+  max-width: calc(100% - 104px);
+  filter: drop-shadow(0 10px 22px rgb(2 4 12 / 0.35));
+  transition:
+    --oht-t 420ms cubic-bezier(0.625, 0.05, 0, 1),
+    opacity 400ms ease,
+    translate 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    bottom 300ms ease;
+}
+@starting-style {
+  .rb-retour {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+.rb-retour .oht-btn-pilule {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* écran tactile : le doigt qui vient de toucher « Choisir mes lieux » reste posé là où la pastille apparaît, et le
+   navigateur y garde un survol collé (flèche ouverte à gauche, pastille de droite repliée). Sans vrai survol, la pastille
+   reste au repos ; le focus clavier garde son mouvement. */
+@media (hover: none) {
+  .rb-retour:hover:not(:focus-visible) {
+    --oht-t: 0;
+  }
+}
+@media (min-width: 768px) {
+  .rb-retour {
+    left: 24px;
+    bottom: calc(24px + var(--oht-reserve-bas, 0px) + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rb-retour {
+    transition: none;
+  }
+}

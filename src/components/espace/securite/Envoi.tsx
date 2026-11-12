@@ -54,13 +54,18 @@ function Retour({ etat, n, id }: { etat: Etat; n: number; id: string }) {
   );
 }
 
+/** Champs refusés par le serveur marqués aria-invalid ; le premier prend le focus. */
 function marquer(f: HTMLFormElement | null, champs: string[]) {
   if (!f) return;
+  let premier: HTMLElement | null = null;
   for (const el of Array.from(f.elements) as HTMLInputElement[]) {
     if (!el.name) continue;
-    if (champs.includes(el.name)) el.setAttribute("aria-invalid", "true");
-    else el.removeAttribute("aria-invalid");
+    if (champs.includes(el.name)) {
+      el.setAttribute("aria-invalid", "true");
+      premier ??= el;
+    } else el.removeAttribute("aria-invalid");
   }
+  premier?.focus();
 }
 
 export function FormSec({

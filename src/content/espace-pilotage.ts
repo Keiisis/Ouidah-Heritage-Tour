@@ -126,7 +126,7 @@ export const pilotage = {
   // ---------- rapport hebdomadaire (admin) ----------
   rapport: {
     titre: "Rapport hebdomadaire",
-    sous: "La semaine écoulée, du lundi au dimanche, tirée de la base.",
+    sous: "La semaine écoulée, du samedi au vendredi, tirée de la base.",
     semaine: (du: string, au: string) => `Semaine du ${du} au ${au}`,
     chiffres: "Chiffres de la semaine",
     lignes: {
@@ -148,7 +148,6 @@ export const pilotage = {
     okAdmins: (n: number) => `Rapport envoyé à ${plur(n, "admin", "admins")}.`,
     dernier: (quand: string, n: number) => `Dernier envoi aux admins : ${quand}, à ${plur(n, "destinataire", "destinataires")}.`,
     jamais: "Ce rapport n’a pas encore été envoyé aux admins.",
-    auto: "L’envoi automatique du lundi n’est pas programmé : il demande une tâche planifiée (Vercel Cron). En attendant, l’envoi se fait d’ici.",
     sansSmtp: "L’envoi d’e-mails n’est pas configuré : l’aperçu reste consultable, rien ne peut partir.",
     courriel: {
       sujet: (semaine: string) => `Rapport OHT · ${semaine}`,

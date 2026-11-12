@@ -1,6 +1,7 @@
 import { base } from "../base";
 import { emettre } from "../documents/emettre";
-import type { Constat, Reservation, Statut } from "./types";
+import { peutPasser } from "../machines";
+import { type Constat, type Reservation, type Statut, TRANSITIONS_RESERVATION } from "./types";
 
 // Seule porte vers l'état « payé », appelée par la vérification au retour du client ET par les webhooks : elle est
 // idempotente (mise à jour conditionnelle sur « attente »), ne croit que la transaction relue auprès de la passerelle,
@@ -29,19 +30,20 @@ export async function finaliser(r: Reservation, c: Constat): Promise<Issue> {
   // remboursement constaté par l'API : une réservation payée passe en « remboursée » (ses billets ne valent plus)
   if (c.etat === "rembourse") {
     if (r.statut !== "paye") return { statut: r.statut, reservation: r };
-    return basculer(r, "paye", { statut: "rembourse" });
+    return basculer(r, "paye", "rembourse", {});
   }
   if (r.statut !== "attente") return { statut: r.statut, reservation: r };
   if (c.etat !== "reussi") return { statut: r.statut, reservation: r, refus: "non_reussi" }; // reste en attente : le client peut réessayer
   if (c.devise !== r.devise) return { statut: r.statut, reservation: r, refus: "devise" };
   if (c.montant === null || c.montant < r.montant) return { statut: r.statut, reservation: r, refus: "montant" };
 
-  return basculer(r, "attente", { statut: "paye", transaction_id: c.transaction, paye_le: new Date().toISOString(), montant_recu: c.montant });
+  return basculer(r, "attente", "paye", { transaction_id: c.transaction, paye_le: new Date().toISOString(), montant_recu: c.montant });
 }
 
-async function basculer(r: Reservation, depuis: Statut, champs: Record<string, unknown>): Promise<Issue> {
+async function basculer(r: Reservation, depuis: Statut, vers: Statut, champs: Record<string, unknown>): Promise<Issue> {
+  if (!peutPasser(TRANSITIONS_RESERVATION, depuis, vers)) return { statut: r.statut, reservation: r };
   // Une confirmation manuelle peut intervenir depuis la lecture de r : la base revérifie aussi ce mode.
-  const reponse = await base(`reservations?id=eq.${r.id}&statut=eq.${depuis}&reglement_manuel=is.false`, { method: "PATCH", corps: { ...champs, modifie_le: new Date().toISOString() }, prefer: "return=representation" }).catch(() => null);
+  const reponse = await base(`reservations?id=eq.${r.id}&statut=eq.${depuis}&reglement_manuel=is.false`, { method: "PATCH", corps: { statut: vers, ...champs, modifie_le: new Date().toISOString() }, prefer: "return=representation" }).catch(() => null);
   if (!reponse) return { statut: r.statut, reservation: r, refus: "base" };
   // 409 : l'index unique (passerelle, transaction_id) refuse une transaction qui a déjà payé une autre réservation
   if (reponse.status === 409) return { statut: r.statut, reservation: r, refus: "transaction_deja_utilisee" };

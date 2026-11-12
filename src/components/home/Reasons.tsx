@@ -14,13 +14,14 @@ const FOND = { sun: "bg-sun text-abyss", abyss: "bg-abyss text-white", laterite:
 const VOILE =
   "isolate before:absolute before:-inset-x-6 before:-bottom-6 before:-top-24 before:-z-10 before:bg-[linear-gradient(to_top,color-mix(in_oklab,var(--color-abyss)_85%,transparent),color-mix(in_oklab,var(--color-abyss)_60%,transparent)_calc(100%_-_6rem),transparent)]";
 
-// Ouverture en volet : la tuile s'ouvre du bas vers le haut, la photo se dézoome, le texte monte en dernier.
+// Ouverture en volet : la tuile s'ouvre du bas vers le haut, la photo se dézoome, le texte monte en dernier. Tout est
+// ouvert en moins de 0,8 s (au défilement, une tuile vide ou coupée plus longtemps se lisait comme un défaut).
 const volet = {
   cache: { clipPath: "inset(100% 0% 0% 0% round 28px)" },
-  vu: (k: number) => ({ clipPath: "inset(0% 0% 0% 0% round 28px)", transition: { duration: 1.1, ease: EASE, delay: 0.15 + k * 0.11 } }),
+  vu: (k: number) => ({ clipPath: "inset(0% 0% 0% 0% round 28px)", transition: { duration: 0.5, ease: EASE, delay: 0.05 + k * 0.03 } }),
 };
-const photo = { cache: { scale: 1.22 }, vu: (k: number) => ({ scale: 1, transition: { duration: 1.8, ease: EASE, delay: 0.15 + k * 0.11 } }) };
-const texte = { cache: { opacity: 0, y: 24 }, vu: (k: number) => ({ opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE, delay: 0.65 + k * 0.11 } }) };
+const photo = { cache: { scale: 1.22 }, vu: (k: number) => ({ scale: 1, transition: { duration: 0.8, ease: EASE, delay: 0.05 + k * 0.03 } }) };
+const texte = { cache: { opacity: 0, y: 24 }, vu: (k: number) => ({ opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE, delay: 0.2 + k * 0.03 } }) };
 
 function Tuile({ i, grand, k, onChoisir }: { i: number; grand: boolean; k: number; onChoisir?: () => void }) {
   const reasons = useContenu("fr.reasons", REASONS);
@@ -129,7 +130,8 @@ export function Reasons() {
             className={`mx-auto mt-10 grid w-full max-w-[1320px] gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:mt-8 lg:min-h-0 lg:flex-1 lg:grid-flow-dense lg:grid-cols-5 lg:grid-rows-2 lg:gap-5 lg:px-24`}
             initial={reduit ? false : "cache"}
             whileInView="vu"
-            viewport={{ once: true, amount: 0.25 }}
+            // la liste dépasse l'écran sur tablette et téléphone : elle s'ouvre dès que son haut entre, pas au quart
+            viewport={{ once: true, amount: "some" }}
           >
             {ordre.map((i, k) => (
               <Tuile key={i} i={i} k={k} grand={recompose ? i === actif : false} onChoisir={recompose ? () => aller(i) : undefined} />

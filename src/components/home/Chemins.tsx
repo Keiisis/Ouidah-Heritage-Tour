@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "@/components/ui/LienPublic";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { adresseCircuit, adresseLieu, cheminsIntro as CHEMINS_INTRO, cleType, destinations as DESTINATIONS, FICHES_LIEU, tours as TOURS, toursIntro as TOURS_INTRO } from "@/content/fr";
+import { adresseCircuit, adresseLieu, cheminsIntro as CHEMINS_INTRO, cleType, destinations as DESTINATIONS, FICHES_LIEU, hero as HERO, places as PLACES, tourFilters as TOUR_FILTERS, tours as TOURS, toursIntro as TOURS_INTRO } from "@/content/fr";
 import { useContenu } from "@/components/ui/ContenuSite";
 import type { Circuit, LieuReleve } from "@/content/types";
 import { Icon } from "@/components/ui/Icon";
@@ -38,6 +38,8 @@ const carteV = {
 };
 
 const sansAbonnement = () => () => {};
+// recherche du Hero (/?lieu=&type=&duree=#chemins) : critères vides = aucun filtre
+type Critere = { lieu: string; type: string; duree: string };
 
 export function Chemins({ totalLieux }: { totalLieux: number }) {
   const { nombre, date } = useFormatsSite();
@@ -47,6 +49,9 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
   const fiches = useContenu("fr.FICHES_LIEU", FICHES_LIEU);
   const tours = useContenu("fr.tours", TOURS);
   const toursIntro = useContenu("fr.toursIntro", TOURS_INTRO);
+  const hero = useContenu("fr.hero", HERO);
+  const placesHero = useContenu("fr.places", PLACES);
+  const tourFilters = useContenu("fr.tourFilters", TOUR_FILTERS);
   const { COULEUR, FAMILLE, LIBELLE, ORDRE_FILTRE } = useMemo(() => ({
     COULEUR: Object.fromEntries(T.filters.flatMap((f) => f.ids.map((id) => [id, f.color]))),
     FAMILLE: Object.fromEntries(T.filters.flatMap((f) => f.ids.map((id) => [id, f.group]))),
@@ -92,18 +97,24 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
     return () => io.disconnect();
   }, []);
 
-  // recherche envoyée par le Hero (/?lieu=&type=&duree=#chemins) : ouvre les circuits prêts sur celui qui répond au plus
-  // de critères (lieu visité ou circuit lui-même, type), une fois par adresse. La durée n'est pas encore saisie pour les
-  // circuits : elle ne départage rien tant que l'admin ne l'a pas remplie.
+  // recherche envoyée par le Hero (/?lieu=&type=&duree=#chemins) : ouvre les circuits prêts filtrés sur tous les critères
+  // (lieu visité ou circuit lui-même, type, durée), une fois par adresse. Une durée encore à saisir n'écarte pas le
+  // circuit (il est gardé, avec « durée à confirmer ») ; une durée saisie répond quand elle contient le libellé cherché.
+  const options = (nom: string) => hero.search.fields.find((f) => f.name === nom)?.options ?? [];
+  const dureeDe = (texte: string) => options("duree").find((o) => o.value && cleType(texte).includes(cleType(o.label)))?.value ?? null;
+  const repond = (t: Circuit, c: Critere | null) =>
+    !c || ((!c.lieu || t.slug === c.lieu || t.stops.includes(c.lieu)) && (!c.type || cleType(t.tag) === c.type) && (!c.duree || t.duration === null || dureeDe(t.duration) === c.duree));
+  const [critere, setCritere] = useState<Critere | null>(null);
   const recherche = useSyncExternalStore(sansAbonnement, () => location.search, () => "");
   const [rechercheLue, setRechercheLue] = useState("");
   if (recherche !== rechercheLue) {
     setRechercheLue(recherche);
     const q = new URLSearchParams(recherche);
-    const lieu = q.get("lieu"), type = q.get("type");
     if (q.has("lieu") || q.has("type") || q.has("duree")) {
-      const score = (t: Circuit) => Number(!!lieu && (t.slug === lieu || t.stops.includes(lieu))) + Number(!!type && cleType(t.tag) === type);
-      setActif(tours.reduce((m, t, j) => (score(t) > score(tours[m]) ? j : m), 0));
+      const c = { lieu: q.get("lieu") ?? "", type: q.get("type") ?? "", duree: q.get("duree") ?? "" };
+      const actifs = c.lieu || c.type || c.duree ? c : null;
+      setCritere(actifs);
+      setActif(Math.max(0, tours.findIndex((t) => repond(t, actifs))));
       setMode("prets");
     }
   }
@@ -225,7 +236,26 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
     if (ok) setSaisie(false);
   };
 
-  const vue: Vue = useMemo(() => (mode === "prets" ? { mode: "prets", etapes: circuit.stops, trace: circuit.trace } : { mode: "composer", gardes, ici: lieu?.slug ?? null }), [mode, circuit, gardes, lieu]);
+  const visibles = tours.flatMap((c, i) => (repond(c, critere) ? [{ c, i }] : []));
+  // critères en clair, dans la langue de la page (mêmes listes que le Hero)
+  const etiquettes = critere
+    ? [
+        critere.lieu && (placesHero.find((p) => p.slug === critere.lieu)?.name ?? parSlug.get(critere.lieu)?.name),
+        critere.type && tourFilters.find((f) => cleType(f) === critere.type),
+        critere.duree && options("duree").find((o) => o.value === critere.duree)?.label,
+      ].filter((x): x is string => !!x)
+    : [];
+  const effacer = () => {
+    setCritere(null);
+    history.replaceState(history.state, "", location.pathname + location.hash);
+  };
+  // aucun circuit trouvé : la carte montre le lieu cherché, sans tracé
+  const lieuCherche = critere?.lieu && parSlug.has(critere.lieu) ? critere.lieu : null;
+  const aucun = visibles.length === 0;
+  const vue: Vue = useMemo(
+    () => (mode !== "prets" ? { mode: "composer", gardes, ici: lieu?.slug ?? null } : aucun ? { mode: "prets", etapes: lieuCherche ? [lieuCherche] : [], trace: null } : { mode: "prets", etapes: circuit.stops, trace: circuit.trace }),
+    [mode, circuit, gardes, lieu, aucun, lieuCherche],
+  );
   const gardesConnus = gardes.filter((id) => fiche(id));
   const lienDevis = T.trip.href; // la demande lit le dossier de voyage : aucun paramètre
   // prix par personne de la fiche du circuit, affiché dès que l'interrupteur « Afficher le prix sur le site » est mis
@@ -416,8 +446,35 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
                 ) : (
                   <motion.div key="prets" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.45, ease: EASE }}>
                     <h3 className="mt-6 font-display text-[26px] leading-[1.1] font-semibold lg:text-[28px]">{T.ready.heading}</h3>
-                    <ul className="mt-4 grid gap-2.5">
-                      {tours.map((c, i) => (
+                    {etiquettes.length ? (
+                      <div role="group" aria-label={T.ready.recherche} className="mt-3 flex flex-wrap items-center gap-2">
+                        {etiquettes.map((e) => (
+                          <span key={e} className="inline-flex min-h-9 items-center rounded-full bg-[#f6f6f4] px-3.5 text-[13px] font-semibold">
+                            {e}
+                          </span>
+                        ))}
+                        <button type="button" onClick={effacer} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-abyss/60 underline underline-offset-4 hover:text-abyss focus-visible:outline-2 focus-visible:outline-sun">
+                          <Icon name="close" className="size-3.5" />
+                          {T.ready.effacer}
+                        </button>
+                      </div>
+                    ) : null}
+                    {aucun ? (
+                      <div aria-live="polite" className="mt-4 rounded-[1.25rem] border border-dashed border-abyss/20 p-5">
+                        <p className="font-display text-[22px] leading-[1.15] font-semibold">{T.ready.aucun}</p>
+                        <p className="mt-2 text-sm leading-[1.6] text-abyss/65">{T.ready.aucunAide}</p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <button type="button" onClick={() => (lieuCherche ? aller(lieuCherche) : setMode("composer"))} className="inline-flex min-h-11 items-center rounded-full bg-abyss px-5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
+                            {T.compose.label}
+                          </button>
+                          <Link href={T.ready.surMesure.href} className="inline-flex min-h-11 items-center rounded-full border border-abyss/15 px-5 text-sm font-semibold hover:border-abyss focus-visible:outline-2 focus-visible:outline-sun">
+                            {T.ready.surMesure.label}
+                          </Link>
+                        </div>
+                      </div>
+                    ) : null}
+                    <ul className="mt-4 grid gap-2.5" aria-live="polite">
+                      {visibles.map(({ c, i }) => (
                         <li key={c.slug}>
                           {i === actif ? (
                             <div className="grid grid-cols-[5rem_1fr] gap-4 rounded-[1.25rem] border-2 border-abyss p-4">
@@ -436,7 +493,7 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
                                 </p>
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   <Link href={adresseCircuit(c.slug, tours)} className="inline-flex min-h-11 items-center rounded-full bg-abyss px-5 text-sm font-bold text-white">
-                                    {T.ready.book}
+                                    {c.duration !== null && prixPublic(c) !== null ? T.ready.book : T.ready.demander}
                                   </Link>
                                   <button type="button" onClick={() => personnaliser(c)} className="min-h-11 rounded-full border border-abyss/15 px-5 text-sm font-bold hover:border-abyss">
                                     {T.ready.customize}
@@ -461,6 +518,7 @@ export function Chemins({ totalLieux }: { totalLieux: number }) {
                         </li>
                       ))}
                     </ul>
+                    {critere?.duree && visibles.some(({ c }) => c.duration === null) ? <p className="mt-3 text-sm leading-[1.6] text-abyss/60">{T.ready.dureeInconnue}</p> : null}
                   </motion.div>
                 )}
               </AnimatePresence>

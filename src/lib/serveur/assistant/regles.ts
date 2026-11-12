@@ -1,9 +1,17 @@
 import { LANGUES_ASSISTANT, type LangueAssistant, RETIRE } from "@/content/assistant";
+import type { Transitions } from "../machines";
 
 // Règles pures de l'assistant (aucun accès réseau, base ni secret) : lecture des saisies du visiteur, identifiant de
 // conversation signé, choix des fiches de connaissance pour une question, filtre du flux de réponse (code interne,
 // adresses e-mail, ligne finale d'actions), validation des actions proposées, lecture du flux SSE de Groq. Prouvées par
 // tests-oht/assistant-test.mjs (import direct, chargeur ts-chargeur.mjs).
+
+export type EtatSource = "brouillon" | "publie" | "retire";
+/** assistant_sources.etat (machine à états : 20261122_machines_etats_deux.sql recopie cette table). Née « brouillon »
+ * (document déposé, aperçu) ou « publiée » (note, réponse à une question). Publier passe le contrôle des passages
+ * sensibles ; retirer garde la source. Republier une source retirée est VOULU (bouton « Republier », même contrôle refait à
+ * chaque publication) : retire → publie direct, sans repasser par le brouillon. */
+export const TRANSITIONS_SOURCE: Transitions<EtatSource> = { brouillon: ["publie"], publie: ["retire"], retire: ["publie"] };
 
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

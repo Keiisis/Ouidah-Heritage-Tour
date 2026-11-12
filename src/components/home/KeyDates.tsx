@@ -10,6 +10,7 @@ import { datesSection as DATES_SECTION, DEVIS, evenements as EVENEMENTS } from "
 import { useContenu } from "@/components/ui/ContenuSite";
 import type { Evenement } from "@/content/types";
 import { Icon } from "@/components/ui/Icon";
+import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
 import { Objet3D } from "@/components/ui/Objet3D";
 import { useMouvementReduit } from "@/lib/mouvement";
 import { dateDuJour, jourDe, jourOuidah, minuitOuidah, prochaine } from "@/lib/jours";
@@ -448,7 +449,10 @@ function Pass({ focus, sejour, nuits, dans, apres, maintenant, formule, setFormu
                   {c.nom}
                   <small className="mt-0.5 block text-[11px]/[15px] font-semibold text-abyss/55">{c.detail}</small>
                 </span>
-                <span>{c.prix !== null ? fmtFcfa(c.prix) : T.pass.onRequest}</span>
+                <span>
+                  {c.prix !== null ? fmtFcfa(c.prix) : T.pass.onRequest}
+                  <EquivalentDevise xof={c.prix} />
+                </span>
               </label>
             ))}
           </fieldset>
@@ -458,7 +462,10 @@ function Pass({ focus, sejour, nuits, dans, apres, maintenant, formule, setFormu
               {sejour ? T.pass.stay(nuits) : o.nom}
               <small className="mt-0.5 block text-[11px]/[15px] font-semibold text-abyss/55">{o.inclus}</small>
             </span>
-            <span className="text-right">{o.prix !== null ? T.pass.from(fmtFcfa(o.prix)) : T.pass.onRequest}</span>
+            <span className="text-right">
+              {o.prix !== null ? T.pass.from(fmtFcfa(o.prix)) : T.pass.onRequest}
+              <EquivalentDevise xof={o.prix} />
+            </span>
           </div>
         )}
         {o.places !== null ? (

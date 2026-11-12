@@ -56,13 +56,18 @@ export function Retour({ etat, n, id }: { etat: Etat; n: number; id: string }) {
   );
 }
 
+/** Champs refusés par le serveur marqués aria-invalid ; le premier prend le focus. */
 function marquer(f: HTMLFormElement | null, champs: string[]) {
   if (!f) return;
+  let premier: HTMLElement | null = null;
   for (const el of Array.from(f.elements) as HTMLInputElement[]) {
     if (!el.name) continue;
-    if (champs.includes(el.name)) el.setAttribute("aria-invalid", "true");
-    else el.removeAttribute("aria-invalid");
+    if (champs.includes(el.name)) {
+      el.setAttribute("aria-invalid", "true");
+      premier ??= el;
+    } else el.removeAttribute("aria-invalid");
   }
+  premier?.focus();
 }
 
 export function FormAction({ action, args = [], bouton, reussite, confirmer, garder = false, className, nom, enfants }: { action: Action; args?: unknown[]; bouton: string; reussite: string; confirmer?: string; garder?: boolean; className?: string; nom?: string; enfants: ReactNode }) {
@@ -71,7 +76,7 @@ export function FormAction({ action, args = [], bouton, reussite, confirmer, gar
   const { etat, n, occupe, lancer } = useEnvoi(action, args);
   const envoyer = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (confirmer && !window.confirm(confirmer)) return;
+    if (occupe || (confirmer && !window.confirm(confirmer))) return;
     lancer([new FormData(e.currentTarget)], reussite, () => {
       if (!garder) form.current?.reset();
     });

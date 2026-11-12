@@ -180,6 +180,8 @@ function Entete({ pop, fermerPop, armer, suspendre, menu, setMenu }: { pop: (Pop
   const ouvreurMenu = useRef<HTMLElement | null>(null);
   const menuX = useRef<HTMLButtonElement>(null);
   const boiteMenu = useRef<HTMLDivElement>(null);
+  // catalogue vide : ni recherche, ni catégories, ni tiroir « Tout » (ils mèneraient à une liste vide)
+  const catalogue = b.catalogue.produits.length > 0;
 
   const ouvrirMenu = (e: { currentTarget: HTMLElement }) => {
     ouvreurMenu.current = e.currentTarget;
@@ -207,13 +209,15 @@ function Entete({ pop, fermerPop, armer, suspendre, menu, setMenu }: { pop: (Pop
       <div className="tete-boutique">
         <div className="tete" role="region" aria-label={T.barre.region}>
           <div className="container-oht tete-in">
-            <button className="burger" type="button" aria-expanded={menu} aria-controls="bq-menu-tout" aria-label={T.nav.toutAria} onClick={ouvrirMenu}>
-              <Icon name="menu" />
-            </button>
+            {catalogue ? (
+              <button className="burger" type="button" aria-expanded={menu} aria-controls="bq-menu-tout" aria-label={T.nav.toutAria} onClick={ouvrirMenu}>
+                <Icon name="menu" />
+              </button>
+            ) : null}
             <Link className="bq-nom" href={T.barre.accueil.href}>
               {T.barre.accueil.label}
             </Link>
-            <Recherche />
+            {catalogue ? <Recherche /> : <span className="recherche-absente" aria-hidden="true" />}
             <div className="tete-act">
               <button className="dev" type="button" aria-label={T.barre.devise(devise, suivante)} onClick={() => setDevise(suivante)}>
                 {devises.map((c) => (
@@ -244,10 +248,11 @@ function Entete({ pop, fermerPop, armer, suspendre, menu, setMenu }: { pop: (Pop
             </div>
           </div>
         </div>
-        <SousNav ouvrirMenu={ouvrirMenu} menu={menu} />
+        {catalogue ? <SousNav ouvrirMenu={ouvrirMenu} menu={menu} /> : null}
       </div>
 
       {/* tiroir « Tout » : les catégories en accordéon (le méga-menu du mobile) */}
+      {catalogue ? (
       <div className={`menu-tout ${menu ? "ouvert" : ""}`} id="bq-menu-tout" inert={!menu} data-lenis-prevent onClick={(e) => e.target === e.currentTarget && setMenu(false)}>
         <div ref={boiteMenu} className="menu-tout-in" role="dialog" aria-modal="true" aria-labelledby="bq-menu-titre" onKeyDown={(e) => pieger(e, boiteMenu.current)}>
           <div className="menu-tout-tete">
@@ -285,6 +290,7 @@ function Entete({ pop, fermerPop, armer, suspendre, menu, setMenu }: { pop: (Pop
           </ul>
         </div>
       </div>
+      ) : null}
     </>
   );
 }

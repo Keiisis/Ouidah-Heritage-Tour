@@ -46,7 +46,8 @@ export async function CarteAnneaux({ d, format, avecPhoto, onde, className }: { 
   ];
   const libre = (b: number[]) => b[0] > 4 && b[2] < W - 4 && b[1] > 4 && b[3] < H - 4 && !boites.some((o) => b[0] < o[2] && b[2] > o[0] && b[1] < o[3] && b[3] > o[1]);
   const points = marques.map((v) => ({ v, p: xy(v.coords) })).filter(({ p }) => dedans(p));
-  const noms: { x: number; y: number; ancre: "start" | "end"; nom: string }[] = [];
+  // nom coupé à 26 signes : le nom entier reste en infobulle (title SVG, lu aussi par les lecteurs d'écran)
+  const noms: { x: number; y: number; ancre: "start" | "end"; nom: string; entier: string }[] = [];
   for (const { v, p } of points) {
     if (noms.length >= max) break;
     const nom = court(v.nom, 26),
@@ -58,7 +59,7 @@ export async function CarteAnneaux({ d, format, avecPhoto, onde, className }: { 
         b = [x0, p[1] - h, x0 + w, p[1] + h];
       if (!libre(b)) continue;
       boites.push(b);
-      noms.push({ x: cote > 0 ? p[0] + ecart : p[0] - ecart, y: p[1], ancre: cote > 0 ? "start" : "end", nom });
+      noms.push({ x: cote > 0 ? p[0] + ecart : p[0] - ecart, y: p[1], ancre: cote > 0 ? "start" : "end", nom, entier: v.nom });
       break;
     }
   }
@@ -101,6 +102,7 @@ export async function CarteAnneaux({ d, format, avecPhoto, onde, className }: { 
       <g className="fl-noms" fontSize={police}>
         {noms.map((n) => (
           <text key={`${n.x}-${n.y}`} x={n1(n.x)} y={n1(n.y)} textAnchor={n.ancre}>
+            {n.nom.endsWith("…") ? <title>{n.entier}</title> : null}
             {n.nom}
           </text>
         ))}

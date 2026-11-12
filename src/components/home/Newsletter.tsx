@@ -53,6 +53,10 @@ export function Newsletter() {
   const [ouvert, setOuvert] = useState(false);
   const [exemple, setExemple] = useState("");
   const [etat, setEtat] = useState<"idle" | "envoi" | "ok" | "erreur" | "aucun" | "echec" | "limite">("idle");
+  // ce qui manque au dernier envoi, dans l'ordre du formulaire : adresse, accord, thème
+  const [manque, setManque] = useState<("emailManque" | "emailInvalide" | "consentManque" | "aucun")[]>([]);
+  const consent = useRef<HTMLInputElement>(null);
+  const premierTheme = useRef<HTMLInputElement>(null);
   const debut = useRef(0);
   useEffect(() => {
     debut.current = performance.now();
@@ -92,16 +96,30 @@ export function Newsletter() {
 
   const basculer = (id: string) => {
     setChoix((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c, id]));
-    if (etat === "aucun") setEtat("idle");
+    if (manque.includes("aucun")) {
+      const reste = manque.filter((m) => m !== "aucun");
+      setManque(reste);
+      if (!reste.length) setEtat("idle");
+    }
   };
   const envoyer = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (etat === "envoi") return;
     if (!ouvert) return setOuvert(true);
-    if (n === 0) return setEtat("aucun");
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email") ?? "").trim();
-    if (!EMAIL.test(email) || !f.get("consent")) return setEtat("erreur");
+    const fautes = [
+      ...(!email ? (["emailManque"] as const) : !EMAIL.test(email) ? (["emailInvalide"] as const) : []),
+      ...(!f.get("consent") ? (["consentManque"] as const) : []),
+      ...(n === 0 ? (["aucun"] as const) : []),
+    ];
+    setManque(fautes);
+    if (fautes.length) {
+      setEtat(fautes[0] === "aucun" ? "aucun" : "erreur");
+      // le focus va au premier champ fautif : l'adresse, la case d'accord, sinon le premier thème
+      (fautes[0].startsWith("email") ? champ.current : fautes[0] === "consentManque" ? consent.current : premierTheme.current)?.focus();
+      return;
+    }
     setEtat("envoi");
     try {
       const res = await fetch("/api/lettre", {
@@ -153,21 +171,23 @@ export function Newsletter() {
         <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
           {/* ce que Ouidah vous écrit */}
           <fieldset className="xl:order-2">
-            <legend className={`mb-3 text-[15px] font-bold xl:w-full xl:text-right ${OMBRE}`}>{T.choisir}</legend>
+            <legend className={`mb-3 text-[15px] font-bold xl:w-full xl:text-right ${OMBRE}`}>
+              {T.choisir} <span className="font-semibold opacity-85">({T.auMoinsUn})</span>
+            </legend>
             <div className="grid grid-cols-2 gap-2 md:gap-3.5 xl:w-[40rem] xl:grid-cols-[1fr_1.3fr]">
-              {T.sujets.map((s) => {
+              {T.sujets.map((s, i) => {
                 const on = choix.includes(s.id);
                 return (
                   <label
                     key={s.id}
                     className={`relative flex cursor-pointer flex-col rounded-xl bg-white p-3 text-ink shadow-[0_24px_48px_-20px_rgba(15,22,45,.65)] transition-[transform,box-shadow] duration-500 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-sun hover:-translate-y-1.5 md:p-4 ${on ? "ring-2 ring-sun" : ""}`}
                   >
-                    <input type="checkbox" name="sujets" value={s.id} form="lettre-form" className="sr-only" checked={on} onChange={() => basculer(s.id)} />
-                    <Objet3D nom={s.objet} taille={72} eteint={!on} className="size-11 md:size-[72px]" />
+                    <input ref={i === 0 ? premierTheme : undefined} type="checkbox" name="sujets" value={s.id} form="lettre-form" className="sr-only" checked={on} onChange={() => basculer(s.id)} aria-invalid={manque.includes("aucun") || undefined} aria-describedby={manque.includes("aucun") ? "lettre-message" : undefined} />
+                    <Objet3D nom={s.objet} taille={72} className="size-11 md:size-[72px]" />
                     <span aria-hidden="true" className={`absolute top-2.5 right-2.5 grid size-6 place-items-center rounded-full transition-colors duration-300 md:top-3.5 md:right-3.5 md:size-8 ${on ? "bg-sun" : "shadow-[inset_0_0_0_1.5px_rgba(15,22,45,.25)]"}`}>
                       <Coche on={on} />
                     </span>
-                    <span className={`mt-1.5 font-display text-[16px]/[1.1] font-semibold tracking-[-0.015em] transition-colors md:mt-2.5 md:text-[22px] ${on ? "" : "text-ink/55"}`}>{s.nom}</span>
+                    <span className="mt-1.5 font-display text-[16px]/[1.1] font-semibold tracking-[-0.015em] md:mt-2.5 md:text-[22px]">{s.nom}</span>
                     <span className="mt-1.5 hidden text-[13px]/[1.45] text-ink-muted md:block">{s.texte}</span>
                     <ul className="mt-3 hidden flex-col gap-1 md:flex">
                       {s.id === "agenda"
@@ -231,10 +251,14 @@ export function Newsletter() {
                     required
                     autoComplete="email"
                     placeholder={reduit ? T.exemple : exemple}
-                    aria-invalid={etat === "erreur" || undefined}
+                    onInput={() => manque.some((m) => m.startsWith("email")) && setManque((m) => m.filter((x) => !x.startsWith("email")))}
+                    aria-invalid={manque.some((m) => m.startsWith("email")) || undefined}
+                    aria-describedby={manque.some((m) => m.startsWith("email")) ? "lettre-message" : undefined}
                     className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-ink/40 md:text-[17px]"
                   />
-                  <button type="submit" aria-label={etat === "envoi" ? T.envoi : n ? T.envoyer(n) : T.submit} aria-disabled={etat === "envoi" || undefined} className="grid size-12 flex-none place-items-center rounded-full bg-abyss text-ivory transition-colors hover:bg-ocean focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun aria-disabled:cursor-progress">
+                  {/* libellé visible (« S'inscrire ») ; le nom complet, thèmes compris, reste lu par les lecteurs d'écran */}
+                  <button type="submit" aria-label={etat === "envoi" ? T.envoi : n ? T.envoyer(n) : T.submit} aria-disabled={etat === "envoi" || undefined} className="flex h-12 flex-none items-center gap-2 rounded-full bg-abyss pr-4 pl-5 text-[15px] font-bold whitespace-nowrap text-ivory transition-colors hover:bg-ocean focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun aria-disabled:cursor-progress">
+                    {T.envoyerCourt}
                     {etat === "envoi" ? <span className="oht-tourne" /> : <Icon name="arrow-right" className="size-[18px]" />}
                   </button>
                   {/* piège à robots : invisible et hors du parcours clavier */}
@@ -252,7 +276,7 @@ export function Newsletter() {
 
             {ouvert && etat !== "ok" ? (
               <label className={`mt-3 flex cursor-pointer items-start gap-2.5 text-[13px]/[1.45] ${OMBRE}`}>
-                <input name="consent" type="checkbox" required className="peer sr-only" />
+                <input ref={consent} name="consent" type="checkbox" className="peer sr-only" aria-invalid={manque.includes("consentManque") || undefined} aria-describedby={manque.includes("consentManque") ? "lettre-message" : undefined} onChange={() => manque.includes("consentManque") && setManque((m) => m.filter((x) => x !== "consentManque"))} />
                 <span aria-hidden="true" className="mt-px grid size-[18px] flex-none place-items-center rounded bg-white text-transparent peer-checked:text-abyss peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sun">
                   <svg viewBox="0 0 24 24" className="size-3 fill-none stroke-current" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 12.5l4 4L18 8" />
@@ -262,7 +286,7 @@ export function Newsletter() {
               </label>
             ) : null}
             <p id="lettre-message" role="alert" className={`mt-2 min-h-5 text-[13px] font-bold text-sun ${OMBRE}`}>
-              {etat === "erreur" ? T.error : etat === "aucun" ? T.aucun : etat === "echec" ? T.echec : etat === "limite" ? T.limite : etat === "envoi" ? T.envoi : null}
+              {etat === "erreur" || etat === "aucun" ? manque.map((m) => T[m]).join(" ") : etat === "echec" ? T.echec : etat === "limite" ? T.limite : etat === "envoi" ? T.envoi : null}
             </p>
           </form>
         </div>

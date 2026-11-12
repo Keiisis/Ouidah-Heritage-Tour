@@ -1,0 +1,880 @@
+/* Hallmark · /devis · carnet des lieux (A carnet + B recherche, étiquettes + C carte) · OHT · surface: panneau du billet · posture: committed */
+/* Feuille globale (classes « cn- ») : la règle Turbopack du projet traite tout *.css en global. Jetons du billet (billet.css,
+   --b-*). Titres Fraunces 600 romain, texte Manrope, graisse 600 au plus, grille de 4 px, aucune capitale espacée.
+   Un lieu gardé porte son numéro dans le voyage (pastille soleil, le même que son épingle) : ni cadre ni coche.
+   Mouvement : ouverture (glissement de la feuille, ou fondu court du panneau), puis le compte en palettes ; rien d'autre. */
+.cn {
+  position: fixed;
+  inset: 96px auto auto var(--cn-g, 24px);
+  width: var(--cn-l, 932px);
+  height: min(780px, calc(100dvh - 120px));
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--b-blanc);
+  color: var(--b-encre);
+  font-family: var(--font-text);
+  box-shadow:
+    0 40px 80px -28px var(--b-ombre),
+    0 0 0 1px var(--b-filet);
+}
+.cn::backdrop {
+  background: color-mix(in oklab, var(--b-nuit) 70%, transparent);
+}
+/* appui : léger enfoncement, sans transition (même règle que les puces du billet) */
+.cn-lieu:active .cn-photo,
+.cn-epingle:active,
+.cn-ailleurs:active,
+.cn-etiquette:active,
+.cn-vues button:active,
+.cn-cbouton:active .cn-cphoto {
+  transform: scale(0.97);
+}
+.cn:focus {
+  outline: 0;
+}
+.cn-boite {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+}
+
+/* en-tête : titre, bascule Carte / Liste (feuille seulement), fermer */
+.cn-tete {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--b-filet);
+}
+.cn-titre {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.cn-titre:focus {
+  outline: 0;
+}
+.cn-vues {
+  display: none;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--b-gris);
+}
+.cn-vues button {
+  min-width: 72px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: 600 15px var(--font-text);
+  color: var(--b-encre-2);
+  cursor: pointer;
+}
+.cn-vues button[aria-pressed="true"] {
+  background: var(--b-encre);
+  color: var(--b-blanc);
+}
+.cn-vues button:focus-visible,
+.cn-fermer:focus-visible,
+.cn-effacer:focus-visible,
+.cn-etiquette:focus-visible,
+.cn-cbouton:focus-visible,
+.cn-ailleurs:focus-visible {
+  outline: 2px solid var(--b-encre);
+  outline-offset: 2px;
+}
+.cn-fermer {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--b-gris);
+  color: var(--b-encre);
+  cursor: pointer;
+}
+.cn svg:not(.cn-svg) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cn-fermer svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* colonne de la liste : recherche collée en haut, puis filtres, circuits, lieux */
+.cn-liste {
+  grid-row: 2;
+  grid-column: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 24px 24px;
+}
+.cn-recherche {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 16px 0 12px;
+  background: var(--b-blanc);
+}
+.cn-champ {
+  position: relative;
+  display: block;
+}
+.cn-champ > svg {
+  position: absolute;
+  left: 16px;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  margin: auto 0;
+  stroke: var(--b-encre-2);
+  stroke-width: 1.8;
+  pointer-events: none;
+}
+.cn-champ .bt-saisie {
+  margin-top: 0;
+  padding: 0 44px;
+}
+.cn-effacer {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--b-encre-2);
+  cursor: pointer;
+}
+.cn-effacer svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* étiquettes des lieux gardés : une seule ligne, « +N » pour le reste */
+.cn-etiquettes {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.cn-etiquette {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--b-blanc);
+  box-shadow: inset 0 0 0 1px var(--b-filet-2);
+  font: 600 14px var(--font-text);
+  color: var(--b-encre);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .cn-etiquette:hover {
+    box-shadow: inset 0 0 0 1.5px var(--b-encre);
+  }
+}
+.cn-etiquette[hidden],
+.cn-plus[hidden] {
+  display: none;
+}
+.cn-enom {
+  max-width: 18ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cn-etiquette > svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  stroke: var(--b-encre-2);
+  stroke-width: 2.2;
+}
+.cn-pastille {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--b-gris);
+}
+.cn-pastille img {
+  object-fit: cover;
+}
+.cn-plus {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--b-filet-2);
+  color: var(--b-encre);
+  font: 600 14px var(--font-text);
+}
+.cn-note {
+  margin-bottom: 4px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--b-encre-2);
+}
+
+/* filtres de type (fr.tourFilters) */
+.cn-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.cn-filtres .bt-puce {
+  padding: 0 12px;
+}
+.cn-filtres .bt-puce small {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cn-bloc {
+  margin-top: 24px;
+}
+.cn-h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.cn-h small,
+.cn-gtitre small {
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--b-encre-3);
+}
+
+/* circuits prêts : une ligne = un bouton, séparées par des filets */
+.cn-circuits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cn-circuit + .cn-circuit {
+  border-top: 1px solid var(--b-filet);
+}
+.cn-cbouton {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 32px;
+  align-items: center;
+  column-gap: 12px;
+  width: 100%;
+  padding: 12px 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--b-encre);
+  text-align: left;
+  cursor: pointer;
+}
+.cn-cphoto {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--b-gris);
+}
+.cn-cphoto img,
+.cn-photo img,
+.cn-ovignette img {
+  object-fit: cover;
+}
+.cn-ctexte {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.cn-ctitre {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+.cn-cmeta {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--b-encre-2);
+}
+.cn-crec {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.cn-coche {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--b-filet-2);
+}
+.cn-coche svg {
+  width: 18px;
+  height: 18px;
+}
+.cn-coche.cn-on {
+  background: var(--b-encre);
+  box-shadow: none;
+}
+.cn-coche.cn-on svg {
+  stroke: var(--b-soleil);
+  stroke-width: 2.4;
+}
+@media (hover: hover) {
+  .cn-cbouton:hover .cn-coche:not(.cn-on) {
+    box-shadow: inset 0 0 0 2px var(--b-encre);
+  }
+}
+/* mise en avant (survol, focus, aperçu) : nom souligné, sans cadre, pour ne pas se lire comme « gardé » */
+.cn-cbouton.cn-allume .cn-ctitre,
+.cn-lieu.cn-allume .cn-nom {
+  text-decoration: underline 2px;
+  text-underline-offset: 4px;
+}
+.cn-question {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 12px 68px;
+}
+.cn-question .bt-petitBouton {
+  margin-top: 0;
+}
+.cn-qRecherche {
+  margin: 4px 0 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--b-gris);
+}
+.cn-qRecherche p {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.cn-qRecherche .cn-question,
+.cn-liste > .cn-question {
+  padding: 0;
+}
+
+/* lieux à voir : cartes photo ; la pastille au coin dit « + » ou le numéro dans le voyage */
+.cn-grille {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 12px;
+}
+.cn-lieu {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--b-encre);
+  text-align: left;
+  cursor: pointer;
+}
+.cn-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--b-gris);
+}
+.cn-photo.cn-objet,
+.cn-ovignette {
+  display: grid;
+  place-items: center;
+}
+.cn-marque {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--b-blanc);
+  color: var(--b-encre);
+  font: 600 15px/1 var(--font-text);
+  box-shadow: 0 6px 14px -6px var(--b-ombre);
+}
+.cn-marque svg {
+  width: 16px;
+  height: 16px;
+}
+.cn-marque.cn-num {
+  background: var(--b-soleil);
+}
+@media (hover: hover) {
+  .cn-lieu:hover .cn-marque:not(.cn-num) {
+    box-shadow:
+      0 0 0 2px var(--b-encre),
+      0 6px 14px -6px var(--b-ombre);
+  }
+}
+.cn-lieu:focus-visible {
+  outline: none;
+}
+.cn-lieu:focus-visible .cn-photo {
+  outline: 2px solid var(--b-encre);
+  outline-offset: 3px;
+}
+.cn-nom {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.cn-sous {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--b-encre-2);
+}
+
+/* résultats de la recherche (listbox pilotée aux flèches depuis le champ) */
+.cn-resultats {
+  margin-top: 4px;
+}
+.cn-groupe + .cn-groupe {
+  margin-top: 16px;
+}
+.cn-gtitre {
+  padding: 4px 8px 8px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.cn-option {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 64px;
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.cn-option.cn-actif {
+  background: var(--b-gris);
+  box-shadow: inset 0 0 0 2px var(--b-encre);
+}
+.cn-ovignette {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--b-gris);
+}
+.cn-otexte {
+  min-width: 0;
+}
+.cn-otexte b {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.cn-otexte small {
+  display: block;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--b-encre-2);
+}
+.cn-option .cn-marque {
+  position: static;
+  box-shadow: inset 0 0 0 1.5px var(--b-filet-2);
+}
+.cn-option .cn-marque.cn-num {
+  box-shadow: none;
+}
+
+/* aucun résultat : le dire, proposer de l'ajouter au message du talon, ou d'effacer */
+.cn-vide {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 16px 0 8px;
+}
+.cn-videTitre {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.cn-videAide {
+  max-width: 48ch;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--b-encre-2);
+}
+.cn-videActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.cn-videActions .bt-petitBouton {
+  margin-top: 0;
+}
+.cn-ajoute {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* carte */
+.cn-carte {
+  position: relative;
+  grid-row: 2;
+  grid-column: 2;
+  min-height: 0;
+  border-left: 1px solid var(--b-filet);
+}
+.cn-plan {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--b-blanc);
+}
+.cn-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.cn-mer {
+  fill: var(--surface-brand);
+}
+.cn-cote {
+  fill: none;
+  stroke: var(--b-blanc);
+  stroke-width: 1.5;
+}
+.cn-point {
+  fill: var(--b-encre);
+  opacity: 0.16;
+}
+.cn-trace {
+  fill: none;
+  stroke: var(--b-encre);
+  stroke-width: 3;
+  stroke-dasharray: 2 8;
+  stroke-linecap: round;
+  opacity: 0.45;
+}
+.cn-trace.cn-on {
+  opacity: 1;
+}
+.cn-exact {
+  fill: var(--b-encre);
+}
+.cn-filet {
+  stroke: var(--b-encre);
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+}
+.cn-epingle {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  translate: -50% -50%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--b-blanc);
+  box-shadow:
+    0 0 0 3px var(--b-blanc),
+    0 8px 18px -8px var(--b-ombre);
+  cursor: pointer;
+}
+.cn-epingle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.cn-epingle.cn-objet {
+  display: grid;
+  place-items: center;
+  background: var(--b-gris);
+}
+.cn-epingle[aria-pressed="true"] {
+  z-index: 1;
+  box-shadow:
+    0 0 0 3px var(--b-encre),
+    0 8px 18px -8px var(--b-ombre);
+}
+/* mise en avant : les autres épingles s'effacent, sans anneau ni mouvement */
+.cn-epingle.cn-allume {
+  z-index: 2;
+}
+.cn-plan:has(.cn-epingle.cn-allume) .cn-epingle:not(.cn-allume) {
+  opacity: 0.4;
+}
+.cn-epingle:focus-visible {
+  outline: 3px solid var(--b-soleil);
+  outline-offset: 3px;
+}
+.cn-epingle b,
+.cn-ailleurs b {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--b-soleil);
+  color: var(--b-encre);
+  font: 600 14px/24px var(--font-text);
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--b-blanc);
+}
+.cn-loin {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  max-width: calc(100% - 100px);
+}
+.cn-ailleurs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 12px 4px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--b-blanc);
+  box-shadow: inset 0 0 0 1px var(--b-filet-2);
+  font: 600 14px/1.25 var(--font-text);
+  color: var(--b-encre);
+  text-align: left;
+  cursor: pointer;
+}
+.cn-ailleurs[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 2px var(--b-encre);
+}
+.cn-ailleurs.cn-allume span:last-of-type {
+  text-decoration: underline 2px;
+  text-underline-offset: 4px;
+}
+.cn-legende {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  color: var(--b-encre-3);
+  pointer-events: none;
+}
+.cn-source {
+  font-size: 12px;
+  line-height: 1.3;
+}
+.cn-echelle {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.cn-echelle i {
+  display: block;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-top: 0;
+}
+.cn-ocean {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--b-blanc);
+  pointer-events: none;
+}
+
+/* pied : compte en palettes, puis l'action */
+.cn-pied {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 24px;
+  border-top: 1px solid var(--b-filet);
+  background: var(--b-blanc);
+}
+.cn-compte {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.cn-cl {
+  display: grid;
+  min-width: 0;
+}
+.cn-cl b {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.cn-cl span {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--b-encre-3);
+}
+.cn-pied .bt-petitBouton {
+  margin-top: 0;
+}
+
+/* tablette : liste plus étroite que la carte n'en a besoin */
+@media (max-width: 1100px) {
+  .cn-boite {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+  }
+}
+/* téléphone et paysage bas : feuille plein écran qui monte du bas (aucune bande de l'en-tête du site au-dessus) ; la carte
+   et la liste se partagent l'écran à tour de rôle, jamais à moitié */
+@media (max-width: 700px), (max-height: 500px) {
+  .cn {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .cn-boite {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cn-tete {
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .cn-titre {
+    font-size: 24px;
+  }
+  .cn-vues {
+    display: flex;
+  }
+  .cn-liste {
+    padding: 0 16px 20px;
+  }
+  .cn-carte {
+    grid-row: 2;
+    grid-column: 1;
+    border-left: 0;
+  }
+  .cn[data-vue="liste"] .cn-carte,
+  .cn[data-vue="carte"] .cn-liste {
+    display: none;
+  }
+  .cn-question {
+    padding-left: 0;
+  }
+  .cn-pied {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  .cn-cl span {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .cn-vues button {
+    min-width: 0;
+    padding: 0 12px;
+  }
+  .cn-titre {
+    font-size: 22px;
+  }
+}
+/* paysage bas : en-tête et pied serrés ; la recherche défile avec la liste ; trois cartes par rangée */
+@media (max-height: 500px) {
+  .cn-tete {
+    padding: 4px 16px;
+  }
+  .cn-titre {
+    font-size: 20px;
+  }
+  .cn-recherche {
+    position: static;
+    padding: 12px 0 8px;
+  }
+  .cn-grille {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cn-pied {
+    padding-block: 4px;
+  }
+  .cn-bloc {
+    margin-top: 16px;
+  }
+}

@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { baseConfiguree } from "@/lib/serveur/base";
+import { envoyerRecuLien } from "@/lib/serveur/courriels/recu";
 import { finaliser, lireReservation } from "@/lib/serveur/paiement/finaliser";
 import { envoyerBillets } from "@/lib/serveur/paiement/courriel";
 import { passerelle } from "@/lib/serveur/paiement";
@@ -36,11 +38,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ passere
   } catch {
     return new Response(null, { status: 502 });
   }
-  // pas de réservation : la transaction peut appartenir à un lien de paiement de devis (lot finances)
-  if (!r) return new Response(null, { status: (await finaliserLienWebhook(nom, c)) === "base" ? 502 : 200 });
+  const origine = origineSite(req);
+  // pas de réservation : la transaction peut appartenir à un lien de paiement de devis ou de commande ; payé, le reçu et
+  // l'avis à l'équipe partent après la réponse (une seule fois, garanti en base)
+  if (!r) return new Response(null, { status: (await finaliserLienWebhook(nom, c, (id) => { if (origine) after(() => envoyerRecuLien(id, origine).catch(() => null)); })) === "base" ? 502 : 200 });
   const issue = await finaliser(r, c);
   if (issue.refus === "base") return new Response(null, { status: 502 });
-  const origine = origineSite(req);
   if (issue.statut === "paye" && origine) await envoyerBillets(issue.reservation, origine);
   return new Response(null, { status: 200 });
 }

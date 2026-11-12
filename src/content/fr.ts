@@ -51,10 +51,9 @@ export const agence = { accroche: null as string | null, histoire: null as strin
 export const SECTIONS = { lieux: "/#lieux", raisons: "/#raisons", circuits: "/#chemins", agenda: "/#agenda", conciergerie: "/#conciergerie", preparer: "/#preparer", agence: "/#bienvenue", engagements: "/#engagements" };
 export const DEVIS = { voyage: "/devis", question: "/devis?demande=question", groupe: "/devis?demande=groupe" };
 export const adresseLieu = (slug: string, fiches = FICHES_LIEU): string | null => (fiches[slug] ? `/ouidah/lieux/${slug}` : null);
-export const adresseCircuit = (slug: string, circuits = tours) => {
-  const t = circuits.find((x) => x.slug === slug);
-  return t && !t.draft && t.duration !== null ? `/circuits/${slug}` : `${DEVIS.voyage}?circuit=${slug}`;
-};
+// Fiche circuit : publiée pour tout circuit du contenu, même en brouillon (non indexée, « Demander ce circuit » tant que
+// durée et prix manquent) ; un slug inconnu mène au formulaire, qui reprend le circuit demandé.
+export const adresseCircuit = (slug: string, circuits = tours) => (circuits.some((x) => x.slug === slug) ? `/circuits/${slug}` : `${DEVIS.voyage}?circuit=${slug}`);
 // Qui sommes-nous : la page existe toujours (non indexée), le lien n'apparaît qu'avec un premier vrai portrait.
 export const adresseAgence = (membres = equipe) => (membres.some((m) => m.portrait) ? "/a-propos" : SECTIONS.agence);
 
@@ -89,10 +88,10 @@ export const nav = {
   book: { label: "Créer mon voyage", href: "/devis" },
   voyage: (n: number) => `Votre voyage · ${n}`, // remplace « Créer mon voyage » dès qu'un élément est composé
   contact: { label: "Nous écrire", href: DEVIS.question },
-  logo: { src: "/brand/oht-logo.png", alt: "Ouidah Heritage Tour" } as Media | null, // bannière OHT détourée (source : Banniere/OHT-Banniere 1.png), 1633 × 469
-  // logo original d'OHT (emblème rond de la carte de visite) : partout sauf la barre de navigation (Kevin, 02/11/2026)
+  // logo original d'OHT (emblème rond de la carte de visite), partout, barre et pied compris, sur pastille blanche avec le nom
+  // (la patronne, via Kevin le 10/11 : la bannière « OUIDAH » le dénaturait)
   embleme: { src: "/brand/oht-embleme.webp", alt: "Ouidah Heritage Tour" } as Media,
-  wordmark: ["Ouidah", "Heritage Tour"], // affiché tant que le logo manque
+  wordmark: ["Ouidah", "Heritage Tour"], // nom à côté de l'emblème, barre et pied
   home: "Ouidah Heritage Tour, retour à l'accueil",
   currencies: [
     { code: "EUR", short: "EUR €", long: "EUR (€)" },
@@ -200,16 +199,10 @@ export const hero = {
     label: "Rechercher un circuit",
     submit: "Rechercher",
     fields: [
-      { name: "lieu", label: "Destination", objet: "destination" as NomObjet, options: [{ value: "", label: "Tout Ouidah" }, ...places.map((p) => ({ value: p.slug, label: p.name }))] },
-      {
-        name: "type",
-        label: "Type de voyage",
-        objet: "type-voyage" as NomObjet,
-        // seulement les types qu'au moins un circuit porte ; lu à la demande (les circuits sont déclarés plus bas)
-        get options() {
-          return [{ value: "", label: "Tous les types" }, ...tourFilters.slice(1).filter((f) => tours.some((t) => t.tag === f)).map((f) => ({ value: cleType(f), label: f }))];
-        },
-      },
+      // Destination et Type : ici seulement le choix « tous », traduisible ; la suite se déduit au rendu (Hero.tsx) des
+      // lieux (fr.places) et des types portés par un circuit (fr.tourFilters), dans la langue de la page
+      { name: "lieu", label: "Destination", objet: "destination" as NomObjet, options: [{ value: "", label: "Tout Ouidah" }] },
+      { name: "type", label: "Type de voyage", objet: "type-voyage" as NomObjet, options: [{ value: "", label: "Tous les types" }] },
       { name: "duree", label: "Durée", objet: "calendrier" as NomObjet, options: [{ value: "", label: "Toutes les durées" }, { value: "demi-journee", label: "Demi-journée" }, { value: "journee", label: "Une journée" }, { value: "plusieurs-jours", label: "Plusieurs jours" }] },
     ],
   },
@@ -258,8 +251,17 @@ export const cheminsIntro = {
     desc: (n: number) => `${pluriel(n, "itinéraire composé", "itinéraires composés")} par nos guides`,
     heading: "Des circuits composés par nos guides.",
     steps: (n: number) => pluriel(n, "étape", "étapes"),
+    // lien vers la fiche du circuit : « Réserver » quand durée et prix sont publiés, sinon « Demander » (devis)
     book: "Réserver ce circuit",
+    demander: "Demander ce circuit",
     customize: "Le personnaliser",
+    // recherche envoyée par le Hero : critères rappelés, liste filtrée, et une sortie quand rien ne répond
+    recherche: "Votre recherche",
+    effacer: "Effacer la recherche",
+    aucun: "Aucun circuit prêt ne répond à cette recherche.",
+    aucunAide: "Gardez vos lieux un à un, ou décrivez-nous votre voyage : nous le composons avec vous.",
+    surMesure: { label: "Créer mon voyage sur mesure", href: "/devis" },
+    dureeInconnue: "La durée de ces circuits reste à confirmer : nous l'ajustons avec vous.",
   },
   compose: {
     label: "Composer mon chemin",
@@ -656,6 +658,12 @@ export const newsletter = {
   limite: "Plusieurs inscriptions sont déjà parties de cette connexion. Réessayez dans une heure.",
   aucun: "Choisissez au moins un thème.",
   error: "Indiquez une adresse e-mail valide et cochez la case.",
+  // ce qui manque, dit précisément (annoncé près des thèmes, puis message du champ fautif) ; libellé visible du bouton
+  auMoinsUn: "au moins un thème",
+  emailManque: "Indiquez votre adresse e-mail.",
+  emailInvalide: "Cette adresse semble incomplète : vérifiez la partie après le @.",
+  consentManque: "Cochez la case pour accepter de recevoir la lettre.",
+  envoyerCourt: "S'inscrire",
 };
 
 // Section 15 — pied de page (maquette A « Verre sur Ouidah ») : vraies photos de Ouidah, annuaire du site (mêmes familles
@@ -796,6 +804,7 @@ export const devisPage = {
     destination: "Destination",
     vol: "votre vol",
     navette: (km: number) => `navette, environ ${km} km`,
+    route: "par la route", // départ d'une ville du Bénin : ni vol ni aéroport
     detectee: "proposée d'après votre connexion",
     choisie: "votre ville",
     villeTrou: "votre ville",
@@ -811,15 +820,17 @@ export const devisPage = {
   dates: {
     aller: "Aller",
     retour: "Retour",
+    allerRetour: "Aller, retour", // case vide, avant le choix des dates
     sejour: "Séjour",
     nuits: (n: number) => `${n} nuit${n > 1 ? "s" : ""}`,
     trou: "à quelles dates ?",
     conseil: "Conseillez-moi",
     conseillees: "Dates à conseiller",
     choisir: "Je choisis mes dates",
-    arrivee: "Arrivée",
-    depart: "Départ",
+    arrivee: "Date d'arrivée",
+    depart: "Date de départ",
     garder: "Garder ces dates",
+    manquantes: "Choisissez vos deux dates.",
     invalides: "Le départ suit l'arrivée, au plus tard trois ans après aujourd'hui.",
     modifier: { label: "Modifier les dates", href: SECTIONS.agenda },
     pendant: "pendant les",
@@ -833,6 +844,31 @@ export const devisPage = {
     conseilles: "Lieux à conseiller",
     choisir: { label: "Choisir mes lieux", href: SECTIONS.circuits },
     modifier: { label: "Modifier les lieux", href: SECTIONS.circuits },
+  },
+  // carnet des lieux, ouvert depuis la case « Vos lieux » du billet : circuits, lieux à voir, recherche, carte.
+  // {n}, {a}, {q}, {nom} : valeurs posées à l'affichage (garder ces jetons dans chaque langue)
+  carnet: {
+    chercher: "Chercher un lieu, un circuit",
+    filtres: "Filtrer par thème",
+    aVoir: "Lieux à voir",
+    ville: "Dans la ville",
+    accueil: "Les lieux gardés sur l'accueil sont déjà numérotés.",
+    recouvre: "{a} sur {n} dans votre voyage",
+    ajouterEtapes: { un: "Ajouter son étape", plusieurs: "Ajouter ses {n} étapes" },
+    remplacer: { un: "Remplacer mon lieu", plusieurs: "Remplacer mes {n} lieux" },
+    retablir: { un: "Rétablir mon lieu", plusieurs: "Rétablir mes {n} lieux" },
+    autres: { un: "1 autre lieu gardé", plusieurs: "{n} autres lieux gardés" },
+    garde: "{nom} gardé.",
+    retire: "{nom} retiré.",
+    aucun: "Aucun lieu ne répond à « {q} ».",
+    ajouterMessage: "Ajouter « {q} » à ma demande",
+    ligneMessage: "Je souhaite aussi voir : {q}",
+    ajouteMessage: "« {q} » est ajouté à votre message.",
+    vues: "Afficher la carte ou la liste",
+    carte: "Carte",
+    liste: "Liste",
+    ocean: "Océan Atlantique",
+    source: "© les contributeurs d'OpenStreetMap",
   },
   services: {
     titre: (n: number) => (n > 1 ? `Vos ${n} services` : "Votre service"),
@@ -886,6 +922,8 @@ export const devisPage = {
   langue: { lib: "Langue de réponse", titre: "Dans quelle langue vous écrire ?", note: "langue du site", aide: "Pour nos échanges, le devis et, quand c'est possible, la visite." },
   langues: { FR: "français", EN: "anglais", ES: "espagnol", DE: "allemand", PT: "portugais", HT: "créole haïtien", GCF: "créole" } as Record<string, string>,
   fermer: "Fermer",
+  // pastille de l'accueil, après un « Choisir » ou « Modifier » du billet qui y mène
+  retourBillet: "Revenir à mon billet",
   talon: {
     titre: "À qui répondre ?",
     titreQuestion: "Votre message",
@@ -926,6 +964,6 @@ export const devisPage = {
     metaTitre: "Reprendre mon voyage — Ouidah Heritage Tour",
     chargement: "Votre voyage revient…",
     invalide: "Ce lien n'est plus valable : il a peut-être expiré. Composez de nouveau votre voyage, ou écrivez-nous.",
-    accueil: { label: "Composer mon voyage", href: "/" },
+    accueil: { label: "Composer mon voyage", href: "/devis" },
   },
 };

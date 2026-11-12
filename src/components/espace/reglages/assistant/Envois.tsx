@@ -170,6 +170,7 @@ export function FormBase({ action, args = [], bouton, reussite, nom, garder = tr
   const vues = alertes ?? (etat?.ton === "erreur" ? etat.alertes : []);
   const envoyer = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (occupe) return;
     setRelaye(null);
     const fd = new FormData(e.currentTarget);
     const refus = avant?.(fd);

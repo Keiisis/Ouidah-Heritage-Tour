@@ -39,5 +39,5 @@ export function messageLettre(d: DonneesLettre, origine: string, modele: Modele 
 export async function envoyerLettre(email: string, d: DonneesLettre, origine: string) {
   const [modele, newsletter] = await Promise.all([lireModele("auto-lettre", langueDe(d.langue)), lireContenu("fr.newsletter")]);
   const m = messageLettre(d, origine, modele, newsletter);
-  return envoyerCourriel({ a: email, sujet: m.sujet, html: m.html, texte: m.texte, cle: `lettre-inscription-${randomUUID()}`, entetes: m.entetes, repondreA: process.env.EMAIL_OHT || null });
+  return envoyerCourriel({ a: email, sujet: m.sujet, html: m.html, texte: m.texte, cle: `lettre-inscription-${randomUUID()}`, entetes: m.entetes, modele: "auto-lettre", repondreA: process.env.EMAIL_OHT || null });
 }

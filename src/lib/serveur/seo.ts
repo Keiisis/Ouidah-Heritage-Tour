@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { lireContenu } from "@/lib/contenu";
 import { LANGUES, type Langue } from "@/lib/langue";
 import { adresseLangue } from "@/lib/adresses-langues";
-import { languePage } from "./contenu-page";
+import { langueInconnue, languePage } from "./contenu-page";
 
 export function origineSite(): string {
   try {
@@ -18,7 +18,15 @@ export function alternances(chemin: string) {
   return Object.fromEntries([...LANGUES.map(l => [l.toLowerCase(), `${origine}${adresseLangue(chemin, l)}`]), ["x-default", `${origine}${chemin}`]]);
 }
 
+/** Page introuvable : avec global-not-found, Next lit les métadonnées de la page qui a appelé notFound(), pas celles de
+ * not-found.tsx ; chaque page sans contenu les demande donc ici (titre « Page introuvable », dans la langue de l'adresse). */
+export async function metadonneesIntrouvable(langue?: Langue): Promise<Metadata> {
+  const T = await lireContenu("introuvable.introuvable", langue ?? await languePage());
+  return { title: T.metaTitre, description: T.metaDescription, robots: { index: false, follow: false } };
+}
+
 export async function metadonneesPage(chemin: string, contenu: Metadata = {}, langue?: Langue): Promise<Metadata> {
+  if (!langue && await langueInconnue()) return metadonneesIntrouvable("FR");
   const l = langue ?? await languePage();
   const reglages = await lireContenu("site.seo", l);
   const page = reglages.pages.find(p => p.chemin === chemin);

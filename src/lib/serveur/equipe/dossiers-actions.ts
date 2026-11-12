@@ -20,6 +20,8 @@ import { exigerDroit } from "./securite/droits";
 import { exigerRole } from "./session";
 import { reglesFinancieres } from "./finances/fiscalite";
 import { ventilationTva, type VentilationTva } from "./finances/fiscalite-regles";
+import { type StatutDevis, TRANSITIONS_DEVIS } from "./finances/regles";
+import { peutPasser } from "../machines";
 
 // Écritures des demandes et dossiers voyage (lot L4). Actions serveur (contrôle d'origine de Next) joignables par une
 // requête forgée : CHAQUE appel relit la session et le rôle, puis le dossier AVEC le filtre de l'agent (dossiers.ts) ; un
@@ -227,7 +229,7 @@ export async function proposerMoments(id: unknown): Promise<RetourDossier> {
 
 // ---------- devis ----------
 
-type LigneDevisBase = { id: string; statut: "brouillon" | "pret" | "paye" | "annule" };
+type LigneDevisBase = { id: string; statut: StatutDevis };
 
 /** Enregistre le brouillon (créé au premier enregistrement) ; refuse si le devis du dossier est déjà prêt ou payé. */
 async function sauverBrouillon(a: { s: { profilId: string }; d: BrutDossier }, brut: unknown, pourEnvoi: boolean): Promise<{ id: string; lu: Extract<ReturnType<typeof lireDevis>, { ok: true }> } | { erreur: RefusDossier; champs?: string[] }> {
@@ -311,6 +313,7 @@ export async function envoyerDevis(id: unknown, brut: unknown): Promise<RetourDo
     refresh();
     return { erreur: "pages" };
   }
+  if (!peutPasser(TRANSITIONS_DEVIS, "brouillon", "pret")) return { erreur: "publie" };
   const numero = await emettre("D", "devis", b.id);
   if (!numero) return { erreur: "panne" };
   const t = maintenantIso();

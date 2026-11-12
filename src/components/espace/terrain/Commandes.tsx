@@ -7,7 +7,8 @@ import { espace } from "@/content/espace";
 import { terrain } from "@/content/espace-terrain";
 import { useMouvementReduit } from "@/lib/mouvement";
 import { avancerCommande, annulerCommande, chiffrerCommande, lienPaiementCommande } from "@/lib/serveur/equipe/terrain/commandes-actions";
-import { type EtatCommande, SUIVANT } from "@/lib/serveur/equipe/terrain/regles";
+import { type EtatCommande, SUIVANT, TRANSITIONS_COMMANDE } from "@/lib/serveur/equipe/terrain/regles";
+import { peutPasser } from "@/lib/serveur/machines";
 import { Vide } from "../Bloc";
 import { Picto } from "../Picto";
 
@@ -57,8 +58,12 @@ export function Commandes({ commandes, admin = false }: { commandes: CarteComman
     minuteur.current = window.setTimeout(() => setAnnonce(null), 6000);
   };
 
+  // actions de l'équipe : seulement les transitions permises par TRANSITIONS_COMMANDE (même table que la base)
+  const pasDe = (etat: EtatCommande) => { const p = SUIVANT[etat]; return p && peutPasser(TRANSITIONS_COMMANDE, etat, p.vers) ? p : undefined; };
+  const annulable = (etat: EtatCommande) => etat !== "annulee" && peutPasser(TRANSITIONS_COMMANDE, etat, "annulee");
+
   const avancer = (c: CarteCommande) => {
-    const pas = SUIVANT[c.etat];
+    const pas = pasDe(c.etat);
     if (!pas || occupe) return;
     setOccupe(c.id);
     demarrer(async () => {
@@ -123,7 +128,7 @@ export function Commandes({ commandes, admin = false }: { commandes: CarteComman
         <ul className="commandes-liste" id="liste-commandes">
           <AnimatePresence initial={false}>
             {vues.map((c) => {
-              const pas = SUIVANT[c.etat];
+              const pas = pasDe(c.etat);
               return (
                 <motion.li key={c.id} id={`commande-${c.id}`} className="commande" data-commande={c.reference} data-etat={c.etat} layout={reduit ? false : "position"} transition={{ layout: { duration: 0.5, ease: GLISSE } }}>
                   <div className="haut">
@@ -184,7 +189,7 @@ export function Commandes({ commandes, admin = false }: { commandes: CarteComman
                       {C.actions[pas.vers]}
                     </button>
                   )}
-                  {c.etat !== "remise" && c.etat !== "annulee" && (
+                  {annulable(c.etat) && (
                     <details open={annulation === c.id} onToggle={(e) => { if (!e.currentTarget.open && annulation === c.id) setAnnulation(null); }}>
                       <summary onClick={(e) => { e.preventDefault(); setAnnulation(annulation === c.id ? null : c.id); }}>{C.annuler}</summary>
                       <form onSubmit={(e) => { e.preventDefault(); annuler(c, String(new FormData(e.currentTarget).get("motif") ?? "")); }}>

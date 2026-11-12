@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 
 export async function metadonneesService(type:"rendez-vous"|"partenaires"|"mes-donnees"):Promise<Metadata> {
   const langue=langueService(await languePage()),T=(await lireContenuPage("services.copiesServices"))[langue];
-  return {title:type==="rendez-vous"?T.rendezVous:type==="partenaires"?T.partenaires:T.donnees,description:type==="rendez-vous"?T.rendezVousDescription:type==="partenaires"?T.partenairesDescription:T.donneesDescription,...(type==="mes-donnees"?{robots:{index:false,follow:false}}:{})};
+  return {title:type==="rendez-vous"?T.metaRendezVous:type==="partenaires"?T.metaPartenaires:T.metaDonnees,description:type==="rendez-vous"?T.rendezVousDescription:type==="partenaires"?T.partenairesDescription:T.donneesDescription,...(type==="mes-donnees"?{robots:{index:false,follow:false}}:{})};
 }
 
 async function RendezVous({T,langue}:{T:CopieServices;langue:ReturnType<typeof langueService>}) {

@@ -6,7 +6,7 @@ import { CATEGORIES_WIKI, pilotage as P } from "@/content/espace-pilotage";
 import { minuteServeur } from "@/lib/serveur/equipe/espace";
 import { changerPage, enregistrerPage, proposerPage } from "@/lib/serveur/equipe/pilotage/actions";
 import { lireWiki, type PageWiki } from "@/lib/serveur/equipe/pilotage/lectures";
-import { paragraphes } from "@/lib/serveur/equipe/pilotage/regles";
+import { actionWikiPossible, paragraphes } from "@/lib/serveur/equipe/pilotage/regles";
 import { exigerRole } from "@/lib/serveur/equipe/session";
 import { Bloc, Vide } from "../Bloc";
 import { Enveloppe } from "../Enveloppe";
@@ -100,10 +100,10 @@ function OutilsAdmin({ p }: { p: PageWiki }) {
   return (
     <div className="pil-outils">
       <div className="pil-actions">
-        {p.etat !== "publie" && p.etat !== "refuse" && <BoutonAction action={changerPage} args={[p.id, "publier"]} libelle={W.publier} reussite={W.okPublie} secondaire={false} />}
-        {p.etat === "publie" && <BoutonAction action={changerPage} args={[p.id, "retirer"]} libelle={W.retirer} reussite={W.okRetire} confirmer={W.confirmerRetrait} />}
+        {actionWikiPossible("publier", p.etat) && <BoutonAction action={changerPage} args={[p.id, "publier"]} libelle={W.publier} reussite={W.okPublie} secondaire={false} />}
+        {actionWikiPossible("retirer", p.etat) && <BoutonAction action={changerPage} args={[p.id, "retirer"]} libelle={W.retirer} reussite={W.okRetire} confirmer={W.confirmerRetrait} />}
       </div>
-      {p.etat === "propose" && (
+      {actionWikiPossible("refuser", p.etat) && (
         <FormAction
           action={changerPage}
           args={[p.id, "refuser"]}

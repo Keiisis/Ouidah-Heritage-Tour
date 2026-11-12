@@ -8,7 +8,7 @@ import Link from "@/components/ui/LienPublic";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GeoJSONSource, Map as CarteMapLibre, Marker } from "maplibre-gl";
-import { adresseLieu, consentement as CONSENTEMENT, creditsPage as CREDITS_PAGE, FICHES_LIEU, places as PLACES, placesIntro as PLACES_INTRO } from "@/content/fr";
+import { adresseCircuit, adresseLieu, consentement as CONSENTEMENT, creditsPage as CREDITS_PAGE, FICHES_LIEU, places as PLACES, placesIntro as PLACES_INTRO, tours as TOURS } from "@/content/fr";
 import { useContenu } from "@/components/ui/ContenuSite";
 import route from "@/content/ouidah-route.json";
 import { Icon } from "@/components/ui/Icon";
@@ -123,7 +123,12 @@ export function PlacesMap() {
   const km = useCallback((m: number) => nombre({ minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(m / 1000), [nombre]);
   const placesPubliees = useContenu("fr.places", PLACES);
   const fiches = useContenu("fr.FICHES_LIEU", FICHES_LIEU);
-  const places = useMemo(() => placesPubliees.map((p) => ({ ...p, href: !p.href || p.href.startsWith("/ouidah/lieux/") ? adresseLieu(p.slug, fiches) : p.href })), [placesPubliees, fiches]);
+  const tours = useContenu("fr.tours", TOURS);
+  // lien du lieu : sa fiche ; sans fiche lieu, la fiche du circuit qui porte ce nom (La Route des Esclaves)
+  const places = useMemo(
+    () => placesPubliees.map((p) => ({ ...p, href: !p.href || p.href.startsWith("/ouidah/lieux/") ? (adresseLieu(p.slug, fiches) ?? (tours.some((t) => t.slug === p.slug) ? adresseCircuit(p.slug, tours) : null)) : p.href })),
+    [placesPubliees, fiches, tours],
+  );
   const placesIntro = useContenu("fr.placesIntro", PLACES_INTRO);
   const consentement = useContenu("fr.consentement", CONSENTEMENT);
   const creditsPage = useContenu("fr.creditsPage", CREDITS_PAGE);
@@ -241,11 +246,8 @@ export function PlacesMap() {
         groupe.current.style.transform = `scale(${1 + (echelle - 1) * e ** 2.2})`;
         voile.current.style.visibility = e >= 1 ? "hidden" : "visible";
       }
-      if (mots.current) {
-        const o = borne(1 - e * 2.5);
-        mots.current.style.opacity = String(o);
-        mots.current.style.filter = o < 1 ? `blur(${(1 - o) * 16}px)` : "";
-      }
+      // le titre s'efface à l'opacité seule (un flou le rendait illisible pendant toute l'ouverture du chiffre)
+      if (mots.current) mots.current.style.opacity = String(borne(1 - e * 2.5));
       const pos = reduit ? Math.round(position(phase(p, [0.05, 0.95]))) : position(phase(p, MARCHE));
       const f = reduit ? 0 : ease(phase(p, RETOUR));
       const k = e < 1 ? -1 : Math.floor(pos + 1e-3);
@@ -328,8 +330,8 @@ export function PlacesMap() {
 
   const t = placesIntro.titleParts;
   const reveler = (k: number) => ({
-    initial: { opacity: 0, y: 24, filter: "blur(14px)" },
-    whileInView: { opacity: 1, y: 0, filter: "blur(0px)" },
+    initial: { opacity: 0, y: 24 },
+    whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.6 },
     transition: { duration: 1, ease: EASE_FICHE, delay: k * 0.18 },
   });
@@ -438,7 +440,7 @@ export function PlacesMap() {
                       </span>
                     ) : null}
                     {p.href ? (
-                      <Link href={p.href} className="inline-flex min-h-7 items-center gap-1 underline-offset-4 hover:underline focus-visible:outline-sun">
+                      <Link href={p.href} className="relative inline-flex min-h-7 items-center gap-1 underline-offset-4 before:absolute before:-inset-x-2 before:-inset-y-2 hover:underline focus-visible:outline-sun">
                         {placesIntro.link}
                         <Icon name="arrow-right" className="size-4" />
                       </Link>

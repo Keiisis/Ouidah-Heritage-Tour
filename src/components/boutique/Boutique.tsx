@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "@/components/ui/LienPublic";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { boutique as BOUTIQUE } from "@/content/boutique";
@@ -162,6 +163,8 @@ export function Boutique() {
             ))}
           </h1>
           <p className="hero-phrase">{T.hero.phrase}</p>
+          {/* catalogue vide : aucun bouton qui défilerait vers rien */}
+          {produits.length ? (
           <a
             className="b-soleil hero-b"
             href="#boutique"
@@ -173,6 +176,7 @@ export function Boutique() {
             {T.hero.bouton}
             <Icon name="arrow-right" />
           </a>
+          ) : null}
         </div>
       </section>
 
@@ -333,6 +337,15 @@ export function Boutique() {
         <section className="section container-oht" id="boutique" aria-label={T.liste.titre}>
           <div className="vide">
             <p>{T.liste.catalogueVide}</p>
+            <p className="vide-suites">
+              <Link className="b-soleil" href={T.liste.catalogueVideLettre.href}>
+                {T.liste.catalogueVideLettre.label}
+                <Icon name="arrow-right" />
+              </Link>
+              <Link className="b-lien" href={T.liste.catalogueVideVoyage.href}>
+                {T.liste.catalogueVideVoyage.label}
+              </Link>
+            </p>
           </div>
         </section>
       )}

@@ -1,4 +1,4 @@
-import { metadonneesPage } from "@/lib/serveur/seo";
+import { metadonneesIntrouvable, metadonneesPage } from "@/lib/serveur/seo";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { lireContenuPage as lireContenu } from "@/lib/serveur/contenu-page";
@@ -17,11 +17,11 @@ export async function generateStaticParams() {
   return (slugs.length ? slugs : ["__vide__"]).map((slug) => ({ slug }));
 }
 
-async function metadataContenu({ params }: PageProps<"/ouidah/lieux/[slug]">): Promise<Metadata> {
+async function metadataContenu({ params }: PageProps<"/ouidah/lieux/[slug]">): Promise<Metadata | null> {
   const { slug } = await params;
   const d = await donneesLieu(slug);
   const T = await lireContenu("fiche-lieu.ficheLieu");
-  return d ? { title: T.metaTitre(d.nom), description: d.description ?? undefined } : {};
+  return d ? { title: T.metaTitre(d.nom), description: d.description ?? undefined } : null;
 }
 
 export default async function Page({ params }: PageProps<"/ouidah/lieux/[slug]">) {
@@ -33,5 +33,6 @@ export default async function Page({ params }: PageProps<"/ouidah/lieux/[slug]">
 
 export async function generateMetadata(...args: Parameters<typeof metadataContenu>): Promise<Metadata> {
   const { slug } = await args[0].params;
-  return metadonneesPage("/ouidah/lieux/[slug]".replace("[slug]", encodeURIComponent(slug)), await metadataContenu(...args));
+  const contenu = await metadataContenu(...args);
+  return contenu ? metadonneesPage("/ouidah/lieux/[slug]".replace("[slug]", encodeURIComponent(slug)), contenu) : metadonneesIntrouvable();
 }

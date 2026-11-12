@@ -177,7 +177,7 @@ export function Introuvable({ cibles, index }: { cibles: Cible[]; index: Entree[
           <div className="pi-chercher">
             <label className="pi-champ">
               <Icon name="search" className="size-5" />
-              <input type="search" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" placeholder={T.recherche.placeholder} aria-label={T.recherche.label} aria-controls="pi-resultats" />
+              <input type="search" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" placeholder={T.recherche.placeholder} aria-label={T.recherche.label} aria-controls={resultats ? "pi-resultats" : undefined} />
             </label>
             {resultats && (
               <ul className="pi-resultats" id="pi-resultats">

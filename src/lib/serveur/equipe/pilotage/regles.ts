@@ -1,5 +1,6 @@
 import { CATEGORIES_WIKI, type CategorieWiki, CONSERVATION_JOURS, JOURS_PISTES, PERIODES_PERFS, PRIORITES, type Priorite, TYPES_DOCUMENT, type TypeDocument } from "@/content/espace-pilotage";
 import { iso, jourOuidah } from "@/lib/jours";
+import { type Transitions } from "../../machines";
 import { plusieursLignes, uneLigne, UUID } from "../dossiers-regles";
 
 // Règles du lot « pilotage », partagées par les écrans et par les actions serveur (actions.ts), qui seules décident : tout
@@ -27,6 +28,26 @@ export function champsDe(brut: unknown): Record<string, unknown> {
 }
 
 // ---------- wiki ----------
+
+export type EtatWiki = "brouillon" | "propose" | "publie" | "refuse";
+/** wiki_pages.etat (machine à états : 20261122_machines_etats_deux.sql recopie cette table). Née « brouillon » (admin,
+ * enregistrerPage) ou « proposée » (agent, proposerPage). L'admin publie un brouillon ou une proposition, retire une page
+ * publiée (retour au brouillon), refuse une proposition (avec motif) ; une page refusée qu'il modifie redevient brouillon. */
+export const TRANSITIONS_WIKI: Transitions<EtatWiki> = {
+  brouillon: ["publie"],
+  propose: ["publie", "refuse"],
+  publie: ["brouillon"],
+  refuse: ["brouillon"],
+};
+/** Actions de l'admin (changerPage) : états de départ acceptés et état d'arrivée, chacun une transition de TRANSITIONS_WIKI
+ * (test machines-etats-2-coherence). L'écran ne montre une action que si l'état de la page est un de ses départs. */
+export const ACTIONS_WIKI = {
+  publier: { de: ["brouillon", "propose"], vers: "publie" },
+  retirer: { de: ["publie"], vers: "brouillon" },
+  refuser: { de: ["propose"], vers: "refuse" },
+} as const satisfies Record<string, { de: readonly EtatWiki[]; vers: EtatWiki }>;
+export type ActionWiki = keyof typeof ACTIONS_WIKI;
+export const actionWikiPossible = (quoi: ActionWiki, etat: string) => (ACTIONS_WIKI[quoi].de as readonly string[]).includes(etat);
 
 export type PageSaisie = { titre: string; categorie: CategorieWiki; corps: string };
 export function lirePage(brut: unknown): { ok: true; v: PageSaisie } | { ok: false; champs: string[] } {
@@ -95,11 +116,19 @@ export function signatureValide(o: Uint8Array, mime: Mime) {
 /** Dernier jour de conservation : CONSERVATION_JOURS après la fin du séjour (jour « epoch »), ou après le dépôt. */
 export const conservation = (depart: number | null, ms: number) => iso(Math.max(jourOuidah(ms), depart ?? 0) + CONSERVATION_JOURS);
 
-// ---------- semaine du rapport (lundi → lundi, à Ouidah) ----------
+// ---------- envois du rapport ----------
 
-/** Jour « epoch » du lundi de la semaine écoulée (celle qui précède la semaine en cours). */
-export function lundiEcoule(ms: number) {
+export type EtatEnvoiRapport = "reservee" | "envoyee" | "incertaine";
+/** rapports_envois.etat : réservée par rapport_reserver (une par période et destinataire), puis envoyée ou incertaine
+ * (rapport-envoi.ts). Un envoi incertain n'est jamais rejoué : il reste visible à l'écran. */
+export const TRANSITIONS_RAPPORT: Transitions<EtatEnvoiRapport> = { reservee: ["envoyee", "incertaine"], envoyee: [], incertaine: [] };
+
+// ---------- période du rapport (samedi → vendredi, à Ouidah ; Kevin, 11/11) ----------
+
+/** Jour « epoch » du samedi qui ouvre la période écoulée : les 7 jours complets (samedi 00:00 → vendredi 23:59 à Ouidah)
+ * qui précèdent le dernier samedi. Envoyé le samedi à 10 h, le rapport couvre la semaine qui finit la veille. */
+export function samediEcoule(ms: number) {
   const j = jourOuidah(ms);
-  const lundi = j - ((j + 3) % 7); // 1er janvier 1970 = jeudi : (j + 3) % 7 vaut 0 le lundi
-  return lundi - 7;
+  const samedi = j - ((j + 5) % 7); // 1er janvier 1970 = jeudi : (j + 5) % 7 vaut 0 le samedi
+  return samedi - 7;
 }

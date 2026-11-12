@@ -5,12 +5,15 @@ import { useFormatsSite } from "@/lib/formats-site";
 import Image from "next/image";
 import Link from "@/components/ui/LienPublic";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
-import { conciergerie as CONCIERGERIE, datesSection as DATES_SECTION, destinations as DESTINATIONS, devisPage as DEVIS_PAGE, evenements as EVENEMENTS, nav as NAV, tenReasons as TEN_REASONS, tours as TOURS } from "@/content/fr";
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
+import { cheminsIntro as CHEMINS_INTRO, conciergerie as CONCIERGERIE, datesSection as DATES_SECTION, destinations as DESTINATIONS, devisPage as DEVIS_PAGE, evenements as EVENEMENTS, nav as NAV, tenReasons as TEN_REASONS, tours as TOURS } from "@/content/fr";
+import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
+import { oublierRetour, retenirRetour } from "./RetourBillet";
 import { useContenu, useLangue } from "@/components/ui/ContenuSite";
 import PAYS from "@/content/pays.json";
 import type { LieuReleve } from "@/content/types";
 import { useDossier, type Dossier } from "@/lib/voyage";
+import { modifierChemin } from "@/lib/chemin";
 import { servicesDemandes } from "@/lib/conciergerie";
 import { ecrireSejour } from "@/lib/sejour";
 import { useVisiteur } from "@/lib/visiteur";
@@ -23,6 +26,9 @@ import { Icon } from "@/components/ui/Icon";
 import { Palettes } from "@/components/ui/Palettes";
 import { adresseRetour, lancerPaiement, type NomPasserelle, type Preparee } from "@/lib/paiement";
 import "./billet.css";
+
+// carnet des lieux (circuits, lieux, recherche, carte) : chargé au premier « Choisir mes lieux » seulement
+const Carnet = lazy(() => import("./Carnet").then((m) => ({ default: m.Carnet })));
 
 // Page /devis, piste E « Le billet pour Ouidah » (choisie par Kevin le 26/10/2026). Le dossier de voyage composé sur
 // l'accueil est lu en direct et inscrit sur le billet en lettres à palettes ; chaque partie a son « Modifier ». Ce qui
@@ -71,6 +77,10 @@ const deIso = (v: string) => {
 
 
 const tailleVille = (v: string) => (v.length <= 7 ? "grand" : v.length <= 11 ? "moyen" : "petit");
+// panneau en feuille posée en bas de l'écran : téléphone, ou écran bas (téléphone couché) ; même règle que billet.css
+const FEUILLE = "(max-width: 700px), (max-height: 500px)";
+const FOCUSABLES = "a[href], button:not(:disabled), input:not(:disabled):not([type=hidden]):not([tabindex='-1']), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex='-1'])";
+const visibles = (racine: ParentNode) => [...racine.querySelectorAll<HTMLElement>(FOCUSABLES)].filter((el) => el.getClientRects().length > 0);
 
 export function Devis() {
   const tours = useContenu("fr.tours", TOURS);
@@ -110,8 +120,9 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const destinations = useContenu("fr.destinations", DESTINATIONS);
   const tenReasons = useContenu("fr.tenReasons", TEN_REASONS);
   const nav = useContenu("fr.nav", NAV);
+  const chemins = useContenu("fr.cheminsIntro", CHEMINS_INTRO);
   const datesSection = useContenu("fr.datesSection", DATES_SECTION);
-  const periode = (a: number, z: number) => {
+  const periode =(a: number, z: number) => {
     const da = dateDuJour(a), dz = dateDuJour(z);
     // le libellé « Du … au … » de l'agenda ouvre une phrase ; sur le tampon il la continue (« pendant les Vodun Days du … »)
     const r = datesSection.scrub.range(da.getUTCMonth() === dz.getUTCMonth() ? fmtJour.format(da) : fmtJourMois.format(da), fmtJourMois.format(dz));
@@ -129,6 +140,11 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const [consent, setConsent] = useState(false);
   const [emailVu, setEmailVu] = useState(false);
   const [ouvert, setOuvert] = useState<Cle | null>(null);
+  const [carnet, setCarnet] = useState(false);
+  // lieux venus de l'adresse (?circuit=, ?lieux=) : affichés en plus de la mémoire jusqu'à l'ouverture du carnet, qui les y
+  // reprend ; ensuite la mémoire de l'accueil (« oht-chemin ») est la seule source de la case « Vos lieux »
+  const [fusion, setFusion] = useState(false);
+  const [circuitDepart] = useState(circuit);
   const [releve, setReleve] = useState<LieuReleve[] | null>(null);
   const releveLu = useContenu("lieux-ouidah", useMemo(() => ({ lieux: releve ?? [] }), [releve]));
   const debut = useRef(0);
@@ -137,6 +153,8 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const talon = useRef<HTMLElement>(null);
   const panneau = useRef<HTMLDivElement>(null);
   const titre = useRef<HTMLHeadingElement>(null);
+  const rendre = useRef(false); // le panneau se ferme sur un choix : le focus revient à sa case
+  const dernier = useRef<Cle | null>(null);
 
   const r = b.reponses, c = b.champs;
   const langue = r.langue ?? langueSite;
@@ -149,14 +167,20 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
     const [arrivee, depart] = prochaine(e.quand, jour);
     return depart >= jour ? { arrivee, depart } : null;
   }, [evenement, jour, evenements]);
-  const d: Dossier = { ...base, sejour: base.sejour ?? sejourLien, lieux: lieuxLien.length ? [...new Set([...base.lieux, ...lieuxLien])] : base.lieux };
-  const tour = tours.find((t) => t.slug === circuit) ?? null;
-  const lieux = useMemo(() => [...new Set([...(tour?.stops ?? []), ...d.lieux])], [tour, d.lieux]);
+  const d: Dossier = { ...base, sejour: base.sejour ?? sejourLien, lieux: !fusion && lieuxLien.length ? [...new Set([...base.lieux, ...lieuxLien])] : base.lieux };
+  const tourLien = tours.find((t) => t.slug === circuit) ?? null;
+  const lieux = useMemo(() => (fusion ? d.lieux : [...new Set([...(tourLien?.stops ?? []), ...d.lieux])]), [fusion, tourLien, d.lieux]);
+  // case « Vos lieux » : « Circuit « … » » quand la sélection est exactement ses étapes (ou le circuit de l'adresse, avant le carnet)
+  const tour = fusion ? (tours.find((t) => t.stops.length === lieux.length && t.stops.every((x) => lieux.includes(x))) ?? null) : tourLien;
+  const tourDepart = tours.find((t) => t.slug === circuitDepart) ?? null;
+  const circuitEnvoye = !fusion ? circuit : tourDepart && tourDepart.stops.every((x) => lieux.includes(x)) ? circuitDepart : null;
   const services = servicesDemandes(d.services, conciergerie);
   const compose = Boolean(d.sejour || lieux.length || services.length);
   // ville : celle que le visiteur a choisie (gardée) ou, à défaut, celle que propose sa connexion ; toujours modifiable
   const ville = d.ville ?? visiteur?.ville ?? null;
   const villeChoisie = Boolean(d.ville);
+  // départ du Bénin : aucun vol jusqu'à Cotonou, la route mène directement à Ouidah
+  const depuisBenin = Boolean(ville && visiteur?.pays === "BJ" && visiteur.ville === ville);
   const paysPropose = visiteur?.pays && (PAYS as string[]).includes(visiteur.pays) ? visiteur.pays : null;
   const fini = etat === "envoye" || etat === "dechirure";
 
@@ -190,6 +214,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
 
   useEffect(() => {
     debut.current = performance.now();
+    oublierRetour(); // de retour sur le billet : la pastille de l'accueil n'a plus lieu d'être
   }, []);
   // brouillon gardé sur l'appareil à chaque changement (un échec d'envoi ou un rechargement ne perd rien)
   useEffect(() => {
@@ -224,7 +249,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
     if (!ouvert) return;
     const placer = () => {
       const p = panneau.current, cible = document.getElementById(`trou-${ouvert}`), sc = scene.current;
-      if (!p || !cible || !sc || matchMedia("(max-width: 700px)").matches) return;
+      if (!p || !cible || !sc || matchMedia(FEUILLE).matches) return;
       const a = sc.getBoundingClientRect(), q = cible.getBoundingClientRect();
       const x = Math.max(0, Math.min(q.left - a.left - 8, a.width - p.offsetWidth));
       const dessous = q.bottom + 12 + p.offsetHeight < innerHeight - 12 || q.top - p.offsetHeight - 12 < 90;
@@ -238,23 +263,62 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
     addEventListener("resize", placer);
     return () => removeEventListener("resize", placer);
   }, [ouvert, reduit]);
-  // Échap ferme (le focus revient sur la case), un clic ailleurs aussi
+  useEffect(() => {
+    if (ouvert) {
+      dernier.current = ouvert;
+      return;
+    }
+    const k = dernier.current;
+    dernier.current = null;
+    if (!k || !rendre.current) return;
+    rendre.current = false;
+    (document.getElementById(`trou-${k}`) ?? document.getElementById(`trou-${k}-suite`))?.focus({ preventScroll: true });
+  }, [ouvert]);
+  // Échap ferme (le focus revient sur la case), un clic ailleurs aussi. Clavier : le panneau, placé après le formulaire
+  // dans la page, se parcourt comme s'il suivait sa case. Tab depuis la case entre dans le panneau ; Maj+Tab depuis son
+  // premier élément revient à la case ; Tab après son dernier élément ferme le panneau et passe à la case suivante du
+  // billet ; le focus parti ailleurs le ferme aussi.
   useEffect(() => {
     if (!ouvert) return;
-    const echap = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      document.getElementById(`trou-${ouvert}`)?.focus();
-      setOuvert(null);
+    const caseDe = () => document.getElementById(`trou-${ouvert}`);
+    const clavier = (e: KeyboardEvent) => {
+      const p = panneau.current, cible = caseDe();
+      if (e.key === "Escape") {
+        cible?.focus();
+        setOuvert(null);
+        return;
+      }
+      if (e.key !== "Tab" || !p || !cible) return;
+      const dedans = visibles(p), actif = document.activeElement as HTMLElement | null;
+      if (!e.shiftKey && actif === cible && dedans.length) {
+        e.preventDefault();
+        dedans[0].focus();
+      } else if (e.shiftKey && (actif === dedans[0] || actif === p)) {
+        e.preventDefault();
+        cible.focus();
+      } else if (!e.shiftKey && (actif === dedans.at(-1) || (actif === p && !dedans.length))) {
+        const suivant = visibles(document).find((el) => !p.contains(el) && cible.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+        if (!suivant) return;
+        e.preventDefault();
+        setOuvert(null);
+        suivant.focus();
+      }
     };
     const dehors = (e: PointerEvent) => {
       const t = e.target as Element;
       if (!panneau.current?.contains(t) && !t.closest?.(`#trou-${ouvert}`)) setOuvert(null);
     };
-    document.addEventListener("keydown", echap);
+    const focus = (e: FocusEvent) => {
+      const t = e.target as Node | null;
+      if (t && !panneau.current?.contains(t) && t !== caseDe()) setOuvert(null);
+    };
+    document.addEventListener("keydown", clavier);
     document.addEventListener("pointerdown", dehors);
+    document.addEventListener("focusin", focus);
     return () => {
-      document.removeEventListener("keydown", echap);
+      document.removeEventListener("keydown", clavier);
       document.removeEventListener("pointerdown", dehors);
+      document.removeEventListener("focusin", focus);
     };
   }, [ouvert]);
 
@@ -278,7 +342,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
 
   const demande: Demande = {
     intention,
-    circuit,
+    circuit: circuitEnvoye,
     dossier: { sejour: d.sejour, lieux: d.lieux, raisons: d.raisons, services: d.services, devise: d.devise, ville },
     reponses: { ...r, langue },
     champs: c,
@@ -343,17 +407,49 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   };
 
   // ——— cases jaunes
-  const ouvrir = (k: Cle) => setOuvert((o) => (o === k ? null : k));
+  const ouvrirCarnet = () => {
+    if (!fusion) {
+      const ajouts = lieux.filter((x) => !base.lieux.includes(x));
+      if (ajouts.length) modifierChemin(ajouts, []);
+      setFusion(true);
+      if (circuit || lieuxLien.length) {
+        const u = new URL(location.href);
+        u.searchParams.delete("circuit");
+        u.searchParams.delete("lieux");
+        window.history.replaceState(null, "", u);
+      }
+    }
+    setOuvert(null);
+    setCarnet(true);
+  };
+  const ouvrir = (k: Cle) => (k === "lieux" ? ouvrirCarnet() : setOuvert((o) => (o === k ? null : k)));
+  const cadreCorps = useCallback(() => corps.current?.getBoundingClientRect() ?? null, []);
+  // carnet refermé (Valider, croix, Échap, clic dehors) : le focus revient à la case, Tab continue dans le billet
+  const carnetVu = useRef(false);
+  useEffect(() => {
+    if (carnet) carnetVu.current = true;
+    else if (carnetVu.current) {
+      carnetVu.current = false;
+      document.getElementById("trou-lieux")?.focus();
+    }
+  }, [carnet]);
+  // choix fait dans le panneau : il se ferme et le focus revient sur la case (ou, si elle a laissé place aux dates, sur
+  // leur « Modifier »), jamais perdu en haut de la page
+  const choisi = () => {
+    rendre.current = true;
+    setOuvert(null);
+  };
   const caseJaune = (k: Cle, valeur: string | null, vide: string, opts: { libre?: boolean; sr?: string; libelle: string }) => (
     <button
       id={`trou-${k}`}
       type="button"
       aria-haspopup="dialog"
-      aria-expanded={ouvert === k}
-      aria-label={`${opts.libelle} : ${opts.sr ?? valeur ?? vide}${fini ? "" : ", modifier"}`}
+      aria-expanded={k === "lieux" ? carnet : ouvert === k}
+      aria-label={`${opts.libelle} : ${opts.sr ?? valeur ?? vide}${fini ? "" : `, ${chemins.location.change.toLocaleLowerCase()}`}`}
+      aria-describedby={erreur(k) ? "devis-manque" : undefined}
       disabled={fini}
       onClick={() => ouvrir(k)}
-      className={`${s.case} ${valeur ? s.rempli : opts.libre ? s.libre : ""} ${ouvert === k ? s.actif : ""} ${erreur(k) ? s.erreur : ""}`}
+      className={`${s.case} ${valeur ? s.rempli : opts.libre ? s.libre : ""} ${ouvert === k || (k === "lieux" && carnet) ? s.actif : ""} ${erreur(k) ? s.erreur : ""}`}
     >
       {valeur ? (
         <>
@@ -371,43 +467,21 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const langueNom = nav.languages.find((l) => l.code === langue)?.label ?? langue;
   const occasionValeur = r.occasion ?? (fini ? T.occasion.aucune : null);
 
-  const contenuPanneau: Record<Cle, () => ReactNode> = {
-    ville: () => <PanVille ville={ville} onVille={async (n) => (await changer(n)) && (setOuvert(null), true)} />,
+  const contenuPanneau: Record<Exclude<Cle, "lieux">, () => ReactNode> = {
+    ville: () => <PanVille ville={ville} onVille={async (n) => (await changer(n)) && (choisi(), true)} />,
     dates: () => (
       <PanDates
         conseil={r.conseilDates}
         onConseil={() => {
           rep({ conseilDates: true });
-          setOuvert(null);
+          choisi();
         }}
         onDates={(x) => {
           ecrireSejour(x);
           rep({ conseilDates: false });
-          setOuvert(null);
+          choisi();
         }}
       />
-    ),
-    lieux: () => (
-      <>
-        <p className={s.panTitre}>{T.lieux.trou.replace(/^./, (x) => x.toUpperCase())}</p>
-        <div className={s.puces}>
-          <button
-            type="button"
-            aria-pressed={r.conseilLieux}
-            className={s.puce}
-            onClick={() => {
-              rep({ conseilLieux: true });
-              setOuvert(null);
-            }}
-          >
-            {T.lieux.conseil}
-          </button>
-        </div>
-        <Link href={T.lieux.choisir.href} className={s.petitBouton}>
-          {T.lieux.choisir.label}
-          <Icon name="arrow-right" className="size-4" />
-        </Link>
-      </>
     ),
     qui: () => (
       <PanQui
@@ -420,7 +494,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
           rep({ qui: id, adultes: seul || r.adultes < 1 ? o.adultes : r.adultes, enfants: seul ? 0 : r.enfants });
         }}
         onNombre={(a, e) => rep({ adultes: a, enfants: e })}
-        onValider={() => setOuvert(null)}
+        onValider={() => choisi()}
       />
     ),
     occasion: () => (
@@ -436,7 +510,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
               className={s.puce}
               onClick={() => {
                 rep({ occasion: r.occasion === o.id ? null : o.id });
-                setOuvert(null);
+                choisi();
               }}
             >
               {o.phrase.charAt(0).toLocaleUpperCase() + o.phrase.slice(1)}
@@ -451,7 +525,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
         propose={paysPropose}
         onPays={(v) => {
           rep({ pays: v });
-          setOuvert(null);
+          choisi();
         }}
       />
     ),
@@ -469,7 +543,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
               className={s.puce}
               onClick={() => {
                 rep({ langue: l.code });
-                setOuvert(null);
+                choisi();
               }}
             >
               {l.label}
@@ -534,11 +608,18 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
               </div>
             ) : null}
           </header>
+          {/* téléphone et tablette : le talon est sous le billet ; ce qui manque reste visible en haut pendant qu'on complète
+              les cases (le résumé lu par les lecteurs d'écran est celui du talon, role=status) */}
+          {verif && manque.length > 0 && etat !== "envoi" && !fini ? (
+            <p className={s.manqueHaut} aria-hidden="true">
+              {T.talon.manque(manque.map((k) => T.talon.noms[k] ?? k))}
+            </p>
+          ) : null}
 
           {voyage ? (
             <>
-              {/* trajet : ville proposée (modifiable) → aéroport de Cotonou → Ouidah */}
-              <section className={s.trajet} aria-label={`${T.trajet.depart} : ${ville ?? T.trajet.villeTrou}, ${T.trajet.aeroport.nom}, Ouidah`}>
+              {/* trajet : ville proposée (modifiable) → aéroport de Cotonou → Ouidah ; depuis le Bénin, la route seule */}
+              <section className={`${s.trajet} ${depuisBenin ? s.trajetRoute : ""}`} aria-label={depuisBenin ? `${T.trajet.depart} : ${ville}, ${T.trajet.route}, Ouidah` : `${T.trajet.depart} : ${ville ?? T.trajet.villeTrou}, ${T.trajet.aeroport.nom}, Ouidah`}>
                 <div className={s.escale}>
                   <span className={s.lib}>{T.trajet.depart}</span>
                   {ville ? (
@@ -549,7 +630,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                         {villeChoisie ? T.trajet.choisie : T.trajet.detectee}
                         {fini ? null : (
                           <button type="button" id="trou-ville" className={s.modifier} aria-haspopup="dialog" aria-expanded={ouvert === "ville"} onClick={() => ouvrir("ville")}>
-                            Modifier
+                            {chemins.location.change}
                           </button>
                         )}
                       </span>
@@ -561,24 +642,28 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                     </>
                   )}
                 </div>
-                <div className={s.liaison}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M21 12c0-.8-.7-1.5-1.5-1.5H15L10 3H8l2.5 7.5H6L4.5 8.5H3l1 3.5-1 3.5h1.5L6 13.5h4.5L8 21h2l5-7.5h4.5c.8 0 1.5-.7 1.5-1.5z" />
-                  </svg>
-                  <span className={s.note}>{T.trajet.vol}</span>
-                </div>
-                <div className={s.escale}>
-                  <span className={s.lib}>{T.trajet.arrivee}</span>
-                  <Palettes texte={T.trajet.aeroport.code} taille="grand" entree delai={550} />
-                  <span className={s.note}>{T.trajet.aeroport.nom}</span>
-                </div>
+                {depuisBenin ? null : (
+                  <>
+                    <div className={s.liaison}>
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M21 12c0-.8-.7-1.5-1.5-1.5H15L10 3H8l2.5 7.5H6L4.5 8.5H3l1 3.5-1 3.5h1.5L6 13.5h4.5L8 21h2l5-7.5h4.5c.8 0 1.5-.7 1.5-1.5z" />
+                      </svg>
+                      <span className={s.note}>{T.trajet.vol}</span>
+                    </div>
+                    <div className={s.escale}>
+                      <span className={s.lib}>{T.trajet.arrivee}</span>
+                      <Palettes texte={T.trajet.aeroport.code} taille="grand" entree delai={550} />
+                      <span className={s.note}>{T.trajet.aeroport.nom}</span>
+                    </div>
+                  </>
+                )}
                 <div className={s.liaison}>
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5.5 16.5H4a1 1 0 0 1-1-1v-3l2.2-4.6A1.6 1.6 0 0 1 6.6 7h10.8a1.6 1.6 0 0 1 1.4.9L21 12.5v3a1 1 0 0 1-1 1h-1.5M9.5 16.5h5M4 12.5h16" />
                     <circle cx="7.5" cy="16.5" r="2" />
                     <circle cx="16.5" cy="16.5" r="2" />
                   </svg>
-                  <span className={s.note}>{T.trajet.navette(T.trajet.aeroport.km)}</span>
+                  <span className={s.note}>{depuisBenin ? T.trajet.route : T.trajet.navette(T.trajet.aeroport.km)}</span>
                 </div>
                 <div className={`${s.escale} ${s.dest}`}>
                   <span className={s.lib}>{T.trajet.destination}</span>
@@ -607,7 +692,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                         <span className={s.sr}>{T.dates.nuits(d.sejour.depart - d.sejour.arrivee)}</span>
                         <Palettes texte={T.dates.nuits(d.sejour.depart - d.sejour.arrivee)} taille="ligne" entree delai={1200} />
                         {fini ? null : (
-                          <Link href={T.dates.modifier.href} className={s.modifier}>
+                          <Link id="trou-dates-suite" href={T.dates.modifier.href} className={s.modifier} onClick={retenirRetour}>
                             {T.dates.modifier.label}
                           </Link>
                         )}
@@ -623,7 +708,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                   </>
                 ) : (
                   <div className={`${s.cel} ${s.datesVides}`}>
-                    <span className={s.lib}>{T.dates.aller}, {T.dates.retour.toLowerCase()}</span>
+                    <span className={s.lib}>{T.dates.allerRetour}</span>
                     {caseJaune("dates", r.conseilDates ? T.dates.conseillees : null, T.dates.trou, { libelle: T.dates.sejour })}
                   </div>
                 )}
@@ -659,9 +744,9 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                   <div className={s.teteBloc}>
                     <span className={s.lib}>{lieux.length ? (tour ? T.lieux.circuit(tour.title) : T.lieux.titre(lieux.length)) : T.lieux.titreVide}</span>
                     {lieux.length && !fini ? (
-                      <Link href={T.lieux.modifier.href} className={s.modifier}>
+                      <button type="button" id="trou-lieux" className={s.modifier} aria-haspopup="dialog" aria-expanded={carnet} onClick={ouvrirCarnet}>
                         {T.lieux.modifier.label}
-                      </Link>
+                      </button>
                     ) : null}
                   </div>
                   {lieux.length ? (
@@ -681,7 +766,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                   <div className={s.teteBloc}>
                     <span className={s.lib}>{services.length ? T.services.titre(services.length) : T.services.titreVide}</span>
                     {services.length && !fini ? (
-                      <Link href={T.services.modifier.href} className={s.modifier}>
+                      <Link href={T.services.modifier.href} className={s.modifier} onClick={retenirRetour}>
                         {T.services.modifier.label}
                       </Link>
                     ) : null}
@@ -700,7 +785,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                     </div>
                   ) : (
                     <p className={s.aucun}>
-                      {T.services.aucun} <Link href={T.services.aucunLien.href}>{T.services.aucunLien.label}</Link>.
+                      {T.services.aucun} <Link href={T.services.aucunLien.href} onClick={retenirRetour}>{T.services.aucunLien.label}</Link>.
                     </p>
                   )}
                 </div>
@@ -713,7 +798,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                     <div className={s.teteBloc}>
                       <span className={s.lib}>{T.billets.titre(billets.length)}</span>
                       {!fini ? (
-                        <Link href={T.billets.modifier.href} className={s.modifier}>
+                        <Link href={T.billets.modifier.href} className={s.modifier} onClick={retenirRetour}>
                           {T.billets.modifier.label}
                         </Link>
                       ) : null}
@@ -724,7 +809,16 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                           <Objet3D nom="billet" taille={54} className="size-12 md:size-[54px]" />
                           <div>
                             <b>{T.billets.ligne(x.court, x.formuleNom, x.quantite)}</b>
-                            <span>{x === aPayer && montant !== null ? T.billets.aPayer(fcfa(montant)) : T.billets.surDevis}</span>
+                            <span>
+                              {x === aPayer && montant !== null ? (
+                                <>
+                                  {T.billets.aPayer(fcfa(montant))}
+                                  <EquivalentDevise xof={montant} />
+                                </>
+                              ) : (
+                                T.billets.surDevis
+                              )}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -753,14 +847,19 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
             <div className={s.form}>
               <label className={s.champ}>
                 <span>{T.talon.champs.nom}</span>
-                <input id="devis-nom" className={s.saisie} name="nom" autoComplete="name" maxLength={120} value={c.nom} onChange={(e) => champ({ nom: e.target.value })} aria-invalid={erreur("nom") || undefined} />
+                <input id="devis-nom" className={s.saisie} name="nom" autoComplete="name" maxLength={120} value={c.nom} onChange={(e) => champ({ nom: e.target.value })} aria-invalid={erreur("nom") || undefined} aria-describedby={erreur("nom") ? "devis-nom-erreur" : undefined} />
+                {erreur("nom") ? (
+                  <span id="devis-nom-erreur" className={s.champErreur}>
+                    {T.talon.manque([T.talon.noms.nom])}
+                  </span>
+                ) : null}
               </label>
               <label className={s.champ}>
                 <span>{T.talon.champs.email}</span>
-                <input id="devis-email" className={s.saisie} name="email" type="email" inputMode="email" autoComplete="email" maxLength={254} value={c.email} onBlur={() => setEmailVu(true)} onChange={(e) => champ({ email: e.target.value })} aria-invalid={erreur("email") || emailFaux || undefined} aria-describedby={emailFaux ? "devis-email-erreur" : undefined} />
-                {emailFaux ? (
+                <input id="devis-email" className={s.saisie} name="email" type="email" inputMode="email" autoComplete="email" maxLength={254} value={c.email} onBlur={() => setEmailVu(true)} onChange={(e) => champ({ email: e.target.value })} aria-invalid={erreur("email") || emailFaux || undefined} aria-describedby={emailFaux || erreur("email") ? "devis-email-erreur" : undefined} />
+                {emailFaux || erreur("email") ? (
                   <span id="devis-email-erreur" className={s.champErreur}>
-                    {T.talon.emailInvalide}
+                    {emailFaux ? T.talon.emailInvalide : T.talon.manque([T.talon.noms.email])}
                   </span>
                 ) : null}
               </label>
@@ -774,7 +873,12 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                 <span>
                   {voyage ? T.talon.champs.message : T.talon.champs.messageQuestion} {voyage ? <small>{T.talon.champs.facultatif}</small> : null}
                 </span>
-                <textarea id="devis-message" className={s.saisie} name="message" rows={voyage ? 2 : 5} maxLength={4000} placeholder={T.talon.champs.messageAide} value={c.message} onChange={(e) => champ({ message: e.target.value })} aria-invalid={erreur("message") || undefined} />
+                <textarea id="devis-message" className={s.saisie} name="message" rows={voyage ? 2 : 5} maxLength={4000} placeholder={T.talon.champs.messageAide} value={c.message} onChange={(e) => champ({ message: e.target.value })} aria-invalid={erreur("message") || undefined} aria-describedby={erreur("message") ? "devis-message-erreur" : undefined} />
+                {erreur("message") ? (
+                  <span id="devis-message-erreur" className={s.champErreur}>
+                    {T.talon.manque([T.talon.noms.message])}
+                  </span>
+                ) : null}
               </label>
               {/* piège à robots : invisible et hors du parcours clavier */}
               <input type="text" name="site" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
@@ -791,7 +895,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                 </fieldset>
               ) : null}
               <label className={s.accord}>
-                <input id="devis-consent" className={s.sr} type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-invalid={erreur("consent") || undefined} />
+                <input id="devis-consent" className={s.sr} type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-invalid={erreur("consent") || undefined} aria-describedby={erreur("consent") ? "devis-consent-erreur" : undefined} />
                 <i aria-hidden="true">
                   <svg viewBox="0 0 24 24">
                     <path d="M6 12.5l4 4L18 8" />
@@ -801,8 +905,13 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                   {voyage ? T.talon.consent : T.talon.consentQuestion} <Link href={T.talon.confidentialite.href}>{T.talon.confidentialite.label}</Link>
                 </span>
               </label>
+              {erreur("consent") ? (
+                <span id="devis-consent-erreur" className={s.champErreur}>
+                  {T.talon.manque([T.talon.noms.consent])}
+                </span>
+              ) : null}
               <div className={s.envoi}>
-                <button type="submit" aria-disabled={etat === "envoi" || manque.length > 0 || undefined} className={`oht-btn ${etat === "envoi" ? "is-attente" : ""}`}>
+                <button type="submit" aria-disabled={etat === "envoi" || undefined} className={`oht-btn ${etat === "envoi" ? "is-attente" : ""}`}>
                   <span className="oht-btn-pastille is-gauche" aria-hidden="true">
                     <Icon name="arrow-right" />
                   </span>
@@ -822,11 +931,27 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
         ) : null}
       </form>
 
-      {ouvert && !fini ? (
+      {ouvert && ouvert !== "lieux" && !fini ? (
         <div ref={panneau} className={s.panneau} role="dialog" aria-modal="false" aria-label={T.talon.noms[ouvert] ?? ouvert} tabIndex={-1}>
           {contenuPanneau[ouvert]()}
         </div>
       ) : null}
+      <Suspense fallback={null}>
+        {carnet && !fini ? (
+          <Carnet
+            gardes={lieux}
+            cadre={cadreCorps}
+            onFermer={() => setCarnet(false)}
+            onConseil={() => rep({ conseilLieux: true })}
+            onMessage={(ligne) =>
+              setB((v) => {
+                const m = v.champs.message;
+                return m.includes(ligne) ? v : { ...v, champs: { ...v.champs, message: [m.trim(), ligne].filter(Boolean).join("\n").slice(0, 4000) } };
+              })
+            }
+          />
+        ) : null}
+      </Suspense>
     </div>
   );
 }
@@ -856,20 +981,22 @@ function PanVille({ ville, onVille }: { ville: string | null; onVille: (nom: str
         />
       </label>
       {perdu ? <p className={s.panErreur}>{T.trajet.villeIntrouvable}</p> : null}
-      <button
-        type="button"
-        data-garder
-        disabled={cherche || !v.trim()}
-        className={s.petitBouton}
-        onClick={async () => {
-          setCherche(true);
-          const ok = await onVille(v.trim());
-          setCherche(false);
-          setPerdu(!ok);
-        }}
-      >
-        {T.trajet.villeOk}
-      </button>
+      <div className={s.panPied}>
+        <button
+          type="button"
+          data-garder
+          disabled={cherche || !v.trim()}
+          className={s.petitBouton}
+          onClick={async () => {
+            setCherche(true);
+            const ok = await onVille(v.trim());
+            setCherche(false);
+            setPerdu(!ok);
+          }}
+        >
+          {T.trajet.villeOk}
+        </button>
+      </div>
     </>
   );
 }
@@ -878,13 +1005,26 @@ function PanDates({ conseil, onConseil, onDates }: { conseil: boolean; onConseil
   const T = useContenu("fr.devisPage", DEVIS_PAGE);
   const [a, setA] = useState("");
   const [z, setZ] = useState("");
-  const [faux, setFaux] = useState(false);
+  // « manque » : une des deux dates n'est pas choisie ; « ordre » : dates choisies mais impossibles
+  const [faux, setFaux] = useState<"manque" | "ordre" | null>(null);
   const [auj] = useState(aujourdhui);
+  const champA = useRef<HTMLInputElement>(null), champZ = useRef<HTMLInputElement>(null);
   const garder = () => {
+    if (!a || !z) {
+      setFaux("manque");
+      (a ? champZ : champA).current?.focus();
+      return;
+    }
     const x = deIso(a), y = deIso(z);
-    if (x === null || y === null || x < auj || y <= x || y > auj + 3 * 366) return setFaux(true);
+    if (x === null || y === null || x < auj || y <= x || y > auj + 3 * 366) {
+      setFaux("ordre");
+      champZ.current?.focus();
+      return;
+    }
     onDates({ arrivee: x, depart: y });
   };
+  const fauxA = faux === "manque" ? !a : faux === "ordre" && (deIso(a) ?? auj) < auj;
+  const fauxZ = faux === "manque" ? !z : faux === "ordre";
   return (
     <>
       <p className={s.panTitre}>{T.dates.trou.replace(/^./, (x) => x.toUpperCase())}</p>
@@ -898,17 +1038,23 @@ function PanDates({ conseil, onConseil, onDates }: { conseil: boolean; onConseil
         <div className={s.dates}>
           <label>
             {T.dates.arrivee}
-            <input type="date" className={s.saisie} min={ISO(auj)} value={a} onChange={(e) => setA(e.target.value)} />
+            <input ref={champA} type="date" className={s.saisie} min={ISO(auj)} value={a} aria-invalid={fauxA || undefined} aria-describedby={fauxA ? "devis-dates-erreur" : undefined} onChange={(e) => (setA(e.target.value), setFaux(null))} />
           </label>
           <label>
             {T.dates.depart}
-            <input type="date" className={s.saisie} min={a || ISO(auj + 1)} value={z} onChange={(e) => setZ(e.target.value)} />
+            <input ref={champZ} type="date" className={s.saisie} min={a || ISO(auj + 1)} value={z} aria-invalid={fauxZ || undefined} aria-describedby={fauxZ ? "devis-dates-erreur" : undefined} onChange={(e) => (setZ(e.target.value), setFaux(null))} />
           </label>
         </div>
-        {faux ? <p className={s.panErreur}>{T.dates.invalides}</p> : null}
-        <button type="button" className={s.petitBouton} onClick={garder}>
-          {T.dates.garder}
-        </button>
+        {faux ? (
+          <p id="devis-dates-erreur" role="alert" className={s.panErreur}>
+            {faux === "manque" ? T.dates.manquantes : T.dates.invalides}
+          </p>
+        ) : null}
+        <div className={s.panPied}>
+          <button type="button" className={s.petitBouton} onClick={garder}>
+            {T.dates.garder}
+          </button>
+        </div>
       </div>
     </>
   );
@@ -951,9 +1097,11 @@ function PanQui({ qui, adultes, enfants, onQui, onNombre, onValider }: { qui: st
           {compteur(T.qui.enfants, enfants, 0, (n) => onNombre(adultes, n))}
         </div>
       ) : null}
-      <button type="button" className={s.petitBouton} onClick={onValider} disabled={!qui}>
-        {T.qui.valider}
-      </button>
+      <div className={s.panPied}>
+        <button type="button" className={s.petitBouton} onClick={onValider} disabled={!qui}>
+          {T.qui.valider}
+        </button>
+      </div>
     </>
   );
 }

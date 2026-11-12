@@ -175,6 +175,12 @@ export async function lireFactures(s: Session, cible?: unknown): Promise<Facture
   }
   return factures;
 }
+/** Une facture lue par le serveur seul, sans session (reçu joint à l'e-mail automatique d'un paiement en ligne). */
+export async function factureServeur(id: string): Promise<Facture | null> {
+  if (!UUID.test(id)) return null;
+  const l = await lire<BrutFacture>(`factures?select=${CHAMPS_FACTURE}&id=eq.${id}&limit=1`);
+  return l?.[0] ? versFacture(l[0]) : null;
+}
 /** Une facture si cette session y a droit, sinon null (introuvable ou hors de portée : même réponse). */
 export async function factureAccessible(s: Session, id: unknown): Promise<Facture | null | "panne"> {
   if (typeof id !== "string" || !UUID.test(id)) return null;
@@ -239,13 +245,14 @@ export async function fileManuels(): Promise<{ file: PaiementManuel[]; traites: 
 
 // ---------- coordonnées de l'agence ----------
 
-export type Reglages = { titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile: string[]; relance: number | null };
+// relance : premier palier (relance_jours, NULL = relances coupées) ; paliers : jours après l'émission (11/11, 7/15/30)
+export type Reglages = { titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile: string[]; relance: number | null; paliers: number[] | null };
 export async function lireReglages(): Promise<Reglages | null> {
-  const l = await lire<{ titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile_money: unknown; relance_jours: number | null }>("reglages_paiement?select=titulaire,banque,iban,bic,mobile_money,relance_jours&limit=1");
+  const l = await lire<{ titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile_money: unknown; relance_jours: number | null; relance_paliers?: number[] | null }>("reglages_paiement?select=titulaire,banque,iban,bic,mobile_money,relance_jours,relance_paliers&limit=1");
   if (!l) return null;
   const r = l[0];
-  if (!r) return { titulaire: null, banque: null, iban: null, bic: null, mobile: [], relance: null };
-  return { titulaire: r.titulaire, banque: r.banque, iban: r.iban, bic: r.bic, mobile: Array.isArray(r.mobile_money) ? r.mobile_money.filter((x): x is string => typeof x === "string") : [], relance: r.relance_jours };
+  if (!r) return { titulaire: null, banque: null, iban: null, bic: null, mobile: [], relance: null, paliers: null };
+  return { titulaire: r.titulaire, banque: r.banque, iban: r.iban, bic: r.bic, mobile: Array.isArray(r.mobile_money) ? r.mobile_money.filter((x): x is string => typeof x === "string") : [], relance: r.relance_jours, paliers: Array.isArray(r.relance_paliers) ? r.relance_paliers : null };
 }
 /** Virement proposé au client seulement si le titulaire et l'IBAN sont saisis. */
 export const virementActif = (r: Reglages | null) => Boolean(r?.titulaire && r.iban);

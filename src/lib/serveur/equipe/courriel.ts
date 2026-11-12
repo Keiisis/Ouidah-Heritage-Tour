@@ -29,5 +29,5 @@ export async function envoyerCode(m: { a: string; prenom: string; langue: string
   const [o, modele] = await Promise.all([origine(), lireModele("auto-code", L)]);
   const c = gabaritCode(m.prenom, m.code, MINUTES, L, { premiere: m.premiere, origine: o ?? undefined, modele });
   // chaque code est un message distinct : identifiant neuf (jamais dérivé du code)
-  return envoyerCourriel({ a: m.a, sujet: c.sujet, html: c.html, texte: c.texte, cle: `equipe-${randomUUID()}`, nom: expediteurEquipe });
+  return envoyerCourriel({ a: m.a, sujet: c.sujet, html: c.html, texte: c.texte, cle: `equipe-${randomUUID()}`, nom: expediteurEquipe, modele: "auto-code" });
 }

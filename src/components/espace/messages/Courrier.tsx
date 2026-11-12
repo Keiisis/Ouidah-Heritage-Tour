@@ -7,6 +7,7 @@ import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, msg, VARIABLES
 import { useMouvementReduit } from "@/lib/mouvement";
 import { enregistrerBrouillon, envoyerCourrier, envoyerTest, type RetourMessages } from "@/lib/serveur/equipe/messages/actions";
 import type { ClientCourrier, Envoi, Modele } from "@/lib/serveur/equipe/messages/lectures";
+import { TRANSITIONS_COURRIEL } from "@/lib/serveur/equipe/messages/regles";
 import { estLangue, lireAdresses, remplir, type Valeurs, valeursDe } from "@/lib/serveur/equipe/messages/rendu";
 import { Rediger } from "../assistant/Rediger";
 import { Bloc, Vide } from "../Bloc";
@@ -365,7 +366,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
                   </span>
                   <span className="langue" title={T.langues[x.langue]}>{x.langue}</span>
                   <span className="etat" data-e={x.statut}>{C.etats[x.statut]}</span>
-                  {x.statut === "brouillon" && x.mien && x.client && (
+                  {TRANSITIONS_COURRIEL[x.statut].includes("envoye") && x.mien && x.client && (
                     <span className="actions">
                       <button type="button" className="bouton-2 bouton-petit" data-reprendre={x.id} onClick={() => reprendre(x)}>
                         {C.reprendre}

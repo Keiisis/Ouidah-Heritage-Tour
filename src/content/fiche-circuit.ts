@@ -16,6 +16,8 @@ export const ficheCircuit = {
   prix: (prix: number | null, visible: boolean, intro = toursIntro) => (prix != null && visible ? intro.from(prix) : intro.onRequest),
   conditions: (duree: string, prix: string) => `${duree} · ${prix}`,
   reserver: { label: "Réserver ce circuit", href: (slug: string) => `${DEVIS.voyage}?circuit=${slug}` },
+  // même bouton tant que la durée ou le prix ne sont pas publiés : la demande ouvre un devis, pas une réservation
+  demander: "Demander ce circuit",
   personnaliser: { label: "Le personnaliser", href: (slug: string) => `${DEVIS.voyage}?circuit=${slug}&demande=question` },
   // longueur : tracé à pied quand il existe, sinon les étapes reliées à vol d'oiseau
   longueur: (km: number, aPied: boolean) => `environ ${nombre.format(km)} km${aPied ? "" : " entre les étapes, à vol d’oiseau"}`,

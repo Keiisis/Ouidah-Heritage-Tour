@@ -39,6 +39,8 @@ export type TexteSuivi = {
   devis: { titre: string; quantite: string; prix: string; total: string; valable: (date: string) => string };
   lie: { accompagnement: { titre: string; texte: string }; billets: { titre: string; texte: string }; ouvrir: string };
   contact: { titre: string; texte: (reference: string) => string; ecrire: string; email: string; telephone: string };
+  // lien de suivi ou de paiement faux, incomplet ou retiré (/suivi/<jeton>, /payer/<jeton>) : écran dédié, réponse 404
+  invalide: { metaTitre: string; titre: string; texte: string; ecrire: string; devis: string };
 };
 
 const fr: TexteSuivi = {
@@ -87,6 +89,7 @@ const fr: TexteSuivi = {
     ouvrir: "Ouvrir ce suivi",
   },
   contact: { titre: "Une question ?", texte: (r) => `Un agent vous répond. Donnez-lui votre référence ${r}.`, ecrire: "Écrire à un agent", email: "E-mail", telephone: "Téléphone" },
+  invalide: { metaTitre: "Ce lien n’est plus valable — Ouidah Heritage Tour", titre: "Ce lien n’est plus valable.", texte: "Il est peut-être incomplet, ou il a expiré. Écrivez-nous en donnant votre nom : un agent vous renvoie le bon lien.", ecrire: "Écrivez-nous :", devis: "Créer mon voyage" },
 };
 
 const en: TexteSuivi = {
@@ -135,6 +138,7 @@ const en: TexteSuivi = {
     ouvrir: "Open tracking",
   },
   contact: { titre: "A question?", texte: (r) => `An agent will reply. Please quote your reference ${r}.`, ecrire: "Message an agent", email: "Email", telephone: "Phone" },
+  invalide: { metaTitre: "This link is no longer valid — Ouidah Heritage Tour", titre: "This link is no longer valid.", texte: "It may be incomplete, or it may have expired. Write to us with your name and an agent will send you the right link.", ecrire: "Write to us:", devis: "Create my trip" },
 };
 
 const es: TexteSuivi = {
@@ -183,6 +187,7 @@ const es: TexteSuivi = {
     ouvrir: "Abrir el seguimiento",
   },
   contact: { titre: "¿Una pregunta?", texte: (r) => `Un agente le responderá. Indique su referencia ${r}.`, ecrire: "Escribir a un agente", email: "Correo electrónico", telephone: "Teléfono" },
+  invalide: { metaTitre: "Este enlace ya no es válido — Ouidah Heritage Tour", titre: "Este enlace ya no es válido.", texte: "Puede que esté incompleto o que haya caducado. Escríbanos indicando su nombre y un agente le enviará el enlace correcto.", ecrire: "Escríbanos:", devis: "Crear mi viaje" },
 };
 
 const de: TexteSuivi = {
@@ -231,6 +236,7 @@ const de: TexteSuivi = {
     ouvrir: "Statusseite öffnen",
   },
   contact: { titre: "Eine Frage?", texte: (r) => `Ein Mitarbeiter antwortet Ihnen. Bitte nennen Sie Ihre Referenz ${r}.`, ecrire: "Mitarbeiter kontaktieren", email: "E-Mail", telephone: "Telefon" },
+  invalide: { metaTitre: "Dieser Link ist nicht mehr gültig — Ouidah Heritage Tour", titre: "Dieser Link ist nicht mehr gültig.", texte: "Er ist vielleicht unvollständig oder abgelaufen. Schreiben Sie uns mit Ihrem Namen, ein Mitarbeiter schickt Ihnen den richtigen Link.", ecrire: "Schreiben Sie uns:", devis: "Meine Reise planen" },
 };
 
 const pt: TexteSuivi = {
@@ -279,6 +285,7 @@ const pt: TexteSuivi = {
     ouvrir: "Abrir o acompanhamento",
   },
   contact: { titre: "Uma pergunta?", texte: (r) => `Um agente responde-lhe. Indique a sua referência ${r}.`, ecrire: "Falar com um agente", email: "E-mail", telephone: "Telefone" },
+  invalide: { metaTitre: "Este link já não é válido — Ouidah Heritage Tour", titre: "Este link já não é válido.", texte: "Pode estar incompleto ou ter expirado. Escreva-nos com o seu nome e um agente envia-lhe o link certo.", ecrire: "Escreva-nos:", devis: "Criar a minha viagem" },
 };
 
 const ht: TexteSuivi = {
@@ -328,6 +335,7 @@ const ht: TexteSuivi = {
     ouvrir: "Ouvri swivi a",
   },
   contact: { titre: "Ou gen yon kesyon?", texte: (r) => `Yon ajan ap reponn ou. Ba li referans ou: ${r}.`, ecrire: "Ekri yon ajan", email: "Imèl", telephone: "Telefòn" },
+  invalide: { metaTitre: "Lyen sa a pa valab ankò — Ouidah Heritage Tour", titre: "Lyen sa a pa valab ankò.", texte: "Petèt li pa konplè, oswa li ekspire. Ekri nou ak non ou, yon ajan ap voye bon lyen an ba ou.", ecrire: "Ekri nou:", devis: "Kreye vwayaj mwen" },
 };
 
 const gcf: TexteSuivi = {
@@ -377,6 +385,7 @@ const gcf: TexteSuivi = {
     ouvrir: "Ouvè swivi-la",
   },
   contact: { titre: "On kèsyon?", texte: (r) => `On ajan ké réponn-vou. Ba-y référans a-w: ${r}.`, ecrire: "Ékri on ajan", email: "Imèl", telephone: "Téléfòn" },
+  invalide: { metaTitre: "Lyen-tala pa valid ankò — Ouidah Heritage Tour", titre: "Lyen-tala pa valid ankò.", texte: "Pétèt i pa konplè, oben i èkspiré. Ékri nou èvè non a-w, on ajan ké voyé-w bon lyen-la.", ecrire: "Ékri nou :", devis: "Kréyé vwayaj mwen" },
 };
 
 export const suivi: Record<LangueDoc, TexteSuivi> = { FR: fr, EN: en, ES: es, DE: de, PT: pt, HT: ht, GCF: gcf };

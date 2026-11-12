@@ -223,11 +223,14 @@ export function CheminsGlobe({ ouidah, lieux, visiteur, large, reduit, libelleOu
 
   return (
     <div ref={boite} role="img" aria-label={libelleOuidah} className="absolute inset-0 [container-type:size]">
-      {secours ? (
+      {/* la même Terre rendue d'avance, à la même place : visible dès l'arrivée, le temps que la 3D se charge (three.js et
+          ses textures), et quand la 3D est refusée ; jamais de grand vide blanc à la place du globe */}
+      {secours || !prete ? (
         <div aria-hidden="true" className={`pointer-events-none absolute ${large ? "top-[-1.35cqh] left-[calc(50cqw-2.35cqh)] size-[102.7cqh]" : "top-[30.75cqh] left-[calc(50cqw-38.95cqh)] size-[77.9cqh]"}`}>
-          <Image src={SECOURS} alt="" fill sizes="100vh" className="object-contain" />
+          <Image src={SECOURS} alt="" fill sizes="100vh" loading="eager" className="object-contain" />
         </div>
-      ) : (
+      ) : null}
+      {secours ? null : (
         <>
           <span ref={pinOuidah} className={`pointer-events-none invisible absolute flex items-center gap-2 ${large ? "flex-row-reverse" : ""}`} style={{ transform: large ? "translate(calc(-100% + 7px), -50%)" : "translate(-7px, -50%)" }}>
             <span className="size-3.5 rounded-full bg-sun" />

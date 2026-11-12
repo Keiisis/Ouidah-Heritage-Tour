@@ -144,3 +144,7 @@
 @media (prefers-reduced-motion: reduce) {
   .esp .esp-reglages *, .esp .esp-reglages *::before { animation: none !important; transition: none !important; }
 }
+
+/* destinataires des avis à l'équipe (écran E-mail d'envoi) */
+.esp-reglages .liste-avis { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.esp-reglages .liste-avis li { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; overflow-wrap: anywhere; }

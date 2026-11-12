@@ -10,12 +10,12 @@ import "./fiche-circuit.css";
 // et la carte du vrai tracé collée à droite (bandeau collant sous 1024 px), puis le bloc « Réserver » sur navy.
 // Rendu serveur ; seul le mouvement de la carte (CarteTrace) est côté client. Une donnée vide n'est pas affichée.
 
-async function Actions({ slug, clair = false }: { slug: string; clair?: boolean }) {
+async function Actions({ slug, reservable, clair = false }: { slug: string; reservable: boolean; clair?: boolean }) {
   const T = await lireContenu("fiche-circuit.ficheCircuit");
   return (
     <div className="fc-actions">
       <ButtonPrimary href={T.reserver.href(slug)} dark={clair}>
-        {T.reserver.label}
+        {reservable ? T.reserver.label : T.demander}
       </ButtonPrimary>
       <LinkLine href={T.personnaliser.href(slug)}>{T.personnaliser.label}</LinkLine>
     </div>
@@ -28,12 +28,7 @@ function Figure({ p }: { p: Photo }) {
       <div className="fc-cadre" style={{ aspectRatio: p.largeur && p.hauteur ? `${p.largeur} / ${p.hauteur}` : "3 / 2" }}>
         <Image src={p.src} alt={p.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" />
       </div>
-      {p.legende ? (
-        <figcaption>
-          {p.legende}
-          {p.annee ? <span className="fc-annee">{p.annee}</span> : null}
-        </figcaption>
-      ) : null}
+      {p.legende ? <figcaption>{p.legende}</figcaption> : null}
     </figure>
   );
 }
@@ -41,6 +36,8 @@ function Figure({ p }: { p: Photo }) {
 export async function FicheCircuit({ f }: { f: Fiche }) {
   const T = await lireContenu("fiche-circuit.ficheCircuit");
   const C = f.circuit;
+  // durée et prix publiés : une réservation ; sinon une demande (devis)
+  const reservable = C.duration !== null && C.price !== null && C.priceVisible;
   return (
     <div className="fc">
       <section className="fc-ouverture" aria-labelledby="fc-titre">
@@ -53,7 +50,7 @@ export async function FicheCircuit({ f }: { f: Fiche }) {
           </div>
         </div>
         <div className="container-oht fc-intro">
-          {f.chapo ? <p className="fc-chapo">{f.chapo}</p> : <div />}
+          {f.chapo ? <p className="fc-chapo">{f.chapo}</p> : null}
           <div>
             <p className="fc-resume">{f.resume}</p>
             {f.trajet ? <p className="fc-trajet">{f.trajet}</p> : null}
@@ -61,7 +58,7 @@ export async function FicheCircuit({ f }: { f: Fiche }) {
               {f.conditions}
               <EquivalentDevise xof={C.priceVisible ? C.price : null} />
             </p>
-            <Actions slug={C.slug} />
+            <Actions slug={C.slug} reservable={reservable} />
           </div>
         </div>
       </section>
@@ -106,7 +103,7 @@ export async function FicheCircuit({ f }: { f: Fiche }) {
               <EquivalentDevise xof={C.priceVisible ? C.price : null} />
             </p>
             {f.marche ? <p className="fc-marche">{f.marche}</p> : null}
-            <Actions slug={C.slug} clair />
+            <Actions slug={C.slug} reservable={reservable} clair />
             {f.chapitre ? (
               <p className="fc-chapitre">
                 <LinkLine href={f.chapitre.href}>{f.chapitre.texte}</LinkLine>

@@ -767,7 +767,7 @@ export function Connexion({ role }: { role: Role }) {
       {/* 10. arrivée : squelette de l'espace, aucun chiffre */}
       <div className="espace" id="espace" aria-hidden={!arrivee}>
         <aside>
-          <Image src={T.logoClair.src} alt="" width={105} height={30} />
+          <Image src={T.logoClair.src} alt="" width={40} height={40} />
           <div className="barre-lien" />
           <div className="barre-lien" />
           <div className="barre-lien" />

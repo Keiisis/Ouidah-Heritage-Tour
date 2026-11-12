@@ -6,7 +6,7 @@ import { espace as T } from "@/content/espace";
 import { useMouvementReduit } from "@/lib/mouvement";
 import type { EtatCompte, Membre } from "@/lib/serveur/equipe/agents";
 import { ajouterAgent, changerAgent, changerRole, type Retour, supprimerAgent } from "@/lib/serveur/equipe/gestion";
-import { type ChampInvalide, type Langue, LANGUES, lireInvitation } from "@/lib/serveur/equipe/partage";
+import { type ChampInvalide, type Langue, LANGUES, lireInvitation, TRANSITIONS_COMPTE } from "@/lib/serveur/equipe/partage";
 import { Bloc, Vide } from "./Bloc";
 import { useMinute } from "./Cadre";
 import { ilYa, lumiere, minutesOuidah, soleil, surArc } from "./outils";
@@ -278,9 +278,9 @@ export function Equipe({ membres }: { membres: Membre[] }) {
                           <>
                             {m.etat === "suspendu" && action(m, "reactiver", E.reactiver)}
                             {m.etat === "invite" && action(m, "reinviter", E.reinviter, "courrier")}
-                            {m.etat !== "suspendu" && action(m, "suspendre", E.suspendre, "pause")}
+                            {TRANSITIONS_COMPTE[m.etat].includes("suspendu") && action(m, "suspendre", E.suspendre, "pause")}
                             {action(m, "role", E.devenir[m.role === "admin" ? "agent" : "admin"])}
-                            {m.etat !== "actif" && (
+                            {TRANSITIONS_COMPTE[m.etat].includes("supprime") && (
                               <button type="button" className="bouton-2 bouton-petit" data-act="demander-suppression" aria-label={E.actionDe(E.supprimer, `${m.prenom} ${m.nom}`)} disabled={Boolean(occupe)} onClick={() => setASupprimer(m.id)}>
                                 {E.supprimer}
                               </button>

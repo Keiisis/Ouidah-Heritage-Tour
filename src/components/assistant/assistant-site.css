@@ -42,6 +42,14 @@
   box-shadow: 0 22px 50px -22px var(--as-ombre), 0 0 0 1px var(--as-filet);
   transition: transform 0.7s var(--as-t), opacity 0.5s var(--as-t);
 }
+/* bande vide en fin de page, bleu nuit comme le pied : la place du lanceur quand on arrive tout en bas */
+.as-reserve {
+  height: calc(88px + env(safe-area-inset-bottom));
+  background: var(--surface-abyss);
+}
+@media (max-width: 639px) {
+  .as-reserve { height: calc(76px + env(safe-area-inset-bottom)); }
+}
 .as-lanceur[data-cache] {
   transform: translateY(calc(100% + 48px)); /* sort par le bas de l'écran : aucun état invisible sur place */
   pointer-events: none;

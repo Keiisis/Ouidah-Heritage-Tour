@@ -152,11 +152,9 @@ export async function QuiSommesNous() {
             <div className="qs-faits">
               {F.map((f) => (
                 <div key={f.libelle} className="qs-fait">
+                  <p className="qs-libelle">{f.libelle}</p>
                   <p className="qs-valeur">{f.valeur}</p>
-                  <p className="qs-detail">
-                    <b>{phrase(f.libelle)}</b>
-                    {f.detail.length ? ` ${f.detail.join(" ")}` : null}
-                  </p>
+                  {f.detail.length ? <p className="qs-detail">{f.detail.join(" ")}</p> : null}
                 </div>
               ))}
             </div>

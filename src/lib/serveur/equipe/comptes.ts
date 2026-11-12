@@ -75,9 +75,12 @@ export async function lireProfil(cle: { id: string } | { email: string }): Promi
   }
 }
 
+/** Écrit le profil. L'activation (état « actif ») n'a qu'un départ, l'invitation (TRANSITIONS_COMPTE) : le filtre
+ * etat=eq.invite empêche qu'un compte suspendu entre-temps redevienne actif par ce chemin. */
 export async function modifierProfil(id: string, champs: Partial<{ etat: "actif"; derniere_connexion: string; modifie_le: string }>) {
   try {
-    return (await base(`equipe_profils?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", corps: champs, prefer: "return=minimal" })).ok;
+    const garde = champs.etat ? "&etat=eq.invite" : "";
+    return (await base(`equipe_profils?id=eq.${encodeURIComponent(id)}${garde}`, { method: "PATCH", corps: champs, prefer: "return=minimal" })).ok;
   } catch {
     return false;
   }

@@ -6,7 +6,7 @@ import { lire, lireToutes } from "../finances/lectures";
 import { bornesMois, decaler, enXof, moisCourant } from "../finances/regles";
 import type { Etape } from "../dossiers-regles";
 import type { Session } from "../session";
-import { lundiEcoule, type Mime, UUID } from "./regles";
+import { samediEcoule, type Mime, UUID } from "./regles";
 
 // Lectures du lot « pilotage », par le serveur seulement avec la clé secrète. La clé contourne RLS : le cloisonnement tient
 // ICI. Un agent ne lit que ses dossiers (agent_id posé dans la requête) et ses propres chiffres ; un admin lit tout.
@@ -108,8 +108,8 @@ export async function direct(ms: number): Promise<Direct | null> {
 // ---------- rapport hebdomadaire (admin) ----------
 
 export type Rapport = {
-  lundi: string; // AAAA-MM-JJ
-  dimanche: string;
+  debut: string; // AAAA-MM-JJ, samedi
+  fin: string; // vendredi
   demandes: number;
   devis: number;
   paiements: number;
@@ -120,10 +120,10 @@ export type Rapport = {
   dernierEnvoi: { quand: string; nombre: number } | null;
 };
 
-/** Rapport de la semaine écoulée (lundi → dimanche à Ouidah) pour l'heure `ms`. */
+/** Rapport de la période écoulée (samedi → vendredi à Ouidah) pour l'heure `ms`. */
 export async function rapport(ms: number): Promise<Rapport | null> {
-  const lundi = lundiEcoule(ms);
-  const debut = new Date(minuitOuidah(lundi)).toISOString(), fin = new Date(minuitOuidah(lundi + 7)).toISOString();
+  const samedi = samediEcoule(ms);
+  const debut = new Date(minuitOuidah(samedi)).toISOString(), fin = new Date(minuitOuidah(samedi + 7)).toISOString();
   const [demandes, devis, argent, billets, aConfirmer, nonAttribuees, envoi] = await Promise.all([
     compter("demandes", `statut=eq.envoyee&cree_le=gte.${enc(debut)}&cree_le=lt.${enc(fin)}`),
     compter("devis", `statut=neq.brouillon&publie_le=gte.${enc(debut)}&publie_le=lt.${enc(fin)}`),
@@ -131,12 +131,12 @@ export async function rapport(ms: number): Promise<Rapport | null> {
     lireToutes<{ quantite: number }>(`reservations?select=quantite&statut=eq.paye&paye_le=gte.${enc(debut)}&paye_le=lt.${enc(fin)}`),
     compter("paiements_manuels", "etat=eq.a_confirmer"),
     compter("demandes", "statut=eq.envoyee&etape=eq.nouvelle&agent_id=is.null"),
-    lire<{ cree_le: string; details: { nombre?: number } }>(`equipe_journal?select=cree_le,details&action=eq.rapport.envoi&details->>semaine=eq.${iso(lundi)}&order=id.desc&limit=1`),
+    lire<{ cree_le: string; details: { nombre?: number } }>(`equipe_journal?select=cree_le,details&action=eq.rapport.envoi&details->>semaine=eq.${iso(samedi)}&order=id.desc&limit=1`),
   ]);
   if (demandes === null || devis === null || !argent || !billets || aConfirmer === null || nonAttribuees === null || !envoi) return null;
   return {
-    lundi: iso(lundi),
-    dimanche: iso(lundi + 6),
+    debut: iso(samedi),
+    fin: iso(samedi + 6),
     demandes,
     devis,
     paiements: argent.length,

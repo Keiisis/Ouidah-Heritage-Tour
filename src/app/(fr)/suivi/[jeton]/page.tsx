@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { LienInvalide } from "@/components/suivi/LienInvalide";
 import { lireDossier } from "@/lib/serveur/documents/dossier";
 import { Suivi } from "@/components/suivi/Suivi";
 
@@ -14,7 +14,7 @@ type Props = { params: Promise<{ jeton: string }>; searchParams: Promise<Record<
 async function Dossier({ params, searchParams }: Props) {
   const [{ jeton }, recherche] = await Promise.all([params, searchParams]);
   const dossier = await lireDossier(jeton);
-  if (!dossier) notFound();
+  if (!dossier) return <LienInvalide />; // signature juste, dossier retiré : même écran (déjà en flux : statut 200)
   return <Suivi dossier={dossier} bienvenue={recherche.bienvenue === "1"} indisponible={recherche.paiement === "indisponible"} />;
 }
 

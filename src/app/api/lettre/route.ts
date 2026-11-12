@@ -3,6 +3,7 @@ import { lireContenu } from "@/lib/contenu";
 import { EMAIL } from "@/lib/demande";
 import { base, baseConfiguree } from "@/lib/serveur/base";
 import { empreinteIp, limiteAtteinte, lireCorps, reponse } from "@/lib/serveur/garde";
+import { noterException } from "@/lib/serveur/courriel";
 import { envoyerLettre } from "@/lib/serveur/courriels/lettre";
 import { jetonLettre } from "@/lib/serveur/equipe/messages/envoi";
 import { origineSite } from "@/lib/serveur/paiement/outils";
@@ -34,6 +35,6 @@ export async function POST(req: Request) {
   if (!r?.ok) return reponse({ erreur: "base" }, 502);
   const id = ((await r.json().catch(() => [])) as { id?: string }[])[0]?.id;
   const origine = origineSite(req), jeton = id ? jetonLettre(id) : null;
-  if (origine) after(() => envoyerLettre(email, { langue, sujets, desinscription: jeton ? `${origine}/lettre/desinscription/${jeton}` : null }, origine).catch(() => false));
+  if (origine) after(() => envoyerLettre(email, { langue, sujets, desinscription: jeton ? `${origine}/lettre/desinscription/${jeton}` : null }, origine).catch(() => noterException("auto-lettre", email)));
   return reponse({ ok: true }, 201);
 }

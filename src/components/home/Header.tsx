@@ -70,7 +70,7 @@ export function Header({ blog }: { blog: boolean }) {
           type="button"
           aria-pressed={devise === c.code}
           onClick={() => setDevise(c.code)}
-          className={`${padding} rounded-md transition-colors ${devise === c.code ? "bg-sun text-abyss" : "text-white/80 hover:text-white"}`}
+          className={`${padding} relative rounded-md transition-colors before:absolute before:inset-x-0 before:-inset-y-2.5 ${devise === c.code ? "bg-sun text-abyss" : "text-white/80 hover:text-white"}`}
         >
           {long ? c.long : c.short}
         </button>
@@ -84,19 +84,20 @@ export function Header({ blog }: { blog: boolean }) {
         data-navigation
         className={`fixed top-0 right-0 left-0 z-50 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${
           defile ? "border-b border-white/10 bg-abyss/90 py-3 shadow-[0_1px_0_rgb(0_0_0/0.06)] backdrop-blur-[16px]" : "bg-gradient-to-b from-abyss/90 via-abyss/40 to-transparent py-4"
-        }`}
+        } [@media(max-height:480px)]:py-1`}
       >
         <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-          <div className="flex h-12 items-center justify-between gap-8">
+          {/* paysage bas (téléphone couché) : barre ramenée à 52 px au lieu de 73 */}
+          <div className="flex h-12 items-center justify-between gap-8 [@media(max-height:480px)]:h-11">
             <Link href="/" aria-label={nav.home} className="group flex shrink-0 items-center gap-3 focus-visible:outline-sun">
-              {nav.logo ? (
-                <Image src={nav.logo.src} alt={nav.logo.alt} width={168} height={48} priority className="h-8 w-auto object-contain transition-transform group-hover:scale-[1.02] sm:h-10 lg:h-12" />
-              ) : (
-                <span className="font-display text-2xl font-semibold tracking-tight text-white">
-                  {nav.wordmark[0]}
-                  <span className="hidden text-sun sm:inline"> {nav.wordmark[1]}</span>
-                </span>
-              )}
+              {/* emblème rond original sur pastille blanche + nom (la patronne, via Kevin le 10/11 : la bannière « OUIDAH » le dénaturait) */}
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white transition-transform group-hover:scale-[1.04] sm:size-11 lg:size-12">
+                <Image src={nav.embleme.src} alt="" width={48} height={48} priority className="size-[34px] sm:size-[38px] lg:size-[42px]" />
+              </span>
+              <span className="font-display text-2xl/none font-semibold tracking-tight text-white">
+                {nav.wordmark[0]}
+                <span className="mt-1 block text-[13px]/none text-sun sm:mt-0 sm:inline sm:text-2xl/none"> {nav.wordmark[1]}</span>
+              </span>
             </Link>
 
             <nav ref={barre} className="hidden shrink-0 items-center gap-7 text-[15px] font-medium text-white/90 min-[1360px]:flex">
@@ -162,7 +163,7 @@ export function Header({ blog }: { blog: boolean }) {
               <details className="relative hidden md:block">
                 <summary
                   aria-label={nav.languageLabel}
-                  className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-white/20 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white focus-visible:outline-sun"
+                  className="relative inline-flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-white/20 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors before:absolute before:inset-x-0 before:-inset-y-2 hover:border-white/40 hover:text-white focus-visible:outline-sun"
                 >
                   <Icon name="globe" className="size-3.5 text-sun" />
                   <span>{langue}</span>
@@ -193,7 +194,7 @@ export function Header({ blog }: { blog: boolean }) {
                 aria-haspopup="dialog"
                 aria-expanded={tiroirOuvert}
                 aria-controls="site-menu"
-                className="rounded-lg p-2 text-white/90 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-sun min-[1360px]:hidden"
+                className="relative rounded-lg p-2 text-white/90 transition-colors before:absolute before:-inset-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-sun min-[1360px]:hidden"
               >
                 <Icon name="menu" className="size-6" />
               </button>
@@ -206,11 +207,23 @@ export function Header({ blog }: { blog: boolean }) {
         id="site-menu"
         ref={tiroir}
         onClose={() => setTiroirOuvert(false)}
+        aria-label={nav.drawerLabel}
+        // Tab et Maj+Tab tournent dans le tiroir : le focus n'en sort pas tant qu'il est ouvert
+        onKeyDown={(e) => {
+          if (e.key !== "Tab") return;
+          const cibles = [...e.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), summary, [tabindex]:not([tabindex='-1'])")].filter((x) => x.getClientRects().length);
+          const [premier, dernier] = [cibles[0], cibles.at(-1)];
+          const actif = document.activeElement;
+          if (e.shiftKey ? actif === premier || actif === e.currentTarget : actif === dernier) {
+            e.preventDefault();
+            (e.shiftKey ? dernier : premier)?.focus();
+          }
+        }}
         data-lenis-prevent
         className="m-0 h-dvh max-h-none w-screen max-w-none bg-abyss/95 text-white backdrop-blur-xl min-[1360px]:hidden"
       >
         <div className="flex min-h-full flex-col justify-between overflow-y-auto px-6 pt-24 pb-8">
-          <button type="button" onClick={fermer} aria-label={nav.close} className="absolute top-4 right-4 rounded-lg p-2 text-white/90 hover:bg-white/10 hover:text-white focus-visible:outline-sun sm:right-6">
+          <button type="button" onClick={fermer} aria-label={nav.close} className="absolute top-4 right-4 rounded-lg p-2 text-white/90 before:absolute before:-inset-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-sun sm:right-6">
             <Icon name="close" className="size-6" />
           </button>
           <div className="space-y-4">

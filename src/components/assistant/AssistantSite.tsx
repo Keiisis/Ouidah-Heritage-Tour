@@ -106,36 +106,30 @@ function lireProgramme(): Etape[] {
 
 // Le lanceur ne couvre jamais les sections protégées de l'accueil (ouverture, collage « Une ville qui se vit. », appel
 // final « OUIDAH »), ni les barres fixées en bas d'écran (boutique, signature, panneau du devis), ni le bandeau des choix
-// tant qu'il est ouvert sur un écran où il passerait dessous, ni aucun bouton, lien ou champ visible de la page : il se
-// range le temps que l'obstacle passe. Les textes d'action comptent aussi : libellés (qui portent souvent le cadre visible
-// du champ ou la case cochée), légendes, alertes, aides et erreurs reliées à un champ (aria-describedby).
-const CONTROLES = "a[href], button, input, select, textarea, summary, label, legend, [role='alert'], [role='button'], [role='link'], [role='tab'], [role='checkbox'], [role='radio'], [role='switch'], [role='combobox'], [role='slider'], [contenteditable='true'], [tabindex]:not([tabindex='-1'])";
-type Gene = "libre" | "compact" | "cache";
+// tant qu'il est ouvert sur un écran où il passerait dessous, ni les calques ouverts (feuille du billet, talon, tiroirs et
+// menu de la boutique), ni aucun bouton, lien, champ ou texte visible de la page (titres, paragraphes, listes) : il se
+// range, en glissant hors de l'écran (transform : aucun décalage de mise en page), le temps que l'obstacle passe. Les
+// textes d'action comptent aussi : libellés, légendes, alertes, aides et erreurs reliées à un champ (aria-describedby).
+// Une réserve en bas de page (as-reserve) lui laisse une place libre sous le pied de page.
+const CONTROLES = "a[href], button, input, select, textarea, summary, label, legend, h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, th, td, [role='alert'], [role='button'], [role='link'], [role='tab'], [role='checkbox'], [role='radio'], [role='switch'], [role='combobox'], [role='slider'], [contenteditable='true'], [tabindex]:not([tabindex='-1'])";
+const CALQUES = ".barre, .sg-barre, .bt-panneau, .bt-talon, .tiroir.ouvert, .menu-tout.ouvert, .panneau-filtres, dialog[open]";
+type Gene = "libre" | "cache";
 function gene(lanceur: HTMLElement | null, bandeauOuvert: boolean, labelCollage: string, motFinal: string): Gene {
   if (!lanceur) return "cache";
   const w = window.innerWidth;
   const h = window.innerHeight;
   if (bandeauOuvert && w < 1360) return "cache";
   // coin bas droit réel du lanceur (position fixe : offsetLeft/offsetTop ignorent sa translation quand il est rangé), marge
-  // et encoche du téléphone (safe-area) comprises : la zone suit le CSS au lieu de le supposer
+  // et encoche du téléphone (safe-area) comprises : la zone suit le CSS au lieu de le supposer. Sa taille ne change jamais
+  // (aucun état réduit) : la zone testée ne dépend pas de l'état courant.
   const droite = lanceur.offsetLeft + lanceur.offsetWidth;
   const bas = lanceur.offsetTop + lanceur.offsetHeight;
-  // largeur et hauteur du lanceur entier, gardées pendant qu'il est réduit à son emblème (ses dimensions affichées changent
-  // alors) : les zones testées ne dépendent pas de l'état courant, sinon un bouton au bord de la zone le fait basculer
-  // sans fin entre entier et réduit
-  const compact = lanceur.hasAttribute("data-compact");
-  if (!compact) {
-    lanceur.dataset.largeur = String(lanceur.offsetWidth);
-    lanceur.dataset.hauteur = String(lanceur.offsetHeight);
-  }
-  const pleine = Number(lanceur.dataset.largeur) || lanceur.offsetWidth;
-  const cote = Number(lanceur.dataset.hauteur) || lanceur.offsetHeight; // réduit : l'emblème seul, carré, jamais plus haut
-  const zone = (l: number) => ({ g: droite - l - 12, h: bas - cote - 12, d: w, b: h });
-  const touche = (z: ReturnType<typeof zone>) => (o: Element) => {
+  const z = { g: droite - lanceur.offsetWidth - 12, h: bas - lanceur.offsetHeight - 12, d: w, b: h };
+  const t = (o: Element) => {
     const r = o.getBoundingClientRect();
     return r.width > 0 && r.height > 0 && r.left < z.d && r.right > z.g && r.top < z.b && r.bottom > z.h;
   };
-  const obstacles: Element[] = [...document.querySelectorAll(".barre, .sg-barre, .bt-panneau")];
+  const obstacles: Element[] = [...document.querySelectorAll(CALQUES)];
   const hero = document.querySelector('select[id^="hero-"]')?.closest("section");
   if (hero) obstacles.push(hero);
   for (const s of document.querySelectorAll("section")) {
@@ -143,11 +137,7 @@ function gene(lanceur: HTMLElement | null, bandeauOuvert: boolean, labelCollage:
   }
   const relies = [...document.querySelectorAll("[aria-describedby]")].flatMap((c) => (c.getAttribute("aria-describedby") ?? "").split(/\s+/).map((id) => (id ? document.getElementById(id) : null)));
   const controles = [...document.querySelectorAll(CONTROLES), ...relies].filter((c): c is Element => !!c && !c.closest(".as-lanceur, .as-panneau"));
-  const libre = (l: number) => {
-    const t = touche(zone(l));
-    return !obstacles.some(t) && !controles.some((c) => t(c) && c.checkVisibility({ opacityProperty: true, visibilityProperty: true }));
-  };
-  return libre(pleine) ? "libre" : libre(cote) ? "compact" : "cache";
+  return !obstacles.some(t) && !controles.some((c) => t(c) && c.checkVisibility({ opacityProperty: true, visibilityProperty: true })) ? "libre" : "cache";
 }
 /** Recalcul au plus une fois par image (défilement, redimensionnement, et chaque seconde pour les barres qui apparaissent
  * sans défilement), plus une fois 200 ms après le dernier défilement : un bloc révélé à l'entrée dans l'écran (opacité 0
@@ -163,8 +153,12 @@ function suivrePage(f: () => void, defile: () => void) {
   window.addEventListener("scroll", auDefilement, { passive: true, capture: true });
   window.addEventListener("resize", maj);
   const t = window.setInterval(maj, 1000);
+  // un calque qui s'ouvre (tiroir, feuille du billet, menu) range le lanceur dès l'image suivante
+  const obs = new MutationObserver(maj);
+  obs.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "open"] });
   maj();
   return () => {
+    obs.disconnect();
     window.removeEventListener("scroll", auDefilement, { capture: true });
     window.removeEventListener("resize", maj);
     window.clearInterval(t);
@@ -915,12 +909,13 @@ export function AssistantSite() {
 
   return (
     <>
+      {/* réserve sous le pied de page : en bas de page, le lanceur se pose sur cette bande vide, jamais sur le contenu */}
+      <div aria-hidden="true" className="as-reserve" />
       <button
         ref={lanceur}
         type="button"
         className="as-lanceur"
         data-cache={ouvert || cache ? "1" : undefined}
-        data-compact={place === "compact" ? "1" : undefined}
         inert={ouvert || cache}
         aria-label={`${T.lanceur.bouton} · ${T.lanceur.aria}`}
         aria-haspopup="dialog"

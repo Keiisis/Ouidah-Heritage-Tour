@@ -71,7 +71,8 @@ export async function lireSite(): Promise<Site | null> {
 // ---------- e-mail d'envoi ----------
 
 export type Echec = { id: string; quand: string; quoi: string; qui: string | null };
-export type EtatEnvoi = { configure: boolean; hote: string | null; port: number | null; adresse: string | null; mdp: boolean; moi: string; echecs: Echec[] | null };
+export type EnvoiJournal = { id: string; quand: string; modele: string; a: string; reussi: boolean; motif: string | null };
+export type EtatEnvoi = { configure: boolean; hote: string | null; port: number | null; adresse: string | null; mdp: boolean; moi: string; echecs: Echec[] | null; journal: EnvoiJournal[] | null; avis: string[] | null; secours: boolean };
 
 const quoiEchec = (action: string, objet = "") => {
   const t = R.envoiCourriel.types[action];
@@ -83,10 +84,12 @@ const quoiEchec = (action: string, objet = "") => {
 export async function lireEnvoi(): Promise<EtatEnvoi | null> {
   const s = await admin();
   if (!s) return null;
-  const [moi, courriels, journal] = await Promise.all([
+  const [moi, courriels, journal, envois, avis] = await Promise.all([
     lire<{ email: string }>(`equipe_profils?select=email&id=eq.${s.profilId}&limit=1`),
     lire<{ id: string; envoye_le: string; objet: string; par: Par }>("courriels_envoyes?select=id,envoye_le,objet,par:equipe_profils(prenom,nom)&statut=eq.echec&order=envoye_le.desc&limit=10"),
     lire<{ id: number; cree_le: string; action: string; par: Par }>("equipe_journal?select=id,cree_le,action,par:equipe_profils(prenom,nom)&details->>motif=eq.envoi&order=cree_le.desc&limit=10"),
+    lire<{ id: string; cree_le: string; modele: string; destinataire: string; reussi: boolean; motif: string | null }>("courriels_journal?select=id,cree_le,modele,destinataire,reussi,motif&order=cree_le.desc&limit=50"),
+    lire<{ avis_equipe: string[] | null }>("reglages_transversaux?select=avis_equipe&id=eq.true&limit=1"),
   ]);
   if (!moi?.[0]) return null;
   const port = Number(process.env.SMTP_PORT);
@@ -107,6 +110,9 @@ export async function lireEnvoi(): Promise<EtatEnvoi | null> {
     mdp: Boolean(process.env.SMTP_MDP),
     moi: moi[0].email,
     echecs,
+    journal: envois ? envois.map((x) => ({ id: x.id, quand: x.cree_le, modele: x.modele, a: x.destinataire, reussi: x.reussi, motif: x.motif })) : null,
+    avis: avis?.[0] ? (avis[0].avis_equipe ?? []) : null,
+    secours: Boolean(process.env.EMAIL_OHT?.trim()),
   };
 }
 

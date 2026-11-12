@@ -3,6 +3,7 @@
 // embarquer ce fichier. La signature d'un billet n'est vérifiée que par le serveur (paiement/billet.ts).
 
 import { UUID } from "../dossiers-regles";
+import type { Transitions } from "../../machines";
 
 /** Code lu dans le QR d'un billet (billets() de paiement/billet.ts) : OHT1:<réservation>:<rang>:<signature>. */
 const CODE = /^OHT1:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}):(\d{1,2}):([A-Za-z0-9_-]{22})$/;
@@ -81,7 +82,18 @@ export const aRejouer = (r: RetourEntree) => "erreur" in r && (r.erreur === "ref
 
 export const ETATS_COMMANDE = ["a_confirmer", "a_preparer", "prete", "remise", "annulee"] as const;
 export type EtatCommande = (typeof ETATS_COMMANDE)[number];
-/** Seul pas permis depuis chaque état (jamais à rebours) et la colonne datée qu'il remplit. */
+/** boutique_commandes.statut (machine à états, recopiée par 20261120_machines_etats.sql). Équipe : avancer_commande_boutique
+ * (pas suivant ou annulation) ; base : boutique_expirer_commandes (paiement immédiat échu → annulee) et
+ * boutique_recalculer_commande (commande échue puis payée en retard, stock disponible → a_preparer). */
+export const TRANSITIONS_COMMANDE: Transitions<EtatCommande> = {
+  a_confirmer: ["a_preparer", "annulee"],
+  a_preparer: ["prete", "annulee"],
+  prete: ["remise", "annulee"],
+  remise: [],
+  annulee: ["a_preparer"],
+};
+/** Action « avancer » de l'équipe depuis chaque état (jamais à rebours) et la colonne datée qu'elle remplit ; l'écran et
+ * l'action serveur la confrontent à TRANSITIONS_COMMANDE. */
 export const SUIVANT: Partial<Record<EtatCommande, { vers: EtatCommande; colonne: "prepare_le" | "prete_le" | "remise_le" }>> = {
   a_confirmer: { vers: "a_preparer", colonne: "prepare_le" },
   a_preparer: { vers: "prete", colonne: "prete_le" },

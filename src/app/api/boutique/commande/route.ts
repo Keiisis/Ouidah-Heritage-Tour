@@ -10,6 +10,7 @@ import { empreinteIp, lireCorps, reponse } from "@/lib/serveur/garde";
 import { emettre } from "@/lib/serveur/documents/emettre";
 import { jetonSuivi } from "@/lib/serveur/documents/jeton";
 import { envoyerCommande } from "@/lib/serveur/courriels/boutique";
+import { noterException } from "@/lib/serveur/courriel";
 import { passerellesActives } from "@/lib/serveur/paiement";
 import { expirerCommandes, ouvrirLienCommande } from "@/lib/serveur/paiement/lien";
 import { origineSite } from "@/lib/serveur/paiement/outils";
@@ -140,7 +141,8 @@ export async function POST(req: Request) {
   const finir = (id: string, reference: string, total: number | null, ticket: { numero: string } | null, paiement: boolean) => {
     const jeton = jetonSuivi("b", id);
     // e-mail « commande reçue » après la réponse : un échec d'envoi ne touche pas la commande enregistrée
-    if (origine) after(() => envoyerCommande({ id, reference, ticket: ticket?.numero ?? null, jeton, langue, contact, lignes, remise, total_xof: total, frais_xof: frais, immediat: paiement, devise, taux_usd: devise === "USD" ? taux.taux_usd : null }, origine).catch(() => false));
+    // e-mail au client et avis à l'équipe ; une exception est tracée au journal des envois
+    if (origine) after(() => envoyerCommande({ id, reference, ticket: ticket?.numero ?? null, jeton, langue, contact, message: message || null, lignes, remise, total_xof: total, frais_xof: frais, immediat: paiement, devise, taux_usd: devise === "USD" ? taux.taux_usd : null }, origine).catch(() => noterException("auto-boutique", contact.email)));
     return jeton;
   };
   const tirer = () => `OHT-B-${Array.from({ length: 6 }, () => ALPHABET[randomInt(ALPHABET.length)]).join("")}`;

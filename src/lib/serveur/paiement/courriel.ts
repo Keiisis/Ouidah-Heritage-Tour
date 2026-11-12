@@ -21,7 +21,7 @@ export async function envoyerBillets(r: Reservation, origine: string) {
   if (!(await prendreEnvoi(r.id))) return false;
   const [ticket, recu, modele, evenements, datesSection, textesSuivi] = await Promise.all([emettre("T", "reservation", r.id), emettre("R", "reservation", r.id), lireModele("auto-billets", langueDe(r.langue)), lireContenu("fr.evenements"), lireContenu("fr.datesSection"), lireContenu("suivi.suivi")]);
   const m = messageBillets(r, origine, { ticket: ticket?.numero ?? null, recu: recu?.numero ?? null, modele, contenu: { evenements, datesSection }, suivi: textesSuivi });
-  const parti = await envoyerCourriel({ a: r.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `${r.id}-billets` });
+  const parti = await envoyerCourriel({ a: r.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `${r.id}-billets`, modele: "auto-billets" });
   if (!parti) await rendreEnvoi(r.id);
   return parti;
 }

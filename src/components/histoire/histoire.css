@@ -34,6 +34,8 @@
 /* la scène, fixe pendant tout le récit */
 .hi-film { position: relative; }
 .hi-scene { position: sticky; top: 0; height: 100svh; overflow: clip; perspective: 1400px; background: var(--hi-abysse); }
+/* sous la barre de navigation (transparente en haut de page) : un fondu nuit, la gravure ne passe plus derrière les liens */
+.hi-scene::after { content: ""; position: absolute; inset: 0 0 auto; height: 96px; z-index: 7; pointer-events: none; background: linear-gradient(var(--hi-abysse) 45%, var(--hi-voile-0)); }
 .hi-plateau { position: absolute; inset: 0; transform-origin: 50% 62%; will-change: transform; }
 .hi-carte, .hi-calque-fil { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform, opacity; }
 .hi-carte img { display: block; width: 100%; height: 100%; }

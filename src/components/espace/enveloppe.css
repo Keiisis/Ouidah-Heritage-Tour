@@ -4,7 +4,7 @@
 /* ---------- navigation ---------- */
 .esp .esp-nav { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; gap: 4px; padding: 24px 16px; background: var(--nav-fond); color: var(--nav-encre); }
 .esp .esp-nav :focus-visible { outline-color: var(--focus-nuit); }
-.esp .esp-nav-logo { width: auto; height: 30px; margin: 0 8px 20px; align-self: flex-start; }
+.esp .esp-nav-logo { width: 44px; height: 44px; padding: 4px; border-radius: 50%; background: var(--blanc); margin: 0 8px 20px; align-self: flex-start; }
 .esp .esp-groupes { flex: 1; min-height: 0; overflow-y: auto; display: grid; align-content: start; gap: 2px; margin: 0 -8px; padding: 0 8px; scrollbar-width: thin; scrollbar-color: var(--trait-nuit-fort) transparent; }
 .esp .esp-groupe summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 12px; border-radius: 12px; color: var(--sur-nuit-2); font: 700 13px/1.2 var(--f-texte); list-style: none; cursor: pointer; }
 .esp .esp-groupe summary::-webkit-details-marker { display: none; }

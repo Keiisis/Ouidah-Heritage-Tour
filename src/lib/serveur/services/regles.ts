@@ -1,4 +1,33 @@
+import type { Transitions } from "../machines";
+
 // Validation commune, indépendante du serveur. Les mêmes bornes sont imposées en SQL.
+
+// Machines à états (recopiées par 20261120_machines_etats.sql).
+export type StatutRdv = "confirme" | "annule" | "termine";
+/** rendez_vous.statut : né « confirmé » (reserver_rdv) ; l'équipe l'annule ou le clôt (traiterRdv) ; anonymiser_services
+ * annule un rendez-vous confirmé. */
+export const TRANSITIONS_RDV: Transitions<StatutRdv> = { confirme: ["annule", "termine"], annule: [], termine: [] };
+export type StatutEffacement = "a_traiter" | "en_cours" | "traitee" | "refusee";
+/** requetes_effacement.statut (obligation légale). traiterEffacement : a_traiter → en_cours (prise) → traitee | refusee.
+ * anonymiser_services (effacement lancé depuis l'écran Sécurité) : a_traiter → traitee. en_cours → a_traiter : reprise
+ * manuelle après une panne, quand l'opérateur a vérifié la fin du traitement (aucun écran ne le fait). */
+export const TRANSITIONS_EFFACEMENT: Transitions<StatutEffacement> = {
+  a_traiter: ["en_cours", "traitee"],
+  en_cours: ["traitee", "refusee", "a_traiter"],
+  traitee: [],
+  refusee: [],
+};
+export type StatutCandidature = "nouvelle" | "en_etude" | "acceptee" | "refusee";
+export const STATUTS_CANDIDATURE = ["nouvelle", "en_etude", "acceptee", "refusee"] as const satisfies readonly StatutCandidature[];
+/** candidatures_partenaires.statut (vague 2, recopiée par 20261122_machines_etats_deux.sql). Née « nouvelle » (formulaire
+ * public) ; seul l'admin la change (traiterCandidature). « Nouvelle » veut dire « pas encore lue » : on n'y revient jamais.
+ * Une décision (acceptée, refusée) se rouvre en la remettant « à l'étude ». Aucun effet hors de l'écran (ni e-mail ni accès). */
+export const TRANSITIONS_CANDIDATURE: Transitions<StatutCandidature> = {
+  nouvelle: ["en_etude", "acceptee", "refusee"],
+  en_etude: ["acceptee", "refusee"],
+  acceptee: ["en_etude"],
+  refusee: ["en_etude"],
+};
 export const LANGUES_SERVICES = ["FR", "EN", "ES", "DE", "PT", "HT", "GCF"] as const;
 export type LangueService = typeof LANGUES_SERVICES[number];
 export const UUID_SERVICE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

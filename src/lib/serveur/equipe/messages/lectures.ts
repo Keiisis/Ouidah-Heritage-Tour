@@ -9,6 +9,7 @@ import type { Session } from "../session";
 import { defautAuto } from "./auto";
 import { origine } from "./envoi";
 import { AUTO_CLES, autoConnue, estAuto, type Faits } from "./rendu";
+import type { StatutCourriel, StatutNumero } from "./regles";
 
 // Lectures du lot « messages », par le serveur seulement avec la clé secrète (elle contourne RLS : le cloisonnement tient
 // ICI). Un agent ne lit que les clients de ses dossiers (lireClients, lot L4), ses propres e-mails, les questions de ses
@@ -28,8 +29,8 @@ async function lire<T>(chemin: string): Promise<T[] | null> {
 
 // ---------- clients du composeur : fiche + faits du dernier dossier ----------
 
-export type ClientCourrier = { id: string; nom: string; email: string; langue: LangueMsg; faits: Faits; devis: { numero: string; url: string } | null };
-type BrutDemande = { id: string; cree_le: string; email: string | null; sejour: { arrivee?: number; depart?: number } | null; devis: { id: string; statut: string; cree_le: string }[] };
+export type ClientCourrier = { id: string; nom: string; email: string; langue: LangueMsg; faits: Faits; devis: { numero: string; url: string; valable: string | null } | null };
+type BrutDemande = { id: string; cree_le: string; email: string | null; sejour: { arrivee?: number; depart?: number } | null; devis: { id: string; statut: string; cree_le: string; valable_jusqu_au: string | null }[] };
 
 const langueSure = (l: string): LangueMsg => ((LANGUES_MSG as readonly string[]).includes(l) ? (l as LangueMsg) : "FR");
 
@@ -37,7 +38,7 @@ const langueSure = (l: string): LangueMsg => ((LANGUES_MSG as readonly string[])
  * session peut voir pour cette adresse. */
 async function faitsDes(s: Session, fiches: FicheClient[]): Promise<ClientCourrier[] | null> {
   if (!fiches.length) return [];
-  const d = await lire<BrutDemande>(`demandes?select=id,cree_le,email,sejour:dossier->sejour,devis(id,statut,cree_le)&statut=eq.envoyee${filtreAgent(s)}&order=cree_le.desc&limit=2000`);
+  const d = await lire<BrutDemande>(`demandes?select=id,cree_le,email,sejour:dossier->sejour,devis(id,statut,cree_le,valable_jusqu_au)&statut=eq.envoyee${filtreAgent(s)}&order=cree_le.desc&limit=2000`);
   if (!d) return null;
   const parEmail = new Map<string, BrutDemande[]>();
   for (const x of d) if (x.email) parEmail.set(x.email.toLowerCase(), [...(parEmail.get(x.email.toLowerCase()) ?? []), x]);
@@ -66,7 +67,7 @@ async function faitsDes(s: Session, fiches: FicheClient[]): Promise<ClientCourri
         reference: n ?? (d ? `DEM-${d.id.slice(0, 6).toUpperCase()}` : null),
         lien,
       },
-      devis: n && lien ? { numero: n, url: `${lien}/document` } : null,
+      devis: n && lien ? { numero: n, url: `${lien}/document`, valable: v?.valable_jusqu_au ?? null } : null,
     };
   });
 }
@@ -87,7 +88,7 @@ export async function clientsChoisis(s: Session, ids: string[]): Promise<ClientC
 
 // ---------- e-mails rédigés ----------
 
-export type Envoi = { id: string; statut: "brouillon" | "envoye" | "echec"; client: { id: string; nom: string } | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: string[]; quand: string; auteur: string; mien: boolean };
+export type Envoi = { id: string; statut: StatutCourriel; client: { id: string; nom: string } | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: string[]; quand: string; auteur: string; mien: boolean };
 type BrutEnvoi = { id: string; statut: Envoi["statut"]; auteur_id: string | null; client_id: string | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: { type: string }[]; cree_le: string; envoye_le: string | null; client: { nom: string } | null; auteur: { prenom: string; nom: string } | null };
 
 export async function envoisRecents(s: Session): Promise<Envoi[] | null> {
@@ -240,7 +241,7 @@ export async function lireAbonnes(): Promise<Abonnes | null> {
   };
 }
 
-export type Numero = { id: string; langue: LangueMsg; sujets: string[]; objet: string; corps: string; statut: "brouillon" | "en_cours" | "envoye"; quand: string; envoyes: number };
+export type Numero = { id: string; langue: LangueMsg; sujets: string[]; objet: string; corps: string; statut: StatutNumero; quand: string; envoyes: number };
 
 export async function lireNumeros(): Promise<Numero[] | null> {
   const l = await lire<{ id: string; langue: LangueMsg; sujets: string[]; objet: string; corps: string; statut: Numero["statut"]; modifie_le: string; envoye_le: string | null }>("lettre_numeros?select=id,langue,sujets,objet,corps,statut,modifie_le,envoye_le&order=modifie_le.desc&limit=30");

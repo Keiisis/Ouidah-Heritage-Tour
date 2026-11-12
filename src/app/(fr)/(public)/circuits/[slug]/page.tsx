@@ -1,4 +1,4 @@
-import { metadonneesPage } from "@/lib/serveur/seo";
+import { metadonneesIntrouvable, metadonneesPage } from "@/lib/serveur/seo";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { lireContenuPage as lireContenu } from "@/lib/serveur/contenu-page";
@@ -18,9 +18,9 @@ export async function generateStaticParams() {
   return (slugs.length ? slugs : ["__vide__"]).map((slug) => ({ slug }));
 }
 
-async function metadataContenu({ params }: Props): Promise<Metadata> {
+async function metadataContenu({ params }: Props): Promise<Metadata | null> {
   const f = await ficheDe((await params).slug);
-  if (!f) return {};
+  if (!f) return null;
   const T = await lireContenu("fiche-circuit.ficheCircuit");
   return { title: T.metaTitre(f.circuit.title), description: f.description, ...(f.brouillon ? { robots: { index: false } } : {}) };
 }
@@ -33,5 +33,6 @@ export default async function Page({ params }: Props) {
 
 export async function generateMetadata(...args: Parameters<typeof metadataContenu>): Promise<Metadata> {
   const { slug } = await args[0].params;
-  return metadonneesPage("/circuits/[slug]".replace("[slug]", encodeURIComponent(slug)), await metadataContenu(...args));
+  const contenu = await metadataContenu(...args);
+  return contenu ? metadonneesPage("/circuits/[slug]".replace("[slug]", encodeURIComponent(slug)), contenu) : metadonneesIntrouvable();
 }

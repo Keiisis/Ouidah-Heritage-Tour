@@ -40,12 +40,19 @@ export async function pdfRecu(f: Facture, origine: string | null): Promise<{ pdf
   const tours = await lireContenu("fr.tours");
   const [d] = (await lire<BrutDemande>(`demandes?select=id,intention,circuit,dossier,reponses&id=eq.${f.demande}&limit=1`)) ?? [];
   if (!d) return null;
-  const [ticket, recu] = await Promise.all([emettre("T", "demande", d.id), emettre("R", "devis", f.devis)]);
-  if (!ticket || !recu) return null;
+  const [ticket, recu, enLigne, datesSection] = await Promise.all([
+    emettre("T", "demande", d.id),
+    emettre("R", "devis", f.devis),
+    lire<{ passerelle: string; transaction_id: string }>(`liens_paiement?select=passerelle,transaction_id&facture_id=eq.${f.id}&paye_le=not.is.null&order=paye_le.asc`),
+    lireContenu("fr.datesSection"),
+  ]);
+  if (!ticket || !recu || !enLigne) return null;
   const langue = langueDoc(f.client.langue);
   const confirmes = f.paiements.filter((p) => p.etat === "confirme" && !p.inverse);
-  const moyens = [...new Set(confirmes.map((p) => modesClient[langue][p.mode]))];
-  const refs = confirmes.map((p) => p.reference).filter((r): r is string => Boolean(r));
+  // paiement en ligne (lien payé) : la passerelle et sa transaction, jamais « virement » par défaut
+  const passerelles = datesSection.talon.passerelles as Record<string, { nom: string }>;
+  const moyens = [...new Set([...confirmes.map((p) => modesClient[langue][p.mode]), ...enLigne.map((l) => passerelles[l.passerelle]?.nom ?? l.passerelle)])];
+  const refs = [...confirmes.map((p) => p.reference), ...enLigne.map((l) => l.transaction_id)].filter((r): r is string => Boolean(r));
   const sejour = d.dossier?.sejour ?? null;
   const dossier: Dossier = {
     jeton: jetonSuivi("d", d.id) ?? "",

@@ -4,8 +4,10 @@ import { jourOuidah } from "@/lib/jours";
 import { EMAIL, manques, nettoyer } from "@/lib/demande";
 import { lireBilletsEnvoyes, tarif } from "@/lib/reservation";
 import { base, baseConfiguree } from "@/lib/serveur/base";
+import { TRANSITIONS_DEMANDE } from "@/lib/serveur/equipe/dossiers-regles";
+import { peutPasser } from "@/lib/serveur/machines";
 import { empreinteIp, limiteAtteinte, lireCorps, reponse } from "@/lib/serveur/garde";
-import { envoyerCourriel } from "@/lib/serveur/courriel";
+import { envoyerAvis, envoyerCourriel } from "@/lib/serveur/courriel";
 import { langueDe, lireModele } from "@/lib/serveur/courriels/commun";
 import { avisOht, copieVoyageur } from "@/lib/serveur/messages";
 import { billetsPossibles } from "@/lib/serveur/paiement/billet";
@@ -106,6 +108,7 @@ export async function POST(req: Request) {
     if (!cree.ok) return reponse({ erreur: cree.erreur }, cree.status); // la demande reste en brouillon : rien n'est envoyé
     resa = cree;
     if (demandeId) {
+      if (!peutPasser(TRANSITIONS_DEMANDE, "brouillon", "envoyee")) return reponse({ erreur: "base" }, 502);
       const envoyee = await base(`demandes?id=eq.${demandeId}&statut=eq.brouillon`, { method: "PATCH", corps: { statut: "envoyee", modifie_le: new Date().toISOString() } }).catch(() => null);
       if (!envoyee?.ok) return reponse({ erreur: "base" }, 502);
     }
@@ -123,8 +126,9 @@ export async function POST(req: Request) {
     const copie = copieVoyageur(d, reference, lignesBillets, lienSuivi, { ticket: ticket?.numero ?? null, modele, origine: origine ?? undefined, contenu: { ...contenu, releve }, suivi: textesSuivi });
     const avis = avisOht(d, reference, paysNom, lignesBillets, { contenu: { ...contenu, releve }, suivi: textesSuivi });
     const [copieOk, ohtPrevenu] = await Promise.all([
-      envoyerCourriel({ a: d.champs.email, sujet: copie.sujet, html: copie.html, texte: copie.texte, repondreA: process.env.EMAIL_OHT || null, cle: `${demandeId}-copie` }),
-      process.env.EMAIL_OHT ? envoyerCourriel({ a: process.env.EMAIL_OHT, sujet: avis.sujet, html: avis.html, texte: avis.texte, repondreA: d.champs.email, cle: `${demandeId}-avis` }) : Promise.resolve(false),
+      envoyerCourriel({ a: d.champs.email, sujet: copie.sujet, html: copie.html, texte: copie.texte, repondreA: process.env.EMAIL_OHT || null, cle: `${demandeId}-copie`, modele: "auto-demande" }),
+      // destinataires des avis : liste de l'admin, sinon EMAIL_OHT
+      envoyerAvis({ sujet: avis.sujet, html: avis.html, texte: avis.texte, repondreA: d.champs.email, cle: `${demandeId}-avis`, modele: "avis-demande" }),
     ]);
     copieEnvoyee = copieOk;
     if (copieOk || ohtPrevenu) await base(`demandes?id=eq.${demandeId}`, { method: "PATCH", corps: { copie_envoyee: copieOk, oht_prevenu: ohtPrevenu, modifie_le: new Date().toISOString() } }).catch(() => null);

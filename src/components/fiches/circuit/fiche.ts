@@ -9,7 +9,7 @@ import type { Circuit, Destination, Media } from "@/content/types";
 import { distance, minutesAPied } from "@/lib/geo";
 
 type LonLat = [number, number];
-export type Photo = { src: string; alt: string; largeur: number | null; hauteur: number | null; legende: string | null; annee: string | null };
+export type Photo = { src: string; alt: string; largeur: number | null; hauteur: number | null; legende: string | null };
 export type Etape = { type: "arret" | "chemin"; n: number | null; nom: string; borne: string | null; recit: string[]; photo: Photo | null; lienLieu: string | null };
 export type Groupe = { x: number; y: number; label: string; chemin: boolean; demi: number; membres: number[] };
 export type Etiquette = { j: number; texte: string; x: number; y: number };
@@ -18,7 +18,6 @@ export type Carte = {
   h: number;
   fond: string | null; // tracé entier, en pointillé
   segments: string[]; // le même tracé recoupé en morceaux de même longueur, allumés un à un
-  lieux: string; // les lieux relevés de Ouidah, en points
   groupes: Groupe[]; // étapes à moins de 30 px (et 125 m) réunies en une pastille « 3·4 »
   groupeDe: number[];
   etiquettes: Etiquette[][]; // noms au repos (0), puis quand l'étape i est lue (i + 1)
@@ -52,13 +51,11 @@ const memeNom = (a: string, b: string) => { const x = norme(a), y = norme(b); re
 const km = (a: LonLat, b: LonLat) => distance([a[1], a[0]], [b[1], b[0]]) / 1000;
 const lonLat = ([lat, lon]: [number, number]): LonLat => [lon, lat];
 
-// légende de la page Histoire : « (photo de 2019) » devient une année affichée à part
-function photoHistoire(m: { src: string; largeur: number; hauteur: number; legende: string } | null): Photo | null {
-  if (!m) return null;
-  const a = m.legende.match(/\s*\(photo de (\d{4})\)/);
-  return { src: m.src, alt: "", largeur: m.largeur, hauteur: m.hauteur, legende: a ? m.legende.replace(a[0], "") : m.legende, annee: a?.[1] ?? null };
-}
-const photoMedia = (m: Media | null | undefined): Photo | null => (m ? { src: m.src, alt: m.alt, largeur: null, hauteur: null, legende: null, annee: null } : null);
+// légende de la page Histoire, entière : « … inaugurée en février 1993 (photo de 2019) » (l'année de la photo séparée de
+// la légende se lisait comme une seconde date de l'événement)
+const photoHistoire = (m: { src: string; largeur: number; hauteur: number; legende: string } | null): Photo | null =>
+  m ? { src: m.src, alt: "", largeur: m.largeur, hauteur: m.hauteur, legende: m.legende } : null;
+const photoMedia = (m: Media | null | undefined): Photo | null => (m ? { src: m.src, alt: m.alt, largeur: null, hauteur: null, legende: null } : null);
 
 // projection équirectangulaire locale (cosinus de la latitude moyenne), ajustée au cadre avec une marge
 function projection(points: LonLat[], marge: number) {
@@ -98,17 +95,21 @@ function etiqueter(items: { j: number; texte: string; x: number; y: number; demi
 export const slugsCircuits = async () => (await lireContenuFrancais("fr.tours")).map((t) => t.slug);
 
 export async function ficheDe(slug: string): Promise<Fiche | null> {
-  const [tours, destinations, FICHES_LIEU, releve, histoireChapitres, T, toursIntro] = await Promise.all([
+  const [tours, destinations, FICHES_LIEU, releve, histoireChapitres, T, toursIntro, destinationsFr, chapitresFr] = await Promise.all([
     lireContenu("fr.tours"), lireContenu("fr.destinations"), lireContenu("fr.FICHES_LIEU"),
     lireContenu("lieux-ouidah"), lireContenu("histoire.histoireChapitres"), lireContenu("fiche-circuit.ficheCircuit"),
-    lireContenu("fr.toursIntro"),
+    lireContenu("fr.toursIntro"), lireContenuFrancais("fr.destinations"), lireContenuFrancais("histoire.histoireChapitres"),
   ]);
+  // les étapes du chapitre et les lieux se rapprochent par leurs noms français (le relevé n'est pas traduit) : une
+  // traduction des noms ne défait pas le lien ; l'affichage reste dans la langue de la page
+  const nomFr = (d: Destination) => destinationsFr.find((x) => x.slug === d.slug)?.name ?? d.name;
   const LIEUX = releve.lieux.map((l) => ({ nom: l.nom, coords: l.coords.length === 2 ? ([l.coords[0], l.coords[1]] as [number, number]) : null, description: l.description, destination: l.destination }));
   const C = tours.find((t) => t.slug === slug);
   if (!C) return null;
   const arrets = C.stops.map((s) => destinations.find((d) => d.slug === s)).filter((d): d is Destination => !!d);
   if (!arrets.length) return null;
-  const chap = histoireChapitres.find((ch) => ch.etapes?.some((e) => arrets.some((d) => memeNom(e, d.name)))) ?? null;
+  const chapFr = chapitresFr.find((ch) => ch.etapes?.some((e) => arrets.some((d) => memeNom(e, nomFr(d))))) ?? null;
+  const chap = chapFr ? (histoireChapitres.find((ch) => ch.id === chapFr.id) ?? chapFr) : null;
   // chapô : le premier paragraphe du chapitre, quand d'autres le suivent, passe sous le titre et quitte la première étape
   const chapo = chap && chap.temps[0]?.length > 1 ? chap.temps[0][0] : null;
   const recitDe = (i: number) => (chap ? (i === 0 && chapo ? chap.temps[0].slice(1) : chap.temps[i] ?? []) : []);
@@ -121,8 +122,9 @@ export async function ficheDe(slug: string): Promise<Fiche | null> {
     return { type: "arret", nom: d.name, sous: d.subtitle, pt: lonLat(d.coords), recit, photos, slug: d.slug, km: 0, n: null };
   };
   const seq: Brute[] = [], reste = [...arrets];
-  if (chap?.etapes) chap.etapes.forEach((nom, i) => {
-    const k = reste.findIndex((d) => memeNom(nom, d.name));
+  if (chap && chapFr?.etapes) chapFr.etapes.forEach((nomFrancais, i) => {
+    const nom = chap.etapes?.[i] ?? nomFrancais;
+    const k = reste.findIndex((d) => memeNom(nomFrancais, nomFr(d)));
     if (k >= 0) {
       const pris = reste.splice(0, k + 1);
       pris.slice(0, -1).forEach((d) => seq.push(etape(d, null)));
@@ -130,7 +132,7 @@ export async function ficheDe(slug: string): Promise<Fiche | null> {
       return;
     }
     // étape racontée hors de la liste du circuit : gardée « en chemin » entre deux arrêts, à moins de 150 m du tracé
-    const l = LIEUX.find((x) => x.coords && memeNom(nom, x.nom));
+    const l = LIEUX.find((x) => x.coords && memeNom(nomFrancais, x.nom));
     if (!C.trace || !l?.coords || !seq.length || !reste.length) return;
     const pt = lonLat(l.coords);
     if (Math.min(...C.trace.map((q) => km(pt, q))) >= 0.15) return;
@@ -139,8 +141,10 @@ export async function ficheDe(slug: string): Promise<Fiche | null> {
     seq.push({ type: "chemin", nom, sous: null, pt, recit: recitDe(i), photos, slug: null, km: 0, n: null });
   });
   reste.forEach((d) => seq.push(etape(d, null)));
+  // toutes les stations sont numérotées dans l'ordre, celles « en chemin » comprises (la case Zomaï est la 3e des six
+  // stations de la Route des Esclaves) : la fiche, la carte et le décompte disent le même nombre
   let rang = 0;
-  seq.forEach((e) => { if (e.type === "arret") e.n = ++rang; });
+  seq.forEach((e) => { e.n = ++rang; });
 
   // ligne : le tracé à pied s'il existe, sinon les étapes reliées dans l'ordre ; longueur cumulée (haversine, lib/geo)
   const ligne: LonLat[] = C.trace ?? seq.map((e) => e.pt);
@@ -158,7 +162,7 @@ export async function ficheDe(slug: string): Promise<Fiche | null> {
     }
   } else seq.forEach((e, i) => { e.km = cumul[i]; });
 
-  const nArrets = seq.filter((e) => e.type === "arret").length;
+  const nArrets = seq.length;
   const premier = seq[0], dernier = seq[seq.length - 1], plusieurs = seq.length > 1;
   const longueur = L ? T.longueur(L, !!C.trace) : null;
   const marche = C.trace && L ? T.marche(minutesAPied(L * 1000)) : null;
@@ -193,10 +197,6 @@ export async function ficheDe(slug: string): Promise<Fiche | null> {
     const [d0, d1] = [(L * k) / M, (L * (k + 1)) / M];
     return trait([pointA(d0), ...ligne.filter((_, i) => cumul[i] > d0 && cumul[i] < d1), pointA(d1)]);
   });
-  // lieux relevés autour du tracé (la caméra du bandeau mobile peut sortir du cadre : marge d'un demi-cadre)
-  const lieux = LIEUX.flatMap((l) => (l.coords ? [f(lonLat(l.coords))] : []))
-    .filter(([x, y]) => x > -W / 2 && x < W * 1.5 && y > -H / 2 && y < H * 1.5)
-    .map(([x, y]) => `M${x.toFixed(1)} ${y.toFixed(1)}h0`).join("");
   // pastilles : étapes à moins de 30 px ou de 125 m réunies (le bandeau mobile montre environ 1,2 km sur sa hauteur)
   const P = seq.map((e) => f(e.pt)), seuil = Math.max(30, 0.125 * pxParKm);
   const brut: { x0: number; y0: number; m: number[] }[] = [];
@@ -220,7 +220,6 @@ export async function ficheDe(slug: string): Promise<Fiche | null> {
     h: H,
     fond: ligne.length > 1 ? trait(ligne) : null,
     segments,
-    lieux,
     groupes,
     groupeDe,
     etiquettes: [-1, ...seq.map((_, i) => i)].map(disposer),

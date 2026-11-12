@@ -3,7 +3,8 @@ import { copiesBoutique } from "@/content/courriels-boutique";
 import { suivi } from "@/content/suivi";
 import { lireContenu } from "@/lib/contenu";
 import type { ChoixOptions } from "@/lib/boutique-types";
-import { envoyerCourriel } from "../courriel";
+import { envoyerAvis, envoyerCourriel } from "../courriel";
+import { avis, ligne, nomLangue } from "./avis";
 import { cloture, debut, dollars, euros, fcfa, langueDe, lireModele, type Modele, textes } from "./commun";
 import { addition, boutons, courriel, notes, paragraphes, titre } from "./gabarit";
 
@@ -17,7 +18,8 @@ export type DonneesCommande = {
   ticket: string | null;
   jeton: string | null; // lien de suivi (b-…)
   langue: string;
-  contact: { prenom: string; email: string };
+  contact: { prenom: string; email: string; nom?: string; telephone?: string; pays?: string };
+  message?: string | null; // mot du client (avis à l'équipe seulement)
   lignes: { nom: string; quantite: number; prix_xof: number | null; options: ChoixOptions }[];
   remise: { mode: string; adresse?: string; ville?: string; pays?: string };
   total_xof: number | null; // frais de livraison compris
@@ -58,9 +60,49 @@ export function messageCommande(d: DonneesCommande, origine: string, modele: Mod
   ]);
 }
 
-/** Envoi au client après l'enregistrement de la commande ; false si l'envoi n'est pas configuré ou échoue. */
+/** Avis à l'équipe : une nouvelle commande de la boutique, en français (articles, total, remise, client). */
+export function avisCommande(d: DonneesCommande, origine: string) {
+  const nom = `${d.contact.prenom} ${d.contact.nom ?? ""}`.trim();
+  const prix = (v: number | null) => (v === null ? "prix à confirmer" : fcfa(v, "FR"));
+  const pays = (c?: string) => (c ? (new Intl.DisplayNames(["fr"], { type: "region" }).of(c) ?? c) : null);
+  const remise = d.remise.mode === "livraison" ? ["Livraison", d.remise.adresse, [d.remise.ville, pays(d.remise.pays)].filter(Boolean).join(", ")].filter((x): x is string => Boolean(x)) : "Retrait à Ouidah";
+  const total = d.total_xof === null ? "à confirmer" : fcfa(d.total_xof, "FR");
+  return avis(
+    {
+      sujet: `Nouvelle commande · ${d.reference} · ${nom}`,
+      apercu: `${nom} · ${total} · ${d.reference}`,
+      titre: `Nouvelle commande de ${nom}`,
+      donnee: d.reference,
+      bouton: { libelle: `Écrire à ${d.contact.prenom}`, href: `mailto:${d.contact.email}` },
+      lignes: [
+        ligne("Statut", d.immediat ? "À régler en ligne (pièces réservées 30 minutes)" : "À confirmer par l’équipe"),
+        ligne("Articles", d.lignes.map((l) => `${l.nom} × ${l.quantite}${Object.values(l.options).some(Boolean) ? ` (${Object.values(l.options).filter(Boolean).join(", ")})` : ""} · ${prix(l.prix_xof === null ? null : l.prix_xof * l.quantite)}`)),
+        ligne("Remise", remise),
+        ligne("Frais de livraison", d.frais_xof ? fcfa(d.frais_xof, "FR") : null),
+        ligne("Total", total),
+        ligne("Devise affichée", d.devise),
+        ligne("Ticket", d.ticket),
+        ligne("Client", nom),
+        ligne("E-mail", d.contact.email),
+        ligne("Téléphone", d.contact.telephone),
+        ligne("Pays", pays(d.contact.pays)),
+        ligne("Langue", nomLangue(langueDe(d.langue))),
+      ],
+      mot: d.message ? { texte: d.message, auteur: nom } : null,
+      raison: "Avis interne envoyé à l’équipe pour chaque commande reçue sur la boutique de ouidahheritagetour.bj.",
+    },
+    origine,
+  );
+}
+
+/** Après l'enregistrement de la commande : e-mail au client et avis à l'équipe ; false pour chacun si l'envoi n'est pas
+ * configuré ou échoue (tracé au journal des envois). */
 export async function envoyerCommande(d: DonneesCommande, origine: string) {
   const [modele, textesSuivi] = await Promise.all([lireModele("auto-boutique", langueDe(d.langue)), lireContenu("suivi.suivi")]);
-  const m = messageCommande(d, origine, modele, textesSuivi);
-  return envoyerCourriel({ a: d.contact.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `boutique-${d.id}-recue` });
+  const m = messageCommande(d, origine, modele, textesSuivi), a = avisCommande(d, origine);
+  const [client, equipe] = await Promise.all([
+    envoyerCourriel({ a: d.contact.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `boutique-${d.id}-recue`, modele: "auto-boutique" }),
+    envoyerAvis({ sujet: a.sujet, html: a.html, texte: a.texte, repondreA: d.contact.email, cle: `boutique-${d.id}-avis`, modele: "avis-commande" }),
+  ]);
+  return { client, equipe };
 }

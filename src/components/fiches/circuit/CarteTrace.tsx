@@ -160,7 +160,6 @@ export function CarteTrace({ carte, nord, aria, children }: { carte: Carte; nord
       <aside className="fc-carte" aria-label={aria}>
         <svg viewBox={`0 0 ${carte.w} ${carte.h}`} role="img" aria-label={carte.image}>
           <g className="fc-camera">
-            <path className="fc-m-lieux" d={carte.lieux} />
             {carte.fond ? <path className="fc-m-fond" d={carte.fond} /> : null}
             <g>
               {carte.segments.map((d, k) => (

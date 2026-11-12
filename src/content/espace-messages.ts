@@ -86,20 +86,33 @@ export const RAISON_COURRIER: Record<LangueMsg, string> = {
   GCF: "Ou ka résévwa imèl-lasa di lékip Ouidah Heritage Tour. Réponn-li pou ékri nou.",
 };
 
-/** Pied de chaque numéro de la lettre (raison) et libellé du lien de désinscription, dans la langue du numéro. */
-export const RAISON_LETTRE: Record<LangueMsg, { raison: string; lien: string }> = {
-  FR: { raison: "Vous recevez la lettre de Ouidah parce que vous vous y êtes inscrit.", lien: "Se désinscrire" },
-  EN: { raison: "You receive the Ouidah letter because you signed up for it.", lien: "Unsubscribe" },
-  ES: { raison: "Recibe la carta de Ouidah porque se suscribió.", lien: "Darse de baja" },
-  DE: { raison: "Sie erhalten den Brief aus Ouidah, weil Sie sich angemeldet haben.", lien: "Abmelden" },
-  PT: { raison: "Recebe a carta de Ouidah porque se inscreveu.", lien: "Cancelar a subscrição" },
-  HT: { raison: "Ou resevwa lèt Ouidah a paske ou te enskri.", lien: "Dezabòne" },
-  GCF: { raison: "Ou ka résévwa lèt a Ouidah paskè ou té enskri.", lien: "Pa résévwa-y ankò" },
+/** Nom de la lettre (en-tête de chaque numéro), pied (raison) et libellé du lien de désinscription, dans la langue du
+ * numéro. Noms repris des objets de content/courriels-lettre.ts ; HT et GCF à relire (A_RELIRE). */
+export const RAISON_LETTRE: Record<LangueMsg, { nom: string; raison: string; lien: string }> = {
+  FR: { nom: "La lettre de Ouidah", raison: "Vous recevez la lettre de Ouidah parce que cette adresse y est inscrite.", lien: "Se désinscrire" },
+  EN: { nom: "The Ouidah letter", raison: "You receive the Ouidah letter because you signed up for it.", lien: "Unsubscribe" },
+  ES: { nom: "La carta de Ouidah", raison: "Recibe la carta de Ouidah porque se suscribió.", lien: "Darse de baja" },
+  DE: { nom: "Der Brief aus Ouidah", raison: "Sie erhalten den Brief aus Ouidah, weil Sie sich angemeldet haben.", lien: "Abmelden" },
+  PT: { nom: "A carta de Ouidah", raison: "Recebe a carta de Ouidah porque se inscreveu.", lien: "Cancelar a subscrição" },
+  HT: { nom: "Lèt Ouidah a", raison: "Ou resevwa lèt Ouidah a paske ou te enskri.", lien: "Dezabòne" },
+  GCF: { nom: "Lèt a Ouidah", raison: "Ou ka résévwa lèt a Ouidah paskè ou té enskri.", lien: "Pa résévwa-y ankò" },
+};
+
+/** Signature d'un e-mail écrit par l'équipe (gabarit B « la signature », 10/11/2026) : les langues cochées dans la fiche
+ * de l'agent (Réglages), écrites dans la langue de l'e-mail. HT et GCF à relire (A_RELIRE). */
+export const SIGNATURE_EQUIPE: Record<LangueMsg, { parle: (liste: string) => string; langues: Record<LangueMsg, string> }> = {
+  FR: { parle: (l) => `Parle ${l}`, langues: { FR: "français", EN: "anglais", ES: "espagnol", DE: "allemand", PT: "portugais", HT: "créole haïtien", GCF: "créole guadeloupéen" } },
+  EN: { parle: (l) => `Speaks ${l}`, langues: { FR: "French", EN: "English", ES: "Spanish", DE: "German", PT: "Portuguese", HT: "Haitian Creole", GCF: "Guadeloupean Creole" } },
+  ES: { parle: (l) => `Habla ${l}`, langues: { FR: "francés", EN: "inglés", ES: "español", DE: "alemán", PT: "portugués", HT: "criollo haitiano", GCF: "criollo guadalupeño" } },
+  DE: { parle: (l) => `Spricht ${l}`, langues: { FR: "Französisch", EN: "Englisch", ES: "Spanisch", DE: "Deutsch", PT: "Portugiesisch", HT: "Haitianisch", GCF: "Guadeloupe-Kreolisch" } },
+  PT: { parle: (l) => `Fala ${l}`, langues: { FR: "francês", EN: "inglês", ES: "espanhol", DE: "alemão", PT: "português", HT: "crioulo haitiano", GCF: "crioulo de Guadalupe" } },
+  HT: { parle: (l) => `Pale ${l}`, langues: { FR: "franse", EN: "angle", ES: "panyòl", DE: "alman", PT: "pòtigè", HT: "kreyòl ayisyen", GCF: "kreyòl gwadloup" } },
+  GCF: { parle: (l) => `Ka palé ${l}`, langues: { FR: "fransé", EN: "anglé", ES: "èspagnòl", DE: "alman", PT: "pòtigé", HT: "kréyòl ayisyen", GCF: "kréyòl gwadloupéyen" } },
 };
 
 /** Pied de chaque numéro de la lettre, dans la langue du numéro (lien de désinscription propre à l'abonné). */
 export const PIED_LETTRE: Record<LangueMsg, (lien: string) => string> = {
-  FR: (l) => `Vous recevez la lettre de Ouidah parce que vous vous y êtes inscrit. Se désinscrire : ${l}`,
+  FR: (l) => `Vous recevez la lettre de Ouidah parce que cette adresse y est inscrite. Se désinscrire : ${l}`,
   EN: (l) => `You receive the Ouidah letter because you signed up for it. Unsubscribe: ${l}`,
   ES: (l) => `Recibe la carta de Ouidah porque se suscribió. Darse de baja: ${l}`,
   DE: (l) => `Sie erhalten den Brief aus Ouidah, weil Sie sich angemeldet haben. Abmelden: ${l}`,
@@ -137,6 +150,10 @@ export const EXEMPLE_AUTO = {
   prix: 15000,
   sejour: { arrivee: "2027-03-12", depart: "2027-03-19" },
   valable: "2027-03-01",
+  recu: "R-0000-000000",
+  rdv: { debut: "2027-03-01T09:30:00Z", fin: "2027-03-01T10:00:00Z" },
+  lieu: "Lieu d’exemple",
+  passerelle: "Passerelle d’exemple",
 };
 
 const plur = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? plusieurs : un}`;
@@ -240,7 +257,7 @@ export const msg = {
     oht: "Les e-mails envoyés automatiquement par le site ont leur propre groupe, plus bas.",
     auto: "E-mails automatiques",
     autoSous: "Textes que le site envoie de lui-même. Une langue sans texte enregistré part avec le texte par défaut du site, affiché dans l’éditeur.",
-    autoNoms: { "auto-billets": "Billets d’un événement", "auto-demande": "Demande reçue", "auto-devis-pret": "Devis prêt", "auto-boutique": "Commande de la boutique", "auto-lettre": "La lettre de Ouidah", "auto-code": "Code de connexion de l’équipe", "auto-relance": "Relance d’une facture" } as Record<string, string>,
+    autoNoms: { "auto-billets": "Billets d’un événement", "auto-demande": "Demande reçue", "auto-devis-pret": "Devis prêt", "auto-boutique": "Commande de la boutique", "auto-lettre": "La lettre de Ouidah", "auto-code": "Code de connexion de l’équipe", "auto-relance": "Relance d’une facture", "auto-rdv": "Rendez-vous confirmé", "auto-rdv-annule": "Rendez-vous annulé par l’équipe", "auto-recu": "Paiement reçu", "auto-signature": "Devis signé", "auto-assistant": "Message transmis à l’équipe", "auto-lien": "Lien de paiement envoyé" } as Record<string, string>,
     defaut: "Texte par défaut du site",
     retirerAuto: "Revenir au texte par défaut du site",
     autoVariables: (v: string[]) => `Champs que cet e-mail remplit : ${v.join(", ")}. Tout autre champ est refusé à l’enregistrement.`,
@@ -251,6 +268,12 @@ export const msg = {
       "auto-lettre": "La liste des thèmes choisis par l’abonné suit toujours ce texte.",
       "auto-code": "Par défaut, l’objet change entre la première connexion et le mot de passe oublié. Un objet enregistré ici sert aux deux.",
       "auto-relance": "Par défaut, la salutation reprend le nom complet du client ; {prénom} ne donne que son prénom.",
+      "auto-rdv": "La date, l’heure de Ouidah, le mode, le lieu et le message du client suivent toujours ce texte. {dates} donne le jour du rendez-vous.",
+      "auto-rdv-annule": "Le bouton « Choisir un autre créneau » suit toujours ce texte.",
+      "auto-recu": "Le montant, le moyen de paiement, la transaction et le reçu R- (joint en PDF quand il existe) suivent toujours ce texte.",
+      "auto-signature": "Le montant, le signataire, la date et les numéros du devis suivent toujours ce texte.",
+      "auto-assistant": "Envoyé seulement quand personne de l’équipe n’est en ligne et que le visiteur laisse son adresse.",
+      "auto-lien": "Le montant, la date de fin de validité et le bouton « Payer en ligne » suivent toujours ce texte.",
     } as Record<string, string>,
     apercuReel: "Aperçu de l’e-mail tel qu’il part, avec des données d’exemple",
     apercuIndispo: "Aperçu indisponible pour le moment.",

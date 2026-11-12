@@ -109,6 +109,9 @@ export const boutique = {
     vide: "Aucune pièce ne correspond à ces critères.",
     // catalogue sans article publié : la page reste en ligne avec ce message
     catalogueVide: "Aucune pièce en ligne pour le moment. Elles apparaîtront ici dès leur publication.",
+    // deux suites au catalogue vide : être prévenu par la lettre (section de l'accueil), ou composer son voyage
+    catalogueVideLettre: { label: "Recevoir la lettre de Ouidah", href: "/#lettre" },
+    catalogueVideVoyage: { label: "Créer mon voyage", href: "/devis" },
   },
 
   carte: {

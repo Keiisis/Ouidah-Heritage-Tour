@@ -354,7 +354,7 @@ export function Prepare() {
           <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[13px] text-ink-muted">
             <span className="basis-full text-[14px] font-bold text-ink">{T.numeros}</span>
             {emergency.map((e) => (
-              <a key={e.label} href={`tel:${e.value}`} className="hover:text-ink">
+              <a key={e.label} href={`tel:${e.value}`} className="relative hover:text-ink before:absolute before:-inset-x-2 before:-inset-y-2.5">
                 <b className="mr-1 font-display text-[18px] font-semibold text-ink">{e.value}</b>
                 {e.label}
               </a>

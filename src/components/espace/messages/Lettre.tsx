@@ -6,6 +6,7 @@ import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, msg, PIED_LETT
 import type { RetourMessages } from "@/lib/serveur/equipe/messages/actions";
 import { enregistrerNumero, envoyerLettre, testerNumero } from "@/lib/serveur/equipe/messages/lettre";
 import type { Numero, Repartition } from "@/lib/serveur/equipe/messages/lectures";
+import { TRANSITIONS_NUMERO } from "@/lib/serveur/equipe/messages/regles";
 import { estLangue } from "@/lib/serveur/equipe/messages/rendu";
 import { Bloc, Vide, vars } from "../Bloc";
 import { useMinute } from "../Cadre";
@@ -194,7 +195,7 @@ export function Lettre({ repartition, numeros, sujets }: { repartition: Repartit
                   </span>
                   <span className="langue" title={T.langues[n.langue]}>{n.langue}</span>
                   <span className="etat" data-e={n.statut}>{L.etats[n.statut]}</span>
-                  {n.statut !== "envoye" && (
+                  {TRANSITIONS_NUMERO[n.statut].length > 0 && (
                     <span className="actions">
                       <button type="button" className="bouton-2 bouton-petit" data-reprendre={n.id} disabled={occupe} onClick={() => reprendre(n)}>
                         {L.reprendre}

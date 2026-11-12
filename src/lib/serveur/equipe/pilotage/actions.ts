@@ -10,7 +10,8 @@ import { exigerDroit } from "../securite/droits";
 import { exigerRole } from "../session";
 import { demandeOuverte, documentAccessible } from "./lectures";
 import { traiterRapport } from "./rapport-envoi";
-import { champsDe, conservation, estMime, estTypeDocument, lireMotif, lirePage, lireSuivi, nomFichier, signatureValide, TAILLE_MAX, UUID } from "./regles";
+import { peutPasser } from "../../machines";
+import { ACTIONS_WIKI, champsDe, conservation, type EtatWiki, estMime, estTypeDocument, lireMotif, lirePage, lireSuivi, nomFichier, signatureValide, TAILLE_MAX, TRANSITIONS_WIKI, UUID } from "./regles";
 import { debutObjet, effacerObjets, urlDepot } from "./stockage";
 
 // Écritures du lot « pilotage » : wiki, pistes, rapport hebdomadaire, documents des clients. Actions serveur joignables par
@@ -52,11 +53,12 @@ export async function enregistrerPage(id: unknown, brut: unknown): Promise<Retou
     page = l[0].id;
   } else {
     if (!uuid(id)) return { erreur: "introuvable" };
-    const lu_ = await lire<{ etat: string }>(`wiki_pages?select=etat&id=eq.${id}&limit=1`);
+    const lu_ = await lire<{ etat: EtatWiki }>(`wiki_pages?select=etat&id=eq.${id}&limit=1`);
     if (!lu_) return { erreur: "panne" };
     const avant = lu_[0];
     if (!avant) return { erreur: "introuvable" };
     const refusee = avant.etat === "refuse";
+    if (refusee && !peutPasser(TRANSITIONS_WIKI, "refuse", "brouillon")) return { erreur: "etat" };
     const l = await ecrire<{ id: string }>(`wiki_pages?id=eq.${id}&etat=eq.${avant.etat}&select=id`, "PATCH", { ...lu.v, modifie_par: s.profilId, modifie_le: maintenant(), ...(refusee ? { etat: "brouillon", motif_refus: null } : {}) });
     if (!l) return { erreur: "panne" };
     if (!l[0]) return { erreur: "etat" };
@@ -76,13 +78,16 @@ export async function changerPage(id: unknown, quoi: unknown, motif?: unknown): 
   const m = quoi === "refuser" ? lireMotif(champsDe(motif).motif ?? motif) : null;
   if (quoi === "refuser" && !m) return { erreur: "champs", champs: ["motif"] };
   const t = maintenant();
-  const [de, corps, action] =
+  const { de, vers } = ACTIONS_WIKI[quoi];
+  if (!de.every((x) => peutPasser(TRANSITIONS_WIKI, x, vers))) return { erreur: "etat" };
+  const [corps, action] =
     quoi === "publier"
-      ? (["in.(brouillon,propose)", { etat: "publie", publie_le: t, publie_par: s.profilId, motif_refus: null, modifie_le: t }, "wiki.publie"] as const)
+      ? ([{ etat: vers, publie_le: t, publie_par: s.profilId, motif_refus: null, modifie_le: t }, "wiki.publie"] as const)
       : quoi === "retirer"
-        ? (["eq.publie", { etat: "brouillon", modifie_le: t, modifie_par: s.profilId }, "wiki.retire"] as const)
-        : (["eq.propose", { etat: "refuse", motif_refus: m, modifie_le: t, modifie_par: s.profilId }, "wiki.refuse"] as const);
-  const l = await ecrire<{ id: string }>(`wiki_pages?id=eq.${id}&etat=${de}&select=id`, "PATCH", corps);
+        ? ([{ etat: vers, modifie_le: t, modifie_par: s.profilId }, "wiki.retire"] as const)
+        : ([{ etat: vers, motif_refus: m, modifie_le: t, modifie_par: s.profilId }, "wiki.refuse"] as const);
+  // l'état lu est exigé dans la requête (in.(…)) : deux admins au même instant, un seul l'emporte
+  const l = await ecrire<{ id: string }>(`wiki_pages?id=eq.${id}&etat=in.(${de.join(",")})&select=id`, "PATCH", corps);
   if (!l) return { erreur: "panne" };
   if (!l[0]) return { erreur: "etat" };
   await journaliser(action, s.profilId, null, { page: id });

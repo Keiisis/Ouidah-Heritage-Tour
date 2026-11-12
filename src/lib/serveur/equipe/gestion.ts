@@ -10,7 +10,8 @@ import { envoyerCode, smtpConfigure } from "./courriel";
 import { journaliser } from "./journal";
 import { modeLocal } from "./mode";
 import { iso, type RoleCompte, selConfigure } from "./outils";
-import { type ChampInvalide, creerInvite, lireInvitation, refusRole, refusSuppression, refusSuspension, ROLES } from "./partage";
+import { peutPasser } from "../machines";
+import { type ChampInvalide, creerInvite, lireInvitation, refusRole, refusSuppression, refusSuspension, ROLES, TRANSITIONS_COMPTE } from "./partage";
 import { exigerRole, revoquerSessions } from "./session";
 
 // Écritures de l'écran Équipe (lot L3) : ajouter un compte, le suspendre, le réactiver, renvoyer l'invitation, le
@@ -69,6 +70,7 @@ async function lireCible(id: string): Promise<Cible | null> {
 
 /** Change l'état seulement si le compte est encore dans l'état lu : deux admins au même instant, un seul l'emporte. */
 async function passer(id: string, de: EtatCompte | "supprime", vers: EtatCompte) {
+  if (!peutPasser(TRANSITIONS_COMPTE, de, vers)) return false;
   try {
     const r = await base(`equipe_profils?id=eq.${id}&etat=eq.${de}&select=id`, { method: "PATCH", corps: { etat: vers, modifie_le: iso(Date.now()) }, prefer: "return=representation" });
     return r.ok && ((await r.json()) as unknown[]).length === 1;

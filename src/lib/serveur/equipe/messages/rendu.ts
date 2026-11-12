@@ -32,7 +32,7 @@ export const valeursDe = (f: Faits, langue: LangueMsg): Valeurs => ({
 // ---------- clés réservées aux e-mails automatiques du site (session oht-ce) ----------
 /** Lues par les e-mails automatiques (repli sur leurs textes par défaut) ; jamais dans le composeur ni dans la liste des
  * modèles de l'équipe. Seul un admin les écrit, dans le groupe « E-mails automatiques ». */
-export const AUTO_CLES = ["auto-billets", "auto-demande", "auto-devis-pret", "auto-boutique", "auto-lettre", "auto-code", "auto-relance"] as const;
+export const AUTO_CLES = ["auto-billets", "auto-demande", "auto-devis-pret", "auto-boutique", "auto-lettre", "auto-code", "auto-relance", "auto-rdv", "auto-rdv-annule", "auto-recu", "auto-signature", "auto-assistant", "auto-lien"] as const;
 export type CleAuto = (typeof AUTO_CLES)[number];
 export const estAuto = (cle: string) => cle.startsWith("auto-");
 export const autoConnue = (cle: string): cle is CleAuto => (AUTO_CLES as readonly string[]).includes(cle);
@@ -46,6 +46,12 @@ export const VARIABLES_AUTO: Record<CleAuto, readonly Variable[]> = {
   "auto-lettre": ["lien"],
   "auto-code": ["prenom"],
   "auto-relance": ["prenom", "lien", "reference"],
+  "auto-rdv": ["prenom", "dates"],
+  "auto-rdv-annule": ["prenom", "dates"],
+  "auto-recu": ["prenom", "lien", "reference"],
+  "auto-signature": ["prenom", "lien", "reference"],
+  "auto-assistant": ["prenom"],
+  "auto-lien": ["prenom", "lien", "reference"],
 };
 /** Jetons « {…} » qui ne sont pas l'un des quatre champs variables (refusés dans un e-mail automatique). */
 export const jetonsInconnus = (t: string) => [...new Set((t.match(/\{[^{}\n]{0,40}\}/g) ?? []).filter((j) => !(Object.values(VARIABLES) as string[]).includes(j)))];

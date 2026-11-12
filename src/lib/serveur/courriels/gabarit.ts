@@ -3,6 +3,8 @@ import { echapper } from "../courriel";
 // Gabarit « la lettre illustrée » (piste E validée par Kevin le 03/11/2026, Assets OHT/Emails/maquettes/e) : fonctions
 // pures, sans base ni réseau. Chaque bloc rend son HTML (tableaux role=presentation, styles en ligne) et sa version texte,
 // assemblés par `courriel()`. Toute donnée passe par `echapper` ; images en adresses absolues `${origine}/courriels/…`.
+// Partagé avec le gabarit B « la signature » des e-mails écrits par l'équipe (equipe/messages/composer.ts, 10/11/2026) :
+// polices, `rang`, `txt`, `courriel()` et, dans l'en-tête, les classes .objet, .corps, .boite, .filet, .disque et .trait-fin.
 export type Bloc = { h: string; t: string };
 export type Courriel = { sujet: string; html: string; texte: string };
 export type Lien = { libelle: string; href: string };
@@ -12,12 +14,12 @@ export type Tampon = { alt: string; image: "paye" | "bezahlt" | null };
 export type Note = { libelle: string; valeur: string | string[]; fort?: boolean };
 export type Article = { titre: string; detail?: string | null; montant: string; valeur?: number; image?: { src: string; alt: string; largeur: number; hauteur: number } | null };
 
-const SANS = "Manrope, 'Segoe UI', Arial, sans-serif";
-const SERIF = "Fraunces, Georgia, 'Times New Roman', serif";
-const NUM = "font-variant-numeric:tabular-nums lining-nums;";
+export const SANS = "Manrope, 'Segoe UI', Arial, sans-serif";
+export const SERIF = "Fraunces, Georgia, 'Times New Roman', serif";
+export const NUM = "font-variant-numeric:tabular-nums lining-nums;";
 const P = `margin:0;font-family:${SANS};font-weight:400;font-size:16px;line-height:26px;color:#0f162d;`;
 const GRIS = `margin:0;font-family:${SANS};font-weight:400;font-size:15px;line-height:24px;color:#3f4863;${NUM}`;
-const IMG = "border:0;outline:none;text-decoration:none;";
+export const IMG = "border:0;outline:none;text-decoration:none;";
 const TAMPONS = { paye: 77, bezahlt: 117 } as const;
 const vide: Bloc = { h: "", t: "" };
 
@@ -45,7 +47,7 @@ export function txt(s: string, langue: string) {
 }
 const insecable = (s: string) => s.replace(/ /g, " ");
 const sansVeuve = (s: string) => s.replace(/ (\S+)$/, " $1"); // le dernier mot ne reste jamais seul
-const rang = (contenu: string, pad: string, cls = "px") => `<tr><td class="${cls}" style="padding:${pad};">${contenu}</td></tr>`;
+export const rang = (contenu: string, pad: string, cls = "px") => `<tr><td class="${cls}" style="padding:${pad};">${contenu}</td></tr>`;
 
 // ---------- blocs ----------
 export function entete(origine: string): Bloc {
@@ -182,7 +184,9 @@ const ADAPTE = `  .px { padding-left:48px !important; padding-right:48px !import
   .phrase { font-size:42px !important; line-height:52px !important; letter-spacing:-0.6px !important; }
   .donnee { font-size:18px !important; line-height:26px !important; }
   .code { font-size:52px !important; line-height:60px !important; letter-spacing:6px !important; }
-  .lbl { width:168px !important; }`;
+  .lbl { width:168px !important; }
+  .objet { font-size:36px !important; line-height:44px !important; letter-spacing:-0.5px !important; }
+  .corps { font-size:17px !important; line-height:28px !important; }`;
 const ENTETE = (lang: string, titre: string) => `<!doctype html>
 <html lang="${lang}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -216,6 +220,8 @@ ${ADAPTE}
   .lien { color:#f7f1e8 !important; }
   .addition { border-color:#dde1ea !important; }
   .pied { border-top:1px solid #3f4863 !important; }
+  .boite, .filet { border-color:#3f4863 !important; }
+  .disque { background:#f5f7fb !important; color:#0f162d !important; }
   .tampon { background:#ac3215 !important; color:#0b1638 !important; }
   .clair { display:none !important; }
   .sombre { display:inline-block !important; }
@@ -224,10 +230,15 @@ ${ADAPTE}
 <style>
 @media screen and (prefers-reduced-motion: no-preference) {
   .trait { background:linear-gradient(#fdbf28,#fdbf28) 0 100% / 0% 6px no-repeat border-box; animation:trace 1800ms cubic-bezier(.22,1,.36,1) 500ms backwards; }
+  .trait-fin { background:linear-gradient(#fdbf28,#fdbf28) 0 100% / 0% 3px no-repeat border-box; animation:trace-fin 1800ms cubic-bezier(.22,1,.36,1) 600ms backwards; }
 }
 @keyframes trace {
   0% { border-bottom-color:transparent; background-size:0% 6px; }
   100% { border-bottom-color:transparent; background-size:100% 6px; }
+}
+@keyframes trace-fin {
+  0% { border-bottom-color:transparent; background-size:0% 3px; }
+  100% { border-bottom-color:transparent; background-size:100% 3px; }
 }
 </style>
 <!--[if mso]><style>

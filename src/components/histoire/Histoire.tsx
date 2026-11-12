@@ -322,7 +322,9 @@ export function Histoire() {
           const b = L.chap[p.dataset.pour!].blocs[Number(p.dataset.n)];
           if (!b) return;
           const freres = pieces.filter((x) => x.dataset.pour === p.dataset.pour && x.dataset.n === p.dataset.n), i = freres.indexOf(p), nb = freres.length;
-          const loc = rampe(y, b.top - vh * 0.62, b.top + b.h - vh * 0.3), a = i / nb, z = (i + 1) / nb, part = rampe(loc, a, z);
+          // fenêtre [haut du temps, bas du temps] décalée du même 45 % d'écran aux deux bouts : celle d'un temps s'arrête où
+          // commence celle du suivant, deux documents (et leurs légendes) ne se superposent jamais
+          const loc = rampe(y, b.top - vh * 0.45, b.top + b.h - vh * 0.45), a = i / nb, z = (i + 1) / nb, part = rampe(loc, a, z);
           p.style.opacity = String((i === 0 ? rampe(loc, 0, 0.05) : rampe(loc, a, a + 0.05)) * (1 - rampe(loc, z - 0.05, z)) * (1 - cl));
           const ty = calme ? 0 : (0.5 - part) * 8, rz = calme ? 0 : (part - 0.5) * -4;
           p.style.transform = `translateY(calc(-50% + ${ty}vh)) rotate(${rz}deg)`;

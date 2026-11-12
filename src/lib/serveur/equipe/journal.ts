@@ -21,7 +21,7 @@ type Action =
   | "boutique.produit" | "boutique.categorie" | "boutique.matiere" | "boutique.publication" | "boutique.livraison"
   // finances (lot L7) : details.facture / paiement / lien = l'objet touché, details.mois, details.mode ; jamais un montant,
   // une référence de virement, un payeur ni une coordonnée bancaire
-  | "facture.emission" | "facture.envoi" | "avoir.emission" | "lien.creation" | "lien.annulation"
+  | "facture.emission" | "facture.envoi" | "avoir.emission" | "lien.creation" | "lien.envoi" | "lien.annulation"
   | "paiement.saisie" | "paiement.confirmation" | "paiement.rejet" | "paiement.inverse" | "finances.refus"
   | "depense.ajout" | "mois.cloture" | "mois.reouverture" | "grille.ajout" | "grille.modification" | "reglages.paiement"
   // pilotage (vague 2) : details.page = la page du wiki, details.dossier = la demande, details.document = le document client,
@@ -32,7 +32,7 @@ type Action =
   // réglages (vague 2) : details.passerelle = la passerelle touchée, details.actif = le nouvel état ; jamais une clé, un
   // mot de passe ni le texte saisi. Mode économie : details.mode = auto / marche / arret, details.nombre = le plafond
   | "reglages.passerelle" | "reglages.ordre" | "reglages.documents" | "reglages.emcf" | "reglages.assistant" | "reglages.maintenance" | "reglages.devises" | "reglages.eco"
-  | "reglages.refus" | "envoi.test" | "profil.modification" | "profil.session" | "profil.refus"
+  | "reglages.refus" | "reglages.avis" | "envoi.test" | "profil.modification" | "profil.session" | "profil.refus"
   // sécurité (vague 2) : details.cible = le compte, la session, le blocage, la fiche du registre ou l'incident visé,
   // details.type = la table exportée, details.mode = le format, details.nombre = lignes ou sessions ; jamais une adresse
   // IP, une adresse e-mail ni un texte saisi

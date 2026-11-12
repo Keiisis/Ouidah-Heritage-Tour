@@ -8,6 +8,11 @@ import { entete, fin, photo, pied, type Bloc, type Lien } from "./gabarit";
 // Outils communs des e-mails clients : langue, dates et montants dans la langue du client (libellés et mois de
 // content/suivi.ts, comme le ticket), modèle de l'admin (table modeles_courriels), début et fin de chaque e-mail.
 export const langueDe = (l: string | null | undefined): LangueCourriel => langueDoc(l);
+/** Adresse publique du site (SITE_URL) pour les liens et images des e-mails partis hors d'une requête publique. */
+export const origineConfiguree = () => {
+  const c = process.env.SITE_URL?.trim().replace(/\/$/, "");
+  return c && /^https?:\/\/[^/\s]+$/.test(c) ? c : null;
+};
 export const prenomDe = (nom: string) => nom.trim().split(/\s+/)[0] ?? "";
 
 const FUSEAU = "Africa/Porto-Novo";
@@ -24,6 +29,9 @@ export function dateLongue(iso: string, L: LangueCourriel, jour = false, contenu
   const t = new Intl.DateTimeFormat(locale(L, contenu), { timeZone: FUSEAU, ...(jour ? { weekday: "long" as const } : {}), day: "numeric", month: "long", year: "numeric" }).format(d);
   return jour ? t.charAt(0).toLocaleUpperCase(locale(L, contenu)) + t.slice(1) : t;
 }
+
+/** « 10:30 » à l'heure de Ouidah (UTC+1, sans heure d'été), dans la langue du client (créoles : format français). */
+export const heure = (iso: string, L: LangueCourriel, contenu = suivi) => new Intl.DateTimeFormat(locale(L, contenu), { timeZone: FUSEAU, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(iso));
 
 export const fcfa = (n: number, L: LangueCourriel, contenu = suivi) => `${new Intl.NumberFormat(locale(L, contenu), { maximumFractionDigits: 0 }).format(n)} FCFA`;
 export const euros = (n: number, L: LangueCourriel, contenu = suivi) => new Intl.NumberFormat(locale(L, contenu), { style: "currency", currency: "EUR" }).format(n);

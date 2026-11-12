@@ -2,10 +2,10 @@ import type { LangueDoc } from "@/lib/suivi";
 
 export const relancesEquipe = {
   titre: "Relances de paiement",
-  aide: "Vide : relances désactivées. Sinon, délai depuis l'émission ou la dernière tentative, en jours. Ce réglage ne fixe pas d'échéance contractuelle.",
-  sous: "Documents déjà émis dont un montant reste attendu, 50 au plus par envoi. L'intervalle configuré s'applique aussi aux relances manuelles.",
+  aide: "Jours après l'émission de la facture, par exemple 7, 15, 30 : une relance à chaque palier, puis plus rien. Vide : relances désactivées. Ce réglage ne fixe pas d'échéance contractuelle.",
+  sous: "Documents déjà émis dont un montant reste attendu, 50 au plus par envoi. Les paliers configurés s'appliquent aussi aux relances manuelles ; chaque relance part aussi en copie à l'équipe.",
   automatique: "Les relances automatiques utilisent la tâche serveur protégée. Sa programmation se configure séparément.",
-  desactivees: "Les relances sont désactivées. Renseignez l'intervalle dans les coordonnées de l'agence pour les activer.",
+  desactivees: "Les relances sont désactivées. Renseignez les paliers dans les coordonnées de l'agence pour les activer.",
   vide: "Aucune relance à effectuer aujourd'hui.",
   lancer: "Relancer les documents affichés",
   confirmer: "Envoyer un e-mail aux clients des documents affichés",

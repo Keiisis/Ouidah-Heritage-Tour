@@ -7,7 +7,8 @@ import { UUID } from "../dossiers-regles";
 import { journaliser } from "../journal";
 import { exigerDroit } from "../securite/droits";
 import { exigerRole } from "../session";
-import { ETATS_COMMANDE, type EtatCommande, type RetourCommande, SUIVANT } from "./regles";
+import { peutPasser } from "../../machines";
+import { ETATS_COMMANDE, type EtatCommande, type RetourCommande, SUIVANT, TRANSITIONS_COMMANDE } from "./regles";
 
 // Avancée d'une commande boutique (lot terrain L5). Action serveur joignable par une requête forgée : CHAQUE appel relit
 // la session. Seul le pas suivant de l'état ACTUEL en base est permis (a_confirmer → a_preparer → prete → remise), écrit
@@ -56,7 +57,7 @@ async function changerCommande(id: unknown, depuis: unknown, motif: string | nul
   if (!s) return { erreur: "refuse" };
   if (typeof id !== "string" || !UUID.test(id) || !ETATS_COMMANDE.includes(depuis as EtatCommande)) return { erreur: "champs" };
   const vers = motif ? "annulee" : SUIVANT[depuis as EtatCommande]?.vers;
-  if (!vers) return { erreur: "etat" };
+  if (!vers || vers === depuis || !peutPasser(TRANSITIONS_COMMANDE, depuis as EtatCommande, vers)) return { erreur: "etat" };
   try {
     const r = await base("rpc/avancer_commande_boutique", { method: "POST", corps: { p_id: id, p_depuis: depuis, p_vers: vers, p_par: s.profilId, p_motif: motif } });
     if (!r.ok) return { erreur: "panne" };

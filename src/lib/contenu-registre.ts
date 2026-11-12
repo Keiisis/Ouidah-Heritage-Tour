@@ -144,8 +144,8 @@ const texteNul = (max = 200, long = false) => F.nul(F.texte(max, { long }));
 // prix, places, nuits : entiers positifs ou nuls (montants en FCFA encaissés : jamais négatifs), null = non affiché
 const nombreNul = (entier = true) => F.nul(F.nombre(entier, 0));
 const mediaHistoire = F.nul(F.objet({ src: F.texte(500, { min: 1, motif: "src" }), largeur: F.nombre(true), hauteur: F.nombre(true), legende: F.texte(400, { min: 1, long: true }) }));
-// recherche du Hero : libellés modifiables ; les options « Destination » et « Type de voyage » se déduisent des lieux
-// (fr.places, écran Lieux) et des filtres (fr.tourFilters, écran Circuits) : figées ici ; « Durée » garde ses valeurs
+// recherche du Hero : libellés modifiables et traduisibles, valeurs figées ; « Destination » et « Type de voyage » ne
+// portent que leur choix « tous », la suite se déduit des lieux (fr.places, écran Lieux) et des filtres (fr.tourFilters)
 const champsRecherche: Forme = {
   k: "paire",
   de: fr.hero.search.fields.map((c) =>
@@ -153,7 +153,7 @@ const champsRecherche: Forme = {
       name: F.fixe(c.name),
       label: F.texte(longueurMax(c.label.length, true), { min: 1 }),
       objet: F.fixe(c.objet),
-      options: c.name === "duree" ? { k: "paire", de: c.options.map((x) => F.objet({ value: F.fixe(x.value), label: F.texte(longueurMax(x.label.length, true), { min: 1 }) })) } : F.fixe(donnees(c.options) ?? null),
+      options: { k: "paire", de: c.options.map((x) => F.objet({ value: F.fixe(x.value), label: F.texte(longueurMax(x.label.length, true), { min: 1 }) })) },
     }),
   ),
 };

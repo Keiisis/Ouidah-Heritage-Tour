@@ -9,6 +9,7 @@
 // chaînes : le rendu React les échappe ; aucun HTML n'est jamais injecté.
 
 import { LANGUES, type Langue } from "../equipe/partage";
+import { peutPasser, type Transitions } from "../machines";
 
 export const LANGUES_BLOG = LANGUES;
 export type LangueBlog = Langue;
@@ -322,7 +323,18 @@ export function manquePourPublier(v: Pick<ChampsArticle, "titre" | "chapo" | "co
   return (["titre", "chapo", "corps"] as const).filter((k) => !v[k].trim());
 }
 
-// ---------- états ----------
+// ---------- états (machine à états : 20261122_machines_etats_deux.sql recopie TRANSITIONS_BLOG) ----------
+
+/** blog_articles.etat. Né « brouillon » (creerArticle, traduireArticle) ou « publié » (variante traduite par
+ * traduction_auto_finaliser, qui ne change jamais l'état ensuite). changerEtat : brouillon ⇄ relecture, publication depuis
+ * brouillon, relecture ou retiré, retrait d'un publié, retour au brouillon d'un retiré. blog_versions.etat n'est qu'une
+ * copie à l'écriture (historique, jamais mis à jour) : pas de machine. */
+export const TRANSITIONS_BLOG: Transitions<EtatBlog> = {
+  brouillon: ["relecture", "publie"],
+  relecture: ["brouillon", "publie"],
+  publie: ["retire"],
+  retire: ["brouillon", "publie"],
+};
 
 export type ActionEtat = "relecture" | "brouillon" | "publier" | "retirer";
 export const ETAT_APRES: Record<ActionEtat, EtatBlog> = { relecture: "relecture", brouillon: "brouillon", publier: "publie", retirer: "retire" };
@@ -331,20 +343,12 @@ type Qui = { role: "agent" | "admin"; auteur: boolean };
 /** Un membre peut-il modifier le texte de cet article ? Admin : toujours. Agent : son article, tant qu'il n'est pas publié. */
 export const peutEcrire = (q: Qui, etat: EtatBlog) => q.role === "admin" || (q.auteur && (etat === "brouillon" || etat === "relecture"));
 
-/** Changement d'état permis. Agent (son article) : brouillon → relecture et retour. Admin : publier (brouillon, relecture,
- * retiré), retirer (publié), remettre en brouillon (relecture, retiré), envoyer en relecture (brouillon). */
+/** Changement d'état permis : une transition de TRANSITIONS_BLOG (jamais l'état inchangé). Admin : toutes. Agent : son
+ * article, brouillon ⇄ relecture seulement. */
 export function transitionPermise(q: Qui, etat: EtatBlog, action: ActionEtat): boolean {
-  if (q.role === "agent") return q.auteur && ((action === "relecture" && etat === "brouillon") || (action === "brouillon" && etat === "relecture"));
-  switch (action) {
-    case "relecture":
-      return etat === "brouillon";
-    case "brouillon":
-      return etat === "relecture" || etat === "retire";
-    case "publier":
-      return etat !== "publie";
-    case "retirer":
-      return etat === "publie";
-  }
+  const vers = ETAT_APRES[action];
+  if (vers === etat || !peutPasser(TRANSITIONS_BLOG, etat, vers)) return false;
+  return q.role === "admin" || (q.auteur && peutEcrire(q, etat) && (vers === "relecture" || vers === "brouillon"));
 }
 
 // ---------- aide à la traduction ----------

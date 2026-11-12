@@ -58,5 +58,5 @@ async function envoyer(v: LigneDevis, origine: string) {
     modele,
     textesSuivi,
   );
-  return envoyerCourriel({ a: d.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `devis-${v.id}-${Date.parse(v.publie_le)}-pret` });
+  return envoyerCourriel({ a: d.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `devis-${v.id}-${Date.parse(v.publie_le)}-pret`, modele: "auto-devis-pret" });
 }

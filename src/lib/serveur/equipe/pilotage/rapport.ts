@@ -11,7 +11,7 @@ const leJour = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long",
 const nombre = new Intl.NumberFormat("fr-FR");
 const jour = (d: string) => leJour.format(Date.parse(`${d}T12:00:00Z`));
 
-export const titreSemaine = (r: Rapport) => P.rapport.semaine(jour(r.lundi), jour(r.dimanche));
+export const titreSemaine = (r: Rapport) => P.rapport.semaine(jour(r.debut), jour(r.fin));
 
 /** Les lignes du rapport, dans l'ordre de l'écran : [libellé, valeur affichée]. */
 export function lignesRapport(r: Rapport): [string, string][] {

@@ -185,6 +185,30 @@
     {
       "fichier": "20261115_passerelles_cles.sql",
       "sha256": "18802460794586bcdd6c91700de20c04cd677f82d25629100615d7833f179c60"
+    },
+    {
+      "fichier": "20261117_traductions_correctifs.sql",
+      "sha256": "43422a80e4373b5f6a298d1e463770854b4c563d6c8b10455d1bfc6a142a46a8"
+    },
+    {
+      "fichier": "20261118_logo_embleme.sql",
+      "sha256": "495132fbb96fd2d207488474e647bc8cb91c8b66ae522214d83902c99f4f1417"
+    },
+    {
+      "fichier": "20261119_traductions_decouverte.sql",
+      "sha256": "34a3014cd8545d74e44ef351cbd6e093da83d7ff6715117a4bfb632ae6b8ef0c"
+    },
+    {
+      "fichier": "20261120_machines_etats.sql",
+      "sha256": "e860f4cabbb484ad5b3edd1095d1784e5db6bde53a7d4a9e447879d37b42798c"
+    },
+    {
+      "fichier": "20261121_courriels_auto.sql",
+      "sha256": "cb73f55ac760d10154049750bb09ab5b28a6c045c01d13ce84659dd5a550c0d6"
+    },
+    {
+      "fichier": "20261122_machines_etats_deux.sql",
+      "sha256": "438581120c0a24e4330b77eebfff6cc2d85581d5d48829b965e9c4de1959bc49"
     }
   ]
 }

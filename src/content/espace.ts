@@ -62,7 +62,7 @@ export const GROUPES: Record<Role, Groupe[]> = {
       ["accueil", "Accueil", "maison", "Encaissé et à confirmer|Réservations à venir|Demandes en attente|Activité récente"],
       ["statistiques", "Statistiques", "courbe", "Visites|Conversions|Pays|Sources"],
       ["direct", "En direct", "soleil", "Équipe connectée|Pages vues du jour"],
-      ["rapport", "Rapport hebdomadaire", "document", "Synthèse de la semaine|Envoyée chaque lundi si l’envoi est activé"],
+      ["rapport", "Rapport hebdomadaire", "document", "Synthèse de la semaine|Envoyée chaque samedi si l’envoi est activé"],
     ]],
     ["Ventes", [
       ["demandes", "Demandes et dossiers", "plateau", "Toutes les demandes|Attribution à un agent"],
@@ -134,11 +134,10 @@ export const MODES = ["kkiapay", "fedapay", "stripe", "flutterwave", "paystack",
 export type Mode = (typeof MODES)[number];
 export const MODES_EN_LIGNE: readonly Mode[] = ["kkiapay", "fedapay", "stripe", "flutterwave", "paystack"];
 
-// Logo de chaque emplacement (règle confirmée par Kevin le 02/11 : logo « OUIDAH » à la corde réservé à la barre de navigation,
-// emblème rond partout ailleurs). Bascule en une ligne ici, aucun chemin d'image dans les composants.
-const LOGO_CORDE = { src: "/brand/oht-logo.png", largeur: 1633, hauteur: 469, alt: "Ouidah Heritage Tour" };
+// Logo de chaque emplacement : emblème rond original partout, navigation comprise (la patronne, via Kevin le 10/11).
+// Bascule en une ligne ici, aucun chemin d'image dans les composants.
 const EMBLEME = { src: "/brand/oht-embleme.webp", largeur: 512, hauteur: 512, alt: "Ouidah Heritage Tour" };
-export const logos = { navigation: LOGO_CORDE, enteteMobile: EMBLEME };
+export const logos = { navigation: EMBLEME, enteteMobile: EMBLEME };
 
 /** Logo officiel d'une passerelle (public/paiement). */
 export const logoPasserelle = (id: string) => `/paiement/${id}.svg`;

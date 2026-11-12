@@ -19,8 +19,10 @@ import {
 import { compter } from "@/lib/serveur/assistant/compteur";
 import { estLangue, lireContact, lireMessage } from "@/lib/serveur/assistant/regles";
 import { baseConfiguree } from "@/lib/serveur/base";
+import { envoyerAccuse, envoyerAvisConversation } from "@/lib/serveur/courriels/assistant";
 import { selConfigure } from "@/lib/serveur/equipe/outils";
 import { empreinteIp, lireCorps, reponse } from "@/lib/serveur/garde";
+import { origineSite } from "@/lib/serveur/paiement/outils";
 
 // Discussion avec un agent (sans IA, sans clé Groq : les messages restent chez OHT ; conversation gardée CONSERVATION_JOURS,
 // jamais effacée à la fin de la visite). Une conversation de l'assistant effacée ou finie (/api/assistant/fin) donne 404.
@@ -96,6 +98,10 @@ export async function POST(req: Request) {
       if (!(await ajouterMessage({ conversation: id, auteur: "visiteur", texte: m.texte, ip }))) return reponse({ erreur: "base" }, 502);
     }
     await notifierEquipe(id);
+    // personne en ligne, conversation qui vient de passer à l'équipe : avis par e-mail, et accusé au visiteur s'il a déjà
+    // laissé son adresse (après la réponse ; un échec d'envoi ne touche pas la conversation)
+    const origine = origineSite(req);
+    if (!enLigne && c?.mode !== "agent" && origine) after(() => envoyerAvisConversation(id, origine).then(() => (c?.contact_email ? envoyerAccuse(id, origine) : false)).catch(() => null));
     // mesure d'audience (accord « mesure » transmis par le widget) : un passage à un agent, sans identifiant
     if (req.headers.get("x-oht-mesure") === "1") after(() => compter("passage_agent"));
     return reponse({ c: signerConversation(id), enLigne, demanderContact: !enLigne && !(c?.contact_email || c?.contact_whatsapp) }, 201);
@@ -123,12 +129,17 @@ export async function POST(req: Request) {
     if (corps.accord !== true) return reponse({ erreur: "accord" }, 400);
     const k = lireContact(corps);
     if (!k.ok) return reponse({ erreur: "contact", champs: k.champs }, 400);
-    const email = k.v.email ?? c.contact_email, whatsapp = k.v.whatsapp ?? c.contact_whatsapp;
+    const email = k.v.email ?? c.contact_email, whatsapp = k.v.whatsapp ?? c.contact_whatsapp, avant = c.contact_email;
     if (!email && !whatsapp) return reponse({ erreur: "contact", champs: ["email", "whatsapp"] }, 400);
     const champs = { contact_nom: k.v.nom ?? c.contact_nom, contact_email: email, contact_whatsapp: whatsapp, contact_accord_le: new Date().toISOString() };
     if (!(await modifierConversation(c.id, champs))) return reponse({ erreur: "base" }, 502);
     Object.assign(c, champs);
-    if (etape === "contact") return reponse({ ok: true }, 200);
+    if (etape === "contact") {
+      // conversation passée à l'équipe hors ligne : accusé au visiteur pour une adresse nouvelle (« l'équipe vous répond »)
+      const origine = origineSite(req);
+      if (c.mode === "agent" && c.hors_ligne && email && email !== avant && origine) after(() => envoyerAccuse(c.id, origine).catch(() => null));
+      return reponse({ ok: true }, 200);
+    }
   }
 
   const r = await versDemande(c);

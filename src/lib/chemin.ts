@@ -9,7 +9,8 @@ export function modifierChemin(ajouter: string[], retirer: string[], ouvrir = fa
   try {
     const m = JSON.parse(localStorage.getItem(CLE_CHEMIN) ?? "null") as { gardes?: unknown; index?: unknown } | null;
     const avant = Array.isArray(m?.gardes) ? m.gardes.filter((s): s is string => typeof s === "string") : [];
-    const gardes = [...avant.filter((s) => !retirer.includes(s)), ...ajouter.filter((s) => !avant.includes(s))];
+    // ajouts comparés à la liste APRÈS retrait : remplacer une sélection par un circuit qui la recoupe garde les étapes communes
+    const gardes = [...new Set([...avant.filter((s) => !retirer.includes(s)), ...ajouter])];
     localStorage.setItem(CLE_CHEMIN, JSON.stringify({ gardes, index: Number(m?.index) || 0 }));
   } catch {
     /* navigation privée : sélection non gardée */

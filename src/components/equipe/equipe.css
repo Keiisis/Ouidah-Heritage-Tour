@@ -201,7 +201,7 @@
   & .rideau { position: fixed; inset: 0; z-index: 4; background: var(--accent); pointer-events: none; clip-path: inset(100% 0 0 0); }
   & .espace { position: fixed; inset: 0; z-index: 5; display: grid; grid-template-columns: 240px minmax(0, 1fr); background: var(--espace-fond); opacity: 0; pointer-events: none; transition: opacity var(--d-long) var(--c-arrivee); }
   & .espace aside { display: grid; align-content: start; gap: 12px; padding: 24px 20px; background: var(--abyss); }
-  & .espace aside img { height: 30px; width: auto; margin-bottom: 20px; }
+  & .espace aside img { height: 40px; width: 40px; padding: 4px; border-radius: 50%; background: #fff; margin-bottom: 20px; }
   & .espace .tableau { display: grid; align-content: start; gap: 20px; padding: 32px; }
   & .espace h2 { margin: 0; font: 400 36px/1.1 var(--f-titre); color: var(--ocean); }
   & .espace h2 span + span { color: var(--encre-3); }

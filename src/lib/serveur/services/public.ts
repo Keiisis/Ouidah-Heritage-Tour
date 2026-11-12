@@ -21,13 +21,16 @@ async function formulaire(req: Request, table: string) {
   if (await limiteAtteinte(table, ip, 5, 60)) return { refus: reponse({ erreur: "limite" }, 429) };
   return { brut, ip };
 }
-export async function reserver(req: Request) {
+/** `apres` : appelé avec l'identifiant du rendez-vous enregistré (la route y programme les e-mails après la réponse). */
+export async function reserver(req: Request, apres?: (id: string) => void) {
   const f = await formulaire(req, "rendez_vous"); if (f.refus) return f.refus;
   const contact = lireContact(f.brut), id = f.brut.creneau;
   if (!contact || typeof id !== "string" || !UUID_SERVICE.test(id)) return reponse({ erreur: "erreur" }, 400);
   const r = await base("rpc/reserver_rdv", { method: "POST", corps: { p_creneau: id, p_nom: contact.nom, p_email: contact.email, p_telephone: contact.telephone, p_message: contact.message, p_langue: contact.langue, p_ip: f.ip } }).catch(() => null);
   if (!r?.ok) { const e = await r?.json().catch(() => ({})); return reponse({ erreur: e?.message === "limite" ? "limite" : e?.message === "indisponible" || e?.code === "23505" ? "indisponible" : "erreur" }, e?.message === "limite" ? 429 : r?.status === 400 || r?.status === 409 ? 409 : 502); }
-  return reponse({ ok: true, id: await r.json() }, 201);
+  const rdv: unknown = await r.json();
+  if (apres && typeof rdv === "string" && UUID_SERVICE.test(rdv)) apres(rdv);
+  return reponse({ ok: true, id: rdv }, 201);
 }
 export async function candidater(req: Request) {
   const f = await formulaire(req, "candidatures_partenaires"); if (f.refus) return f.refus;
@@ -57,7 +60,7 @@ export async function demanderAcces(req: Request) {
   // Le fragment ne part ni dans les logs HTTP ni dans les en-têtes Referer. Aucun jeton dans la réponse JSON.
   const lien = `${origine}${langue === "FR" ? "" : `/${langue.toLowerCase()}`}/mes-donnees#acces=${jeton}`;
   const m = courriel({ langue, sujet: T.lienSujet, apercu: T.lienTexte }, [entete(origine), titre({ phrase: { avant: T.donnees } }, langue, origine), paragraphes([T.lienTexte], langue), boutons({ principal: { href: lien, libelle: T.donnees } }, " : ", "0 24px 28px"), paragraphes([T.lienIgnore], langue)]);
-  const envoye = await envoyerCourriel({ ...m, a: email, cle: `donnees-${id}` });
+  const envoye = await envoyerCourriel({ ...m, a: email, cle: `donnees-${id}`, modele: "donnees" });
   const e = await base(`acces_donnees?id=eq.${id}`, { method: "PATCH", corps: envoye ? { envoye: true } : { consomme_le: new Date().toISOString() }, prefer: "return=minimal" }).catch(() => null);
   return envoye && e?.ok ? reponse({ ok: true }, 200) : reponse({ erreur: "erreur" }, 502);
 }

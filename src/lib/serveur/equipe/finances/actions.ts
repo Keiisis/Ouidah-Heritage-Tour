@@ -6,18 +6,25 @@ import { refresh } from "next/cache";
 import { headers } from "next/headers";
 import { langueDoc } from "@/lib/suivi";
 import { base } from "../../base";
-import { courrielConfigure, envoyerCourriel } from "../../courriel";
+import { courrielConfigure, envoyerAvis, envoyerCourriel } from "../../courriel";
+import { avisReservationAttente } from "../../courriels/avis";
 import { passerellesActives } from "../../paiement";
 import { journaliser } from "../journal";
 import { modeLocal } from "../mode";
 import { exigerDroit } from "../securite/droits";
 import { exigerRole, type Session } from "../session";
+import { lireContenu } from "@/lib/contenu";
+import { lireModele } from "../../courriels/commun";
+import { messageLien } from "../../courriels/lien";
+import { origine, partir, voie } from "../messages/envoi";
 import { courrielFacture } from "./documents";
 import { pdfFinancier } from "./pdf";
 import { apresEtat } from "./effets";
 import { objetsPayables } from "./objets";
-import { devisPayables, factureAccessible, lire, lireReglages, moisClos, secretLiens, voitTout } from "./lectures";
-import { aujourdhuiOuidah, champsDe, JUSTIFICATIF_MAX, lireAvoir, lireCoordonnees, lireDepense, lireLien, lireMotif, lirePaiement, lirePrix, moisCourant, moisValide, typeJustificatif, UUID } from "./regles";
+import { devisPayables, type DevisPayable, factureAccessible, jetonLien, lire, lireReglages, moisClos, secretLiens, voitTout } from "./lectures";
+import { aujourdhuiOuidah, champsDe, etatLien, JUSTIFICATIF_MAX, lireAvoir, lireCoordonnees, lireDepense, lireLien, lireMotif, lirePaiement, lirePrix, moisCourant, moisValide, TRANSITIONS_PAIEMENT, typeJustificatif, UUID } from "./regles";
+import { peutPasser } from "../../machines";
+import { TRANSITIONS_RESERVATION } from "../../paiement/types";
 
 // Écritures du lot « finances » (L7). Actions serveur (contrôle d'origine de Next) joignables par une requête forgée :
 // CHAQUE appel relit la session et le rôle, relit ses entrées avec les règles partagées (regles.ts), puis relit l'objet
@@ -29,7 +36,7 @@ import { aujourdhuiOuidah, champsDe, JUSTIFICATIF_MAX, lireAvoir, lireCoordonnee
 export type RefusFin =
   | "refuse" | "admin" | "champs" | "panne" | "introuvable" | "etat" | "doublon" | "justificatif" | "justificatifVirement" | "mois_clos"
   | "soi" | "montant" | "devis" | "passerelles" | "secret" | "smtp" | "envoi" | "annulee" | "termine" | "deja" | "attente";
-export type RetourFin = { ok: true; numero?: string; montant?: number; etat?: string; ecart?: number } | { erreur: RefusFin; champs?: string[] };
+export type RetourFin = { ok: true; numero?: string; montant?: number; etat?: string; ecart?: number; envoi?: "envoye" | "echec" } | { erreur: RefusFin; champs?: string[] };
 
 const maintenant = () => new Date().toISOString();
 
@@ -131,7 +138,7 @@ export async function envoyerFacture(factureId: unknown): Promise<RetourFin> {
   if (boite) {
     parti = await appendFile(boite, `${JSON.stringify({ a: f.client.email, sujet: m.sujet, facture: f.numero, langue: m.langue, pieces: pieces.map((p) => ({ nom: p.nom, type: p.type, taille: p.contenu.length })), le: maintenant() })}\n`, "utf8").then(() => true, () => false);
   } else {
-    parti = await envoyerCourriel({ a: f.client.email, sujet: m.sujet, html: m.html, texte: m.texte, cle: `facture-${f.id}-${Date.now()}`, pieces });
+    parti = await envoyerCourriel({ a: f.client.email, sujet: m.sujet, html: m.html, texte: m.texte, cle: `facture-${f.id}-${Date.now()}`, pieces, modele: "facture" });
   }
   if (!parti) return { erreur: "envoi" };
   await base(`factures?id=eq.${f.id}`, { method: "PATCH", corps: { envoyee_le: maintenant(), modifie_le: maintenant() }, prefer: "return=minimal" }).catch(() => null);
@@ -173,8 +180,30 @@ export async function creerLien(brut: unknown): Promise<RetourFin> {
   }));
   if (!cree?.[0]) return { erreur: "panne" };
   await journaliser("lien.creation", s.profilId, null, { lien: cree[0].id, dossier: d[0].demande, devis: d[0].id });
+  // case « Envoyer le lien au client par e-mail » (cochée par défaut) : le lien est créé quoi qu'il arrive à l'envoi
+  const envoyer = [true, "on", "true"].includes(champsDe(brut).envoyer as string | boolean);
+  const envoi = envoyer ? await envoyerLien(cree[0].id, d[0], s.profilId) : undefined;
   refresh();
-  return { ok: true, montant: d[0].montant };
+  return { ok: true, montant: d[0].montant, ...(envoi ? { envoi } : {}) };
+}
+
+/** Lien neuf envoyé au client dans la langue du lien (SMTP d'OHT ; en local, la boîte EQUIPE_BOITE). État dérivé des
+ * dates : envoye_le n'est posé qu'après l'envoi, et seulement sur un lien encore « créé » (ni ouvert, payé, annulé ni
+ * expiré). */
+async function envoyerLien(id: string, d: DevisPayable, par: string): Promise<"envoye" | "echec"> {
+  const [v, site] = await Promise.all([voie(), origine()]);
+  const jeton = jetonLien(id);
+  const l = (await lire<{ montant: number; langue: string; expire_le: string; envoye_le: string | null; ouvert_le: string | null; paye_le: string | null; annule_le: string | null }>(`liens_paiement?select=montant,langue,expire_le,envoye_le,ouvert_le,paye_le,annule_le&id=eq.${id}&limit=1`))?.[0];
+  if (!v || !site || !jeton || !d.email || !l || etatLien(l, Date.now()) !== "cree") return "echec";
+  const L = langueDoc(l.langue);
+  const [modele, textesSuivi] = await Promise.all([lireModele("auto-lien", L), lireContenu("suivi.suivi")]);
+  const m = messageLien({ nom: d.client, langue: L, jeton, montant: l.montant, expire: l.expire_le, numero: d.numero, reference: `DEM-${d.demande.slice(0, 6).toUpperCase()}` }, site, modele, textesSuivi);
+  const parti = await partir({ a: d.email, sujet: m.sujet, html: m.html, texte: m.texte, repondreA: process.env.EMAIL_OHT || null, cle: `lien-${id}-envoi`, modele: "auto-lien" }, v.boite).catch(() => false);
+  if (!parti) return "echec";
+  const t = maintenant();
+  await ecrire(`liens_paiement?id=eq.${id}&envoye_le=is.null&ouvert_le=is.null&paye_le=is.null&annule_le=is.null&select=id`, "PATCH", { envoye_le: t, modifie_le: t });
+  await journaliser("lien.envoi", par, null, { lien: id, dossier: d.demande, langue: L });
+  return "envoye";
 }
 
 export async function annulerLien(id: unknown): Promise<RetourFin> {
@@ -285,6 +314,7 @@ export async function rejeterPaiement(id: unknown, motif: unknown): Promise<Reto
   if (typeof id !== "string" || !UUID.test(id)) return { erreur: "champs" };
   const m = lireMotif(typeof motif === "string" ? motif : champsDe(motif).motif);
   if (!m) return { erreur: "champs", champs: ["motif"] };
+  if (!peutPasser(TRANSITIONS_PAIEMENT, "a_confirmer", "rejete")) return { erreur: "etat" };
   const t = maintenant();
   const r = lignes(await ecrire(`paiements_manuels?id=eq.${id}&etat=eq.a_confirmer&select=id`, "PATCH", { etat: "rejete", motif: m, confirme_par: s.profilId, confirme_le: t, modifie_le: t }));
   if (!r) return { erreur: "panne" };
@@ -294,6 +324,20 @@ export async function rejeterPaiement(id: unknown, motif: unknown): Promise<Reto
   return { ok: true };
 }
 
+/** Réservation repassée de « payée » à « en attente » par une écriture inverse (TRANSITIONS_RESERVATION) : avis à
+ * l'équipe (billets annulés, client à prévenir). Son échec ne change rien à l'écriture inverse, déjà faite. */
+async function avisReservationRetiree(id: string, motif: string, inverse: string) {
+  const [res, site] = await Promise.all([
+    lire<{ statut: string; nom: string; email: string; langue: string; evenement: string; occurrence: string; formule_nom: string; quantite: number }>(`reservations?select=statut,nom,email,langue,evenement,occurrence,formule_nom,quantite&id=eq.${id}&limit=1`),
+    origine(),
+  ]);
+  const x = res?.[0];
+  if (!x || x.statut !== "attente" || !peutPasser(TRANSITIONS_RESERVATION, "paye", "attente") || !site) return;
+  const [doc] = (await lire<{ numero: string }>(`documents?select=numero&source=eq.reservation&source_id=eq.${id}&type=eq.T&limit=1`)) ?? [];
+  const a = avisReservationAttente({ reference: doc?.numero ?? `${x.evenement} · ${x.occurrence}`, nom: x.nom, email: x.email, langue: x.langue, evenement: x.evenement, occurrence: x.occurrence, formule: x.formule_nom, quantite: x.quantite, motif }, site);
+  await envoyerAvis({ sujet: a.sujet, html: a.html, texte: a.texte, repondreA: x.email || null, cle: `reservation-${id}-attente-${inverse}`, modele: "avis-reservation" }).catch(() => false);
+}
+
 /** Un paiement confirmé ne se modifie plus : l'erreur se corrige par une écriture inverse, inscrite au journal. */
 export async function inverserPaiement(id: unknown, motif: unknown): Promise<RetourFin> {
   const s = await admin();
@@ -301,11 +345,14 @@ export async function inverserPaiement(id: unknown, motif: unknown): Promise<Ret
   if (typeof id !== "string" || !UUID.test(id)) return { erreur: "champs" };
   const m = lireMotif(typeof motif === "string" ? motif : champsDe(motif).motif);
   if (!m) return { erreur: "champs", champs: ["motif"] };
+  // réservation réglée en agence : son état avant l'écriture inverse (paye → attente annule les billets, avis à l'équipe)
+  const [avant] = (await lire<{ reservation_id: string | null; reservation: { statut: string } | null }>(`paiements_manuels?select=reservation_id,reservation:reservations(statut)&id=eq.${id}&limit=1`)) ?? [];
   const r = await rpc<{ erreur?: string; id?: string; statut?: string }>("inverser_paiement_manuel", { p_id: id, p_par: s.profilId, p_motif: m });
   if (r === "panne" || !r) return { erreur: "panne" };
   if (r.erreur) return { erreur: r.erreur === "mois_clos" ? "mois_clos" : r.erreur === "etat" ? "etat" : "introuvable" };
   const [p] = (await lire<{ devis_id: string | null; devis: { demande_id: string } | null }>(`paiements_manuels?select=devis_id,devis:devis!paiements_manuels_devis_id_fkey(demande_id)&id=eq.${id}&limit=1`)) ?? [];
   if (p?.devis_id && p.devis && r.statut) await apresEtat(p.devis_id, p.devis.demande_id, r.statut);
+  if (avant?.reservation_id && avant.reservation?.statut === "paye") await avisReservationRetiree(avant.reservation_id, m, r.id ?? id);
   await journaliser("paiement.inverse", s.profilId, null, { paiement: id, cible: r.id });
   refresh();
   return { ok: true, etat: r.statut };

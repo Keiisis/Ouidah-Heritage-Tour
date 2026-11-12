@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, useTransition, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, useTransition, type FormEvent } from "react";
 import { securite as S } from "@/content/espace-securite";
 import { chercherPersonne, effacerPersonne, exporterPersonne, type RetourSec } from "@/lib/serveur/equipe/securite/actions";
 import type { Apercu } from "@/lib/serveur/equipe/securite/personne";
@@ -21,6 +21,9 @@ export function Personne({ aujourdhui }: { aujourdhui: string }) {
   const [etat, setEtat] = useState<Etat>(null);
   const [champs, setChamps] = useState<string[]>([]);
   const [occupe, demarrer] = useTransition();
+  const racine = useRef<HTMLDivElement>(null);
+  // après un refus, le premier champ fautif prend le focus
+  useEffect(() => racine.current?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus(), [champs]);
 
   const lancer = (faire: () => Promise<RetourSec>, ok: (r: Extract<RetourSec, { ok: true }>) => string | null) => {
     setEtat(null);
@@ -89,7 +92,7 @@ export function Personne({ aujourdhui }: { aujourdhui: string }) {
   const faux = (c: string) => champs.includes(c) || undefined;
 
   return (
-    <div className="sec-form" id="personne">
+    <div className="sec-form" id="personne" ref={racine}>
       <form className="sec-form" onSubmit={chercher} noValidate aria-describedby={`${id}-r`}>
         <div className="champs">
           <div className="champ">

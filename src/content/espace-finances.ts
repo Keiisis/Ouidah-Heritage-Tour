@@ -152,6 +152,10 @@ export const finances = {
     aucunePasserelle: "Aucune passerelle active : activez-en une dans « Passerelles et paiements » avant de créer un lien.",
     creerBouton: "Créer le lien",
     cree: "Lien créé, au total du devis.",
+    envoyer: "Envoyer le lien au client par e-mail",
+    envoyerAide: "Dans la langue du client, depuis l’adresse de l’agence.",
+    creeEnvoye: "Lien créé et envoyé au client par e-mail.",
+    creeNonEnvoye: "Lien créé, mais l’e-mail n’est pas parti : copiez le lien pour l’envoyer vous-même.",
     annuler: "Annuler le lien",
     annule: "Lien annulé.",
     copier: "Copier le lien",
@@ -228,7 +232,7 @@ export const finances = {
     bic: "BIC / SWIFT",
     mobile: "Numéros Mobile Money",
     mobileAide: "Un par ligne : opérateur, puis numéro avec l’indicatif (« MTN +229 01 00 00 00 00 »). 4 au plus.",
-    relance: "Relance d’une facture non payée après (jours)",
+    relance: "Relances d’une facture non payée (jours après l’émission)",
     relanceAide: "Vide : aucune relance conseillée.",
     enregistrerCoord: "Enregistrer les coordonnées",
     coordEnregistrees: "Coordonnées enregistrées.",
@@ -326,7 +330,7 @@ export const finances = {
     iban: "IBAN ou RIB de 10 à 42 caractères, lettres et chiffres.",
     bic: "BIC de 8 ou 11 caractères.",
     mobile: "4 numéros au plus, avec l’indicatif.",
-    relance: "De 1 à 90 jours, ou vide.",
+    relance: "De 1 à 5 paliers croissants, de 1 à 90 jours (par exemple 7, 15, 30), ou vide.",
     categorie: "Choisissez une catégorie.",
     unite: "40 caractères au plus.",
     prix: "Prix de 0 à 9 999 999 FCFA.",
@@ -678,5 +682,30 @@ export const copiesPayer: Record<LangueDoc, CopiePayer> = {
     aucune: "Pa ni pyès mwayen péman disponib pou lé moman. Kontakté ajan a-w.",
     erreur: "Péman-la pa té pé ouvè. Éséyé ankò adan on ti moman.",
     suivi: "Ouvè swivi a kòmand a-w",
+  },
+};
+
+// Avis internes à l'équipe (en français, l'équipe travaille en français), décisions de Kevin du 11/11 : une réservation
+// réglée en agence qui repasse en attente, un paiement en ligne arrivé sur un lien fermé, une commande payée dont la pièce
+// n'est plus disponible. Lus par lib/serveur/courriels/avis.ts et recu.ts.
+export const avisEquipe = {
+  reservation: {
+    sujet: (reference: string) => `Réservation repassée en attente · ${reference}`,
+    titre: (nom: string) => `Réservation de ${nom} repassée en attente`,
+    apercu: (nom: string, n: number) => `${nom} · ${n > 1 ? `${n} billets annulés` : "1 billet annulé"} · client à prévenir`,
+    ecrire: (prenom: string) => `Écrire à ${prenom}`,
+    lignes: { evenement: "Événement", date: "Date", billets: "Billets", motif: "Motif de l’écriture inverse", client: "Client", email: "E-mail", langue: "Langue", suite: "À faire" },
+    billets: (n: number) => (n > 1 ? `${n} billets annulés : ils ne sont plus valables à l’entrée` : "1 billet annulé : il n’est plus valable à l’entrée"),
+    suite: "Prévenir le client : aucun e-mail automatique ne lui a été envoyé.",
+    raison: "Avis interne envoyé à l’équipe quand l’écriture inverse d’un règlement en agence remet une réservation en attente.",
+  },
+  paiement: {
+    lien: "Lien",
+    annule: "Lien annulé au moment du paiement",
+    expire: "Lien expiré au moment du paiement",
+    stockSujet: (reference: string) => `Stock insuffisant pour une commande payée · ${reference}`,
+    stockTitre: (nom: string) => `Commande payée de ${nom}, pièce plus disponible`,
+    stock: "Stock",
+    stockTexte: "Stock insuffisant pour une commande payée : la commande reste annulée, l’argent reçu est à régulariser. Contacter le client.",
   },
 };

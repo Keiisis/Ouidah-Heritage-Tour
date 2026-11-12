@@ -11,6 +11,7 @@ import { conciergerie as CONCIERGERIE, datesSection as DATES_SECTION, evenements
 import { useContenu } from "@/components/ui/ContenuSite";
 import type { Evenement } from "@/content/types";
 import { Icon } from "@/components/ui/Icon";
+import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
 import { Objet3D } from "@/components/ui/Objet3D";
 import { Palettes } from "@/components/ui/Palettes";
 import { poserBillet, QUANTITE_MAX } from "@/lib/billets";
@@ -260,7 +261,10 @@ export function Talon({ e, a, b, sejour, formule, setFormule, passerelles, retou
                       <label key={c.nom} className={`${s.formule} ${formule === i ? s.on : ""}`}>
                         <input type="radio" name="talon-formule" checked={formule === i} onChange={() => changerFormule(i)} />
                         <b>{c.nom}</b>
-                        <span>{c.prix !== null ? fcfa(c.prix) : D.pass.onRequest}</span>
+                        <span>
+                          {c.prix !== null ? fcfa(c.prix) : D.pass.onRequest}
+                          <EquivalentDevise xof={c.prix} />
+                        </span>
                       </label>
                     ))}
                   </fieldset>

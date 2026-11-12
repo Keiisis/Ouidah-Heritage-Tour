@@ -35,16 +35,12 @@
 .fc-num { font: 600 clamp(64px, 7vw, 112px)/0.84 var(--font-display); color: var(--surface-abyss); font-variant-numeric: lining-nums tabular-nums; transition: opacity 0.6s var(--fc-courbe); }
 .fc-lecture .fc-num { opacity: 0.14; }
 .fc-lecture .fc-etape.fc-actif .fc-num { opacity: 1; }
-.fc-chemin .fc-num { width: 22px; height: 22px; margin: 16px 0 0 16px; background: var(--accent-sun); transform: rotate(45deg); }
-.fc-lecture .fc-chemin .fc-num { opacity: 0.4; }
 .fc-etape h2 { font: 600 clamp(30px, 3.1vw, 46px)/1.08 var(--font-display); color: var(--surface-abyss); letter-spacing: -0.012em; overflow-wrap: break-word; }
-.fc-chemin h2 { font-size: clamp(26px, 2.4vw, 34px); }
 .fc-borne { margin-top: 8px; font-size: 16px; color: var(--fc-encre-3); }
 .fc-photo { margin: 36px 0 0; }
 .fc-cadre { position: relative; width: 100%; max-height: 72vh; overflow: hidden; border-radius: 18px; background: var(--surface-abyss); }
 .fc-cadre img { object-fit: cover; }
 .fc-photo figcaption { margin-top: 12px; font-size: 15px; line-height: 1.45; color: var(--fc-encre-3); }
-.fc-annee { margin-left: 8px; font-weight: 600; color: var(--fc-encre-2); font-variant-numeric: lining-nums; }
 .fc-texte { margin-top: 32px; max-width: 62ch; }
 .fc-texte p { color: var(--fc-encre-2); font-size: 18px; line-height: 1.7; }
 .fc-texte p + p { margin-top: 16px; }
@@ -55,7 +51,6 @@
 .fc-carte { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: var(--fc-entete); height: calc(100svh - var(--fc-entete)); overflow: hidden; background: var(--surface-abyss); color: var(--text-inverse); }
 .fc-carte svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
 .fc-camera { transform-box: view-box; transform-origin: 0 0; transition: transform 0.9s var(--fc-courbe); }
-.fc-m-lieux { fill: none; stroke: var(--fc-sable-20); stroke-width: 3.8; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .fc-m-fond { fill: none; stroke: var(--fc-sable-38); stroke-width: 2.5; stroke-dasharray: 1 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .fc-seg { fill: none; stroke: var(--accent-sun); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transition: opacity 0.3s linear; }
 .fc-anime .fc-seg { opacity: 0; }

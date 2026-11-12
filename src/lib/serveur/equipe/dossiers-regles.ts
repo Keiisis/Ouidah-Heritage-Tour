@@ -1,8 +1,14 @@
 import { LIMITES_DEVIS } from "@/content/documents";
+import type { Transitions } from "../machines";
 
 // Règles des dossiers voyage (lot L4), partagées par l'écran (compteurs et refus pendant la saisie) et par les actions
 // serveur (dossiers-actions.ts), qui seules décident : tout ce qui arrive du navigateur est relu ici. Aucun secret, aucun
 // accès à la base : le navigateur peut embarquer ce fichier. Heures à Ouidah : UTC+1 toute l'année.
+
+export type StatutDemande = "brouillon" | "envoyee";
+/** demandes.statut (machine à états, recopiée par 20261120_machines_etats.sql). brouillon → envoyee : /api/devis quand le
+ * paiement des billets est prêt ; une demande née « envoyée » (/api/devis, assistant) n'a plus de transition. */
+export const TRANSITIONS_DEMANDE: Transitions<StatutDemande> = { brouillon: ["envoyee"], envoyee: [] };
 
 export const ETAPES = ["nouvelle", "devis_envoye", "payee", "en_voyage", "terminee", "perdue"] as const;
 export type Etape = (typeof ETAPES)[number];

@@ -1,4 +1,4 @@
-import { metadonneesPage } from "@/lib/serveur/seo";
+import { metadonneesIntrouvable, metadonneesPage } from "@/lib/serveur/seo";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { languePage } from "@/lib/serveur/contenu-page";
@@ -37,9 +37,9 @@ export async function generateStaticParams({ params }: { params: Record<string, 
 
 const description = (a: ArticlePublieDetail) => a.seo.description ?? (a.chapo.length > 160 ? `${a.chapo.slice(0, 157).trimEnd()}…` : a.chapo);
 
-async function metadataContenu({ params }: Props): Promise<Metadata> {
+async function metadataContenu({ params }: Props): Promise<Metadata | null> {
   const a = await lire(params);
-  if (!a) return {};
+  if (!a) return null;
   const T = texteBlog(await lireContenu("blog-site.copiesBlog"), a.langue);
   const langues = await traductions(a.id);
   const titre = a.seo.titre ?? T.meta.titreArticle(a.titre);
@@ -108,5 +108,6 @@ export default async function Page({ params }: Props) {
 
 export async function generateMetadata(...args: Parameters<typeof metadataContenu>): Promise<Metadata> {
   const { slug } = await args[0].params;
-  return metadonneesPage("/blog/[slug]".replace("[slug]", encodeURIComponent(slug)), await metadataContenu(...args));
+  const contenu = await metadataContenu(...args);
+  return contenu ? metadonneesPage("/blog/[slug]".replace("[slug]", encodeURIComponent(slug)), contenu) : metadonneesIntrouvable();
 }

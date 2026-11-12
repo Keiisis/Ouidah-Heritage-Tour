@@ -20,7 +20,7 @@ export function FormLien({ devis, passerelles, initial = "" }: { devis: DevisCho
       action={creerLien}
       nom={L.creer}
       bouton={L.creerBouton}
-      reussite={L.cree}
+      reussite={(r) => (r.envoi === "envoye" ? L.creeEnvoye : r.envoi === "echec" ? L.creeNonEnvoye : L.cree)}
       apres={() => setChoisi("")}
       enfants={
         <div className="champs">
@@ -55,6 +55,12 @@ export function FormLien({ devis, passerelles, initial = "" }: { devis: DevisCho
             <span>{L.total}</span>
             <b>{d ? fcfa(d.montant) : "–"}</b>
             <span>{d ? `${euroDeFcfa(d.montant)} · ${L.totalAide}` : L.totalAide}</span>
+          </div>
+          <div className="champ large">
+            <label className="mention">
+              <input type="checkbox" name="envoyer" defaultChecked /> {L.envoyer}
+            </label>
+            <span className="aide">{L.envoyerAide}</span>
           </div>
           <div className="champ large">
             <span className="aide">

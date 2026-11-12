@@ -18,7 +18,8 @@ export async function voie(): Promise<{ boite: string | null } | null> {
   return courrielConfigure() ? { boite: null } : null;
 }
 
-export type Message = { a: string; sujet: string; html: string; texte: string; cle: string };
+// modele : clé du journal des envois (courriel.ts) ; repondreA : adresse de réponse
+export type Message = { a: string; sujet: string; html: string; texte: string; cle: string; modele?: string; repondreA?: string | null };
 
 export async function partir(m: Message, boite: string | null): Promise<boolean> {
   if (boite) {
@@ -47,6 +48,17 @@ export async function emailDe(profilId: string): Promise<string | null> {
     return r.ok ? (((await r.json()) as { email: string }[])[0]?.email ?? null) : null;
   } catch {
     return null;
+  }
+}
+
+/** Langues cochées dans la fiche du compte (signature des e-mails : « Parle français et anglais ») ; [] si illisibles. */
+export async function languesDe(profilId: string): Promise<string[]> {
+  try {
+    const r = await base(`equipe_profils?select=langues&id=eq.${profilId}&limit=1`);
+    const l = r.ok ? ((await r.json()) as { langues: unknown }[])[0]?.langues : null;
+    return Array.isArray(l) ? l.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
   }
 }
 

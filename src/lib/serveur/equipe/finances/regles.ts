@@ -1,6 +1,7 @@
 import { CATEGORIES_SAISIES, type CategorieSaisie, finances as F, MODES_DEPENSE, MODES_MANUELS, type ModeDepense, type ModeManuel } from "@/content/espace-finances";
 import { LIMITES_DEVIS } from "@/content/documents";
 import { dateDuJour, iso, jourDe, jourOuidah, minuitOuidah } from "@/lib/jours";
+import type { Transitions } from "../../machines";
 
 // Règles du lot « finances » (L7), partagées par les écrans (compteurs, refus pendant la saisie) et par les actions
 // serveur (actions.ts), qui seules décident : tout ce qui arrive du navigateur est relu ici. Aucun secret, aucun accès à
@@ -167,7 +168,18 @@ export function lirePrix(brut: unknown): Lu<PrixSaisi> {
   return { ok: true, v: { id, categorie: o.categorie as CategorieSaisie, libelle, unite, prix } };
 }
 
-export type Coordonnees = { titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile_money: string[]; relance_jours: number | null };
+export type Coordonnees = { titulaire: string | null; banque: string | null; iban: string | null; bic: string | null; mobile_money: string[]; relance_jours: number | null; relance_paliers: number[] | null };
+
+/** Paliers de relance saisis (« 7, 15, 30 ») : 1 à 5 nombres entiers de 1 à 90, strictement croissants ; vide : null
+ * (relances coupées) ; undefined si la saisie n'est pas valable. Même règle que la contrainte SQL (20261121). */
+export function lirePaliers(v: unknown): number[] | null | undefined {
+  const t = uneLigne(v);
+  if (!t) return null;
+  const morceaux = t.split(/[\s,;]+/).filter(Boolean);
+  const l = morceaux.map(Number);
+  const ok = morceaux.every((x) => /^\d{1,2}$/.test(x)) && l.length >= 1 && l.length <= 5 && l.every((n, i) => n >= 1 && n <= 90 && (i === 0 || n > l[i - 1]));
+  return ok ? l : undefined;
+}
 export function lireCoordonnees(brut: unknown): Lu<Coordonnees> {
   const o = champsDe(brut);
   const champs: string[] = [];
@@ -181,11 +193,11 @@ export function lireCoordonnees(brut: unknown): Lu<Coordonnees> {
   if (bic && !/^[A-Z0-9]{8}([A-Z0-9]{3})?$/.test(bic)) champs.push("bic");
   const mobile = (typeof o.mobile === "string" ? o.mobile.split(/\r?\n/) : []).map(uneLigne).filter(Boolean);
   if (mobile.length > 4 || mobile.some((l) => l.length > 60 || !/\d{6}/.test(l.replace(/\D/g, "")))) champs.push("mobile");
-  const r = uneLigne(o.relance);
-  const relance = r ? Number(r) : null;
-  if (relance !== null && (!Number.isInteger(relance) || relance < 1 || relance > 90)) champs.push("relance");
-  if (champs.length) return { ok: false, champs };
-  return { ok: true, v: { titulaire, banque, iban, bic, mobile_money: mobile, relance_jours: relance } };
+  // paliers de relance ; relance_jours garde le premier (NULL : coupées), lu par la vérification SQL d'avant l'envoi
+  const paliers = lirePaliers(o.relance);
+  if (paliers === undefined) champs.push("relance");
+  if (champs.length || paliers === undefined) return { ok: false, champs };
+  return { ok: true, v: { titulaire, banque, iban, bic, mobile_money: mobile, relance_jours: paliers?.[0] ?? null, relance_paliers: paliers } };
 }
 
 // ---------- justificatif ----------
@@ -200,8 +212,51 @@ export function typeJustificatif(o: Uint8Array): TypeJustificatif | null {
   return null;
 }
 
-// ---------- états ----------
+// ---------- états (machines à états : 20261120_machines_etats.sql recopie ces tables) ----------
 
+export type StatutDevis = "brouillon" | "pret" | "paye" | "annule";
+/** devis.statut. brouillon → pret : envoi du devis (dossiers-actions) ; pret ↔ paye : état de la facture (effets.ts).
+ * « annule » : état gardé (contrainte CHECK, lu en statut=neq.annule) sans aucun écrivain ni dans le code ni en SQL
+ * (vérifié le 11/11, vague 2) ; il n'a donc aucune transition. L'ajouter ici ET dans la migration le jour où une annulation
+ * de devis existera. */
+export const TRANSITIONS_DEVIS: Transitions<StatutDevis> = { brouillon: ["pret"], pret: ["paye"], paye: ["pret"], annule: [] };
+
+export type StatutFacture = "emise" | "payee" | "a_regulariser" | "annulee";
+/** factures.statut, posé par la seule fonction SQL finances_recalculer (reçu comparé au net = total − avoirs). Le net ne
+ * remonte jamais (avoirs immuables) : une facture annulée ne redevient ni émise ni payée ; une facture payée ne passe à
+ * « annulée » qu'après une régularisation (un événement à la fois : avoir, paiement ou écriture inverse). */
+export const TRANSITIONS_FACTURE: Transitions<StatutFacture> = {
+  emise: ["payee", "a_regulariser", "annulee"],
+  payee: ["emise", "a_regulariser"],
+  a_regulariser: ["emise", "payee", "annulee"],
+  annulee: ["a_regulariser"],
+};
+
+export type EtatPaiement = "a_confirmer" | "confirme" | "rejete";
+/** paiements_manuels.etat : déjà gardé en base par paiements_figes (20261103_finances.sql), qui fige toute la ligne
+ * hors « à confirmer ». Une erreur se corrige par une écriture inverse (nouvelle ligne), jamais par un changement d'état. */
+export const TRANSITIONS_PAIEMENT: Transitions<EtatPaiement> = { a_confirmer: ["confirme", "rejete"], confirme: [], rejete: [] };
+
+export type EtatRelance = "reservee" | "envoyee" | "ignoree" | "incertaine";
+/** finances_relances.etat (vague 2 : 20261122_machines_etats_deux.sql recopie cette table). Réservée par
+ * finances_relance_reserver, puis close par finances_relance_verifier (ignorée : réglée ou relances coupées) ou
+ * finances_relance_terminer (envoyée, ignorée, incertaine). Incertaine est finale : un SMTP qui a peut-être accepté le
+ * message n'est jamais rejoué, et la tentative bloque la facture (index finances_relance_unique_en_cours). */
+export const TRANSITIONS_RELANCE: Transitions<EtatRelance> = { reservee: ["envoyee", "ignoree", "incertaine"], envoyee: [], ignoree: [], incertaine: [] };
+
+/** Une commande se paie une fois confirmée par l'équipe et tant que rien n'a été reçu (jamais d'acompte ni de second
+ * règlement). Règle commune au lancement du paiement (paiement/lien.ts) et à la page publique d'un lien. */
+const COMMANDE_PAYABLE = ["a_preparer", "prete"];
+export const commandePayable = (c: { statut: string; paiement_etat: string; montant_recu: number | string }) => COMMANDE_PAYABLE.includes(c.statut) && c.paiement_etat === "attente" && Number(c.montant_recu) === 0;
+
+/** Source d'un lien (devis ou commande) relue en base : déjà réglée, encore payable, ou fermée (annulée, réglée en partie). */
+export function sourceLien(l: { commande_id?: string | null; devis: { statut: string } | null; commande?: { statut: string; paiement_etat: string; montant_recu: number | string } | null }): "reglee" | "ouverte" | "fermee" {
+  if (l.devis?.statut === "paye" || l.commande?.paiement_etat === "paye") return "reglee";
+  const ouverte = l.commande_id ? Boolean(l.commande && commandePayable(l.commande)) : l.devis?.statut === "pret";
+  return ouverte ? "ouverte" : "fermee";
+}
+
+// État d'un lien : DÉRIVÉ de ses dates (aucune colonne d'état, aucun déclencheur) ; liens_figes fige paye_le une fois posé.
 export type EtatLien = "cree" | "envoye" | "ouvert" | "paye" | "expire" | "annule";
 export function etatLien(l: { annule_le: string | null; paye_le: string | null; expire_le: string; ouvert_le: string | null; envoye_le: string | null }, ms: number): EtatLien {
   if (l.paye_le) return "paye";
@@ -210,6 +265,13 @@ export function etatLien(l: { annule_le: string | null; paye_le: string | null; 
   if (l.ouvert_le) return "ouvert";
   if (l.envoye_le) return "envoye";
   return "cree";
+}
+
+/** État d'un lien montré au client : jamais « à payer » si sa source est réglée (« paye ») ou fermée (« annule »). Même
+ * verdict que le lancement du paiement, qui refuse alors avec « paye » ou « expire ». */
+export function etatLienClient(etat: EtatLien, source: ReturnType<typeof sourceLien>): EtatLien {
+  if (etat === "paye" || source === "reglee") return "paye";
+  return source === "fermee" && etat !== "expire" ? "annule" : etat;
 }
 
 // ---------- export CSV (Excel : séparateur « ; », BOM UTF-8) ----------

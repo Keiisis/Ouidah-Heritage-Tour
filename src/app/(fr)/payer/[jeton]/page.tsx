@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { LienInvalide } from "@/components/suivi/LienInvalide";
 import { lireContenu } from "@/lib/contenu";
 import { lienDuJeton, marquerOuvert } from "@/lib/serveur/equipe/finances/public";
 import { passerellesActives } from "@/lib/serveur/paiement";
@@ -18,7 +18,7 @@ type Props = { params: Promise<{ jeton: string }>; searchParams: Promise<Record<
 async function Lien({ params, searchParams }: Props) {
   const [{ jeton }, recherche] = await Promise.all([params, searchParams]);
   const l = await lienDuJeton(jeton);
-  if (!l) notFound();
+  if (!l) return <LienInvalide />; // signature juste, lien retiré : même écran (déjà en flux : statut 200)
   if (l.etat === "cree" || l.etat === "envoye") await marquerOuvert(l.id);
   const actives = l.etat === "paye" ? [] : await passerellesActives();
   const langue = langueDoc(l.langue);

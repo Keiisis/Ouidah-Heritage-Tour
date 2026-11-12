@@ -12,6 +12,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { Prepare } from "@/components/home/Prepare";
 import { FinalCta } from "@/components/home/FinalCta";
 import { Newsletter } from "@/components/home/Newsletter";
+import { RetourBillet } from "@/components/devis/RetourBillet";
 import { lireContenuPage as lireContenu } from "@/lib/serveur/contenu-page";
 
 // Accueil : sections 2 à 14 (l'en-tête et le pied de page sont dans le layout).
@@ -36,6 +37,8 @@ export default async function Home() {
       <Prepare />
       <FinalCta />
       <Newsletter />
+      {/* parti du billet pour choisir ici : le chemin du retour reste en vue */}
+      <RetourBillet />
     </>
   );
 }

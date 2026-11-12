@@ -1,0 +1,45 @@
+/* Lien client faux ou retiré : fond blanc, titre Fraunces, texte Manrope, bouton « Pastille double » du site. */
+.li-page {
+  min-height: 70svh;
+  background: #fff;
+  color: var(--surface-abyss);
+}
+.li-carte {
+  display: grid;
+  gap: 24px;
+  justify-items: start;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(64px, 10vw, 120px) 24px 96px;
+  font: 400 18px/1.6 var(--font-text);
+}
+.li-carte h1 {
+  font: 600 clamp(36px, 6vw, 56px)/1.08 var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.li-carte p {
+  max-width: 52ch;
+  color: color-mix(in oklab, var(--surface-abyss) 78%, transparent);
+}
+.li-ecrire {
+  font-weight: 600;
+}
+.li-email {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+  color: var(--surface-abyss);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+.li-email:focus-visible {
+  outline: 3px solid var(--brand-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.li-devis {
+  margin-top: 8px;
+}

@@ -11,6 +11,8 @@ import { emailDe, jetonLettre, origine, partir, voie } from "./envoi";
 import type { RetourMessages } from "./actions";
 import { composer } from "./composer";
 import { estLangue, lireTexte, UUID } from "./rendu";
+import { peutPasser } from "../../machines";
+import { type StatutNumero, TRANSITIONS_ENVOI_LETTRE, TRANSITIONS_NUMERO } from "./regles";
 
 // La lettre de Ouidah (admin) : brouillon d'un numéro, test à soi-même, envoi par lots aux abonnés réels. Chaque appel
 // relit la session et exige le rôle admin. L'envoi réel demande le nombre de destinataires annoncé à l'écran (recompté
@@ -20,10 +22,9 @@ import { estLangue, lireTexte, UUID } from "./rendu";
 
 const LOT = LIMITES_COURRIEL.lot; // e-mails par appel
 const PAGE = 400; // abonnés examinés par appel
-const SIGNATURE = "Ouidah Heritage Tour";
 
 type Numero = { langue: LangueMsg; sujets: string[]; objet: string; corps: string };
-type Ligne = Numero & { id: string; statut: "brouillon" | "en_cours" | "envoye"; curseur: string | null };
+type Ligne = Numero & { id: string; statut: StatutNumero; curseur: string | null };
 type Abonne = { id: string; email: string; sujets: unknown };
 
 const objet = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
@@ -64,7 +65,7 @@ async function lire<T>(chemin: string): Promise<T[] | null> {
 
 // même gabarit que les autres e-mails (photo de la rue de la Basilique, comme la confirmation d'inscription) ; lien de
 // désinscription propre à l'abonné dans le pied
-const rendre = (n: Numero, lien: string, o: string) => composer({ langue: n.langue, origine: o, sujet: n.objet, corps: n.corps, signature: SIGNATURE, raison: RAISON_LETTRE[n.langue].raison, lien: { libelle: RAISON_LETTRE[n.langue].lien, href: lien }, photo: "rue-basilique" });
+const rendre = (n: Numero, lien: string, o: string) => composer({ langue: n.langue, origine: o, sujet: n.objet, corps: n.corps, raison: RAISON_LETTRE[n.langue].raison, desinscription: { libelle: RAISON_LETTRE[n.langue].lien, href: lien } });
 
 /** Abonnés actifs de la langue qui ont choisi un des thèmes (nombre seulement). */
 async function cible(n: Numero): Promise<number | null> {
@@ -114,7 +115,7 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
   const l = await lire<Ligne>(`lettre_numeros?select=id,langue,sujets,objet,corps,statut,curseur&id=eq.${id}&limit=1`);
   if (!l) return { erreur: "panne" };
   const n = l[0];
-  if (!n || n.statut === "envoye") return { erreur: "etat" };
+  if (!n || !TRANSITIONS_NUMERO[n.statut]?.length) return { erreur: "etat" }; // état final (envoyé) : rien ne repart
   const [v, o] = await Promise.all([voie(), origine()]);
   if (!v) return { erreur: "smtp" };
   if (!o || !jetonLettre(n.id)) return { erreur: "variables", manque: ["lien"] };
@@ -123,6 +124,7 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
     const total = await cible(n);
     if (total === null) return { erreur: "panne" };
     if (attendu !== total || total === 0) return { erreur: "confirmer", total };
+    if (!peutPasser(TRANSITIONS_NUMERO, "brouillon", "en_cours")) return { erreur: "etat" };
     const pris = await ecrire<{ id: string }>(`lettre_numeros?id=eq.${n.id}&statut=eq.brouillon&select=id`, "PATCH", { statut: "en_cours", modifie_le: maintenant() });
     if (!pris) return { erreur: "panne" };
     if (!pris.length) return { erreur: "etat" };
@@ -144,11 +146,13 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
     const jeton = jetonLettre(a.id);
     const e = rendre(n, `${o}/lettre/desinscription/${jeton}`, o ?? "");
     const parti = await partir({ a: a.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `lettre-${n.id}-${a.id}` }, v.boite);
-    await ecrire(`lettre_envois?id=eq.${reserve[0].id}&select=id`, "PATCH", { statut: parti ? "envoye" : "echec" });
+    const issue = parti ? "envoye" : "echec";
+    if (peutPasser(TRANSITIONS_ENVOI_LETTRE, "envoi", issue)) await ecrire(`lettre_envois?id=eq.${reserve[0].id}&statut=eq.envoi&select=id`, "PATCH", { statut: issue });
     partis++;
   }
   const fini = toutVu && page.length < PAGE;
-  await ecrire(`lettre_numeros?id=eq.${n.id}&select=id`, "PATCH", { curseur, modifie_le: maintenant(), ...(fini ? { statut: "envoye", envoye_le: maintenant() } : {}) });
+  // le numéro est « en cours » pendant tout l'envoi : curseur avancé dans cet état, puis en_cours → envoye au dernier lot
+  await ecrire(`lettre_numeros?id=eq.${n.id}&statut=eq.en_cours&select=id`, "PATCH", { curseur, modifie_le: maintenant(), ...(fini && peutPasser(TRANSITIONS_NUMERO, "en_cours", "envoye") ? { statut: "envoye", envoye_le: maintenant() } : {}) });
   const [envoyes, echecs] = await Promise.all([compter("lettre_envois", `numero_id=eq.${n.id}&statut=eq.envoye`), compter("lettre_envois", `numero_id=eq.${n.id}&statut=eq.echec`)]);
   if (fini) {
     await journaliser("lettre.envoi", s.profilId, null, { numero: n.id, langue: n.langue, nombre: envoyes ?? 0 });

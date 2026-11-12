@@ -61,9 +61,15 @@ export function TenReasons() {
     const g = i < n - 1 ? borne((f - 0.82) / 0.18) : 0;
     const pos = i + 0.5 + g * g * (3 - 2 * g);
     loupe.set(`${(pos / n) * 100}%`);
-    // texte plus long que la place disponible : il remonte au fil de la lecture
+    // toutes les raisons restent posées l'une sous l'autre (hauteur réservée, aucun décalage de mise en page) : la pile
+    // glisse (transform) pour garder la fin de la précédente au-dessus de la vue lue ; un texte plus long que la place
+    // remonte au fil de la lecture
     const fl = flux.current;
-    if (fl) decaleCible.set(-Math.max(0, fl.scrollHeight - fl.clientHeight) * borne((f - 0.04) / 0.72));
+    const vue = fl?.querySelectorAll<HTMLElement>("[data-raison]")[i];
+    if (fl && vue) {
+      const avant = i ? Math.min(fl.clientHeight * 0.2, (vue.previousElementSibling as HTMLElement | null)?.offsetHeight ?? 0) : 0;
+      decaleCible.set(-(vue.offsetTop - avant) - Math.max(0, vue.offsetHeight - (fl.clientHeight - avant)) * borne((f - 0.04) / 0.72));
+    }
     // téléphone : la bande défile pour garder la vue lue au centre
     const fe = fenetre.current;
     const b = bande.current;
@@ -106,7 +112,6 @@ export function TenReasons() {
 
   const mots = r.text.split(" ");
   const allumes = reduit ? mots.length : Math.round(mots.length * lecture);
-  const voisins = [lue - 1, lue, lue + 1].filter((i) => i >= 0 && i < n);
 
   return (
     <section ref={zone} id="raisons" aria-labelledby="raisons-titre" className="relative z-[2] bg-white text-abyss" style={{ height: `${100 + n * 75}svh` }}>
@@ -140,19 +145,17 @@ export function TenReasons() {
               </h2>
             </div>
 
-            {/* chapitres : la vue précédente s'efface, la vue lue s'allume mot à mot, la suivante attend en gris */}
+            {/* chapitres : la vue précédente s'efface, la vue lue s'allume mot à mot, la suivante attend en gris ; toutes sont
+                rendues à leur taille, seules l'opacité et la position (transform) changent */}
             <div ref={flux} className="relative min-h-0 flex-1 overflow-hidden [mask-image:linear-gradient(transparent,#000_8%,#000_86%,transparent)] max-lg:order-4 lg:mt-4">
-              <motion.div style={{ y: reduit ? 0 : decale }} className="pt-3">
-                {voisins.map((i) => {
-                  const x = tenReasons[i];
+              <motion.div style={{ y: reduit ? decaleCible : decale }} className="pt-3">
+                {tenReasons.map((x, i) => {
                   const etat = i < lue ? "lue" : i > lue ? "suivante" : "actuelle";
                   return (
-                    <motion.article
+                    <article
                       key={x.slug}
-                      initial={{ opacity: 0, y: 24 }}
-                      animate={{ opacity: etat === "lue" ? 0.28 : 1, y: 0 }}
-                      transition={{ duration: reduit ? 0 : 0.5, ease: EASE }}
-                      className="border-abyss/10 py-4 not-first:border-t lg:py-5"
+                      data-raison=""
+                      className={`border-abyss/10 py-4 transition-opacity duration-500 not-first:border-t lg:py-5 ${etat === "lue" ? "opacity-[0.28]" : ""}`}
                     >
                       <p className="text-xs font-bold text-laterite tabular-nums">
                         ▸ {nn(i)} / {n} · {x.category}
@@ -169,10 +172,10 @@ export function TenReasons() {
                             ))}
                           </p>
                         </>
-                      ) : etat === "lue" ? (
-                        <p className="mt-2 text-base/[1.6] font-semibold lg:text-lg/[1.6]">{x.text.split(". ").at(-1)}</p>
-                      ) : null}
-                    </motion.article>
+                      ) : (
+                        <p className={`mt-2.5 text-base/[1.6] font-semibold tracking-[-0.005em] transition-opacity duration-500 lg:mt-3 lg:text-lg/[1.6] ${etat === "suivante" ? "opacity-0" : ""}`}>{x.text}</p>
+                      )}
+                    </article>
                   );
                 })}
               </motion.div>
@@ -244,13 +247,12 @@ export function TenReasons() {
                       ) : null}
                     </button>
                   ))}
-                  <motion.div
-                    aria-hidden="true"
-                    style={{ left: loupe }}
-                    className="pointer-events-none absolute top-1/2 z-[3] size-[6.5rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full shadow-[0_0_0_0.4375rem_#1c1c1f,0_0_0_0.5625rem_#5a5a61,0_0_0_0.625rem_#1c1c1f,0_1.5rem_2rem_-0.75rem_rgb(15_15_25/0.5)] lg:size-[9.5rem]"
-                  >
-                    <Image key={r.slug} src={r.image.src} alt="" fill sizes="160px" className="scale-110 object-cover" />
-                    <span className="absolute inset-0 rounded-full bg-[radial-gradient(60%_45%_at_30%_22%,rgb(255_255_255/0.4),transparent_60%),radial-gradient(circle,transparent_62%,rgb(0_0_0/0.28)_100%)]" />
+                  {/* loupe : la couche pleine largeur glisse (transform en % de la bande), la loupe reste à son bord gauche */}
+                  <motion.div aria-hidden="true" style={{ x: loupe }} className="pointer-events-none absolute inset-0 z-[3]">
+                    <div className="absolute top-1/2 left-0 size-[6.5rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full shadow-[0_0_0_0.4375rem_#1c1c1f,0_0_0_0.5625rem_#5a5a61,0_0_0_0.625rem_#1c1c1f,0_1.5rem_2rem_-0.75rem_rgb(15_15_25/0.5)] lg:size-[9.5rem]">
+                      <Image key={r.slug} src={r.image.src} alt="" fill sizes="160px" className="scale-110 object-cover" />
+                      <span className="absolute inset-0 rounded-full bg-[radial-gradient(60%_45%_at_30%_22%,rgb(255_255_255/0.4),transparent_60%),radial-gradient(circle,transparent_62%,rgb(0_0_0/0.28)_100%)]" />
+                    </div>
                   </motion.div>
                 </div>
               </motion.div>

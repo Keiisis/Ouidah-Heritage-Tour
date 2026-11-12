@@ -15,9 +15,9 @@ export const equipe = {
   fuseau: "Africa/Porto-Novo",
 
   photo: { src: "/ouidah/eng-4-paillote.jpg", largeur: 1280, hauteur: 1707, legende: "Paillote au toit de chaume, Ouidah" },
-  // carte d'accréditation : emblème rond original (règle de Kevin du 02/11 : la bannière « OUIDAH » sert seulement à la navigation)
+  // emblème rond original partout, navigation comprise (la patronne, via Kevin le 10/11)
   logoEncre: { src: "/brand/oht-embleme.webp", alt: "Ouidah Heritage Tour" },
-  logoClair: { src: "/brand/oht-logo.png" },
+  logoClair: { src: "/brand/oht-embleme.webp" },
   serie: "Accréditation OHT",
   tamponMarque: "OHT",
   talon1: "Accès réservé à l’équipe Ouidah Heritage Tour",

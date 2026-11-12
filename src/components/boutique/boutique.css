@@ -113,6 +113,7 @@
   & .burger { display: none; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 999px; background: none; color: var(--blanc); cursor: pointer; }
   & .burger svg { width: 24px; height: 24px; }
   & .recherche { position: relative; flex: 1; display: flex; min-width: 0; height: 48px; border-radius: 8px; background: var(--blanc); }
+  & .recherche-absente { flex: 1; } /* catalogue vide : la barre garde sa disposition, panier à droite */
   & .recherche:focus-within { box-shadow: 0 0 0 3px var(--sun); }
   & .rech-cat { position: relative; display: flex; align-items: center; border-right: 1px solid var(--hairline); }
   & .rech-cat select { height: 100%; max-width: 188px; padding: 0 32px 0 16px; border: 0; border-radius: 8px 0 0 8px; background: var(--blanc); color: var(--ink); font: 600 14px/1 var(--f-texte); cursor: pointer; appearance: none; }
@@ -304,6 +305,10 @@
   & #grille { margin-top: 28px; }
   & .vide { display: grid; justify-items: center; gap: 12px; padding: 48px 0; text-align: center; }
   & .vide p { margin: 0; font: 600 17px/1.5 var(--f-texte); color: var(--ink-soft); }
+  /* catalogue vide : être prévenu par la lettre, ou composer son voyage */
+  & .vide-suites { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 24px; margin-top: 12px; }
+  & .b-lien { display: inline-flex; align-items: center; min-height: 48px; font: 700 16px/1 var(--f-texte); color: var(--ocean); text-decoration: underline; text-underline-offset: 4px; }
+  & .b-lien:focus-visible { outline: 2px solid var(--ocean); outline-offset: 3px; border-radius: 4px; }
 
   /* ---------- carte produit photo (H), grille de 4 aux rangées alignées (subgrid) ---------- */
   & .grille { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 24px; margin: 0; padding: 0; list-style: none; }

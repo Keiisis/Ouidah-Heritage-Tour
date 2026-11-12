@@ -59,15 +59,20 @@ function Retour({ etat, n, id }: { etat: Etat; n: number; id: string }) {
   );
 }
 
-/** Champs refusés par le serveur marqués aria-invalid (« jour » couvre aussi la date de réception, « expire » la durée). */
+/** Champs refusés par le serveur marqués aria-invalid (« jour » couvre aussi la date de réception, « expire » la durée) ;
+ * le premier prend le focus. */
 function marquer(f: HTMLFormElement | null, champs: string[]) {
   if (!f) return;
   const noms = new Set(champs.flatMap((c) => (c === "jour" ? ["jour", "recu_le"] : c === "expire" ? ["jours"] : [c.split(":")[0]])));
+  let premier: HTMLElement | null = null;
   for (const el of Array.from(f.elements) as HTMLInputElement[]) {
     if (!el.name) continue;
-    if (noms.has(el.name)) el.setAttribute("aria-invalid", "true");
-    else el.removeAttribute("aria-invalid");
+    if (noms.has(el.name)) {
+      el.setAttribute("aria-invalid", "true");
+      premier ??= el;
+    } else el.removeAttribute("aria-invalid");
   }
+  premier?.focus();
 }
 
 export function FormAction({
@@ -98,7 +103,7 @@ export function FormAction({
   const { etat, n, occupe, lancer } = useEnvoi(action, args);
   const envoyer = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (confirmer && !window.confirm(confirmer)) return;
+    if (occupe || (confirmer && !window.confirm(confirmer))) return;
     const fd = new FormData(e.currentTarget);
     lancer([fd], reussite, () => {
       if (!garder) form.current?.reset();

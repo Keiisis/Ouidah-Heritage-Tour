@@ -3,7 +3,7 @@
 import Link from "@/components/ui/LienPublic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { devisPage as DEVIS_PAGE } from "@/content/fr";
+import { devisPage as DEVIS_PAGE, nav as NAV } from "@/content/fr";
 import { useContenu, useLangue } from "@/components/ui/ContenuSite";
 import { adresseLangue } from "@/lib/adresses-langues";
 import { ecrireDossier } from "@/lib/voyage";
@@ -15,6 +15,7 @@ type Brouillon = { intention: Intention; circuit: string | null; langue: string;
 
 export function Reprise({ jeton }: { jeton: string }) {
   const T = useContenu("fr.devisPage", DEVIS_PAGE);
+  const nav = useContenu("fr.nav", NAV);
   const langue = useLangue();
   const router = useRouter();
   const [perdu, setPerdu] = useState(false);
@@ -48,9 +49,15 @@ export function Reprise({ jeton }: { jeton: string }) {
   return perdu ? (
     <div role="alert">
       <p className="max-w-[28ch] font-display text-[32px]/[1.15] font-semibold tracking-[-0.02em] md:text-[44px]">{T.reprendre.invalide}</p>
-      <Link href={T.reprendre.accueil.href} className="oht-lien mt-8 text-[16px]">
-        {T.reprendre.accueil.label}
-      </Link>
+      {/* les deux suites de la phrase : recomposer le voyage, ou écrire à l'équipe */}
+      <p className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-[16px]">
+        <Link href={T.reprendre.accueil.href} className="oht-lien">
+          {T.reprendre.accueil.label}
+        </Link>
+        <Link href={nav.contact.href} className="oht-lien">
+          {nav.contact.label}
+        </Link>
+      </p>
     </div>
   ) : (
     <p aria-live="polite" className="font-display text-[32px] md:text-[44px]">

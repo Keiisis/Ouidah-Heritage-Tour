@@ -18,9 +18,9 @@ import { transversal as X } from "@/content/transversal";
 import "../finances/finances.css";
 import "./pilotage.css";
 
-// Rapport hebdomadaire (admin), rendu sous <Suspense> : admin connecté seulement. La semaine écoulée (lundi → dimanche à
+// Rapport hebdomadaire (admin), rendu sous <Suspense> : admin connecté seulement. La période écoulée (samedi → vendredi à
 // Ouidah) tirée de la base, l'aperçu exact de l'e-mail (iframe sans script ni lien actif), l'envoi de test à soi-même et
-// l'envoi aux admins actifs et le réglage du lundi. Les tentatives réservées et incertaines restent visibles.
+// l'envoi aux admins actifs et le réglage de l'envoi du samedi. Les tentatives réservées et incertaines restent visibles.
 const R = P.rapport;
 
 export async function EcranRapport() {
@@ -28,7 +28,7 @@ export async function EcranRapport() {
   if (!s) redirect("/admins");
   const minute = minuteServeur();
   const [r, v, reglages] = await Promise.all([rapport(minute * 60_000), voie(), lireTaches()]);
-  const envois = r ? await lire<{ id: string; destinataire: string; etat: keyof typeof X.rapport.etats }>(`rapports_envois?select=id,destinataire,etat&semaine=eq.${r.lundi}&order=cree_le.desc&limit=100`) : null;
+  const envois = r ? await lire<{ id: string; destinataire: string; etat: keyof typeof X.rapport.etats }>(`rapports_envois?select=id,destinataire,etat&semaine=eq.${r.debut}&order=cree_le.desc&limit=100`) : null;
   const envoiPossible = v !== null;
 
   return (
@@ -43,7 +43,7 @@ export async function EcranRapport() {
           </div>
         ) : (
           <>
-            <h2 className="pil-semaine" id="rapport-semaine" data-lundi={r.lundi}>
+            <h2 className="pil-semaine" id="rapport-semaine" data-debut={r.debut}>
               {titreSemaine(r)}
             </h2>
             <div className="esp-grille">

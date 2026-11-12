@@ -1,3 +1,4 @@
+import type { Transitions } from "../machines";
 import type { RoleCompte } from "./outils";
 
 // Règles des comptes de l'équipe, partagées par l'écran Équipe (validation dans le navigateur), ses actions serveur
@@ -7,6 +8,19 @@ import type { RoleCompte } from "./outils";
 // Clé secrète dans l'en-tête « apikey » (doc Supabase « API keys »). POST /auth/v1/admin/users : 422 « email_exists »
 // si l'adresse a déjà un compte ; DELETE /auth/v1/admin/users/<id> (source github.com/supabase/auth, internal/api/admin.go,
 // adminUserCreate et adminUserDelete, lue le 02/11/2026).
+
+export type EtatProfil = "invite" | "actif" | "suspendu" | "supprime";
+/** equipe_profils.etat (machine à états : 20261122_machines_etats_deux.sql recopie cette table ; touche à la sécurité).
+ * Né « invité » (creerInvite, scripts/equipe-premier-admin.mjs). invité → actif : premier mot de passe (api/equipe,
+ * « nouveau ») ; invité ou actif → suspendu (gestion.ts, « suspendre ») ; suspendu → actif, ou → invité s'il ne s'est
+ * jamais connecté (« réactiver », et retour arrière quand la suspension laisserait zéro admin actif) ; invité ou suspendu →
+ * supprimé (supprimerAgent, compte anonymisé). « Supprimé » est final : l'adresse libérée sert à une nouvelle invitation. */
+export const TRANSITIONS_COMPTE: Transitions<EtatProfil> = {
+  invite: ["actif", "suspendu", "supprime"],
+  actif: ["suspendu"],
+  suspendu: ["actif", "invite", "supprime"],
+  supprime: [],
+};
 
 export const LANGUES = ["FR", "EN", "ES", "DE", "PT", "HT", "GCF"] as const;
 export const ROLES = ["agent", "admin"] as const;
@@ -67,7 +81,7 @@ export function refusSuspension(acteurId: string, cible: { id: string; role: Rol
 /** Motif de refus d'une suppression, ou null : mêmes gardes que la suspension (jamais soi-même, jamais le dernier admin
  * actif), et seulement un compte invité ou suspendu (un compte actif se suspend d'abord). */
 export function refusSuppression(acteurId: string, cible: { id: string; role: RoleCompte; etat: string }, adminsActifs: number): "soi" | "dernier_admin" | "etat" | null {
-  return refusSuspension(acteurId, cible, adminsActifs) ?? (cible.etat === "invite" || cible.etat === "suspendu" ? null : "etat");
+  return refusSuspension(acteurId, cible, adminsActifs) ?? ((TRANSITIONS_COMPTE[cible.etat as EtatProfil] ?? []).includes("supprime") ? null : "etat");
 }
 
 /** Motif de refus d'un changement de rôle, ou null : jamais soi-même, jamais un compte supprimé ni le rôle qu'il a déjà,

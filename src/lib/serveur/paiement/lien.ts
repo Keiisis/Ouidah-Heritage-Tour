@@ -6,6 +6,7 @@ import { emettre } from "../documents/emettre";
 import { apresEtat } from "../equipe/finances/effets";
 import { jetonLien } from "../equipe/finances/lectures";
 import { idDuJeton } from "../equipe/finances/public";
+import { commandePayable, sourceLien } from "../equipe/finances/regles";
 import { passerelle, passerellesActives } from "./index";
 import { PASSERELLES, type Constat, type Lancement, type NomPasserelle, type Reservation } from "./types";
 
@@ -29,9 +30,6 @@ type Ligne = {
   commande?: CommandeLien | null;
 };
 const CHAMPS = "id,devis_id,demande_id,commande_id,facture_id,montant,devise,langue,passerelles,passerelle,transaction_id,expire_le,paye_le,annule_le,demande:demandes(nom,email,whatsapp),devis:devis(statut),commande:boutique_commandes(reference,statut,paiement_etat,montant_recu,contact)";
-// Une commande se paie une fois confirmée par l'équipe et tant que rien n'a été reçu (jamais d'acompte ni de second règlement).
-const COMMANDE_PAYABLE = ["a_preparer", "prete"];
-const commandePayable = (c: { statut: string; paiement_etat: string; montant_recu: number | string }) => COMMANDE_PAYABLE.includes(c.statut) && c.paiement_etat === "attente" && Number(c.montant_recu) === 0;
 
 async function lireLien(filtre: string, signalerPanne = false): Promise<Ligne | null> {
   const r = await base(`liens_paiement?select=${CHAMPS}&${filtre}&limit=1`).catch(() => null);
@@ -105,10 +103,10 @@ export async function lancerPaiementLien({ jeton, nom, origine }: { jeton: strin
   if (!id) return { ok: false, erreur: "lien" };
   const l = await lireLien(`id=eq.${id}`);
   if (!l) return { ok: false, erreur: "lien" };
-  if (l.paye_le || l.devis?.statut === "paye" || l.commande?.paiement_etat === "paye") return { ok: false, erreur: "paye" };
-  // devis encore « prêt », ou commande confirmée sans rien de reçu : relu en base à chaque lancement
-  const ouvert = l.commande_id ? Boolean(l.commande && commandePayable(l.commande)) : l.devis?.statut === "pret";
-  if (l.annule_le || Date.parse(l.expire_le) <= Date.now() || !ouvert) return { ok: false, erreur: "expire" };
+  // devis encore « prêt », ou commande confirmée sans rien de reçu : relu en base à chaque lancement (règle partagée avec /payer)
+  const source = sourceLien(l);
+  if (l.paye_le || source === "reglee") return { ok: false, erreur: "paye" };
+  if (l.annule_le || Date.parse(l.expire_le) <= Date.now() || source !== "ouverte") return { ok: false, erreur: "expire" };
   const choisie = PASSERELLES.find((p) => p === nom);
   if (!choisie || !l.passerelles.includes(choisie) || !(await passerellesActives()).includes(choisie)) return { ok: false, erreur: "passerelle" };
   const lance = await passerelle(choisie).lancer(await commeReservation(l, choisie), `${origine}/payer/${jeton}`).catch(() => null);
@@ -230,8 +228,9 @@ export async function ouvrirLienCommande(commandeId: string, par: string | null 
 }
 
 /** Webhook : le lien de la transaction constatée (notre référence, sinon la transaction notée au lancement), puis
- * finaliserLien. « base » si la base ne répond pas (la passerelle renverra le webhook), sinon null. */
-export async function finaliserLienWebhook(nom: NomPasserelle, c: Constat): Promise<"base" | null> {
+ * finaliserLien. « base » si la base ne répond pas (la passerelle renverra le webhook), sinon null. `surPaye` : appelé
+ * avec l'identifiant du lien quand il est payé (la route y programme le reçu, envoyé une seule fois). */
+export async function finaliserLienWebhook(nom: NomPasserelle, c: Constat, surPaye?: (lienId: string) => void): Promise<"base" | null> {
   let l: Ligne | null;
   try {
     l = c.reservation ? (UUID.test(c.reservation) ? await lireLien(`id=eq.${c.reservation}&passerelle=eq.${nom}`, true) : null) : await lireLien(`passerelle=eq.${nom}&transaction_id=eq.${encodeURIComponent(c.transaction)}`, true);
@@ -239,18 +238,26 @@ export async function finaliserLienWebhook(nom: NomPasserelle, c: Constat): Prom
     return "base";
   }
   if (!l) return null;
-  return (await finaliserLien(l.id, c)).refus === "base" ? "base" : null;
+  const issue = await finaliserLien(l.id, c);
+  if (issue.statut === "paye") surPaye?.(l.id);
+  return issue.refus === "base" ? "base" : null;
 }
 
 /** Retour du client sur /payer/<jeton> : si le lien attend encore et qu'une passerelle a été lancée, la transaction est
- * relue auprès d'elle (celle notée au lancement, sinon celle rendue par le retour, jamais crue sans relecture). */
-export async function verifierLien(jeton: string, proposee: string | null): Promise<"paye" | "attente" | null> {
+ * relue auprès d'elle (celle notée au lancement, sinon celle rendue par le retour, jamais crue sans relecture).
+ * `surPaye` : comme pour le webhook (le reçu déjà parti n'est pas renvoyé : sa marque en base l'empêche). */
+export async function verifierLien(jeton: string, proposee: string | null, surPaye?: (lienId: string) => void): Promise<"paye" | "attente" | null> {
   const id = idDuJeton(jeton);
   const l = id ? await lireLien(`id=eq.${id}`) : null;
   if (!l) return null;
-  if (l.paye_le) return "paye";
+  if (l.paye_le) {
+    surPaye?.(l.id);
+    return "paye";
+  }
   if (!l.passerelle) return "attente";
   const transaction = l.transaction_id ?? proposee;
   const c = await passerelle(l.passerelle).constater(transaction, await commeReservation(l, l.passerelle)).catch(() => null);
-  return c ? (await finaliserLien(l.id, c)).statut : "attente";
+  const statut = c ? (await finaliserLien(l.id, c)).statut : "attente";
+  if (statut === "paye") surPaye?.(l.id);
+  return statut;
 }

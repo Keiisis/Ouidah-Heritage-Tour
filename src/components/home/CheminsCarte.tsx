@@ -251,17 +251,18 @@ export function CheminsCarte({ lieux, releve, categoriesActives, couleur, vue, c
   return (
     <div className="absolute inset-0">
       <div ref={boite} role="img" aria-label={T.mapLabel} className="size-full" />
-      {secours || sansAccord ? (
+      {/* plan fixe de Ouidah : sans accord, quand la 3D est refusée, et le temps que la carte se charge (jamais de vide) */}
+      {secours || sansAccord || (cartesOk && !prete) ? (
         <div className="absolute inset-0">
-          <Image src="/ouidah/carte-secours-large.webp" alt="" fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
+          <Image src="/ouidah/carte-secours-large.webp" alt="" fill sizes="(min-width: 1024px) 60vw, 100vw" loading="eager" className="object-cover" />
           <span className="absolute top-2 right-2 text-[10px] text-abyss/60">{creditsPage.carteSource}</span>
           {sansAccord ? (
             <button type="button" className="absolute right-4 bottom-4 z-[4] min-h-11 cursor-pointer rounded-full bg-abyss px-5 text-sm font-bold text-white shadow-[0_12px_24px_-12px_rgb(2_4_12/0.6)] hover:bg-ocean" onClick={() => enregistrerChoix({ cartes: true, ville: choix?.ville ?? false, mesure: choix?.mesure ?? false })}>
               {consentement.afficherCarte}
             </button>
-          ) : (
+          ) : secours ? (
             <p className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/95 px-4 py-3 text-sm font-bold text-abyss shadow-[0_12px_24px_-16px_color-mix(in_oklab,var(--surface-abyss)_60%,transparent)]">{T.mapFallback}</p>
-          )}
+          ) : null}
         </div>
       ) : null}
       {vue.mode === "composer" && loin.length && large ? (

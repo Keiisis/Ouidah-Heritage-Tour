@@ -12,8 +12,8 @@ import type { RetourReg } from "@/lib/serveur/equipe/reglages/actions";
 type Action = (...a: unknown[]) => Promise<RetourReg>;
 // réussite : un texte fixe, ou un texte qui dépend du nombre rendu par le serveur (passé par son nom : une fonction ne
 // traverse pas la frontière serveur → client)
-type Reussite = string | { nombre: "mdp" | "sessions" };
-const PAR_NOMBRE = { mdp: R.profil.change, sessions: R.profil.autresFermees };
+type Reussite = string | { nombre: "mdp" | "sessions" | "avis" };
+const PAR_NOMBRE = { mdp: R.profil.change, sessions: R.profil.autresFermees, avis: R.envoiCourriel.avisTeste };
 type Etat = { ton: "ok" | "erreur"; texte: string; champs: string[] } | null;
 
 /** Un envoi à la fois ; le message précédent est effacé au clic, `n` compte les envois (data-envoi). */
@@ -59,17 +59,22 @@ function Retour({ etat, n, id }: { etat: Etat; n: number; id: string }) {
   );
 }
 
-/** Champs refusés par le serveur marqués aria-invalid (« message_FR », « pied » couvrent leurs champs par langue). */
+/** Champs refusés par le serveur marqués aria-invalid (« message_FR », « pied » couvrent leurs champs par langue) ; le
+ * premier prend le focus. */
 function marquer(f: HTMLFormElement | null, champs: string[]) {
   if (!f) return;
   const noms = new Set(champs);
+  let premier: HTMLElement | null = null;
   for (const el of Array.from(f.elements) as HTMLInputElement[]) {
     if (!el.name) continue;
     const base = el.name.replace(/_(FR|EN|ES|DE|PT|HT|GCF)$/, "");
     const refuse = noms.has(el.name) || (noms.has(base) && !noms.has(`${base}_FR`)) || (el.name === "langue" && noms.has("langues")) || (el.name === "telephone" && noms.has("telephone_doc"));
-    if (refuse) el.setAttribute("aria-invalid", "true");
-    else el.removeAttribute("aria-invalid");
+    if (refuse) {
+      el.setAttribute("aria-invalid", "true");
+      premier ??= el;
+    } else el.removeAttribute("aria-invalid");
   }
+  premier?.focus();
 }
 
 export function FormAction({ action, args = [], bouton, reussite, garder = true, className, enfants, nom }: { action: Action; args?: unknown[]; bouton: string; reussite: Reussite; garder?: boolean; className?: string; enfants: ReactNode; nom?: string }) {
@@ -78,6 +83,7 @@ export function FormAction({ action, args = [], bouton, reussite, garder = true,
   const { etat, n, occupe, lancer } = useEnvoi(action, args);
   const envoyer = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (occupe) return;
     lancer([new FormData(e.currentTarget)], reussite, () => {
       if (!garder) form.current?.reset();
     });
