@@ -9,11 +9,11 @@ export type StatutRdv = "confirme" | "annule" | "termine";
 export const TRANSITIONS_RDV: Transitions<StatutRdv> = { confirme: ["annule", "termine"], annule: [], termine: [] };
 export type StatutEffacement = "a_traiter" | "en_cours" | "traitee" | "refusee";
 /** requetes_effacement.statut (obligation légale). traiterEffacement : a_traiter → en_cours (prise) → traitee | refusee.
- * anonymiser_services (effacement lancé depuis l'écran Sécurité) : a_traiter → traitee. en_cours → a_traiter : reprise
- * manuelle après une panne, quand l'opérateur a vérifié la fin du traitement (aucun écran ne le fait). */
+ * anonymiser_services (écran Sécurité, ou effacer_par_acces depuis /mes-donnees) : a_traiter → traitee. Une requête
+ * en_cours ne revient plus à a_traiter (Kevin, 13/11) : /mes-donnees efface tout de suite, sans file. */
 export const TRANSITIONS_EFFACEMENT: Transitions<StatutEffacement> = {
   a_traiter: ["en_cours", "traitee"],
-  en_cours: ["traitee", "refusee", "a_traiter"],
+  en_cours: ["traitee", "refusee"],
   traitee: [],
   refusee: [],
 };

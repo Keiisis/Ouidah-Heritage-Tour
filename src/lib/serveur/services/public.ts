@@ -1,9 +1,11 @@
 import "server-only";
 import { lireContenu } from "@/lib/contenu";
 import { base, baseConfiguree, compter } from "../base";
-import { courrielConfigure, envoyerCourriel } from "../courriel";
+import { adresseMasquee, courrielConfigure, envoyerAvis, envoyerCourriel } from "../courriel";
+import { avis, ligne } from "../courriels/avis";
 import { boutons, courriel, entete, paragraphes, titre } from "../courriels/gabarit";
-import { nouveauJeton, jetonValide, sha256 } from "../equipe/outils";
+import { hmac, nouveauJeton, jetonValide, selConfigure, sha256 } from "../equipe/outils";
+import { effacerObjets } from "../equipe/pilotage/stockage";
 import { empreinteIp, limiteAtteinte, lireCorps, reponse } from "../garde";
 import { origineSite } from "../paiement/outils";
 import { langueService, lireCandidature, lireContact, lireEmail, objet, UUID_SERVICE } from "./regles";
@@ -69,9 +71,39 @@ export async function utiliserAcces(req: Request) {
   const jeton = req.headers.get("authorization")?.replace(/^Bearer /, "");
   const b = objet(await lireCorps(req, 1000));
   if (!jetonValide(jeton) || !["export", "effacement"].includes(String(b.action)) || (b.action === "effacement" && b.confirmation !== true)) return reponse({ erreur: "jeton" }, 400);
+  if (b.action === "effacement") return effacerParAcces(req, jeton, langueService(b.langue));
   const r = await base("rpc/utiliser_acces_donnees", { method: "POST", corps: { p_hash: sha256(jeton), p_action: b.action } }).catch(() => null);
   if (!r?.ok) { const e = await r?.json().catch(() => ({})); return reponse({ erreur: e?.message === "jeton" ? "jeton" : "erreur" }, e?.message === "jeton" ? 410 : 502); }
   const donnees: unknown = await r.json();
-  if (b.action === "effacement") return reponse({ ok: true }, 201);
   return new Response(JSON.stringify(donnees, null, 2), { headers: { "content-type": "application/json; charset=utf-8", "content-disposition": 'attachment; filename="oht-mes-donnees.json"', "cache-control": "private, no-store", "referrer-policy": "no-referrer", "x-content-type-options": "nosniff" } });
+}
+
+type Compte = Record<string, number>;
+const somme = (c: Compte) => Object.values(c).reduce((s, n) => s + n, 0);
+
+/** Effacement demandé depuis /mes-donnees : le lien reçu par e-mail prouve l'adresse, l'effacement part tout de suite
+ * (Kevin 13/11), sans file a_traiter. Les pièces que la loi impose de garder restent ; le client le lit à l'écran et
+ * dans l'e-mail de confirmation. */
+async function effacerParAcces(req: Request, jeton: string, langue: ReturnType<typeof langueService>) {
+  if (!selConfigure()) return reponse({ erreur: "erreur" }, 503);
+  const hash = sha256(jeton);
+  const l = await base(`acces_donnees?select=email&jeton_hash=eq.${hash}`).catch(() => null);
+  const email = l?.ok ? ((await l.json()) as { email: string }[])[0]?.email : undefined;
+  if (!email) return reponse({ erreur: l?.ok ? "jeton" : "erreur" }, l?.ok ? 410 : 502);
+  const r = await base("rpc/effacer_par_acces", { method: "POST", corps: { p_hash: hash, p_email: email, p_hmac: hmac(`personne|${email}`) } }).catch(() => null);
+  if (!r?.ok) { const e = await r?.json().catch(() => ({})); return reponse({ erreur: e?.message === "jeton" ? "jeton" : "erreur" }, e?.message === "jeton" ? 410 : 502); }
+  const x = (await r.json()) as { deja?: boolean; id?: string; efface?: Compte; garde?: Compte; chemins?: string[] };
+  if (x.deja || !x.id) return reponse({ ok: true, deja: true }, 200);
+  const garde = somme(x.garde ?? {}) > 0, fichiers = await effacerObjets(x.chemins ?? []);
+  const origine = origineSite(req), T = (await lireContenu("services.copiesServices"))[langue];
+  if (origine && courrielConfigure()) {
+    const texte = [T.effacementFait, garde ? T.effacementGarde : T.effacementRien];
+    const m = courriel({ langue, sujet: T.effacementSujet, apercu: T.effacementFait }, [entete(origine), titre({ phrase: { avant: T.effacementSujet } }, langue, origine), paragraphes(texte, langue)]);
+    await envoyerCourriel({ ...m, a: email, cle: `effacement-${x.id}`, modele: "donnees" });
+    const compte = (c: Compte = {}) => Object.entries(c).filter(([, n]) => n > 0).map(([k, n]) => `${k} ${n}`).join(", ") || "rien";
+    const a = avis({ sujet: "Effacement fait depuis /mes-donnees", apercu: "Un client a effacé ses données.", titre: "Effacement fait par le client", donnee: adresseMasquee(email), lignes: [ligne("Effacé", compte(x.efface)), ligne("Gardé (comptabilité)", compte(x.garde)), ligne("Fichiers du stockage", fichiers ? "effacés" : "à effacer à la main (chemins dans le journal)")], raison: "Avis interne : effacement automatique /mes-donnees." }, origine);
+    await envoyerAvis({ ...a, cle: `effacement-${x.id}-equipe`, modele: "donnees" });
+  }
+  if (!fichiers) console.error("effacement: fichiers du stockage non effacés", x.id, x.chemins);
+  return reponse({ ok: true, garde }, 200);
 }

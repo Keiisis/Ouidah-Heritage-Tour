@@ -54,12 +54,12 @@ export type TexteBlog = {
 const FR: TexteBlog = {
   meta: {
     titre: "Le journal de Ouidah — Ouidah Heritage Tour",
-    description: "Récits, lieux et gens de Ouidah, écrits par l’équipe de Ouidah Heritage Tour.",
+    description: "Ouidah racontée par l’équipe de Ouidah Heritage Tour.",
     titreCategorie: (c) => `${c} — Le journal de Ouidah`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "Le journal de Ouidah",
-  phrase: "Récits, lieux et gens de Ouidah, écrits par l’équipe de Ouidah Heritage Tour.",
+  phrase: "Ouidah racontée par l’équipe de Ouidah Heritage Tour.",
   filtres: { aria: "Catégories du journal", tous: "Tout lire" },
   une: "Article à la une",
   liste: { tous: "Tous les articles", categorie: (c) => c },
@@ -84,7 +84,7 @@ const FR: TexteBlog = {
     lireEn: "Lire en",
     lies: "Dans la même catégorie",
     cta: {
-      titre: "Ouidah se raconte encore mieux sur place.",
+      titre: "Voir ces lieux à Ouidah.",
       texte: "Dites-nous ce qui vous attire, nous composons le voyage à votre rythme.",
       bouton: "Créer mon voyage",
     },
@@ -94,12 +94,12 @@ const FR: TexteBlog = {
 const EN: TexteBlog = {
   meta: {
     titre: "The Ouidah journal — Ouidah Heritage Tour",
-    description: "Stories, places and people of Ouidah, written by the Ouidah Heritage Tour team.",
+    description: "Ouidah, told by the Ouidah Heritage Tour team.",
     titreCategorie: (c) => `${c} — The Ouidah journal`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "The Ouidah journal",
-  phrase: "Stories, places and people of Ouidah, written by the Ouidah Heritage Tour team.",
+  phrase: "Ouidah, told by the Ouidah Heritage Tour team.",
   filtres: { aria: "Journal categories", tous: "Read everything" },
   une: "Featured article",
   liste: { tous: "All articles", categorie: (c) => c },
@@ -124,7 +124,7 @@ const EN: TexteBlog = {
     lireEn: "Read in",
     lies: "In the same category",
     cta: {
-      titre: "Ouidah tells its story even better in person.",
+      titre: "See these places in Ouidah.",
       texte: "Tell us what draws you, and we will shape the trip at your own pace.",
       bouton: "Create my trip",
     },
@@ -134,12 +134,12 @@ const EN: TexteBlog = {
 const ES: TexteBlog = {
   meta: {
     titre: "El diario de Ouidah — Ouidah Heritage Tour",
-    description: "Relatos, lugares y gente de Ouidah, escritos por el equipo de Ouidah Heritage Tour.",
+    description: "Ouidah contada por el equipo de Ouidah Heritage Tour.",
     titreCategorie: (c) => `${c} — El diario de Ouidah`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "El diario de Ouidah",
-  phrase: "Relatos, lugares y gente de Ouidah, escritos por el equipo de Ouidah Heritage Tour.",
+  phrase: "Ouidah contada por el equipo de Ouidah Heritage Tour.",
   filtres: { aria: "Categorías del diario", tous: "Leerlo todo" },
   une: "Artículo destacado",
   liste: { tous: "Todos los artículos", categorie: (c) => c },
@@ -164,7 +164,7 @@ const ES: TexteBlog = {
     lireEn: "Leer en",
     lies: "En la misma categoría",
     cta: {
-      titre: "Ouidah se cuenta aún mejor en persona.",
+      titre: "Ver estos lugares en Ouidah.",
       texte: "Cuéntenos lo que le atrae y prepararemos el viaje a su ritmo.",
       bouton: "Crear mi viaje",
     },
@@ -174,12 +174,12 @@ const ES: TexteBlog = {
 const DE: TexteBlog = {
   meta: {
     titre: "Das Ouidah-Journal — Ouidah Heritage Tour",
-    description: "Geschichten, Orte und Menschen aus Ouidah, geschrieben vom Team von Ouidah Heritage Tour.",
+    description: "Ouidah, erzählt vom Team von Ouidah Heritage Tour.",
     titreCategorie: (c) => `${c} — Das Ouidah-Journal`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "Das Ouidah-Journal",
-  phrase: "Geschichten, Orte und Menschen aus Ouidah, geschrieben vom Team von Ouidah Heritage Tour.",
+  phrase: "Ouidah, erzählt vom Team von Ouidah Heritage Tour.",
   filtres: { aria: "Kategorien des Journals", tous: "Alles lesen" },
   une: "Titelartikel",
   liste: { tous: "Alle Artikel", categorie: (c) => c },
@@ -204,7 +204,7 @@ const DE: TexteBlog = {
     lireEn: "Lesen auf",
     lies: "In derselben Kategorie",
     cta: {
-      titre: "Vor Ort erzählt Ouidah seine Geschichte noch besser.",
+      titre: "Diese Orte in Ouidah sehen.",
       texte: "Sagen Sie uns, was Sie anzieht, und wir gestalten die Reise in Ihrem Tempo.",
       bouton: "Meine Reise gestalten",
     },
@@ -214,12 +214,12 @@ const DE: TexteBlog = {
 const PT: TexteBlog = {
   meta: {
     titre: "O diário de Ouidah — Ouidah Heritage Tour",
-    description: "Histórias, lugares e gente de Ouidah, escritos pela equipa da Ouidah Heritage Tour.",
+    description: "Ouidah contada pela equipa da Ouidah Heritage Tour.",
     titreCategorie: (c) => `${c} — O diário de Ouidah`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "O diário de Ouidah",
-  phrase: "Histórias, lugares e gente de Ouidah, escritos pela equipa da Ouidah Heritage Tour.",
+  phrase: "Ouidah contada pela equipa da Ouidah Heritage Tour.",
   filtres: { aria: "Categorias do diário", tous: "Ler tudo" },
   une: "Artigo em destaque",
   liste: { tous: "Todos os artigos", categorie: (c) => c },
@@ -244,7 +244,7 @@ const PT: TexteBlog = {
     lireEn: "Ler em",
     lies: "Na mesma categoria",
     cta: {
-      titre: "Ouidah conta-se ainda melhor no local.",
+      titre: "Ver estes lugares em Ouidah.",
       texte: "Diga-nos o que o atrai e compomos a viagem ao seu ritmo.",
       bouton: "Criar a minha viagem",
     },
@@ -254,12 +254,12 @@ const PT: TexteBlog = {
 const HT: TexteBlog = {
   meta: {
     titre: "Jounal Ouidah — Ouidah Heritage Tour",
-    description: "Istwa, kote ak moun Ouidah, ekip Ouidah Heritage Tour ekri yo.",
+    description: "Ouidah, jan ekip Ouidah Heritage Tour rakonte l.",
     titreCategorie: (c) => `${c} — Jounal Ouidah`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "Jounal Ouidah",
-  phrase: "Istwa, kote ak moun Ouidah, ekip Ouidah Heritage Tour ekri yo.",
+  phrase: "Ouidah, jan ekip Ouidah Heritage Tour rakonte l.",
   filtres: { aria: "Kategori jounal la", tous: "Li tout" },
   une: "Atik devan an",
   liste: { tous: "Tout atik yo", categorie: (c) => c },
@@ -284,7 +284,7 @@ const HT: TexteBlog = {
     lireEn: "Li an",
     lies: "Nan menm kategori a",
     cta: {
-      titre: "Ouidah rakonte tèt li pi byen sou plas.",
+      titre: "Wè kote sa yo nan Ouidah.",
       texte: "Di nou sa ki atire w, n ap konpoze vwayaj la nan ritm pa w.",
       bouton: "Kreye vwayaj mwen",
     },
@@ -294,12 +294,12 @@ const HT: TexteBlog = {
 const GCF: TexteBlog = {
   meta: {
     titre: "Jounal a Ouidah — Ouidah Heritage Tour",
-    description: "Listwa, koté é moun a Ouidah, ékip a Ouidah Heritage Tour ékri yo.",
+    description: "Ouidah, kon ékip a Ouidah Heritage Tour ka rakonté-y.",
     titreCategorie: (c) => `${c} — Jounal a Ouidah`,
     titreArticle: (t) => `${t} — Ouidah Heritage Tour`,
   },
   titre: "Jounal a Ouidah",
-  phrase: "Listwa, koté é moun a Ouidah, ékip a Ouidah Heritage Tour ékri yo.",
+  phrase: "Ouidah, kon ékip a Ouidah Heritage Tour ka rakonté-y.",
   filtres: { aria: "Kalité a jounal-la", tous: "Li tout" },
   une: "Awtik douvan-la",
   liste: { tous: "Tout awtik-la", categorie: (c) => c },
@@ -324,7 +324,7 @@ const GCF: TexteBlog = {
     lireEn: "Li an",
     lies: "Adan menm kalité-la",
     cta: {
-      titre: "Ouidah ka rakonté kò a-y pli bien asi plas.",
+      titre: "Vwè koté-lasa an Ouidah.",
       texte: "Di nou sa ki ka atiré-w, nou ké konpozé vwayaj-la an rit a-w.",
       bouton: "Kréyé vwayaj an mwen",
     },

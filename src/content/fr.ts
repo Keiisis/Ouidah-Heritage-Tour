@@ -124,11 +124,11 @@ export const nav = {
 
 export const welcome = {
   label: "Qui sommes-nous",
-  title: ["Bienvenue chez vous,", "au cœur de votre Histoire."],
+  title: ["Bienvenue chez vous,", "sur les lieux de votre Histoire."],
   paragraphs: [
-    "Ouidah Héritage Tour est bien plus qu'une agence : c'est un engagement pour un tourisme responsable et profondément humain.",
-    "Nous vous invitons à vivre Ouidah au plus près de son âme, une destination où l'histoire, la spiritualité, la culture, l'art et la nature se rencontrent pour vous offrir une expérience authentique.",
-    "Chaque voyage est unique : notre équipe prend soin de vos centres d'intérêt, de vos attentes et de vos besoins. Nous vous accompagnons avant, pendant et après le voyage.",
+    "Ouidah Heritage Tour est une agence de tourisme mémoriel et culturel, à Ouidah.",
+    "Nous vous menons dans Ouidah, du fort portugais à la plage : lieux de mémoire, temples vodun, artisans, lagune et océan.",
+    "Nous composons chaque voyage à partir de vos questions et de vos envies, et vous accompagnons jusqu'au retour.",
   ],
   link: { label: "L'histoire de Ouidah", href: "/ouidah/histoire" },
   portrait: IMG.waxFabric, // provisoire : un guide OHT photographié sur la Route [OHT TO PROVIDE]
@@ -136,7 +136,7 @@ export const welcome = {
 };
 
 export const placesIntro = {
-  kicker: "La carte · De la ville à l'océan",
+  kicker: "La carte",
   title: "Ouidah en quatre lieux",
   // titre en trois morceaux : le chiffre géant sert de fenêtre sur la carte, puis s'ouvre au défilement
   titleParts: { before: "Ouidah en", number: "4", spoken: "quatre", after: "lieux." },
@@ -157,7 +157,7 @@ export const places: Lieu[] = [
 // Section 4 : mosaïque des engagements. Tuile photo (image) ou tuile de couleur (fond + texte) ; la tuile active passe en grand.
 export const reasonsIntro = {
   kicker: "Ouidah Heritage Tour · Nos engagements",
-  title: "Sept engagements, tenus sur le terrain.",
+  title: "Nos sept engagements.",
   intro: "Ce que vous pouvez attendre de nous, de la première question au retour.",
   of: "sur",
 };
@@ -265,8 +265,8 @@ export const cheminsIntro = {
   },
   compose: {
     label: "Composer mon chemin",
-    desc: (n: number) => `${pluriel(n, "lieu", "lieux")} à voir, où dormir, où manger : gardez ce qui vous parle`,
-    heading: "Gardez les lieux qui vous parlent.",
+    desc: (n: number) => `${pluriel(n, "lieu", "lieux")} à voir, où dormir, où manger : gardez ce qui vous intéresse`,
+    heading: "Gardez les lieux qui vous intéressent.",
     views: { deck: "Un lieu à la fois", list: (n: number) => `Tous les lieux · ${n}` },
     viewsLabel: "Façon de parcourir les lieux",
     position: (i: number, n: number) => `Lieu ${i} sur ${n}`,
@@ -347,7 +347,7 @@ export const cheminsIntro = {
 export const evenements: Evenement[] = [
   { slug: "vodun-days", title: "Vodun Days", short: "Vodun Days", theme: "Spiritualité", place: "Ouidah", text: "Le grand rendez-vous annuel des cultures Vodun : cérémonies, danses rituelles, expositions et rencontres, dans le respect des règles fixées par les communautés.", image: IMG.egungun, quand: { type: "editions", dates: [["2027-01-02", "2027-01-09"]] /* 4e édition, annoncée sur vodundays.bj (relevé le 26/10/2026) */ }, organisateur: { type: "externe", nom: "Événement national" }, offre: { type: "sejour", nom: "Séjour Vodun Days", inclus: "hébergement, transferts, guide, accès accompagné", nuits: null, prix: null, places: null } },
   // exemple d'événement OHT, gardé en attendant la confirmation d'OHT (supprimable depuis l'admin)
-  { slug: "ouidah-blue", title: "Ouidah Blue", short: "Ouidah Blue", theme: "Culture", place: "Ouidah", text: "Rendez-vous festif autour de la scène artistique locale et internationale : musique, arts visuels et rencontres.", image: null, quand: { type: "paques", debut: -1, fin: 1 }, organisateur: { type: "oht" }, offre: { type: "billet", categories: [{ nom: "Place", detail: "accès à l'événement", prix: null }, { nom: "Place et séjour", detail: "votre place, logement compris", prix: null, logement: true }], places: null, jauge: null } },
+  { slug: "ouidah-blue", title: "Ouidah Blue", short: "Ouidah Blue", theme: "Culture", place: "Ouidah", text: "Rendez-vous de musique et d'arts visuels à Ouidah.", image: null, quand: { type: "paques", debut: -1, fin: 1 }, organisateur: { type: "oht" }, offre: { type: "billet", categories: [{ nom: "Place", detail: "accès à l'événement", prix: null }, { nom: "Place et séjour", detail: "votre place, logement compris", prix: null, logement: true }], places: null, jauge: null } },
   { slug: "souvenir-23-aout", title: "Journée internationale du souvenir de la traite négrière et de son abolition", short: "Journée du souvenir de la traite", theme: "Mémoire", place: "Route des Esclaves, Ouidah", text: "Date reconnue par l'UNESCO, marquée à Ouidah par des cérémonies de recueillement sur la Route des Esclaves.", image: IMG.beachOuidah, quand: { type: "annuel", mois: 8, jour: 23, jours: 1 }, organisateur: { type: "externe", nom: "Commémoration publique" }, offre: { type: "sejour", nom: "Séjour du souvenir", inclus: "hébergement, transferts, guide, cérémonie accompagnée", nuits: null, prix: null, places: null } },
 ];
 
@@ -474,7 +474,7 @@ export const datesSection = {
 // « Entourer » garde la raison et ajoute ses lieux à « Votre chemin » (section 5). Faits repris de lieux-ouidah.json (vérifiés OSM + web).
 export const tenIntro = {
   label: (n: number) => `${n} raisons de visiter Ouidah`,
-  title: ["Ce que la ville vous réserve,", "de la mémoire à l'océan."],
+  title: ["Dix raisons de venir,", "du fort à la plage."],
   link: { label: "Les découvrir", href: SECTIONS.raisons },
   place: "Ouidah",
   discover: "Découvrir le lieu",
@@ -482,7 +482,7 @@ export const tenIntro = {
   circled: "Entourée",
   kept: (n: number) => `${n} entourée${n > 1 ? "s" : ""}`,
   path: { label: "Voir mon chemin", href: "#chemins" },
-  stripLabel: "Les vues, de la mémoire à l'océan",
+  stripLabel: "Les dix vues",
   frame: (n: string, titre: string) => `Lire la raison ${n} : ${titre}`,
   filmEdge: "OUIDAH 400",
 };
@@ -504,7 +504,7 @@ export const tenReasons: Raison[] = [
   { slug: "memorial-zoungbodji", title: "Le mémorial de Zoungbodji", short: "Zoungbodji", category: "Mémoire", image: { src: "/ouidah/visite-zoungbodji.jpg", alt: "Le mémorial de Zoungbodji, sur la Route des Esclaves" }, credit: "Gbehlon, Wikimedia Commons, CC BY-SA 4.0", href: adresseLieu("memorial-zoungbodji"), lieux: ["memorial-zoungbodji"],
     text: "Le mémorial du village de Zoungbodji marque le dernier lieu où séjournaient les captifs avant l'embarquement, près de la fosse commune où l'on jetait les morts. C'est l'étape la plus grave de la Route des Esclaves, à environ 2 km de la plage et de la Porte du Non-Retour. On s'y arrête un moment avant de rejoindre la mer." },
   { slug: "marches", title: "Artisans, marchés, cuisine", short: "Marchés", category: "Saveurs", image: { src: "/ouidah/eng-7-vendeuses.jpg", alt: "Vendeuses portant leurs marchandises dans une rue de Ouidah" }, credit: "GARNI RAFIK, Wikimedia Commons, CC BY-SA 4.0", href: null, lieux: ["r:marche-de-zobe"],
-    text: "Le marché de Zobè, près du fort portugais, et celui du quartier de Kpassè rythment la vie de la ville. Nos guides vous y emmènent, comme chez les artisans et aux bonnes tables de Ouidah, des maquis aux restaurants. C'est la ville d'aujourd'hui, celle qui vit entre deux visites." },
+    text: "Le marché de Zobè, près du fort portugais, et celui du quartier de Kpassè : nos guides vous y emmènent, comme chez les artisans, dans les maquis et les restaurants de Ouidah." },
   { slug: "plage-et-lagune", title: "La plage et la lagune", short: "Plage et lagune", category: "Océan", image: { src: "/hero/hero-4-plage.jpg", alt: "La plage de Ouidah vue du ciel, vagues de l'Atlantique et cocotiers" }, credit: null, href: adresseLieu("route-des-peches"), lieux: ["route-des-peches", "r:lagune-de-ouidah"],
     text: "Au bout de la Route des Esclaves, une longue plage peu aménagée, où se tiennent la grande cérémonie et les concerts des Vodun Days. Derrière, la lagune sépare la ville de l'océan : l'un des écosystèmes côtiers les plus importants du Bénin, qu'on découvre en pirogue depuis le petit embarcadère. La route des Pêches, bordée de cocotiers, court entre les deux. Baignade déconseillée par vent fort." },
 ];
@@ -516,7 +516,7 @@ export const stripImages: Media[] = [IMG.ceremony2, IMG.egungun, IMG.waxFabric, 
 // Nombres d'adresses : comptés côté serveur dans lieux-ouidah.json (champ « releve » des options), jamais écrits ici.
 export const conciergeIntro = {
   label: "Conciergerie",
-  title: ["Tout ce qui entoure votre visite,", "organisé."],
+  title: ["Navette, hôtel, tables, voiture :", "nous l'organisons."],
   link: { label: "Demander un devis", href: "/devis" },
   envoyer: "Envoyer la demande",
   aucunService: "Choisissez un service",
@@ -597,19 +597,19 @@ export const prepare = {
   verifie: "2026-10-22",
 };
 export const preparer: ThemePreparer[] = [
-  { id: "sur-place", court: "Sur place", objet: "accueil", vue: "benin", titre: "Ouidah se visite l'esprit tranquille.",
-    cle: { valeur: "Accompagné", texte: "par notre équipe, avant, pendant et après le voyage." }, mot: true,
+  { id: "sur-place", court: "Sur place", objet: "accueil", vue: "benin", titre: "Sur place, on vous accompagne.",
+    cle: { valeur: "Accompagné", texte: "par notre équipe, jusqu'au retour." }, mot: true,
     points: ["À l'aéroport, on vous attend si vous le souhaitez : la navette vous conduit jusqu'à Ouidah.", "Hébergement et tables : nous choisissons avec vous parmi les adresses relevées à Ouidah.", "Avant une photo de cérémonie ou un portrait, un mot suffit : demandez, c'est l'usage.", "À la plage, profitez du sable et du coucher de soleil ; pour la baignade, demandez conseil sur place, la barre de l'Atlantique est puissante."],
     source: "Engagements OHT · France Diplomatie (15 sept. 2026) · FCDO" },
-  { id: "arriver", court: "Arriver", objet: "navette", vue: "cote", titre: "Arriver, simplement.",
+  { id: "arriver", court: "Arriver", objet: "navette", vue: "cote", titre: "Visa et trajet.",
     cle: { valeur: "41 km", texte: "de l'aéroport de Cotonou à Ouidah. La navette OHT vous y conduit." },
     points: ["Votre e-Visa se demande en ligne, sur evisa.bj : 30 ou 90 jours, réponse en 1 à 96 heures.", "Faites la demande au moins 7 jours avant l'arrivée, puis gardez-le à portée de main.", "Ressortissants africains : pas de visa, jusqu'à 90 jours.", "Voyageurs français : passeport valide 6 mois après le retour, billet retour dans le sac."],
     source: "evisa.bj · France Diplomatie · OSRM (41 km)" },
-  { id: "sante", court: "Santé", objet: "sante", vue: "benin", titre: "Votre santé, préparée.",
+  { id: "sante", court: "Santé", objet: "sante", vue: "benin", titre: "Vaccins et moustiques.",
     cle: { valeur: "1 visite", texte: "chez votre médecin ou dans un centre de vaccinations internationales, avant le départ." },
     points: ["Vaccins à jour, hépatite A et typhoïde : votre médecin fait le point avec vous.", "Fièvre jaune : vaccin recommandé dès 9 mois. Glissez votre carnet dans le sac.", "Contre les moustiques : répulsif et manches longues le soir. Votre médecin vous dira si un traitement contre le paludisme est utile."],
     source: "Ministère de la Santé du Bénin (16 sept. 2026) · Institut Pasteur · OMS — fièvre jaune : sources en désaccord, à confirmer" },
-  { id: "argent", court: "Argent", objet: "type-voyage", vue: "benin", titre: "L'argent, sans calcul.",
+  { id: "argent", court: "Argent", objet: "type-voyage", vue: "benin", titre: "Le franc CFA.",
     cle: { valeur: "15,24 €", texte: "pour 10 000 FCFA. Le taux est fixe, toute l'année." },
     points: ["Le franc CFA est arrimé à l'euro : 1 € = 655,957 FCFA, sans variation.", "Repère rapide : 1 000 FCFA font environ 1,50 €.", "Pour retirer, choisissez les distributeurs situés à l'intérieur des agences."],
     source: "BCEAO · France Diplomatie" },
@@ -740,7 +740,7 @@ export const enPreparation = {
   label: "Bientôt",
   title: "Cette page est en préparation.",
   titre: (page: string) => `« ${page} » arrive bientôt.`,
-  text: "Nous construisons le site page par page, en commençant par l'accueil. Revenez très vite, ou écrivez-nous pour préparer votre voyage dès maintenant.",
+  text: "Nous construisons le site page par page, en commençant par l'accueil. Revenez bientôt, ou écrivez-nous pour préparer votre voyage dès maintenant.",
   back: "Retour à l'accueil",
 };
 
@@ -752,7 +752,7 @@ export const welcomeStatement = {
   segments: [
     { text: "Bienvenue chez vous," },
     { image: { src: "/ouidah/bienvenue-1-porte-nuit.jpg", alt: "La Porte du Non-Retour illuminée, la nuit" }, ring: "sun" },
-    { text: "au cœur de votre Histoire," },
+    { text: "sur les lieux de votre Histoire," },
     { image: { src: "/ouidah/bienvenue-2-temple-pythons.jpg", alt: "L'entrée peinte du Temple des Pythons" }, ring: "abyss" },
     { text: "de la Route des Esclaves" },
     { image: { src: "/ouidah/bienvenue-3-plage-cocotiers.jpg", alt: "La plage de Ouidah au soleil couchant" }, ring: "sun" },
@@ -760,8 +760,8 @@ export const welcomeStatement = {
   ] as ({ text: string } | { image: Media; ring: "sun" | "abyss" })[],
   columns: [
     { title: "Mémoire et culture", text: "Agence de tourisme mémoriel et culturel, nous vous emmenons à pied sur la Route des Esclaves, avec un guide qui raconte chaque étape." },
-    { title: "Les lieux que vous choisissez", text: "Le Temple des Pythons face à la basilique, la forêt sacrée de Kpassè, le marché de Zobè, la lagune en pirogue. Nous composons votre séjour avec les lieux qui vous parlent." },
-    { title: "De l'aéroport à Ouidah", text: "Navette depuis l'aéroport de Cotonou, hébergement, tables, véhicule : nous organisons avec vous ce qui entoure la visite, avant, pendant et après le voyage." },
+    { title: "Les lieux que vous choisissez", text: "Le Temple des Pythons face à la basilique, la forêt sacrée de Kpassè, le marché de Zobè, la lagune en pirogue. Nous composons votre séjour à partir de ces lieux." },
+    { title: "De l'aéroport à Ouidah", text: "Navette depuis l'aéroport de Cotonou, hébergement, tables, véhicule : nous organisons avec vous ce qui entoure la visite." },
   ],
 };
 // Collage « Une ville qui se vit » : les gens de Ouidah, photos prises à Ouidah (Wikimedia Commons, CC BY-SA 4.0) en attendant celles d'OHT.
@@ -954,7 +954,7 @@ export const devisPage = {
     },
   },
   merci: {
-    titre: (p: string) => `C'est entre nos mains${p ? `, ${p}` : ""}.`,
+    titre: (p: string) => `Demande reçue${p ? `, ${p}` : ""}.`,
     texte: (langue: string, email: string) => `Nous vous répondons sous 24 heures, en ${langue}, à ${email}.`,
     copie: "Une copie de votre demande vient de partir dans votre boîte.",
     retour: { label: "Retour à l'accueil", href: "/" },

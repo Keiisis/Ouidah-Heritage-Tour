@@ -26,7 +26,7 @@ export function FinalCta() {
         {finalMask.word}
       </motion.p>
       <div className="container-oht mt-12 flex flex-col items-center">
-        <MaskedLines lines={finalCta.title} className="text-[40px]/[48px] tracking-[-1px] md:text-h1" />
+        <MaskedLines lines={finalCta.title} className="text-[clamp(24px,7.6vw,72px)]/[1.2] tracking-[-1px] lg:text-h1" />
         <p className="mt-6 max-w-[44ch] text-[18px]/[28px] text-ivory/80">{finalCta.sub}</p>
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
           <ButtonPrimary href={finalCta.primary.href}>{finalCta.primary.label}</ButtonPrimary>

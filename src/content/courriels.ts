@@ -44,7 +44,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Services",
     noms: { navette: "navette", accueil: "accueil", telephone: "téléphone", hebergement: "hébergement", tables: "tables", vehicule: "véhicule" },
     voyageurs: (a, e) => [a ? `${a} adulte${a > 1 ? "s" : ""}` : "", e ? `${e} enfant${e > 1 ? "s" : ""}` : ""].filter(Boolean).join(", "),
-    repondre: "Pour ajouter un détail, répondez simplement à cet e-mail.",
+    repondre: "Pour ajouter un détail, répondez à cet e-mail.",
     signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   EN: {
@@ -64,7 +64,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Services",
     noms: { navette: "airport shuttle", accueil: "welcome", telephone: "phone", hebergement: "accommodation", tables: "dining", vehicule: "vehicle" },
     voyageurs: (a, e) => [a ? `${a} adult${a > 1 ? "s" : ""}` : "", e ? `${e} ${e > 1 ? "children" : "child"}` : ""].filter(Boolean).join(", "),
-    repondre: "To add a detail, simply reply to this email.",
+    repondre: "To add a detail, reply to this email.",
     signature: "Ouidah Heritage Tour, Ouidah (Benin)",
   },
   ES: {
@@ -84,7 +84,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Servicios",
     noms: { navette: "traslado", accueil: "recepción", telephone: "teléfono", hebergement: "alojamiento", tables: "comidas", vehicule: "vehículo" },
     voyageurs: (a, e) => [a ? `${a} adulto${a > 1 ? "s" : ""}` : "", e ? `${e} niño${e > 1 ? "s" : ""}` : ""].filter(Boolean).join(", "),
-    repondre: "Para añadir un detalle, basta con responder a este correo.",
+    repondre: "Para añadir un detalle, responda a este correo.",
     signature: "Ouidah Heritage Tour, Ouidah (Benín)",
   },
   DE: {
@@ -104,7 +104,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Leistungen",
     noms: { navette: "Flughafentransfer", accueil: "Empfang", telephone: "Telefon", hebergement: "Unterkunft", tables: "Essen", vehicule: "Fahrzeug" },
     voyageurs: (a, e) => [a ? `${a} ${a > 1 ? "Erwachsene" : "Erwachsener"}` : "", e ? `${e} ${e > 1 ? "Kinder" : "Kind"}` : ""].filter(Boolean).join(", "),
-    repondre: "Um etwas zu ergänzen, antworten Sie einfach auf diese E-Mail.",
+    repondre: "Um etwas zu ergänzen, antworten Sie auf diese E-Mail.",
     signature: "Ouidah Heritage Tour, Ouidah (Benin)",
   },
   PT: {
@@ -124,7 +124,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Serviços",
     noms: { navette: "transfer", accueil: "acolhimento", telephone: "telefone", hebergement: "alojamento", tables: "refeições", vehicule: "veículo" },
     voyageurs: (a, e) => [a ? `${a} adulto${a > 1 ? "s" : ""}` : "", e ? `${e} criança${e > 1 ? "s" : ""}` : ""].filter(Boolean).join(", "),
-    repondre: "Para acrescentar um pormenor, basta responder a este e-mail.",
+    repondre: "Para acrescentar um pormenor, responda a este e-mail.",
     signature: "Ouidah Heritage Tour, Ouidah (Benim)",
   },
   HT: {
@@ -144,7 +144,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Sèvis",
     noms: { navette: "navèt", accueil: "akèy", telephone: "telefòn", hebergement: "lojman", tables: "manje", vehicule: "machin" },
     voyageurs: (a, e) => [a ? `${a} granmoun` : "", e ? `${e} timoun` : ""].filter(Boolean).join(", "),
-    repondre: "Pou w ajoute yon detay, jis reponn imèl sa a.",
+    repondre: "Pou w ajoute yon detay, reponn imèl sa a.",
     signature: "Ouidah Heritage Tour, Ouidah (Benen)",
   },
   GCF: {
@@ -164,7 +164,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     services: "Sèvis",
     noms: { navette: "navèt", accueil: "lakèy", telephone: "téléfòn", hebergement: "lojman", tables: "manjé", vehicule: "loto" },
     voyageurs: (a, e) => [a ? `${a} granmoun` : "", e ? `${e} timoun` : ""].filter(Boolean).join(", "),
-    repondre: "Pou ajouté on détay, réponn sèlman a imèl-lasa.",
+    repondre: "Pou ajouté on détay, réponn a imèl-lasa.",
     signature: "Ouidah Heritage Tour, Ouidah (Benen)",
   },
 };
@@ -180,7 +180,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   FR: {
     salutation: "Bien à vous,",
     equipe: "L’équipe Ouidah Heritage Tour",
-    question: "Une question ? Répondez simplement à cet e-mail.",
+    question: "Une question ? Répondez à cet e-mail.",
     et: " et ",
     pdf: (l) => `${l} (PDF)`,
     photos: {
@@ -194,7 +194,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   EN: {
     salutation: "Kind regards,",
     equipe: "The Ouidah Heritage Tour team",
-    question: "Any questions? Simply reply to this email.",
+    question: "Any questions? Reply to this email.",
     et: " and ",
     pdf: (l) => `${l} (PDF)`,
     photos: {
@@ -208,7 +208,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   ES: {
     salutation: "Un saludo,",
     equipe: "El equipo de Ouidah Heritage Tour",
-    question: "¿Alguna pregunta? Basta con responder a este correo.",
+    question: "¿Alguna pregunta? Responda a este correo.",
     et: " y ",
     pdf: (l) => `${l} (PDF)`,
     photos: {
@@ -222,7 +222,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   DE: {
     salutation: "Mit freundlichen Grüßen",
     equipe: "Das Team von Ouidah Heritage Tour",
-    question: "Fragen? Antworten Sie einfach auf diese E-Mail.",
+    question: "Fragen? Antworten Sie auf diese E-Mail.",
     et: " und ",
     pdf: (l) => `${l} (PDF)`,
     photos: {
@@ -236,7 +236,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   PT: {
     salutation: "Com os melhores cumprimentos,",
     equipe: "A equipa da Ouidah Heritage Tour",
-    question: "Alguma dúvida? Basta responder a este e-mail.",
+    question: "Alguma dúvida? Responda a este e-mail.",
     et: " e ",
     pdf: (l) => `${l} (PDF)`,
     photos: {
@@ -250,7 +250,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   HT: {
     salutation: "Avèk respè,",
     equipe: "Ekip Ouidah Heritage Tour",
-    question: "Ou gen yon kesyon? Jis reponn imèl sa a.",
+    question: "Ou gen yon kesyon? Reponn imèl sa a.",
     et: " ak ",
     pdf: (l) => `${l} (PDF)`,
     photos: {
@@ -264,7 +264,7 @@ export const communs: Record<LangueCourriel, Commun> = {
   GCF: {
     salutation: "An tout lanmityé,",
     equipe: "Lékip Ouidah Heritage Tour",
-    question: "Ou ni on kèsyon ? Réponn imèl-lasa sèlman.",
+    question: "Ou ni on kèsyon ? Réponn imèl-lasa.",
     et: " é ",
     pdf: (l) => `${l} (PDF)`,
     photos: {

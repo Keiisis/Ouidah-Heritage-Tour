@@ -1,3 +1,4 @@
+// ARCHIVÉ le 13/11/2026 : plus importé nulle part. Le site joue l'ouverture B « le passage » (Ouverture.tsx). Kevin le garde « au cas où ».
 // Moteur de l'ouverture « Dangbé » (piste H, passe 4, validée par Kevin le 29/10/2026). Une seule SVG plein écran, rendue
 // image par image : la tête du python écrit le O, les brins de la tresse apparaissent derrière elle, le nœud tire la corde,
 // les lettres sortent de derrière la corde, HERITAGE TOUR se trace, tenue, puis plongée dans l'œil qui s'ouvre sur le site.

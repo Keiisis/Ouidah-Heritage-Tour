@@ -1,7 +1,7 @@
 // Réglages de départ éditables dans Contenu du site. Les polices suivent la charte validée.
 export const seoSite = {
   titre: "Ouidah Heritage Tour · Voyages à Ouidah, Bénin",
-  description: "Découvrez Ouidah, son patrimoine et ses lieux de mémoire avec Ouidah Heritage Tour. Circuits, événements et voyages préparés avec l'équipe locale.",
+  description: "Agence de tourisme mémoriel et culturel à Ouidah, au Bénin : circuits à pied sur la Route des Esclaves, événements et séjours préparés avec l'équipe sur place.",
   image: { src: "/brand/oht-embleme.webp", alt: "Ouidah Heritage Tour" },
   pages: [] as { chemin: string; titre: string; description: string; indexer: boolean }[],
 };

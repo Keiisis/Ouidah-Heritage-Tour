@@ -209,6 +209,14 @@
     {
       "fichier": "20261122_machines_etats_deux.sql",
       "sha256": "438581120c0a24e4330b77eebfff6cc2d85581d5d48829b965e9c4de1959bc49"
+    },
+    {
+      "fichier": "20261123_effacement_auto.sql",
+      "sha256": "acc23916fe3e43452ca00e11d701e9af20ca944b3ac2a8c968d428a5dce9417d"
+    },
+    {
+      "fichier": "20261124_reecriture_unslop.sql",
+      "sha256": "b7c0bbd02bde5d8a0f9e92a25d51b7e5eb0d688dd8b2a0b3e4d305e0504bce76"
     }
   ]
 }

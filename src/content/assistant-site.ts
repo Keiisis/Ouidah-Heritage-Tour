@@ -40,10 +40,10 @@ const FR = {
   entete: { titre: "Composer mon séjour", sousIa: "Assistant IA d’OHT", sousAgent: "Avec l’équipe OHT", langue: "Choisir la langue de la conversation", fermer: "Fermer l’assistant", dialogue: "Assistant IA d’OHT et programme du séjour" },
   ouvert: {
     titre: "Parlez-nous de votre voyage.",
-    chapo: "À chaque réponse, votre programme se compose. Vous le gardez, vous le modifiez, vous l’envoyez en devis.",
+    chapo: "Votre programme se compose au fil des réponses. Modifiez-le, puis envoyez-le en devis.",
     amorces: [
       { titre: "Deux jours pour voir l’essentiel", detail: "Temple, Musée, Route, Porte", question: "Je viens deux jours à Ouidah. Que voir en priorité ?" },
-      { titre: "Venir pour les Vodun Days", detail: "Le grand rendez-vous des cultures Vodun", question: "Je voudrais venir pour les Vodun Days. Comment m’organiser ?" },
+      { titre: "Venir pour les Vodun Days", detail: "Le rendez-vous des cultures vodun", question: "Je voudrais venir pour les Vodun Days. Comment m’organiser ?" },
       { titre: "Les lieux sacrés", detail: "Forêt de Kpassè, Temple des Pythons", question: "Quels lieux sacrés voir à Ouidah ?" },
     ],
     note: "Ou écrivez ci-dessous : l’assistant IA d’OHT vous répond tout de suite.",
@@ -116,7 +116,7 @@ const FR = {
   },
   erreurs: {
     ia: "L’assistant IA n’est pas disponible pour le moment. L’équipe peut vous répondre.",
-    occupe: "L’assistant est très demandé en ce moment. Réessayez dans un instant, ou écrivez à l’équipe.",
+    occupe: "L’assistant ne peut pas répondre pour le moment. Réessayez dans un instant, ou écrivez à l’équipe.",
     limite: "Beaucoup de messages en peu de temps. Patientez une minute avant de réécrire.",
     budget: "L’assistant a atteint sa limite du jour. L’équipe peut vous répondre.",
     long: `Votre message dépasse ${M} caractères. Raccourcissez-le.`,
@@ -140,10 +140,10 @@ const EN: TexteAssistant = {
   entete: { titre: "Plan my stay", sousIa: "OHT AI assistant", sousAgent: "With the OHT team", langue: "Choose the conversation language", fermer: "Close the assistant", dialogue: "OHT AI assistant and trip plan" },
   ouvert: {
     titre: "Tell us about your trip.",
-    chapo: "With every answer, your plan takes shape. You keep it, change it, and send it as a quote request.",
+    chapo: "Your plan takes shape as the answers come. Change it, then send it as a quote request.",
     amorces: [
       { titre: "Two days for the essentials", detail: "Temple, Museum, Route, Door", question: "I’m coming to Ouidah for two days. What should I see first?" },
-      { titre: "Coming for the Vodun Days", detail: "The great gathering of Vodun cultures", question: "I’d like to come for the Vodun Days. How should I plan?" },
+      { titre: "Coming for the Vodun Days", detail: "The gathering of Vodun cultures", question: "I’d like to come for the Vodun Days. How should I plan?" },
       { titre: "The sacred places", detail: "Kpassè Forest, Python Temple", question: "Which sacred places should I see in Ouidah?" },
     ],
     note: "Or write below: the OHT AI assistant answers right away.",
@@ -216,7 +216,7 @@ const EN: TexteAssistant = {
   },
   erreurs: {
     ia: "The AI assistant isn’t available right now. The team can reply.",
-    occupe: "The assistant is very busy right now. Try again in a moment, or write to the team.",
+    occupe: "The assistant can’t answer right now. Try again in a moment, or write to the team.",
     limite: "Many messages in a short time. Wait a minute before writing again.",
     budget: "The assistant has reached its daily limit. The team can reply.",
     long: `Your message is longer than ${M} characters. Please shorten it.`,
@@ -238,10 +238,10 @@ const ES: TexteAssistant = {
   entete: { titre: "Preparar mi estancia", sousIa: "Asistente IA de OHT", sousAgent: "Con el equipo de OHT", langue: "Elegir el idioma de la conversación", fermer: "Cerrar el asistente", dialogue: "Asistente IA de OHT y programa de la estancia" },
   ouvert: {
     titre: "Háblenos de su viaje.",
-    chapo: "Con cada respuesta, su programa toma forma. Lo guarda, lo cambia y lo envía como solicitud de presupuesto.",
+    chapo: "Su programa toma forma con las respuestas. Modifíquelo y luego envíelo como solicitud de presupuesto.",
     amorces: [
       { titre: "Dos días para lo esencial", detail: "Templo, Museo, Ruta, Puerta", question: "Vengo dos días a Ouidah. ¿Qué ver primero?" },
-      { titre: "Venir para los Vodun Days", detail: "El gran encuentro de las culturas vodún", question: "Me gustaría venir para los Vodun Days. ¿Cómo organizarme?" },
+      { titre: "Venir para los Vodun Days", detail: "El encuentro de las culturas vodún", question: "Me gustaría venir para los Vodun Days. ¿Cómo organizarme?" },
       { titre: "Los lugares sagrados", detail: "Bosque de Kpassè, Templo de las Pitones", question: "¿Qué lugares sagrados ver en Ouidah?" },
     ],
     note: "O escriba abajo: el asistente IA de OHT le responde al instante.",
@@ -314,7 +314,7 @@ const ES: TexteAssistant = {
   },
   erreurs: {
     ia: "El asistente IA no está disponible por ahora. El equipo puede responderle.",
-    occupe: "El asistente está muy solicitado ahora. Inténtelo en un momento o escriba al equipo.",
+    occupe: "El asistente no puede responder ahora. Inténtelo en un momento o escriba al equipo.",
     limite: "Muchos mensajes en poco tiempo. Espere un minuto antes de volver a escribir.",
     budget: "El asistente ha alcanzado su límite del día. El equipo puede responderle.",
     long: `Su mensaje supera los ${M} caracteres. Acórtelo.`,
@@ -336,10 +336,10 @@ const DE: TexteAssistant = {
   entete: { titre: "Meinen Aufenthalt planen", sousIa: "KI-Assistent von OHT", sousAgent: "Mit dem OHT-Team", langue: "Sprache des Gesprächs wählen", fermer: "Assistenten schließen", dialogue: "KI-Assistent von OHT und Reiseprogramm" },
   ouvert: {
     titre: "Erzählen Sie uns von Ihrer Reise.",
-    chapo: "Mit jeder Antwort entsteht Ihr Programm. Sie behalten es, ändern es und schicken es als Angebotsanfrage.",
+    chapo: "Ihr Programm entsteht mit den Antworten. Ändern Sie es und schicken Sie es dann als Angebotsanfrage.",
     amorces: [
       { titre: "Zwei Tage für das Wesentliche", detail: "Tempel, Museum, Route, Tor", question: "Ich bin zwei Tage in Ouidah. Was sollte ich zuerst sehen?" },
-      { titre: "Zu den Vodun Days kommen", detail: "Das große Treffen der Vodun-Kulturen", question: "Ich möchte zu den Vodun Days kommen. Wie plane ich das?" },
+      { titre: "Zu den Vodun Days kommen", detail: "Das Treffen der Vodun-Kulturen", question: "Ich möchte zu den Vodun Days kommen. Wie plane ich das?" },
       { titre: "Die heiligen Orte", detail: "Wald von Kpassè, Pythontempel", question: "Welche heiligen Orte sollte ich in Ouidah sehen?" },
     ],
     note: "Oder schreiben Sie unten: Der KI-Assistent von OHT antwortet sofort.",
@@ -412,7 +412,7 @@ const DE: TexteAssistant = {
   },
   erreurs: {
     ia: "Der KI-Assistent ist gerade nicht verfügbar. Das Team kann Ihnen antworten.",
-    occupe: "Der Assistent ist gerade sehr gefragt. Versuchen Sie es gleich noch einmal oder schreiben Sie dem Team.",
+    occupe: "Der Assistent kann gerade nicht antworten. Versuchen Sie es gleich noch einmal oder schreiben Sie dem Team.",
     limite: "Viele Nachrichten in kurzer Zeit. Warten Sie eine Minute, bevor Sie wieder schreiben.",
     budget: "Der Assistent hat sein Tageslimit erreicht. Das Team kann Ihnen antworten.",
     long: `Ihre Nachricht ist länger als ${M} Zeichen. Bitte kürzen Sie sie.`,
@@ -434,10 +434,10 @@ const PT: TexteAssistant = {
   entete: { titre: "Preparar a minha estadia", sousIa: "Assistente IA da OHT", sousAgent: "Com a equipa da OHT", langue: "Escolher a língua da conversa", fermer: "Fechar o assistente", dialogue: "Assistente IA da OHT e programa da estadia" },
   ouvert: {
     titre: "Fale-nos da sua viagem.",
-    chapo: "A cada resposta, o seu programa ganha forma. Guarda-o, altera-o e envia-o como pedido de orçamento.",
+    chapo: "O seu programa ganha forma com as respostas. Altere-o e depois envie-o como pedido de orçamento.",
     amorces: [
       { titre: "Dois dias para o essencial", detail: "Templo, Museu, Rota, Porta", question: "Venho dois dias a Ouidah. O que ver primeiro?" },
-      { titre: "Vir para os Vodun Days", detail: "O grande encontro das culturas vodum", question: "Gostava de vir para os Vodun Days. Como me organizo?" },
+      { titre: "Vir para os Vodun Days", detail: "O encontro das culturas vodum", question: "Gostava de vir para os Vodun Days. Como me organizo?" },
       { titre: "Os lugares sagrados", detail: "Floresta de Kpassè, Templo das Pítons", question: "Que lugares sagrados ver em Ouidah?" },
     ],
     note: "Ou escreva abaixo: o assistente IA da OHT responde de imediato.",
@@ -510,7 +510,7 @@ const PT: TexteAssistant = {
   },
   erreurs: {
     ia: "O assistente IA não está disponível de momento. A equipa pode responder-lhe.",
-    occupe: "O assistente está muito solicitado neste momento. Tente daqui a pouco ou escreva à equipa.",
+    occupe: "O assistente não pode responder neste momento. Tente daqui a pouco ou escreva à equipa.",
     limite: "Muitas mensagens em pouco tempo. Aguarde um minuto antes de voltar a escrever.",
     budget: "O assistente atingiu o limite do dia. A equipa pode responder-lhe.",
     long: `A sua mensagem ultrapassa ${M} caracteres. Encurte-a.`,
@@ -532,10 +532,10 @@ const HT: TexteAssistant = {
   entete: { titre: "Prepare sejou mwen", sousIa: "Asistan IA OHT", sousAgent: "Ak ekip OHT", langue: "Chwazi lang konvèsasyon an", fermer: "Fèmen asistan an", dialogue: "Asistan IA OHT ak pwogram sejou a" },
   ouvert: {
     titre: "Pale nou de vwayaj ou.",
-    chapo: "Chak repons ede pwogram ou pran fòm. Ou kenbe l, ou chanje l, ou voye l pou yon devi.",
+    chapo: "Pwogram ou pran fòm ak repons yo. Chanje l, epi voye l pou yon devi.",
     amorces: [
       { titre: "De jou pou wè sa ki pi enpòtan", detail: "Tanp, Mize, Wout, Pòt", question: "M ap vini Ouidah pou de jou. Kisa pou m wè an premye?" },
-      { titre: "Vini pou Vodun Days yo", detail: "Gwo randevou kilti Vodou yo", question: "Mwen ta renmen vini pou Vodun Days yo. Kijan pou m òganize m?" },
+      { titre: "Vini pou Vodun Days yo", detail: "Randevou kilti Vodou yo", question: "Mwen ta renmen vini pou Vodun Days yo. Kijan pou m òganize m?" },
       { titre: "Kote sakre yo", detail: "Forè Kpassè, Tanp Piton yo", question: "Ki kote sakre pou m wè Ouidah?" },
     ],
     note: "Oswa ekri anba a: asistan IA OHT a reponn ou touswit.",
@@ -608,7 +608,7 @@ const HT: TexteAssistant = {
   },
   erreurs: {
     ia: "Asistan IA a pa disponib pou kounye a. Ekip la ka reponn ou.",
-    occupe: "Gen anpil moun ki mande asistan an kounye a. Eseye ankò nan yon ti moman, oswa ekri ekip la.",
+    occupe: "Asistan an pa ka reponn kounye a. Eseye ankò nan yon ti moman, oswa ekri ekip la.",
     limite: "Twòp mesaj nan yon ti tan. Tann yon minit anvan ou ekri ankò.",
     budget: "Asistan an rive nan limit jounen an. Ekip la ka reponn ou.",
     long: `Mesaj ou depase ${M} karaktè. Fè l pi kout.`,
@@ -630,10 +630,10 @@ const GCF: TexteAssistant = {
   entete: { titre: "Paré séjou an mwen", sousIa: "Asistan IA OHT", sousAgent: "Épi lékip OHT", langue: "Chwazi lang a konvèsasyon-la", fermer: "Fèmé asistan-la", dialogue: "Asistan IA OHT é pwogram a séjou-la" },
   ouvert: {
     titre: "Palé-nou dè vwayaj a-w.",
-    chapo: "A chak répons, pwogram a-w ka pran fòm. Ou ka gadé-y, chanjé-y, voyé-y pou on dévi.",
+    chapo: "Pwogram a-w ka pran fòm épi répons-la. Chanjé-y, é voyé-y pou on dévi.",
     amorces: [
       { titre: "Dé jou pou vwè sa ki pli enpòtan", detail: "Tanp, Mizé, Chimen, Pòt", question: "An ka vini Ouidah pou dé jou. Kisa pou an vwè an prèmyé ?" },
-      { titre: "Vini pou Vodun Days", detail: "Gran randévou a kilti Vodou", question: "An té ké vlé vini pou Vodun Days. Kijan pou an òwganizé mwen ?" },
+      { titre: "Vini pou Vodun Days", detail: "Randévou a kilti Vodou", question: "An té ké vlé vini pou Vodun Days. Kijan pou an òwganizé mwen ?" },
       { titre: "Koté sakré-la", detail: "Fowè Kpassè, Tanp a Piton", question: "Ki koté sakré pou an vwè Ouidah ?" },
     ],
     note: "Oben ékri anba-la : asistan IA OHT-la ka réponn-vou owa-la.",
@@ -706,7 +706,7 @@ const GCF: TexteAssistant = {
   },
   erreurs: {
     ia: "Asistan IA-la pa disponib pou kounye-la. Lékip-la pé réponn-vou.",
-    occupe: "Ni onlo moun ka mandé asistan-la kounye-la. Éséyé ankò an on ti moman, oben ékri lékip-la.",
+    occupe: "Asistan-la pa ka réponn kounye-la. Éséyé ankò an on ti moman, oben ékri lékip-la.",
     limite: "Two mésaj an on ti tan. Atann on minit avan ou ékri ankò.",
     budget: "Asistan-la rivé o limit a jounen-la. Lékip-la pé réponn-vou.",
     long: `Mésaj a-w ka dépasé ${M} karaktè. Fè-y pli kout.`,

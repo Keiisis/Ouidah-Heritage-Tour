@@ -24,7 +24,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Signer mon devis",
     valable: "Valable jusqu’au",
     conseiller: (p) => `${p}, votre conseiller`,
-    modifier: "Pour modifier une ligne ou poser une question, répondez simplement à cet e-mail.",
+    modifier: "Pour modifier une ligne ou poser une question, répondez à cet e-mail.",
     raison: "Vous recevez cet e-mail parce qu’un conseiller a préparé le devis de votre demande de voyage.",
   },
   EN: {
@@ -35,7 +35,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Sign my quote",
     valable: "Valid until",
     conseiller: (p) => `${p}, your advisor`,
-    modifier: "To change a line or ask a question, simply reply to this email.",
+    modifier: "To change a line or ask a question, reply to this email.",
     raison: "You are receiving this email because an advisor has prepared the quote for your travel request.",
   },
   ES: {
@@ -46,7 +46,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Firmar mi presupuesto",
     valable: "Válido hasta el",
     conseiller: (p) => `${p}, su asesor`,
-    modifier: "Para modificar una línea o hacer una pregunta, basta con responder a este correo.",
+    modifier: "Para modificar una línea o hacer una pregunta, responda a este correo.",
     raison: "Recibe este correo porque un asesor ha preparado el presupuesto de su solicitud de viaje.",
   },
   DE: {
@@ -57,7 +57,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Angebot unterschreiben",
     valable: "Gültig bis",
     conseiller: (p) => `${p}, Ihr Berater`,
-    modifier: "Um eine Zeile zu ändern oder eine Frage zu stellen, antworten Sie einfach auf diese E-Mail.",
+    modifier: "Um eine Zeile zu ändern oder eine Frage zu stellen, antworten Sie auf diese E-Mail.",
     raison: "Sie erhalten diese E-Mail, weil ein Berater das Angebot zu Ihrer Reiseanfrage erstellt hat.",
   },
   PT: {
@@ -68,7 +68,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Assinar o meu orçamento",
     valable: "Válido até",
     conseiller: (p) => `${p}, o seu consultor`,
-    modifier: "Para alterar uma linha ou colocar uma questão, basta responder a este e-mail.",
+    modifier: "Para alterar uma linha ou colocar uma questão, responda a este e-mail.",
     raison: "Recebe este e-mail porque um consultor preparou o orçamento do seu pedido de viagem.",
   },
   HT: {
@@ -79,7 +79,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Siyen devi mwen",
     valable: "Valab jiska",
     conseiller: (p) => `${p}, konseye ou`,
-    modifier: "Pou chanje yon liy oswa poze yon kesyon, jis reponn imèl sa a.",
+    modifier: "Pou chanje yon liy oswa poze yon kesyon, reponn imèl sa a.",
     raison: "Ou resevwa imèl sa a paske yon konseye prepare devi pou demann vwayaj ou.",
   },
   GCF: {
@@ -90,7 +90,7 @@ export const copiesDevis: Record<LangueCourriel, CopieDevis> = {
     signer: "Siyé dévi an mwen",
     valable: "Valab jis",
     conseiller: (p) => `${p}, konséyé a-w`,
-    modifier: "Pou chanjé on lign oben pozé on kèsyon, réponn sèlman a imèl-lasa.",
+    modifier: "Pou chanjé on lign oben pozé on kèsyon, réponn a imèl-lasa.",
     raison: "Ou ka résévwa imèl-lasa paskè on konséyé paré dévi a domann a vwayaj a-w.",
   },
 };

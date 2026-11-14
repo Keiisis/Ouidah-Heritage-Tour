@@ -7,7 +7,7 @@ import type { Langue } from "@/lib/langue";
 import { variablesTheme } from "@/lib/theme";
 import { lireContenu, surchargesPubliques } from "@/lib/contenu";
 import { Providers } from "@/components/ui/Providers";
-import { Ouverture, scriptOuverture } from "@/components/ui/Ouverture";
+import { scriptOuverture } from "@/components/ui/Ouverture";
 import { Consentement } from "@/components/ui/Consentement";
 import { AssistantSite } from "@/components/assistant/AssistantSite";
 import { Mesure } from "@/components/mesure/Mesure";
@@ -40,7 +40,7 @@ export default async function DocumentSite({ children, langue = "FR" }: { childr
     surchargesPubliques(langue), lireContenu("fr.nav", langue), lireContenu("site.theme"),
   ]);
   return (
-    // suppressHydrationWarning : le script de <head> pose data-ouverture sur <html> avant l'hydratation
+    // suppressHydrationWarning : le script en tête de <body> pose data-ouverture sur <html> avant l'hydratation
     <html lang={langue.toLowerCase()} className={`${fraunces.variable} ${manrope.variable}`} style={variablesTheme(theme)} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: scriptOuverture }} />
@@ -52,7 +52,6 @@ export default async function DocumentSite({ children, langue = "FR" }: { childr
           <ContenuSite valeurs={valeurs} langue={langue}>
           {/* /agents et /admins : écran de connexion seul, sans l'habillage du site (ChromeSite) */}
           <ChromeSite>
-            <Ouverture />
             <Header blog={blog} />
           </ChromeSite>
           <main id="contenu">{children}</main>

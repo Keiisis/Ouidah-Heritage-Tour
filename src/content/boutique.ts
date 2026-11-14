@@ -262,7 +262,7 @@ export const boutique = {
     description: "Description",
     entretien: "Entretien",
     retraitTitre: "Retrait et livraison",
-    retraitTexte: ["Retrait à Ouidah ou livraison, au choix à la commande.", REGLEMENT, TAUX],
+    retraitTexte: ["Retrait à Ouidah ou livraison, au choix à la commande."],
     galerie: "Photos de la pièce",
     choisirPhoto: "Choisir une photo",
     vue: (n: number) => (n === 1 ? "vue d’ensemble" : n === 2 ? "détail" : `vue ${n}`),
@@ -287,7 +287,7 @@ export const boutique = {
 
   // trois engagements vrais, avec les objets 3D du site
   reassurance: {
-    label: "Commander en confiance",
+    label: "Conditions de commande",
     points: [
       { objet: "billet", titre: "Paiement en une fois", texte: "Vous réglez votre commande en une fois au moment de commander, sans acompte." },
       { objet: "vehicule", titre: "Retrait ou livraison", texte: "Retirez votre commande à Ouidah ou faites-la livrer chez vous." },

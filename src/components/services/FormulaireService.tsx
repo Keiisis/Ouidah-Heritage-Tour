@@ -101,10 +101,11 @@ export function FormulaireService({ type, T, langue, creneaux = [], indisponible
     setErreurs({});
     setOccupe(true); setErreur("");
     try {
-      const r = await fetch("/api/mes-donnees/acces", { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action, confirmation: f.get("confirmation") === "on" }) });
+      const r = await fetch("/api/mes-donnees/acces", { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${jeton}` }, body: JSON.stringify({ action, confirmation: f.get("confirmation") === "on", langue }) });
       if (!r.ok) { const b = await r.json(); setErreur(erreurDe(b.erreur)); return; }
       if (action === "export") { const blob = await r.blob(), url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = "oht-mes-donnees.json"; a.click(); URL.revokeObjectURL(url); setRecu(T.exporter); }
-      else setRecu(T.effacementRecu);
+      // effacement fait côté serveur : le client lit ce qui reste et pourquoi (pièces comptables)
+      else { const b = (await r.json()) as { garde?: boolean; deja?: boolean }; setRecu(b.deja ? T.effacementFait : `${T.effacementFait} ${b.garde ? T.effacementGarde : T.effacementRien}`); }
       window.history.replaceState(null, "", window.location.pathname); window.dispatchEvent(new Event("hashchange"));
     } catch { setErreur(T.erreur); } finally { setOccupe(false); }
   }
