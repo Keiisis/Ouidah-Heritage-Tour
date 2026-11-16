@@ -36,7 +36,7 @@ export const copiesCode: Record<LangueEquipe, CopieCode> = {
     premiere: "Here is your first sign-in code for the Ouidah Heritage Tour team area:",
     validite: "This code is valid for 10 minutes and can be used once.",
     ignorer: "If you did not request it, ignore this email: your password stays the same.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benin)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   ES: {
     sujetOubli: "Su código para elegir una nueva contraseña",
@@ -46,7 +46,7 @@ export const copiesCode: Record<LangueEquipe, CopieCode> = {
     premiere: "Este es su código de primer acceso al espacio del equipo de Ouidah Heritage Tour:",
     validite: "Este código es válido durante 10 minutos y solo sirve una vez.",
     ignorer: "Si no lo ha solicitado, ignore este correo: su contraseña no cambia.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benín)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   DE: {
     sujetOubli: "Ihr Code für ein neues Passwort",
@@ -56,7 +56,7 @@ export const copiesCode: Record<LangueEquipe, CopieCode> = {
     premiere: "Hier ist Ihr Code für die erste Anmeldung im Teambereich von Ouidah Heritage Tour:",
     validite: "Dieser Code ist 10 Minuten gültig und nur einmal verwendbar.",
     ignorer: "Wenn Sie nichts angefordert haben, ignorieren Sie diese E-Mail: Ihr Passwort bleibt unverändert.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benin)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   PT: {
     sujetOubli: "O seu código para escolher uma nova palavra-passe",
@@ -66,7 +66,7 @@ export const copiesCode: Record<LangueEquipe, CopieCode> = {
     premiere: "Eis o seu código de primeiro acesso ao espaço da equipa da Ouidah Heritage Tour:",
     validite: "Este código é válido durante 10 minutos e só pode ser usado uma vez.",
     ignorer: "Se não pediu nada, ignore este e-mail: a sua palavra-passe não muda.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benim)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   HT: {
     sujetOubli: "Kòd ou pou chwazi yon nouvo modpas",
@@ -76,7 +76,7 @@ export const copiesCode: Record<LangueEquipe, CopieCode> = {
     premiere: "Men kòd premye koneksyon ou nan espas ekip Ouidah Heritage Tour la :",
     validite: "Kòd sa a valab pandan 10 minit epi li sèvi yon sèl fwa.",
     ignorer: "Si se pa ou ki te mande l, pa okipe imèl sa a : modpas ou pa chanje.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benen)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   GCF: {
     sujetOubli: "Kòd a-w pou chwazi on nouvo mod-pas",
@@ -86,6 +86,6 @@ export const copiesCode: Record<LangueEquipe, CopieCode> = {
     premiere: "Men kòd a-w pou prèmyé konnèksyon adan lèspas a lékip Ouidah Heritage Tour :",
     validite: "Kòd-lasa bon pannan 10 minit é i ka sèvi on sèl fwa.",
     ignorer: "Si sé pa-w ki mandé-y, pa okipé-w di imèl-lasa : mod-pas a-w pa ka chanjé.",
-    signature: "Ouidah Heritage Tour, Ouidah (Bénen)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
 };

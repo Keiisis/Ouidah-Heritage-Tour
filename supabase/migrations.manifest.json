@@ -221,6 +221,14 @@
     {
       "fichier": "20261125_gcf_harmonisation.sql",
       "sha256": "8579176fd08712a9d380fe564d1b2954c0cb9e201f6a1f5ef36712a703c69571"
+    },
+    {
+      "fichier": "20261126_benin_non_traduit.sql",
+      "sha256": "6f0e639395439aa63a2ea9351a0f478def2850529f838609edac64440f3325d4"
+    },
+    {
+      "fichier": "20261127_hero_sous_titre.sql",
+      "sha256": "967d8ea6544ea4a6beb48254c28330863618f5502a50850f03528062457f0923"
     }
   ]
 }

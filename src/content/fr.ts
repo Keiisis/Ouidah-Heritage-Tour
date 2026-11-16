@@ -188,7 +188,7 @@ export const tourFilters = ["Tous", "Mémoire", "Spiritualité", "Culture", "Nat
 export const hero = {
   kicker: ["Agence de tourisme mémoriel et culturel", "Ouidah, Bénin"],
   title: { lead: "Ouidah,", accent: "ville du Vodun et de la mémoire" },
-  sub: "Suivez à pied la Route des Esclaves, de la place Chacha jusqu'à la Porte du Non-Retour, face à l'Atlantique.",
+  sub: "Marchez sur les pas de l'histoire le long de la Route des Esclaves, de la place Chacha jusqu'à la Porte du Non-Retour, face à l'immensité de l'Atlantique. Une expérience hors du temps pour vibrer au rythme de l'âme du Vodun et de la mémoire.",
   // photos en fondu enchaîné, dans cet ordre (6 s chacune) ; à venir : route, temple et basilique
   images: [
     { src: "/hero/hero-4-plage.jpg", alt: "Vue aérienne de la plage de Ouidah : vagues de l'Atlantique, sable doré et cocotiers" },

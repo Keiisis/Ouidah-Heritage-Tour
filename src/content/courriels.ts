@@ -65,7 +65,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     noms: { navette: "airport shuttle", accueil: "welcome", telephone: "phone", hebergement: "accommodation", tables: "dining", vehicule: "vehicle" },
     voyageurs: (a, e) => [a ? `${a} adult${a > 1 ? "s" : ""}` : "", e ? `${e} ${e > 1 ? "children" : "child"}` : ""].filter(Boolean).join(", "),
     repondre: "To add a detail, reply to this email.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benin)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   ES: {
     phrase: { voyage: ["su solicitud de estancia en Ouidah", "ha llegado"], question: ["su pregunta", "ha llegado"] },
@@ -85,7 +85,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     noms: { navette: "traslado", accueil: "recepción", telephone: "teléfono", hebergement: "alojamiento", tables: "comidas", vehicule: "vehículo" },
     voyageurs: (a, e) => [a ? `${a} adulto${a > 1 ? "s" : ""}` : "", e ? `${e} niño${e > 1 ? "s" : ""}` : ""].filter(Boolean).join(", "),
     repondre: "Para añadir un detalle, responda a este correo.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benín)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   DE: {
     phrase: { voyage: ["Ihre Anfrage für einen Aufenthalt in Ouidah ist", "gut angekommen"], question: ["Ihre Frage ist", "gut angekommen"] },
@@ -105,7 +105,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     noms: { navette: "Flughafentransfer", accueil: "Empfang", telephone: "Telefon", hebergement: "Unterkunft", tables: "Essen", vehicule: "Fahrzeug" },
     voyageurs: (a, e) => [a ? `${a} ${a > 1 ? "Erwachsene" : "Erwachsener"}` : "", e ? `${e} ${e > 1 ? "Kinder" : "Kind"}` : ""].filter(Boolean).join(", "),
     repondre: "Um etwas zu ergänzen, antworten Sie auf diese E-Mail.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benin)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   PT: {
     phrase: { voyage: ["o seu pedido de estadia em Ouidah", "chegou bem"], question: ["a sua pergunta", "chegou bem"] },
@@ -125,7 +125,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     noms: { navette: "transfer", accueil: "acolhimento", telephone: "telefone", hebergement: "alojamento", tables: "refeições", vehicule: "veículo" },
     voyageurs: (a, e) => [a ? `${a} adulto${a > 1 ? "s" : ""}` : "", e ? `${e} criança${e > 1 ? "s" : ""}` : ""].filter(Boolean).join(", "),
     repondre: "Para acrescentar um pormenor, responda a este e-mail.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benim)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   HT: {
     phrase: { voyage: ["demann sejou ou nan Ouidah", "rive byen"], question: ["kesyon ou", "rive byen"] },
@@ -145,7 +145,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     noms: { navette: "navèt", accueil: "akèy", telephone: "telefòn", hebergement: "lojman", tables: "manje", vehicule: "machin" },
     voyageurs: (a, e) => [a ? `${a} granmoun` : "", e ? `${e} timoun` : ""].filter(Boolean).join(", "),
     repondre: "Pou w ajoute yon detay, reponn imèl sa a.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benen)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
   GCF: {
     phrase: { voyage: ["domann a séjou a-w Ouidah", "rivé byen"], question: ["kèsyon a-w", "rivé byen"] },
@@ -165,7 +165,7 @@ export const copies: Record<"FR" | "EN" | "ES" | "DE" | "PT" | "HT" | "GCF", Cop
     noms: { navette: "navèt", accueil: "lakèy", telephone: "téléfòn", hebergement: "lojman", tables: "manjé", vehicule: "loto" },
     voyageurs: (a, e) => [a ? `${a} granmoun` : "", e ? `${e} timoun` : ""].filter(Boolean).join(", "),
     repondre: "Pou ajouté on détay, réponn a imèl-lasa.",
-    signature: "Ouidah Heritage Tour, Ouidah (Benen)",
+    signature: "Ouidah Heritage Tour, Ouidah (Bénin)",
   },
 };
 

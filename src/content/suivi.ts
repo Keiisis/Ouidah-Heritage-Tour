@@ -94,7 +94,7 @@ const fr: TexteSuivi = {
 
 const en: TexteSuivi = {
   html: "en", locale: "en-GB",
-  titre: ["Welcome to", "Benin"],
+  titre: ["Welcome to", "Bénin"],
   doc: { paiement: "Payment ticket", boutique: "Order ticket", attente: "Quote request ticket", pret: "Quote ticket" },
   ticket: {
     no: "Ticket no.", date: "Date", voyageur: "Traveller", client: "Customer",
@@ -143,7 +143,7 @@ const en: TexteSuivi = {
 
 const es: TexteSuivi = {
   html: "es", locale: "es-ES",
-  titre: ["Bienvenidos a", "Benín"],
+  titre: ["Bienvenidos a", "Bénin"],
   doc: { paiement: "Ticket de pago", boutique: "Ticket de pedido", attente: "Ticket de solicitud de presupuesto", pret: "Ticket de presupuesto" },
   ticket: {
     no: "Ticket n.º", date: "Fecha", voyageur: "Viajero", client: "Cliente",
@@ -192,7 +192,7 @@ const es: TexteSuivi = {
 
 const de: TexteSuivi = {
   html: "de", locale: "de-DE",
-  titre: ["Willkommen in", "Benin"],
+  titre: ["Willkommen in", "Bénin"],
   doc: { paiement: "Zahlungsticket", boutique: "Bestellticket", attente: "Ticket zur Angebotsanfrage", pret: "Angebotsticket" },
   ticket: {
     no: "Ticket-Nr.", date: "Datum", voyageur: "Gast", client: "Kunde",
@@ -241,7 +241,7 @@ const de: TexteSuivi = {
 
 const pt: TexteSuivi = {
   html: "pt", locale: "pt-PT", formatMois: "long",
-  titre: ["Bem-vindos ao", "Benin"],
+  titre: ["Bem-vindos ao", "Bénin"],
   doc: { paiement: "Ticket de pagamento", boutique: "Ticket de encomenda", attente: "Ticket de pedido de orçamento", pret: "Ticket de orçamento" },
   ticket: {
     no: "Ticket n.º", date: "Data", voyageur: "Viajante", client: "Cliente",
@@ -291,7 +291,7 @@ const pt: TexteSuivi = {
 const ht: TexteSuivi = {
   html: "ht", locale: null,
   mois: ["janvye", "fevriye", "mas", "avril", "me", "jen", "jiyè", "out", "septanm", "oktòb", "novanm", "desanm"],
-  titre: ["Byenvini nan", "Benen"],
+  titre: ["Byenvini nan", "Bénin"],
   doc: { paiement: "Tikè peman", boutique: "Tikè kòmand", attente: "Tikè demann devi", pret: "Tikè devi" },
   ticket: {
     no: "Tikè nº", date: "Dat", voyageur: "Vwayajè", client: "Kliyan",
@@ -341,7 +341,7 @@ const ht: TexteSuivi = {
 const gcf: TexteSuivi = {
   html: "gcf", locale: null,
   mois: ["janvyé", "févryé", "mas", "avril", "mé", "jen", "jiyé", "out", "sèptanm", "oktòb", "novanm", "désanm"],
-  titre: ["Byenvini an", "Benen"],
+  titre: ["Byenvini an", "Bénin"],
   doc: { paiement: "Tikè pèman", boutique: "Tikè kòmand", attente: "Tikè dimann dévi", pret: "Tikè dévi" },
   ticket: {
     no: "Tikè nº", date: "Dat", voyageur: "Vwayajè", client: "Kliyan",
