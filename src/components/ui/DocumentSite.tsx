@@ -8,6 +8,7 @@ import { variablesTheme } from "@/lib/theme";
 import { lireContenu, surchargesPubliques } from "@/lib/contenu";
 import { Providers } from "@/components/ui/Providers";
 import { scriptOuverture } from "@/components/ui/Ouverture";
+import { ScriptEnLigne } from "@/components/ui/ScriptEnLigne";
 import { Consentement } from "@/components/ui/Consentement";
 import { AssistantSite } from "@/components/assistant/AssistantSite";
 import { Mesure } from "@/components/mesure/Mesure";
@@ -43,7 +44,7 @@ export default async function DocumentSite({ children, langue = "FR" }: { childr
     // suppressHydrationWarning : le script en tête de <body> pose data-ouverture sur <html> avant l'hydratation
     <html lang={langue.toLowerCase()} className={`${fraunces.variable} ${manrope.variable}`} style={variablesTheme(theme)} suppressHydrationWarning>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: scriptOuverture }} />
+        <ScriptEnLigne html={scriptOuverture} />
         <a href="#contenu" className="label sr-only z-[60] bg-laterite px-4 py-3 text-ivory focus:not-sr-only focus:fixed focus:top-2 focus:left-2">
           {nav.skip}
         </a>

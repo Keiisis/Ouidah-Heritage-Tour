@@ -13,7 +13,7 @@ import type { Fiche } from "./Carnet";
 export type Trace = { slug: string; points: [number, number][]; etat: "on" | "apercu" };
 type Props = {
   lieux: Fiche[]; // épingles (Ouidah et ses abords)
-  loin: Fiche[]; // « Plus loin » : au bord de la carte, avec leur distance
+  loin: Fiche[]; // « Plus loin » : en bandeau au-dessus de la carte, avec leur distance
   points: [number, number][]; // relevé de la ville : points discrets
   gardes: string[];
   traces: Trace[];
@@ -44,7 +44,7 @@ export function CarteLieux({ lieux, loin, points, gardes, traces, allumes, onBas
     if (!w || !h || !lieux.length) return null;
     const xs = lieux.map((l) => pr(l.coords));
     const [x0, y0, x1, y1] = [Math.min(...xs.map((p) => p[0])), Math.min(...xs.map((p) => p[1])), Math.max(...xs.map((p) => p[0])), Math.max(...xs.map((p) => p[1]))];
-    // marges en pixels : en haut et sur les côtés pour les épingles, en bas pour la mer, l'échelle et « Plus loin »
+    // marges en pixels : en haut et sur les côtés pour les épingles, en bas pour la mer
     // carte basse (téléphone couché) : moins de mer, la ville garde la hauteur
     // carte étroite : la ville commence sous la légende (source, échelle) posée en haut à gauche
     const etroite = w < 600;
@@ -94,71 +94,80 @@ export function CarteLieux({ lieux, loin, points, gardes, traces, allumes, onBas
     return { mer, cote, releve, pos, chemins, ocean, km: (1000 / 111.32) * s };
   }, [taille, lieux, points, traces]);
 
+  // « Plus loin » en bandeau au-dessus du plan, pas dessus : posée en bas, sur la mer, la pastille de Ganvié (cité lacustre,
+  // à l'intérieur des terres) se lisait comme un lieu sur l'océan
   return (
-    <div ref={cadre} className="cn-plan" role="group" aria-label={textes.carte}>
-      {vue ? (
-        <>
-          <svg className="cn-svg" width={taille.w} height={taille.h} aria-hidden="true" focusable="false">
-            <path className="cn-mer" d={vue.mer} />
-            <path className="cn-cote" d={`M${vue.cote.map((p) => p.map((v) => v.toFixed(1)).join(" ")).join("L")}`} />
-            {vue.releve.map(([x, y], i) => (
-              <circle key={i} className="cn-point" cx={x} cy={y} r={2} />
-            ))}
-            {vue.chemins.map((t) => (
-              <path key={t.slug + t.etat} className={`cn-trace ${t.etat === "on" ? "cn-on" : ""}`} data-trace={t.slug} d={t.d} />
-            ))}
-            {vue.pos.map(({ l, vrai, xy }) =>
-              Math.hypot(xy[0] - vrai[0], xy[1] - vrai[1]) > 8 ? <line key={l.id} className="cn-filet" x1={vrai[0]} y1={vrai[1]} x2={xy[0]} y2={xy[1]} /> : null,
-            )}
-            {vue.pos.map(({ l, vrai }) => (
-              <circle key={l.id} className="cn-exact" cx={vrai[0]} cy={vrai[1]} r={3} />
-            ))}
-          </svg>
-          {vue.pos.map(({ l, xy }) => {
-            const n = gardes.indexOf(l.id) + 1;
-            return (
-              <button
-                key={l.id}
-                type="button"
-                className={`cn-epingle ${allumes.includes(l.id) ? "cn-allume" : ""} ${l.image ? "" : "cn-objet"}`}
-                data-id={l.id}
-                aria-pressed={n > 0}
-                aria-label={l.nom}
-                style={{ left: xy[0], top: xy[1] }}
-                onClick={() => onBasculer(l.id)}
-                onPointerEnter={(e) => e.pointerType === "mouse" && onSurvol(l.id)}
-                onPointerLeave={() => onSurvol(null)}
-                onFocus={() => onSurvol(l.id)}
-                onBlur={() => onSurvol(null)}
-              >
-                {l.image ? <Image src={l.image.src} alt="" width={EPINGLE} height={EPINGLE} /> : <Objet3D nom={l.objet} taille={28} />}
-                {n ? <b aria-hidden="true">{n}</b> : null}
-              </button>
-            );
-          })}
-          <div className="cn-loin" role="group" aria-label={textes.loin}>
-            {loin.map((l) => (
-              <button key={l.id} type="button" className={`cn-ailleurs ${allumes.includes(l.id) ? "cn-allume" : ""}`} data-id={l.id} aria-pressed={gardes.includes(l.id)} onClick={() => onBasculer(l.id)} onFocus={() => onSurvol(l.id)} onBlur={() => onSurvol(null)}>
-                <span className="cn-pastille">{l.image ? <Image src={l.image.src} alt="" width={32} height={32} /> : <Objet3D nom={l.objet} taille={24} />}</span>
-                <span>
-                  {l.nom}, {textes.km(l)}
-                </span>
-                {gardes.includes(l.id) ? <b aria-hidden="true">{gardes.indexOf(l.id) + 1}</b> : null}
-              </button>
-            ))}
-          </div>
-          {/* en haut à gauche, sur la terre : source des données (licence OpenStreetMap) et échelle ; le nom de l'océan sur
-              la mer, en bas à gauche, s'il y tient */}
-          <div className="cn-legende">
-            <span className="cn-source">{textes.source}</span>
-            <span className="cn-echelle" aria-hidden="true">
-              <span>{textes.echelle}</span>
-              <i style={{ width: vue.km }} />
+    <>
+      {loin.length ? (
+        <div className="cn-loin" role="group" aria-label={textes.loin}>
+            <span className="cn-loin-titre" aria-hidden="true">
+              {textes.loin}
             </span>
-          </div>
-          {vue.ocean ? <span className="cn-ocean">{textes.ocean}</span> : null}
-        </>
+          {loin.map((l) => (
+            <button key={l.id} type="button" className={`cn-ailleurs ${allumes.includes(l.id) ? "cn-allume" : ""}`} data-id={l.id} aria-pressed={gardes.includes(l.id)} onClick={() => onBasculer(l.id)} onFocus={() => onSurvol(l.id)} onBlur={() => onSurvol(null)}>
+              <span className="cn-pastille">{l.image ? <Image src={l.image.src} alt="" width={32} height={32} /> : <Objet3D nom={l.objet} taille={24} />}</span>
+              <span>
+                {l.nom}, {textes.km(l)}
+              </span>
+              {gardes.includes(l.id) ? <b aria-hidden="true">{gardes.indexOf(l.id) + 1}</b> : null}
+            </button>
+          ))}
+        </div>
       ) : null}
-    </div>
+      <div ref={cadre} className="cn-plan" role="group" aria-label={textes.carte}>
+        {vue ? (
+          <>
+            <svg className="cn-svg" width={taille.w} height={taille.h} aria-hidden="true" focusable="false">
+              <path className="cn-mer" d={vue.mer} />
+              <path className="cn-cote" d={`M${vue.cote.map((p) => p.map((v) => v.toFixed(1)).join(" ")).join("L")}`} />
+              {vue.releve.map(([x, y], i) => (
+                <circle key={i} className="cn-point" cx={x} cy={y} r={2} />
+              ))}
+              {vue.chemins.map((t) => (
+                <path key={t.slug + t.etat} className={`cn-trace ${t.etat === "on" ? "cn-on" : ""}`} data-trace={t.slug} d={t.d} />
+              ))}
+              {vue.pos.map(({ l, vrai, xy }) =>
+                Math.hypot(xy[0] - vrai[0], xy[1] - vrai[1]) > 8 ? <line key={l.id} className="cn-filet" x1={vrai[0]} y1={vrai[1]} x2={xy[0]} y2={xy[1]} /> : null,
+              )}
+              {vue.pos.map(({ l, vrai }) => (
+                <circle key={l.id} className="cn-exact" cx={vrai[0]} cy={vrai[1]} r={3} />
+              ))}
+            </svg>
+            {vue.pos.map(({ l, xy }) => {
+              const n = gardes.indexOf(l.id) + 1;
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  className={`cn-epingle ${allumes.includes(l.id) ? "cn-allume" : ""} ${l.image ? "" : "cn-objet"}`}
+                  data-id={l.id}
+                  aria-pressed={n > 0}
+                  aria-label={l.nom}
+                  style={{ left: xy[0], top: xy[1] }}
+                  onClick={() => onBasculer(l.id)}
+                  onPointerEnter={(e) => e.pointerType === "mouse" && onSurvol(l.id)}
+                  onPointerLeave={() => onSurvol(null)}
+                  onFocus={() => onSurvol(l.id)}
+                  onBlur={() => onSurvol(null)}
+                >
+                  {l.image ? <Image src={l.image.src} alt="" width={EPINGLE} height={EPINGLE} /> : <Objet3D nom={l.objet} taille={28} />}
+                  {n ? <b aria-hidden="true">{n}</b> : null}
+                </button>
+              );
+            })}
+            {/* en haut à gauche, sur la terre : source des données (licence OpenStreetMap) et échelle ; le nom de l'océan sur
+                la mer, en bas à gauche, s'il y tient */}
+            <div className="cn-legende">
+              <span className="cn-source">{textes.source}</span>
+              <span className="cn-echelle" aria-hidden="true">
+                <span>{textes.echelle}</span>
+                <i style={{ width: vue.km }} />
+              </span>
+            </div>
+            {vue.ocean ? <span className="cn-ocean">{textes.ocean}</span> : null}
+          </>
+        ) : null}
+      </div>
+    </>
   );
 }

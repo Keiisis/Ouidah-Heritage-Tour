@@ -217,6 +217,10 @@
     {
       "fichier": "20261124_reecriture_unslop.sql",
       "sha256": "b7c0bbd02bde5d8a0f9e92a25d51b7e5eb0d688dd8b2a0b3e4d305e0504bce76"
+    },
+    {
+      "fichier": "20261125_gcf_harmonisation.sql",
+      "sha256": "8579176fd08712a9d380fe564d1b2954c0cb9e201f6a1f5ef36712a703c69571"
     }
   ]
 }

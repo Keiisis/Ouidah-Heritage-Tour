@@ -17,6 +17,9 @@ export async function lireTaches(): Promise<ReglagesTaches | null> {
 export async function rpcTache<T>(nom: string, corps: Record<string, unknown>): Promise<{ valeur: T } | null> {
   try {
     const r = await base(`rpc/${nom}`, { method: "POST", corps });
-    return r.ok ? { valeur: await r.json() as T } : null;
+    if (!r.ok) return null;
+    // Fonction void : PostgREST répond 204 sans corps.
+    const texte = await r.text();
+    return { valeur: (texte ? JSON.parse(texte) : null) as T };
   } catch { return null; }
 }

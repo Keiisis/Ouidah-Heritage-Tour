@@ -585,15 +585,17 @@
 
 /* carte */
 .cn-carte {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   grid-row: 2;
   grid-column: 2;
   min-height: 0;
   border-left: 1px solid var(--b-filet);
 }
 .cn-plan {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   background: var(--b-blanc);
 }
@@ -692,13 +694,18 @@
   box-shadow: 0 0 0 2px var(--b-blanc);
 }
 .cn-loin {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  display: grid;
-  justify-items: end;
-  gap: 8px;
-  max-width: calc(100% - 100px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--b-filet);
+}
+.cn-loin-titre {
+  flex-basis: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--b-encre-3);
 }
 .cn-ailleurs {
   position: relative;
@@ -860,6 +867,12 @@
 @media (max-height: 500px) {
   .cn-tete {
     padding: 4px 16px;
+  }
+  .cn-loin {
+    padding: 4px 12px;
+  }
+  .cn-loin-titre {
+    flex-basis: auto;
   }
   .cn-titre {
     font-size: 20px;

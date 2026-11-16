@@ -3,7 +3,8 @@ import { SECTIONS, adresseAgence, adresseCircuit, adresseLieu } from "@/content/
 import { lireContenu as lireContenuLangue } from "@/lib/contenu";
 import { languePage, lireContenuPage as lireContenu } from "@/lib/serveur/contenu-page";
 import type { Langue } from "@/lib/langue";
-import { Introuvable, type Cible, type Entree } from "@/components/introuvable/Introuvable";
+import type { Cible, Entree } from "@/components/introuvable/Introuvable";
+import { Introuvable } from "@/components/introuvable/IntrouvableDiffere";
 
 // Page introuvable (adresse inconnue ou notFound() d'une fiche) : Next y ajoute lui-même <meta name="robots" content="noindex">.
 export async function generateMetadata(): Promise<Metadata> {
