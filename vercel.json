@@ -1,6 +1,17 @@
 {
   "crons": [
     { "path": "/api/taches/traductions", "schedule": "0 3 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 1 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 5 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 7 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 9 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 11 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 13 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 15 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 17 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 19 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 21 * * *" },
+    { "path": "/api/taches/traductions", "schedule": "0 23 * * *" },
     { "path": "/api/taches/rapport", "schedule": "0 9 * * 6" },
     { "path": "/api/taches/imap", "schedule": "0 6 * * *" },
     { "path": "/api/taches/purge", "schedule": "30 4 * * *" },

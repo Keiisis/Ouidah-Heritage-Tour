@@ -89,7 +89,8 @@ export async function traiterTraductions(): Promise<{ traites: number; erreur?: 
   if (!reg.actif || !cleGroq()) return { traites: 0, erreur: reg.actif ? "configuration" : undefined };
   const init = await rpcTache("traduction_auto_initialiser", { p_cles: Object.keys(REGISTRE).filter(estContenuAuto), p_forcer: false });
   if (!init) return { traites: 0, erreur: "base" };
-  const limite = Date.now() + 43_000;
+  // Sous le bail de 3 min (traduction_auto_prendre) : un job pris ne peut pas survivre à son bail.
+  const limite = Date.now() + 170_000;
   let traites = 0;
   while (Date.now() < limite) {
     const prise = await rpcTache<Job | null>("traduction_auto_prendre", {});
@@ -174,7 +175,7 @@ export async function traiterTraductions(): Promise<{ traites: number; erreur?: 
           const reservation = await rpcTache<string | null>("traduction_auto_reserver_budget", { p_jetons: reserves });
           if (!reservation) throw new Error("base");
           if (!reservation.valeur) { await reporter("budget"); return { traites, erreur: "budget" }; }
-          const traduit = await traduireSegments(langue, lot, { ...options, modele: reg.modele, plafond });
+          const traduit = await traduireSegments(langue, lot, { ...options, modele: reg.modele, plafond, attenteMax: limite - 21_000 - Date.now() });
           // Une requête sans usage fiable garde la réserve ; jamais un échec compté comme gratuit.
           const solde = await rpcTache("traduction_auto_solder_budget", { p_reservation: reservation.valeur, p_jetons: traduit.jetons > 0 ? traduit.jetons : null });
           if (!solde) throw new Error("base");

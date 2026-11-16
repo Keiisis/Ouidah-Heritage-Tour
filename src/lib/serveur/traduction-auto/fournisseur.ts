@@ -3,7 +3,7 @@ import { appelerGroq } from "../assistant/fournisseur";
 import { traductionValide, type OptionsMemoire, type SegmentAuto } from "./moteur";
 import type { Langue } from "@/lib/langue";
 
-export type OptionsFournisseur = OptionsMemoire & { modele: string; plafond: number; host?: string | null };
+export type OptionsFournisseur = OptionsMemoire & { modele: string; plafond: number; host?: string | null; attenteMax?: number };
 export type RetourTraduction = { ok: true; traductions: Record<string, string>; jetons: number } | { ok: false; erreur: "lot" | "fournisseur" | "reponse"; jetons: number };
 export const MAX_SEGMENTS_LOT = 24;
 export const MAX_CARACTERES_LOT = 9000;
@@ -38,11 +38,12 @@ export async function traduireSegments(langue: Langue, segments: SegmentAuto[], 
   const utilisateur = JSON.stringify({ langue, regle_numerique: "Conserve TOUS les chiffres et leur notation exacte. Ne convertis jamais heures, unités, monnaies ni format numérique. Exemple obligatoire : 9h et 17h restent exactement 9h et 17h, même en anglais ; jamais 9am, 5pm, 09:00 ou 17:00. Traduis seulement les mots autour de ces valeurs.", segments: segments.map(({ id, source: texte, contexte, max }) => ({ id, source: texte, contexte, max })) });
   // Borne unique pour toutes les clés, les en-têtes ET le corps ; aucun flux survivant après le délai.
   const ctl = new AbortController();
-  const minuterie = setTimeout(() => ctl.abort(), 20000);
+  const attenteMax = Math.max(0, options.attenteMax ?? 0); // clés limitées : attendre qu'une se libère (voir appelerGroq)
+  const minuterie = setTimeout(() => ctl.abort(), 20000 + attenteMax);
   let jetons = 0;
   let reponseRecue = false;
   try {
-    const reponse = await appelerGroq({ model: options.modele, messages: [{ role: "system", content: systeme }, { role: "user", content: utilisateur }], max_completion_tokens: options.plafond, stream: false, temperature: 0, response_format: { type: "json_object" } }, options.host ?? null, ctl.signal);
+    const reponse = await appelerGroq({ model: options.modele, messages: [{ role: "system", content: systeme }, { role: "user", content: utilisateur }], max_completion_tokens: options.plafond, stream: false, temperature: 0, response_format: { type: "json_object" } }, options.host ?? null, ctl.signal, attenteMax);
     if (!reponse) return { ok: false, erreur: "fournisseur", jetons: 0 };
     reponseRecue = true;
     const brut = await lireCorps(reponse, ctl.signal);

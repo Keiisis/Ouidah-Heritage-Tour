@@ -12,8 +12,8 @@ import { modeLocal } from "../equipe/mode";
 //   « not supported » pour gpt-oss (console.groq.com/docs/reasoning). Les modèles Llama ne reçoivent aucun de ces deux
 //   champs (« Values outside a model's supported set are rejected with a 400 »).
 // Clés : GROQ_API_KEYS, une ou plusieurs séparées par des virgules, jamais lues ailleurs, jamais renvoyées ni écrites.
-// Rotation : chaque appel commence par la clé suivante ; repli sur la suivante en cas de 429, 401/403, 5xx, délai dépassé
-// ou réseau coupé. Une requête refusée (400, 404…) s'arrête : une autre clé n'y changerait rien.
+// Rotation : chaque appel prend la clé prête le plus tôt (voir `etats`) ; repli sur une autre en cas de 429, 401/403, 5xx,
+// délai dépassé ou réseau coupé. Une requête refusée (400, 404…) s'arrête : une autre clé n'y changerait rien.
 //
 // Faux fournisseur, POUR LES TESTS SEULEMENT : ASSISTANT_FAUX=<chemin absolu .jsonl hors du dépôt>, retenu par les mêmes
 // règles que EQUIPE_BOITE (equipe/mode.ts : jamais sur Vercel, jamais hors localhost). Il remplace l'appel réseau, écrit
@@ -100,28 +100,76 @@ export type Echange = { role: "system" | "user" | "assistant"; content: string }
 type Corps = { model: string; messages: Echange[]; max_completion_tokens: number; stream: boolean; temperature?: number; response_format?: { type: "json_object" } };
 
 let tour = 0;
+// État de chaque clé dans cette instance : limitée jusqu'à `libre` (429, clé refusée, panne), et jetons de la minute
+// restants selon Groq (x-ratelimit-remaining-tokens, rechargés à `recharge`, x-ratelimit-reset-tokens). Chaque appel prend
+// la clé prête le plus tôt, à égalité la suivante du tourniquet : les clés s'épuisent l'une après l'autre, pas ensemble.
+// Des clés d'une même organisation Groq partagent la même limite : la rotation répartit, elle n'ajoute pas de débit.
+const etats = new Map<string, { libre: number; restants: number; recharge: number }>();
+/** « 7.66s », « 2m59.5s », « 120ms » ou « 12 » (retry-after, secondes) → millisecondes ; NaN si illisible. */
+const duree = (v: string | null) => {
+  if (!v) return NaN;
+  if (/^\d+(\.\d+)?$/.test(v.trim())) return Number(v) * 1000;
+  let ms = 0, lu = false;
+  for (const [, n, u] of v.matchAll(/([\d.]+)(ms|h|m|s)/g)) { ms += Number(n) * { ms: 1, s: 1000, m: 60_000, h: 3_600_000 }[u as "ms"]; lu = true; }
+  return lu ? ms : NaN;
+};
+const attendre = (ms: number, signal?: AbortSignal) => new Promise<void>((fin) => {
+  const t = setTimeout(fin, ms);
+  signal?.addEventListener("abort", () => { clearTimeout(t); fin(); }, { once: true });
+});
 
-/** Réponse de Groq (statut 2xx), ou null : aucune clé, toutes limitées ou en panne, ou requête refusée. */
-export async function appelerGroq(corps: Corps, hote: string | null, signal?: AbortSignal): Promise<Response | null> {
+/** Réponse de Groq (statut 2xx), ou null : aucune clé, toutes limitées ou en panne, ou requête refusée.
+ * `attenteMax` (ms, tâches de fond) : une clé limitée n'est pas redemandée avant l'heure donnée par Groq ; si toutes le sont,
+ * attendre la première qui se libère dans ce délai plutôt que d'abandonner. */
+export async function appelerGroq(corps: Corps, hote: string | null, signal?: AbortSignal, attenteMax = 0): Promise<Response | null> {
   const k = cles();
   if (!k.length || signal?.aborted) return null;
   const faux = cheminFaux(hote);
   const params = { ...corps, temperature: corps.temperature ?? GROQ.temperature, ...(corps.model.startsWith("openai/gpt-oss") ? { reasoning_effort: GROQ.raisonnement, include_reasoning: false } : {}) };
+  // Groq compte la demande comme entrée + max_completion_tokens ; environ 4 caractères par jeton.
+  const besoin = Math.ceil(JSON.stringify(params.messages).length / 4) + params.max_completion_tokens;
+  const pret = (cle: string) => {
+    const e = etats.get(cle);
+    if (!e) return 0;
+    return e.restants < besoin && e.recharge > e.libre ? e.recharge : e.libre;
+  };
+  const echeance = Date.now() + attenteMax;
   const depart = tour++ % k.length;
-  for (let n = 0; n < k.length; n++) {
+  const essayees = new Set<number>();
+  for (let n = 0; n < k.length * (attenteMax > 0 ? 3 : 1); n++) {
     if (signal?.aborted) return null;
-    const i = (depart + n) % k.length;
+    // Sans attente permise (visiteur en direct), chaque clé est essayée une fois, la plus prête d'abord.
+    const ordre = k.map((_, j) => (depart + n + j) % k.length).filter((j) => attenteMax > 0 || !essayees.has(j));
+    const i = ordre.reduce((a, b) => (pret(k[b]) < pret(k[a]) ? b : a));
+    essayees.add(i);
+    const delai = pret(k[i]) - Date.now();
+    if (delai > 0 && attenteMax > 0) {
+      if (Date.now() + delai > echeance) return null;
+      await attendre(delai, signal);
+      if (signal?.aborted) return null;
+    }
+    const e = etats.get(k[i]);
+    if (e) e.restants -= besoin; // réservé tout de suite : un appel simultané choisira une autre clé
     const ctl = new AbortController();
     const minuterie = setTimeout(() => ctl.abort(), GROQ.delaiMs); // attente des en-têtes seulement : levée dès la réponse
     try {
       const r = faux
         ? await fauxGroq(params, n, faux)
         : await fetch(GROQ.url, { method: "POST", headers: { authorization: `Bearer ${k[i]}`, "content-type": "application/json" }, body: JSON.stringify(params), signal: signal ? AbortSignal.any([ctl.signal, signal]) : ctl.signal, cache: "no-store" });
+      const maintenant = Date.now();
+      const restants = Number(r.headers.get("x-ratelimit-remaining-tokens")), recharge = duree(r.headers.get("x-ratelimit-reset-tokens"));
+      const suivant = { libre: 0, restants: Infinity, recharge: 0 };
+      if (Number.isFinite(restants) && Number.isFinite(recharge)) Object.assign(suivant, { restants, recharge: maintenant + recharge });
+      if (r.status === 429) suivant.libre = maintenant + (duree(r.headers.get("retry-after")) || recharge || 10_000);
+      else if (r.status === 401 || r.status === 403) suivant.libre = maintenant + 600_000;
+      else if (r.status >= 500) suivant.libre = maintenant + 5_000;
+      etats.set(k[i], suivant);
       if (r.ok) return r;
       await r.body?.cancel().catch(() => null);
       if (r.status !== 429 && r.status !== 401 && r.status !== 403 && r.status < 500) return null;
     } catch {
       // délai dépassé ou réseau coupé : clé suivante
+      etats.set(k[i], { libre: Date.now() + 5_000, restants: Infinity, recharge: 0 });
     } finally {
       clearTimeout(minuterie);
     }
