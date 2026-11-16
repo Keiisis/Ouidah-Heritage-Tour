@@ -6,7 +6,7 @@ import { egaux, hmac, iso } from "../equipe/outils";
 import { effacer } from "../equipe/dossiers";
 import { droitsEffectifs } from "../equipe/securite/droits";
 import type { Session } from "../equipe/session";
-import { type Action, completer, lireSigne, resumer, signer, UUID } from "./regles";
+import { type Action, completer, lireSigne, type ModeConversation, resumer, signer, UUID } from "./regles";
 
 // Conversations des visiteurs (assistant, puis agent), lues et écrites par le serveur seulement (clé secrète, RLS sans
 // politique). L'identifiant donné au navigateur est toujours signé (HMAC EQUIPE_SEL), jamais l'uuid seul. Une conversation
@@ -23,7 +23,7 @@ export type Conversation = {
   cree_le: string;
   vu_le: string;
   langue: LangueAssistant;
-  mode: "assistant" | "agent";
+  mode: ModeConversation;
   ip_hash: string;
   passage_le: string | null;
   hors_ligne: boolean;

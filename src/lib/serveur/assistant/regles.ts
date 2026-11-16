@@ -13,6 +13,11 @@ export type EtatSource = "brouillon" | "publie" | "retire";
  * chaque publication) : retire → publie direct, sans repasser par le brouillon. */
 export const TRANSITIONS_SOURCE: Transitions<EtatSource> = { brouillon: ["publie"], publie: ["retire"], retire: ["publie"] };
 
+export type ModeConversation = "assistant" | "agent";
+/** conversations.mode (machine à états : 20261128_machines_etats_trois.sql recopie cette table). Un seul écrivain, passerAgent
+ * (conversations.ts) : le passage à l'équipe est définitif, la conversation ne revient jamais à l'assistant IA. */
+export const TRANSITIONS_MODE_CONVERSATION: Transitions<ModeConversation> = { assistant: ["agent"], agent: [] };
+
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const WHATSAPP = /^\+?[0-9][0-9 ().-]{5,31}$/;

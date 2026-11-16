@@ -8,6 +8,8 @@ import { assistantSite as ASSISTANT_SITE, NOMS_LANGUES as NOMS_LANGUES_DEFAUT, P
 import { collage as COLLAGE, consentement as CONSENTEMENT, DEVIS, finalMask as FINAL_MASK } from "@/content/fr";
 import { useContenu } from "@/components/ui/ContenuSite";
 import { choixActuel, useConsentement } from "@/lib/consentement";
+import { TRANSITIONS_PANNEAU, type EtatPanneau } from "@/lib/machines-ecrans";
+import { avancer } from "@/lib/serveur/machines";
 import { langueDetectee, rien } from "@/lib/langue";
 import { Icon } from "@/components/ui/Icon";
 import { ECO_FACTEUR, lireEco } from "@/components/mesure/eco";
@@ -21,7 +23,7 @@ import "./assistant-site.css";
 // Kevin, 04/11 : l'assistant IA d'OHT répond sans accord à donner ; la conversation reste en mémoire seulement et son
 // effacement est demandé quand le visiteur quitte la page (/api/assistant/fin). Le programme, lui, reste sur l'appareil.
 
-type Etat = "ouvert" | "conversation" | "agent" | "horsligne" | "langues";
+type Etat = EtatPanneau;
 type TypeEtape = "circuit" | "lieu" | "evenement";
 type Etape = { type: TypeEtape; id: string; titre: string; url: string; image: string | null };
 type Action = { type: "devis"; circuit: string | null; url: string } | { type: TypeEtape | "article"; id: string; titre: string; url: string; image: string | null } | { type: "agent" };
@@ -327,7 +329,8 @@ export function AssistantSite() {
   const aEffacer = useRef<string | null>(null); // conversation avec l'assistant, effacée quand le visiteur quitte la page
 
   const [ouvert, setOuvert] = useState(false);
-  const [etat, setEtat] = useState<Etat>("ouvert");
+  const [etat, ecrireEtat] = useState<Etat>("ouvert");
+  const setEtat = useCallback((vers: Etat) => ecrireEtat((de) => avancer(TRANSITIONS_PANNEAU, de, vers)), []);
   const [avantLangues, setAvantLangues] = useState<Etat>("ouvert");
   const [dispo, setDispo] = useState<Dispo | "panne" | null>(null);
   const [msgs, setMsgs] = useState<Message[]>([]);
@@ -444,7 +447,7 @@ export function AssistantSite() {
               .filter((x) => !m.some((y) => y.cle === `a${String(x.id)}`))
               .map((x): Message => ({ cle: `a${String(x.id)}`, auteur: "agent", texte: x.texte as string, prenom: typeof x.agent === "string" ? x.agent : null })),
           ]);
-          setEtat((e) => (e === "horsligne" ? "agent" : e));
+          ecrireEtat((e) => (e === "horsligne" ? avancer(TRANSITIONS_PANNEAU, e, "agent") : e));
         }
         setEnLigne(j.enLigne === true);
         if (j.contact === true) setContactDonne(true);

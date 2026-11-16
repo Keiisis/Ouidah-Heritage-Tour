@@ -9,3 +9,8 @@ export type Transitions<E extends string> = { readonly [K in E]: readonly E[] };
 export function peutPasser<E extends string>(table: Transitions<E>, de: E, vers: E): boolean {
   return de === vers || (table[de]?.includes(vers) ?? false);
 }
+
+/** État suivant d'un écran (état React, sans base) : `vers` si la transition est permise, sinon l'état courant reste. */
+export function avancer<E extends string>(table: Transitions<E>, de: E, vers: E): E {
+  return peutPasser(table, de, vers) ? vers : de;
+}

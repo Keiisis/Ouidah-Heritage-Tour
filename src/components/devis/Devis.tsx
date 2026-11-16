@@ -25,6 +25,8 @@ import { Objet3D } from "@/components/ui/Objet3D";
 import { Icon } from "@/components/ui/Icon";
 import { Palettes } from "@/components/ui/Palettes";
 import { adresseRetour, lancerPaiement, type NomPasserelle, type Preparee } from "@/lib/paiement";
+import { TRANSITIONS_BILLET, TRANSITIONS_LIEN_REPRISE, type EtatBillet, type EtatLienReprise } from "@/lib/machines-ecrans";
+import { avancer } from "@/lib/serveur/machines";
 import "./billet.css";
 
 // carnet des lieux (circuits, lieux, recherche, carte) : chargé au premier « Choisir mes lieux » seulement
@@ -37,7 +39,6 @@ const Carnet = lazy(() => import("./Carnet").then((m) => ({ default: m.Carnet })
 // classes du billet : feuille globale billet.css, toutes préfixées « bt- »
 const s = new Proxy({} as Record<string, string>, { get: (_, k) => `bt-${String(k)}` });
 const BROUILLON = "oht-devis";
-type Etat = "saisie" | "envoi" | "echec" | "limite" | "dechirure" | "envoye";
 type Brouillon = { reponses: Omit<ReponsesDevis, "langue"> & { langue: string | null }; champs: ChampsDevis };
 type Cle = "ville" | "dates" | "lieux" | "qui" | "occasion" | "pays" | "langue";
 const VIDE: Brouillon = { reponses: { qui: null, adultes: 0, enfants: 0, occasion: null, pays: null, langue: null, conseilDates: false, conseilLieux: false }, champs: { nom: "", email: "", whatsapp: "", message: "" } };
@@ -134,7 +135,8 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const reduit = useMouvementReduit();
   const [b, setB] = useState<Brouillon>(lireBrouillon);
   const langueSite = useLangue();
-  const [etat, setEtat] = useState<Etat>("saisie");
+  const [etat, ecrireEtat] = useState<EtatBillet>("saisie");
+  const setEtat = (vers: EtatBillet) => ecrireEtat((de) => avancer(TRANSITIONS_BILLET, de, vers));
   const [verif, setVerif] = useState(false);
   const [envoye, setEnvoye] = useState<{ reference: string; copie: boolean; suivi: string | null } | null>(null);
   const [consent, setConsent] = useState(false);
@@ -386,7 +388,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
       } catch {
         /* rien à effacer */
       }
-      await dechirer();
+      await dechirer().catch(() => undefined); // animation interrompue : la demande est partie, la confirmation s'affiche
       setEtat("envoye");
       requestAnimationFrame(() => titre.current?.focus({ preventScroll: true }));
     } catch {
@@ -1150,7 +1152,8 @@ function PanPays({ pays, propose, onPays }: { pays: string | null; propose: stri
 
 function Reprise({ demande }: { demande: Demande }) {
   const T = useContenu("fr.devisPage", DEVIS_PAGE);
-  const [etat, setEtat] = useState<"idle" | "creation" | "erreur" | "copie">("idle");
+  const [etat, ecrireEtat] = useState<EtatLienReprise>("idle");
+  const setEtat = (vers: EtatLienReprise) => ecrireEtat((de) => avancer(TRANSITIONS_LIEN_REPRISE, de, vers));
   const [lien, setLien] = useState<string | null>(null);
   const creer = async () => {
     setEtat("creation");

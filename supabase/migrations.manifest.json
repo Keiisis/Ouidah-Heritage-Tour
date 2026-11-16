@@ -229,6 +229,10 @@
     {
       "fichier": "20261127_hero_sous_titre.sql",
       "sha256": "967d8ea6544ea4a6beb48254c28330863618f5502a50850f03528062457f0923"
+    },
+    {
+      "fichier": "20261128_machines_etats_trois.sql",
+      "sha256": "2b011b674c10cd0fe3938bee42b23101a49ce025b3110b58456691efc8d4ce78"
     }
   ]
 }
