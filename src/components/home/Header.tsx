@@ -13,6 +13,8 @@ import { Icon } from "@/components/ui/Icon";
 // Section 1 — barre de navigation : logo à gauche, 6 entrées (Ouidah et L'agence ouvrent un menu, même plan que le pied
 // de page), devise, langue, un bouton jaune ; dégradé marine en haut de page, verre dépoli après 20 px de défilement.
 // Menu mobile en <dialog> natif (piège du focus et touche Échap fournis par le navigateur).
+// Barre complète à partir de 1440 px dans un conteneur de 1440 px : logo, entrées, devise, langue et bouton y tiennent
+// dans les 7 langues (l'allemand est le plus long) ; en dessous, menu tiroir. Mesuré le 18/11/2026.
 // blog : vrai quand au moins un article est publié ; sinon pas de lien.
 export function Header({ blog }: { blog: boolean }) {
   const nav = useContenu("fr.nav", NAV);
@@ -86,9 +88,9 @@ export function Header({ blog }: { blog: boolean }) {
           defile ? "border-b border-white/10 bg-abyss/90 py-3 shadow-[0_1px_0_rgb(0_0_0/0.06)] backdrop-blur-[16px]" : "bg-gradient-to-b from-abyss/90 via-abyss/40 to-transparent py-4"
         } [@media(max-height:480px)]:py-1`}
       >
-        <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           {/* paysage bas (téléphone couché) : barre ramenée à 52 px au lieu de 73 */}
-          <div className="flex h-12 items-center justify-between gap-8 [@media(max-height:480px)]:h-11">
+          <div className="flex h-12 items-center justify-between gap-6 [@media(max-height:480px)]:h-11">
             <Link href="/" aria-label={nav.home} className="group flex shrink-0 items-center gap-3 focus-visible:outline-sun">
               {/* emblème rond original sur pastille blanche + nom (la patronne, via Kevin le 10/11 : la bannière « OUIDAH » le dénaturait) */}
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white transition-transform group-hover:scale-[1.04] sm:size-11 lg:size-12">
@@ -100,7 +102,7 @@ export function Header({ blog }: { blog: boolean }) {
               </span>
             </Link>
 
-            <nav ref={barre} className="hidden shrink-0 items-center gap-7 text-[15px] font-medium text-white/90 min-[1360px]:flex">
+            <nav ref={barre} className="hidden shrink-0 items-center gap-5 text-[15px] font-medium text-white/90 min-[1440px]:flex">
               {primary.map((l) => {
                 if (!l.sous) {
                   return (
@@ -194,7 +196,7 @@ export function Header({ blog }: { blog: boolean }) {
                 aria-haspopup="dialog"
                 aria-expanded={tiroirOuvert}
                 aria-controls="site-menu"
-                className="relative rounded-lg p-2 text-white/90 transition-colors before:absolute before:-inset-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-sun min-[1360px]:hidden"
+                className="relative rounded-lg p-2 text-white/90 transition-colors before:absolute before:-inset-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-sun min-[1440px]:hidden"
               >
                 <Icon name="menu" className="size-6" />
               </button>
@@ -220,7 +222,7 @@ export function Header({ blog }: { blog: boolean }) {
           }
         }}
         data-lenis-prevent
-        className="m-0 h-dvh max-h-none w-screen max-w-none bg-abyss/95 text-white backdrop-blur-xl min-[1360px]:hidden"
+        className="m-0 h-dvh max-h-none w-screen max-w-none bg-abyss/95 text-white backdrop-blur-xl min-[1440px]:hidden"
       >
         <div className="flex min-h-full flex-col justify-between overflow-y-auto px-6 pt-24 pb-8">
           <button type="button" onClick={fermer} aria-label={nav.close} className="absolute top-4 right-4 rounded-lg p-2 text-white/90 before:absolute before:-inset-0.5 hover:bg-white/10 hover:text-white focus-visible:outline-sun sm:right-6">

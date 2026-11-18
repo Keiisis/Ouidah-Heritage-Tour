@@ -356,7 +356,7 @@ export function PlacesMap() {
         ) : null}
 
         {reduit ? (
-          <div className="absolute top-20 right-4 left-4 z-[6] rounded-[26px] bg-white p-6 lg:top-28 lg:right-auto lg:left-16 lg:max-w-md lg:p-9">
+          <div className="absolute top-20 right-4 left-4 z-[6] rounded-[26px] bg-white p-6 min-[760px]:[@media(max-height:480px)]:right-[472px] [@media(max-height:480px)]:p-5 lg:top-28 lg:right-auto lg:left-16 lg:max-w-md lg:p-9">
             <h2 id="lieux-titre" className="font-display text-[32px] leading-[1.08] font-semibold lg:text-[46px]">
               {placesIntro.title}
             </h2>

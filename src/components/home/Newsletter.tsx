@@ -144,7 +144,7 @@ export function Newsletter() {
           <h2 id="lettre-titre" className="font-display text-[34px]/[1.08] font-medium tracking-[-0.025em] md:text-[52px]/[1.04] xl:text-[64px]/[1.04]">
             {ciel ? (
               <>
-                {T.phrase(ciel.passe)[0]} <b className="font-semibold text-sun">{ciel.coucher}</b> {T.phrase(ciel.passe)[1]}
+                {T.phrase(ciel.passe)[0]} <b className="font-semibold whitespace-nowrap text-sun">{ciel.coucher}</b> {T.phrase(ciel.passe)[1]}
               </>
             ) : (
               T.phraseSansHeure

@@ -49,19 +49,33 @@ function plusProche(demande: string, cibles: Cible[]) {
   return meilleur && meilleur.score <= 0.55 ? meilleur : null;
 }
 
-// positions de chaque lettre dans un flux caché, à la largeur du calque (repli autorisé après « / » et « - »)
-function positions(calque: HTMLElement, texte: string) {
+// positions de chaque lettre dans un flux caché, à la largeur du calque (repli après « / » et « - » ; un segment plus
+// large que le calque à lui seul, un jeton par exemple, se replie aussi entre ses lettres)
+function positions(calque: HTMLElement, texte: string, coupes?: Set<number>): { xs: (readonly [number, number])[]; h: number } {
+  const lettres = [...texte];
   const m = document.createElement("div");
   m.className = "pi-mesure";
-  for (const ch of texte) {
+  lettres.forEach((ch, i) => {
     const s = document.createElement("span");
     s.textContent = ch;
     m.append(s);
-    if (ch === "/" || ch === "-") m.append(document.createElement("wbr"));
-  }
+    if (ch === "/" || ch === "-" || coupes?.has(i)) m.append(document.createElement("wbr"));
+  });
   calque.append(m);
   const o = m.getBoundingClientRect();
-  const xs = [...m.querySelectorAll("span")].map((s) => { const r = s.getBoundingClientRect(); return [r.left - o.left, r.top - o.top] as const; });
+  const spans = [...m.querySelectorAll("span")];
+  if (!coupes && m.scrollWidth > calque.clientWidth + 1) {
+    const larges = new Set<number>();
+    let debut = 0;
+    lettres.forEach((ch, i) => {
+      if (ch !== "/" && ch !== "-" && i < lettres.length - 1) return;
+      if (spans[i].getBoundingClientRect().right - spans[debut].getBoundingClientRect().left > calque.clientWidth) for (let k = debut; k < i; k++) larges.add(k);
+      debut = i + 1;
+    });
+    m.remove();
+    return positions(calque, texte, larges);
+  }
+  const xs = spans.map((s) => { const r = s.getBoundingClientRect(); return [r.left - o.left, r.top - o.top] as const; });
   m.remove();
   return { xs, h: o.height };
 }
