@@ -3,21 +3,22 @@ import type { Circuit, Destination, Evenement, FiltreLieux, Lien, Lieu, Media, Q
 import type { NomObjet } from "@/components/ui/Objet3D";
 import traceRouteDesEsclaves from "./trace-route-des-esclaves.json";
 
-const px = (id: number, w = 2000) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}`;
+// photos Pexels (licence libre) copiées dans public/ouidah/pexels : aucune requête vers un tiers au chargement des pages
+const px = (id: number) => `/ouidah/pexels/${id}.jpg`;
 
 // Photos libres prises au Bénin (Pexels, sans attribution obligatoire), en attendant les photos d'OHT.
 export const IMG = {
-  beachOuidah: { src: px(20231862, 2400), alt: "Une voyageuse face aux vagues, sur la plage de Ouidah au coucher du soleil" },
+  beachOuidah: { src: px(20231862), alt: "Une voyageuse face aux vagues, sur la plage de Ouidah au coucher du soleil" },
   ouidahAerial: { src: px(32032141), alt: "Vue aérienne de cases et de verdure à Ouidah" },
-  ceremony: { src: px(25945407, 1600), alt: "Danse traditionnelle en pagnes colorés, à Abomey-Calavi" },
-  ceremony2: { src: px(25703722, 1600), alt: "Groupe de danseuses en tenues traditionnelles devant un mur de briques" },
-  dance: { src: px(25945412, 1600), alt: "Hommes en cérémonie traditionnelle, vus de dos" },
-  egungun: { src: px(38242758, 1600), alt: "Costume et masque Egungun brodés de couleurs vives" },
-  market: { src: px(31238851, 1600), alt: "Scène de marché au Bénin, une vendeuse assise devant son étal" },
-  waxFabric: { src: px(8655018, 1600), alt: "Une jeune femme range des tissus wax colorés au marché" },
-  ganvieBoat: { src: px(6729840, 1600), alt: "Pêcheur lançant son filet depuis une pirogue à Ganvié" },
-  ganvieRower: { src: px(6729842, 1600), alt: "Une femme pagaie en pirogue sur le lac Nokoué" },
-  artisan: { src: px(33812288, 1600), alt: "Mains d'un artisan d'Abomey frappant l'argile au marteau" },
+  ceremony: { src: px(25945407), alt: "Danse traditionnelle en pagnes colorés, à Abomey-Calavi" },
+  ceremony2: { src: px(25703722), alt: "Groupe de danseuses en tenues traditionnelles devant un mur de briques" },
+  dance: { src: px(25945412), alt: "Hommes en cérémonie traditionnelle, vus de dos" },
+  egungun: { src: px(38242758), alt: "Costume et masque Egungun brodés de couleurs vives" },
+  market: { src: px(31238851), alt: "Scène de marché au Bénin, une vendeuse assise devant son étal" },
+  waxFabric: { src: px(8655018), alt: "Une jeune femme range des tissus wax colorés au marché" },
+  ganvieBoat: { src: px(6729840), alt: "Pêcheur lançant son filet depuis une pirogue à Ganvié" },
+  ganvieRower: { src: px(6729842), alt: "Une femme pagaie en pirogue sur le lac Nokoué" },
+  artisan: { src: px(33812288), alt: "Mains d'un artisan d'Abomey frappant l'argile au marteau" },
 } satisfies Record<string, Media>;
 
 // Barre de navigation : composition reprise du dossier bénin-tours (logo, 6 liens, devise, langue, un bouton).
@@ -957,6 +958,8 @@ export const devisPage = {
     titre: (p: string) => `Demande reçue${p ? `, ${p}` : ""}.`,
     texte: (langue: string, email: string) => `Nous vous répondons sous 24 heures, en ${langue}, à ${email}.`,
     copie: "Une copie de votre demande vient de partir dans votre boîte.",
+    // paiement fermé sans payer (widget fermé, passerelle injoignable) : la demande reste enregistrée
+    attente: (reference: string) => `Demande ${reference} enregistrée, paiement en attente : rien n'a été débité. Vous pourrez payer plus tard depuis le lien de paiement que nous vous enverrons par e-mail.`,
     retour: { label: "Retour à l'accueil", href: "/" },
     suivre: "Suivre ma demande (ticket et devis)",
   },

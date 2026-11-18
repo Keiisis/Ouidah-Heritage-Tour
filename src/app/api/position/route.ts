@@ -1,6 +1,6 @@
 // Ville approximative du visiteur, d'après les en-têtes de géolocalisation que Vercel ajoute à chaque requête
 // (adresse IP, aucune autorisation demandée). Rien n'est enregistré ; réponse jamais mise en cache.
-// Hors Vercel (ou en-têtes absents) : null, et la page se replie sur le fuseau horaire du navigateur.
+// Hors Vercel (ou en-têtes absents) : null, et la page ne propose aucune ville.
 export async function GET(request: Request) {
   const h = request.headers;
   const ville = h.get("x-vercel-ip-city");

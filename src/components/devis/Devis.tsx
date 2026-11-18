@@ -10,6 +10,7 @@ import { cheminsIntro as CHEMINS_INTRO, conciergerie as CONCIERGERIE, datesSecti
 import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
 import { oublierRetour, retenirRetour } from "./RetourBillet";
 import { useContenu, useLangue } from "@/components/ui/ContenuSite";
+import { adresseSuivi } from "@/lib/suivi";
 import PAYS from "@/content/pays.json";
 import type { LieuReleve } from "@/content/types";
 import { useDossier, type Dossier } from "@/lib/voyage";
@@ -138,7 +139,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const [etat, ecrireEtat] = useState<EtatBillet>("saisie");
   const setEtat = (vers: EtatBillet) => ecrireEtat((de) => avancer(TRANSITIONS_BILLET, de, vers));
   const [verif, setVerif] = useState(false);
-  const [envoye, setEnvoye] = useState<{ reference: string; copie: boolean; suivi: string | null } | null>(null);
+  const [envoye, setEnvoye] = useState<{ reference: string; copie: boolean; suivi: string | null; paiementEnAttente?: boolean } | null>(null);
   const [consent, setConsent] = useState(false);
   const [emailVu, setEmailVu] = useState(false);
   const [ouvert, setOuvert] = useState<Cle | null>(null);
@@ -185,6 +186,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
   const depuisBenin = Boolean(ville && visiteur?.pays === "BJ" && visiteur.ville === ville);
   const paysPropose = visiteur?.pays && (PAYS as string[]).includes(visiteur.pays) ? visiteur.pays : null;
   const fini = etat === "envoye" || etat === "dechirure";
+  const occupe = etat === "envoi" || etat === "paiement"; // demande en route, ou enregistrée et paiement ouvert
 
   // billets choisis dans l'Agenda (dossier unique) : un seul événement au prix publié se paie avec l'envoi, si une
   // passerelle est active ; le reste part en devis
@@ -361,7 +363,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
 
   const envoyer = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (etat === "envoi" || fini) return;
+    if (occupe || fini) return;
     if (manque.length) {
       setVerif(true);
       const m = manque[0];
@@ -379,21 +381,30 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
       });
       const corpsJson = (await res.json().catch(() => null)) as { reference?: string; copie?: boolean; suivi?: string | null; reservation?: Preparee } | null;
       if (res.status !== 201 || !corpsJson?.reference) return setEtat(res.status === 429 ? "limite" : "echec");
-      // billet payé avec l'envoi : paiement chez la passerelle, puis retour sur l'accueil où le talon montre les billets
+      const recu = { reference: corpsJson.reference, copie: corpsJson.copie === true, suivi: typeof corpsJson.suivi === "string" ? corpsJson.suivi : null };
+      // billet payé avec l'envoi : paiement chez la passerelle, puis retour sur l'accueil où le talon montre les billets.
+      // La demande est déjà enregistrée : widget fermé sans payer ou passerelle injoignable = confirmation « paiement en attente »
       const prep = corpsJson.reservation;
-      if (prep) return await lancerPaiement(prep, corpsJson.reference, (transaction) => window.location.assign(adresseRetour(prep, transaction)));
-      setEnvoye({ reference: corpsJson.reference, copie: corpsJson.copie === true, suivi: typeof corpsJson.suivi === "string" ? corpsJson.suivi : null });
-      try {
-        localStorage.removeItem(BROUILLON);
-      } catch {
-        /* rien à effacer */
+      if (prep) {
+        setEtat("paiement");
+        const enAttente = () => void confirmer({ ...recu, paiementEnAttente: true });
+        return await lancerPaiement(prep, corpsJson.reference, (transaction) => window.location.assign(adresseRetour(prep, transaction)), enAttente).catch(enAttente);
       }
-      await dechirer().catch(() => undefined); // animation interrompue : la demande est partie, la confirmation s'affiche
-      setEtat("envoye");
-      requestAnimationFrame(() => titre.current?.focus({ preventScroll: true }));
+      await confirmer(recu);
     } catch {
       setEtat("echec");
     }
+  };
+  const confirmer = async (recu: NonNullable<typeof envoye>) => {
+    setEnvoye(recu);
+    try {
+      localStorage.removeItem(BROUILLON);
+    } catch {
+      /* rien à effacer */
+    }
+    await dechirer().catch(() => undefined); // animation interrompue : la demande est partie, la confirmation s'affiche
+    setEtat("envoye");
+    requestAnimationFrame(() => titre.current?.focus({ preventScroll: true }));
   };
   // le talon se déchire le long des pointillés et s'envole (seulement après la réponse 201)
   const dechirer = async () => {
@@ -463,11 +474,16 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
       )}
     </button>
   );
-  const quiValeur = r.qui;
+  // l'identifiant enregistré reste en français ; la case montre la phrase traduite de l'option
+  const libelleOption = (options: { id: string; phrase: string }[], id: string | null) => {
+    const p = options.find((o) => o.id === id)?.phrase ?? id;
+    return p ? p.charAt(0).toLocaleUpperCase() + p.slice(1) : null;
+  };
+  const quiValeur = libelleOption(T.qui.options, r.qui);
   const quiNote = r.qui && !SANS_COMPTE.includes(r.qui) ? T.qui.nombre(r.adultes, r.enfants) : "";
   const paysNom = r.pays ? (nomsPays.of(r.pays) ?? r.pays) : null;
   const langueNom = nav.languages.find((l) => l.code === langue)?.label ?? langue;
-  const occasionValeur = r.occasion ?? (fini ? T.occasion.aucune : null);
+  const occasionValeur = libelleOption(T.occasion.options, r.occasion) ?? (fini ? T.occasion.aucune : null);
 
   const contenuPanneau: Record<Exclude<Cle, "lieux">, () => ReactNode> = {
     ville: () => <PanVille ville={ville} onVille={async (n) => (await changer(n)) && (choisi(), true)} />,
@@ -572,7 +588,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
             <p className={s.phrase}>
               {fini && envoye ? (
                 <>
-                  {T.merci.texte(T.langues[langue] ?? langue, c.email.trim())} {envoye.copie ? T.merci.copie : null}
+                  {T.merci.texte(T.langues[langue] ?? langue, c.email.trim())} {envoye.copie ? T.merci.copie : null} {envoye.paiementEnAttente ? T.merci.attente(envoye.reference) : null}
                 </>
               ) : intention === "voyage" ? (
                 compose ? T.intro.compose : T.intro.vide
@@ -581,7 +597,7 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
               )}
             </p>
             {fini && envoye?.suivi ? (
-              <Link href={`/suivi/${envoye.suivi}`} prefetch={false} className={s.suivre}>
+              <Link href={adresseSuivi(envoye.suivi, langueSite)} prefetch={false} className={s.suivre}>
                 {T.merci.suivre}
               </Link>
             ) : null}
@@ -913,13 +929,13 @@ function Billet({ intention, circuit, lieuxLien = [], evenement = null }: { inte
                 </span>
               ) : null}
               <div className={s.envoi}>
-                <button type="submit" aria-disabled={etat === "envoi" || undefined} className={`oht-btn ${etat === "envoi" ? "is-attente" : ""}`}>
+                <button type="submit" aria-disabled={occupe || undefined} className={`oht-btn ${occupe ? "is-attente" : ""}`}>
                   <span className="oht-btn-pastille is-gauche" aria-hidden="true">
                     <Icon name="arrow-right" />
                   </span>
-                  <span className="oht-btn-pilule">{etat === "envoi" ? T.talon.envoi : etat === "echec" ? T.talon.reessayer : montant !== null ? T.talon.payer(fcfa(montant)) : T.talon.bouton}</span>
+                  <span className="oht-btn-pilule">{occupe ? T.talon.envoi : etat === "echec" ? T.talon.reessayer : montant !== null ? T.talon.payer(fcfa(montant)) : T.talon.bouton}</span>
                   <span className="oht-btn-pastille is-droite" aria-hidden="true">
-                    {etat === "envoi" ? <span className="oht-tourne" /> : <Icon name="arrow-right" />}
+                    {occupe ? <span className="oht-tourne" /> : <Icon name="arrow-right" />}
                   </span>
                 </button>
                 <p className={s.promesse}>{T.talon.promesse}</p>
@@ -1072,10 +1088,21 @@ function PanQui({ qui, adultes, enfants, onQui, onNombre, onValider }: { qui: st
           <path d="M5 12h14" />
         </svg>
       </button>
-      <span className={s.sr} aria-live="polite">
-        {v}
-      </span>
-      <Palettes texte={String(v)} taille="ligne" />
+      {/* saisie directe (un groupe de 15 = un nombre, pas 13 clics) ; les boutons restent pour 1 ou 2 de plus */}
+      <input
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={99}
+        value={v}
+        aria-label={nom}
+        className={s.nombre}
+        onFocus={(e) => e.currentTarget.select()}
+        onChange={(e) => {
+          const n = Number.parseInt(e.target.value, 10);
+          if (Number.isFinite(n)) poserN(Math.min(99, Math.max(min, n)));
+        }}
+      />
       <button type="button" className={s.rond} aria-label={T.qui.plus(nom)} disabled={v >= 99} onClick={() => poserN(v + 1)}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 12h14M12 5v14" />

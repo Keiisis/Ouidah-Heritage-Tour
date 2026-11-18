@@ -167,12 +167,13 @@ export function Concierge({ comptes }: { comptes: Record<string, number> }) {
                 <li key={x.id} className="lg:border-b lg:border-abyss/15">
                   <button type="button" onClick={() => setRang(i)} aria-current={i === rang ? "step" : undefined} className="flex w-full items-center gap-2.5 py-1 text-left lg:py-1.5 lg:pr-3">
                     <Objet3D nom={x.objet} taille={44} eteint={!fait} className="size-10 lg:size-11" />
-                    <span className="hidden min-w-0 lg:block">
+                    <span className="hidden min-w-0 lg:block" aria-hidden="true">
                       <span className={`block text-xs font-bold ${i === rang ? "text-laterite" : "text-ink-soft"}`}>{x.court}</span>
                       <span className={`block truncate ${v?.length ? (fait ? "font-display text-[15px] font-semibold" : "text-[13px] font-semibold text-abyss/40") : "text-[13px] font-semibold text-abyss/40"}`}>{v?.length ? v.join(", ") : "—"}</span>
                     </span>
                     <span className="sr-only">
-                      {x.court} : {v?.length ? v.join(", ") : "—"}
+                      {/* service sans réponse : son nom seul, jamais « Téléphone : — » lu à voix haute */}
+                      {v?.length ? `${x.court} : ${v.join(", ")}` : x.court}
                     </span>
                   </button>
                 </li>

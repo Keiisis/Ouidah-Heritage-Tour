@@ -8,7 +8,8 @@ import QRCode from "qrcode";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { conciergerie as CONCIERGERIE, datesSection as DATES_SECTION, evenements as EVENEMENTS, nav as NAV } from "@/content/fr";
-import { useContenu } from "@/components/ui/ContenuSite";
+import { useContenu, useLangue } from "@/components/ui/ContenuSite";
+import { adresseSuivi } from "@/lib/suivi";
 import type { Evenement } from "@/content/types";
 import { Icon } from "@/components/ui/Icon";
 import { EquivalentDevise } from "@/components/ui/EquivalentDevise";
@@ -84,6 +85,7 @@ export function Talon({ e, a, b, sejour, formule, setFormule, passerelles, retou
   const { fmtJour, fmtLong, fcfa, euros, dollars, periode } = useTalonFormats();
   const D = useContenu("fr.datesSection", DATES_SECTION);
   const T = D.talon;
+  const langueSite = useLangue();
   const conciergerie = useContenu("fr.conciergerie", CONCIERGERIE);
   const evenements = useContenu("fr.evenements", EVENEMENTS);
   const nav = useContenu("fr.nav", NAV);
@@ -160,7 +162,7 @@ export function Talon({ e, a, b, sejour, formule, setFormule, passerelles, retou
     } catch {
       /* rien */
     }
-    if (frais && vue.suivi) return router.push(`/suivi/${vue.suivi}?bienvenue=1`);
+    if (frais && vue.suivi) return router.push(`${adresseSuivi(vue.suivi, langueSite)}${langueSite === "FR" ? "?" : "&"}bienvenue=1`);
     setEtat({ k: "paye", vue });
     requestAnimationFrame(() => titre.current?.focus());
   };
@@ -444,6 +446,7 @@ function Paye({ vue, ev, titreRef }: { vue: Vue; ev: Evenement; titreRef: React.
   const { fcfa, periode, date } = useTalonFormats();
   const D = useContenu("fr.datesSection", DATES_SECTION);
   const T = D.talon;
+  const langueSite = useLangue();
   const P = T.paye;
   const [i, setI] = useState(0);
   const [qr, setQr] = useState<string[]>([]);
@@ -550,7 +553,7 @@ function Paye({ vue, ev, titreRef }: { vue: Vue; ev: Evenement; titreRef: React.
         {P.confirme(fcfa(vue.montant), T.passerelles[vue.passerelle]?.nom ?? vue.passerelle)}
       </p>
       {vue.suivi ? (
-        <a className={s.suivi} href={`/suivi/${vue.suivi}`}>
+        <a className={s.suivi} href={adresseSuivi(vue.suivi, langueSite)}>
           {P.suivi}
         </a>
       ) : null}

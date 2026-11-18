@@ -486,6 +486,16 @@ export function AssistantSite() {
     setVueProg(false);
     setEtat(e);
   };
+  // nouvelle question : la conversation avec l'assistant est effacée (comme à la sortie de la page) et le panneau repart
+  // de l'accueil ; jamais pour une conversation passée à l'équipe, qui y répond
+  const nouvelle = () => {
+    if (mode !== "ia" || occupe) return;
+    if (c) navigator.sendBeacon("/api/assistant/fin", JSON.stringify({ c }));
+    setC(null);
+    setMsgs([]);
+    setSaisie("");
+    aller("ouvert");
+  };
   const fermer = () => {
     retour.current = true;
     geneVue.current = "libre";
@@ -1013,6 +1023,14 @@ export function AssistantSite() {
                 </div>
                 <p className="as-note">
                   {note}
+                  {etat === "conversation" && mode === "ia" && !transmis && msgs.length ? (
+                    <>
+                      {" "}
+                      <button type="button" className="as-lien as-nouvelle" disabled={occupe} onClick={nouvelle}>
+                        {T.saisie.nouvelle}
+                      </button>
+                    </>
+                  ) : null}
                   {(etat === "ouvert" || etat === "conversation") && avecAgent && !sansIa ? (
                     <>
                       {" "}

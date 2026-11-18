@@ -8,7 +8,8 @@ export type Lancement = { mode: "widget"; options: Record<string, unknown> } | {
 export type Preparee = { id: string; cle: string; lancement: Lancement };
 export const MEMOIRE_PAIEMENT = "oht-paiement"; // réservation en cours (session de l'onglet), reprise au retour
 
-type Kkiapay = { openKkiapayWidget: (o: Record<string, unknown>) => void; addSuccessListener: (cb: (r: { transactionId?: string }) => void) => void };
+// k.js expose addKkiapayCloseListener (relevé dans https://cdn.kkiapay.me/k.js le 17/11/2026)
+type Kkiapay = { openKkiapayWidget: (o: Record<string, unknown>) => void; addSuccessListener: (cb: (r: { transactionId?: string }) => void) => void; addKkiapayCloseListener: (cb: () => void) => void };
 
 function chargerScript(src: string) {
   return new Promise<void>((ok, ko) => {
@@ -18,8 +19,9 @@ function chargerScript(src: string) {
   });
 }
 
-/** Ouvre le paiement. `retourWidget` reçoit l'identifiant rendu par un widget (à faire vérifier par le serveur). */
-export async function lancerPaiement(r: Preparee, reference: string | undefined, retourWidget: (transaction: string | null) => void) {
+/** Ouvre le paiement. `retourWidget` reçoit l'identifiant rendu par un widget (à faire vérifier par le serveur) ;
+ * `fermeSansPayer` est appelé si le visiteur ferme le widget sans avoir payé. */
+export async function lancerPaiement(r: Preparee, reference: string | undefined, retourWidget: (transaction: string | null) => void, fermeSansPayer?: () => void) {
   try {
     sessionStorage.setItem(MEMOIRE_PAIEMENT, JSON.stringify({ reservation: r.id, cle: r.cle, reference }));
   } catch {
@@ -29,7 +31,14 @@ export async function lancerPaiement(r: Preparee, reference: string | undefined,
   if (r.lancement.options.passerelle !== "kkiapay") throw new Error("widget inconnu");
   await chargerScript("https://cdn.kkiapay.me/k.js");
   const k = window as unknown as Kkiapay;
-  k.addSuccessListener(({ transactionId }) => retourWidget(transactionId ?? null));
+  let paye = false;
+  k.addSuccessListener(({ transactionId }) => {
+    paye = true;
+    retourWidget(transactionId ?? null);
+  });
+  k.addKkiapayCloseListener(() => {
+    if (!paye) fermeSansPayer?.();
+  });
   const options = { ...r.lancement.options };
   delete options.passerelle; // repère interne, pas une option du widget
   k.openKkiapayWidget(options);

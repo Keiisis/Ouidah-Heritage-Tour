@@ -14,10 +14,19 @@ import { FinalCta } from "@/components/home/FinalCta";
 import { Newsletter } from "@/components/home/Newsletter";
 import { RetourBillet } from "@/components/devis/RetourBillet";
 import { lireContenuPage as lireContenu } from "@/lib/serveur/contenu-page";
+import { cacheLife } from "next/cache";
+import { jourOuidah } from "@/lib/jours";
+
+// Jour de Ouidah du rendu statique, recalculé une fois par jour : l'agenda montre le prochain événement dès le HTML.
+async function jourServeur() {
+  "use cache";
+  cacheLife("days");
+  return jourOuidah(Date.now());
+}
 
 // Accueil : sections 2 à 14 (l'en-tête et le pied de page sont dans le layout).
 export default async function Home() {
-  const [destinations, releve] = await Promise.all([lireContenu("fr.destinations"), lireContenu("lieux-ouidah")]);
+  const [destinations, releve, jour] = await Promise.all([lireContenu("fr.destinations"), lireContenu("lieux-ouidah"), jourServeur()]);
   // Compteurs du contenu publié, sans charger tout le relevé dans le composant client.
   const totalLieux = destinations.length + releve.lieux.filter((l) => !l.destination).length;
   const comptes: Record<string, number> = {};
@@ -29,7 +38,7 @@ export default async function Home() {
       <PlacesMap />
       <Reasons />
       <Chemins totalLieux={totalLieux} />
-      <KeyDates />
+      <KeyDates jourInitial={jour} />
       <TenReasons />
       <Strip />
       <Concierge comptes={comptes} />

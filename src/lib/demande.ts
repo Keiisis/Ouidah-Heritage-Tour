@@ -22,7 +22,8 @@ export function manques(d: Pick<Demande, "intention" | "circuit" | "dossier" | "
   const r = d.reponses;
   if (d.intention !== "question") {
     if (!d.dossier.sejour && !r.conseilDates) m.push("dates");
-    if (!d.dossier.lieux.length && !d.circuit && !r.conseilLieux) m.push("lieux");
+    // groupe : « dites-nous qui vient, nous composons le séjour » ; les lieux restent facultatifs
+    if (d.intention !== "groupe" && !d.dossier.lieux.length && !d.circuit && !r.conseilLieux) m.push("lieux");
     if (!r.qui) m.push("qui");
     if (!r.pays) m.push("pays");
   }

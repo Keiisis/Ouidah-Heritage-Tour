@@ -9,6 +9,7 @@ import PAYS from "@/content/pays.json";
 import { zoneLivraison, type DemandeCommande, type Produit, type ReponseCommande } from "@/lib/boutique-types";
 import { EMAIL } from "@/lib/demande";
 import { langueDuSite } from "@/lib/langue";
+import { adresseSuivi } from "@/lib/suivi";
 import { changerQuantite, cleLigne, nbArticles, QUANTITE_MAX, usePanier, viderPanier } from "@/lib/panier";
 import { Icon } from "@/components/ui/Icon";
 import { bloquer, pieger, useBoutique } from "./Cadre";
@@ -169,7 +170,7 @@ export function TiroirPanier({ ouvert, etape, setEtape, fermer }: { ouvert: bool
             <p className="merci-ref">{T.commande.merci(reference)[0]}</p>
             <p className="merci-texte">{aPayer ? T.commande.paiementPlusTard : T.commande.merci(reference)[1]}</p>
             {suivi ? (
-              <a className="merci-suivi" href={`/suivi/${suivi}`}>
+              <a className="merci-suivi" href={adresseSuivi(suivi, b.langue)}>
                 {T.commande.suivi}
               </a>
             ) : null}

@@ -7,8 +7,15 @@ import { idDuJeton } from "@/lib/serveur/equipe/finances/public";
 // slug contre le contenu publié dans leur page bloquante (instant = false) : une liste figée ici empêcherait les ajouts
 // depuis l'admin.
 const introuvable = (request: NextRequest) => NextResponse.rewrite(new URL("/_introuvable", request.url), { status: 404 });
-const invalide = (request: NextRequest) => NextResponse.rewrite(new URL("/lien-invalide", request.url), { status: 404, headers: { "x-robots-tag": "noindex, nofollow" } });
-const prive = () => NextResponse.next({ headers: { "x-robots-tag": "noindex, nofollow" } });
+// Langue de l'adresse (?langue=en, posée par le site sur ses liens privés) transmise au rendu : l'écran du lien invalide
+// la suit, faute de quoi il prend celle du navigateur.
+const avecLangue = (request: NextRequest) => {
+  const h = new Headers(request.headers);
+  h.set("x-oht-langue", request.nextUrl.searchParams.get("langue")?.toUpperCase() ?? "");
+  return { request: { headers: h }, headers: { "x-robots-tag": "noindex, nofollow" } };
+};
+const invalide = (request: NextRequest) => NextResponse.rewrite(new URL("/lien-invalide", request.url), { status: 404, ...avecLangue(request) });
+const prive = (request: NextRequest) => NextResponse.next(avecLangue(request));
 const lire = (s: string) => {
   try {
     return decodeURIComponent(s);
@@ -20,10 +27,10 @@ const lire = (s: string) => {
 export async function proxy(request: NextRequest) {
   const chemin = request.nextUrl.pathname;
   const s = chemin.match(/^\/suivi\/([^/]+)(?:\/document|\/signer)?\/?$/);
-  if (s) return lireJeton(lire(s[1])) ? prive() : invalide(request);
+  if (s) return lireJeton(lire(s[1])) ? prive(request) : invalide(request);
   if (chemin.startsWith("/suivi")) return introuvable(request);
   const p = chemin.match(/^\/payer\/([^/]+)\/?$/);
-  if (p) return idDuJeton(lire(p[1])) ? prive() : invalide(request);
+  if (p) return idDuJeton(lire(p[1])) ? prive(request) : invalide(request);
 }
 
 // toutes les pages (maintenance), sauf les fichiers internes de Next et l'icône

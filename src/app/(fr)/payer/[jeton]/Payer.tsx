@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState, useTransition } from "react";
 import { copiesPayer as COPIES_PAYER } from "@/content/espace-finances";
 import { useContenu } from "@/components/ui/ContenuSite";
-import type { LangueDoc } from "@/lib/suivi";
+import { adresseSuivi, type LangueDoc } from "@/lib/suivi";
 import { lancer, verifier } from "./actions";
 
 // Paiement d'un lien, côté navigateur : le client choisit une passerelle, le serveur prépare le paiement au montant du lien
@@ -101,7 +101,7 @@ export function Payer(p: Props) {
         ) : null}
         {/* commande de la boutique : son suivi montre l'état, le reçu, et rouvre un lien si celui-ci n'est plus valable */}
         {p.suivi && (etat === "paye" || etat === "fini") ? (
-          <a className="py-reverifier py-suivi" href={`/suivi/${p.suivi}`}>
+          <a className="py-reverifier py-suivi" href={adresseSuivi(p.suivi, p.langue)}>
             {t.suivi}
           </a>
         ) : null}

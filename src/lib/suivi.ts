@@ -8,6 +8,9 @@ export const LANGUES_DOC = ["FR", "EN", "ES", "DE", "PT", "HT", "GCF"] as const;
 export type LangueDoc = (typeof LANGUES_DOC)[number];
 export const langueDoc = (l: string | null | undefined): LangueDoc => (LANGUES_DOC.includes(l as LangueDoc) ? (l as LangueDoc) : "FR");
 /** Langue d'un visiteur sans dossier (lien faux ou retiré) : la première langue de son navigateur que le site propose. */
+/** Lien de suivi portant la langue du visiteur (?langue=en) : si le dossier a disparu, l'écran du lien invalide la suit. */
+export const adresseSuivi = (jeton: string, langue: string) => `/suivi/${jeton}${langueDoc(langue) === "FR" ? "" : `?langue=${langue.toLowerCase()}`}`;
+
 export function langueNavigateur(accept: string | null | undefined): LangueDoc {
   for (const partie of (accept ?? "").split(",")) {
     const code = partie.split(";")[0].trim().split("-")[0].toUpperCase();

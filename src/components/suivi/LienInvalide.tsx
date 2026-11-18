@@ -2,14 +2,17 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { lireContenu } from "@/lib/contenu";
 import { adresseLangue } from "@/lib/adresses-langues";
-import { langueNavigateur, type LangueDoc } from "@/lib/suivi";
+import { LANGUES_DOC, langueNavigateur, type LangueDoc } from "@/lib/suivi";
 import { Icon } from "@/components/ui/Icon";
 import "./lien-invalide.css";
 
 // Écran d'un lien client faux, incomplet ou retiré (/suivi/<jeton>, /payer/<jeton>) : sans dossier, la langue est celle
-// du navigateur. Une issue claire : l'e-mail public de l'agence (mentions légales, modifiable dans l'admin) et le billet.
+// de l'adresse (?langue=en, relayée par le proxy), sinon celle du navigateur. Une issue claire : l'e-mail public de l'agence
+// (mentions légales, modifiable dans l'admin) et le billet.
 export async function langueVisiteur(): Promise<LangueDoc> {
-  return langueNavigateur((await headers()).get("accept-language"));
+  const h = await headers();
+  const url = h.get("x-oht-langue");
+  return url && LANGUES_DOC.includes(url as LangueDoc) ? (url as LangueDoc) : langueNavigateur(h.get("accept-language"));
 }
 
 export async function titreLienInvalide(): Promise<string> {

@@ -62,7 +62,7 @@ const FR = {
     ajout: (c: Compte): string => `Ajouté à votre programme : ${FR.programme.compte(c)}`,
     actions: { devis: "Préparer un devis", circuit: "Circuit", lieu: "Lieu", evenement: "Agenda", article: "Boutique", agent: "Parler à une personne de l’équipe" },
   },
-  saisie: { question: "Votre question", agent: "Écrire à l’équipe", envoyer: "Envoyer", noteIa: "Assistant IA, pas une personne. L’équipe confirme chaque devis.", noteAgent: "Vous écrivez à une personne de l’équipe OHT." },
+  saisie: { question: "Votre question", nouvelle: "Nouvelle question", agent: "Écrire à l’équipe", envoyer: "Envoyer", noteIa: "Assistant IA, pas une personne. L’équipe confirme chaque devis.", noteAgent: "Vous écrivez à une personne de l’équipe OHT." },
   agent: {
     titre: "Votre programme part chez l’équipe.",
     chapo: "La personne qui vous répond reçoit votre programme et la conversation. Elle reprend là où vous en êtes.",
@@ -162,7 +162,7 @@ const EN: TexteAssistant = {
     ajout: (c: Compte): string => `Added to your plan: ${EN.programme.compte(c)}`,
     actions: { devis: "Prepare a quote", circuit: "Tour", lieu: "Place", evenement: "Calendar", article: "Shop", agent: "Talk to a person from the team" },
   },
-  saisie: { question: "Your question", agent: "Write to the team", envoyer: "Send", noteIa: "AI assistant, not a person. The team confirms every quote.", noteAgent: "You are writing to a person from the OHT team." },
+  saisie: { question: "Your question", nouvelle: "New question", agent: "Write to the team", envoyer: "Send", noteIa: "AI assistant, not a person. The team confirms every quote.", noteAgent: "You are writing to a person from the OHT team." },
   agent: {
     titre: "Your plan goes to the team.",
     chapo: "The person who replies receives your plan and the conversation, and picks up where you left off.",
@@ -260,7 +260,7 @@ const ES: TexteAssistant = {
     ajout: (c: Compte): string => `Añadido a su programa: ${ES.programme.compte(c)}`,
     actions: { devis: "Preparar un presupuesto", circuit: "Circuito", lieu: "Lugar", evenement: "Agenda", article: "Tienda", agent: "Hablar con una persona del equipo" },
   },
-  saisie: { question: "Su pregunta", agent: "Escribir al equipo", envoyer: "Enviar", noteIa: "Asistente IA, no una persona. El equipo confirma cada presupuesto.", noteAgent: "Está escribiendo a una persona del equipo de OHT." },
+  saisie: { question: "Su pregunta", nouvelle: "Nueva pregunta", agent: "Escribir al equipo", envoyer: "Enviar", noteIa: "Asistente IA, no una persona. El equipo confirma cada presupuesto.", noteAgent: "Está escribiendo a una persona del equipo de OHT." },
   agent: {
     titre: "Su programa pasa al equipo.",
     chapo: "La persona que le responde recibe su programa y la conversación, y sigue donde usted lo dejó.",
@@ -358,7 +358,7 @@ const DE: TexteAssistant = {
     ajout: (c: Compte): string => `Zu Ihrem Programm hinzugefügt: ${DE.programme.compte(c)}`,
     actions: { devis: "Angebot vorbereiten", circuit: "Tour", lieu: "Ort", evenement: "Kalender", article: "Shop", agent: "Mit einer Person aus dem Team sprechen" },
   },
-  saisie: { question: "Ihre Frage", agent: "Dem Team schreiben", envoyer: "Senden", noteIa: "KI-Assistent, kein Mensch. Das Team bestätigt jedes Angebot.", noteAgent: "Sie schreiben einer Person aus dem OHT-Team." },
+  saisie: { question: "Ihre Frage", nouvelle: "Neue Frage", agent: "Dem Team schreiben", envoyer: "Senden", noteIa: "KI-Assistent, kein Mensch. Das Team bestätigt jedes Angebot.", noteAgent: "Sie schreiben einer Person aus dem OHT-Team." },
   agent: {
     titre: "Ihr Programm geht an das Team.",
     chapo: "Die Person, die Ihnen antwortet, erhält Ihr Programm und das Gespräch und macht dort weiter, wo Sie sind.",
@@ -456,7 +456,7 @@ const PT: TexteAssistant = {
     ajout: (c: Compte): string => `Adicionado ao seu programa: ${PT.programme.compte(c)}`,
     actions: { devis: "Preparar um orçamento", circuit: "Circuito", lieu: "Lugar", evenement: "Agenda", article: "Loja", agent: "Falar com uma pessoa da equipa" },
   },
-  saisie: { question: "A sua pergunta", agent: "Escrever à equipa", envoyer: "Enviar", noteIa: "Assistente IA, não uma pessoa. A equipa confirma cada orçamento.", noteAgent: "Está a escrever a uma pessoa da equipa da OHT." },
+  saisie: { question: "A sua pergunta", nouvelle: "Nova pergunta", agent: "Escrever à equipa", envoyer: "Enviar", noteIa: "Assistente IA, não uma pessoa. A equipa confirma cada orçamento.", noteAgent: "Está a escrever a uma pessoa da equipa da OHT." },
   agent: {
     titre: "O seu programa segue para a equipa.",
     chapo: "A pessoa que lhe responde recebe o seu programa e a conversa, e continua onde ficou.",
@@ -554,7 +554,7 @@ const HT: TexteAssistant = {
     ajout: (c: Compte): string => `Ajoute nan pwogram ou: ${HT.programme.compte(c)}`,
     actions: { devis: "Prepare yon devi", circuit: "Sikui", lieu: "Kote", evenement: "Ajanda", article: "Boutik", agent: "Pale ak yon moun nan ekip la" },
   },
-  saisie: { question: "Kesyon ou", agent: "Ekri ekip la", envoyer: "Voye", noteIa: "Asistan IA, se pa yon moun. Ekip la konfime chak devi.", noteAgent: "W ap ekri yon moun nan ekip OHT a." },
+  saisie: { question: "Kesyon ou", nouvelle: "Nouvo kesyon", agent: "Ekri ekip la", envoyer: "Voye", noteIa: "Asistan IA, se pa yon moun. Ekip la konfime chak devi.", noteAgent: "W ap ekri yon moun nan ekip OHT a." },
   agent: {
     titre: "Pwogram ou ale kay ekip la.",
     chapo: "Moun ki reponn ou a resevwa pwogram ou ak konvèsasyon an. Li kontinye kote ou rive a.",
@@ -652,7 +652,7 @@ const GCF: TexteAssistant = {
     ajout: (c: Compte): string => `Ajouté an pwogram a-w : ${GCF.programme.compte(c)}`,
     actions: { devis: "Paré on dévi", circuit: "Sirkui", lieu: "Koté", evenement: "Ajanda", article: "Boutik", agent: "Palé épi on moun an lékip-la" },
   },
-  saisie: { question: "Késyon a-w", agent: "Ékri lékip-la", envoyer: "Voyé", noteIa: "Asistan IA, sé pa on moun. Lékip-la ka konfirmé chak dévi.", noteAgent: "Ou ka ékri on moun an lékip OHT." },
+  saisie: { question: "Késyon a-w", nouvelle: "Nouvo késyon", agent: "Ékri lékip-la", envoyer: "Voyé", noteIa: "Asistan IA, sé pa on moun. Lékip-la ka konfirmé chak dévi.", noteAgent: "Ou ka ékri on moun an lékip OHT." },
   agent: {
     titre: "Pwogram a-w ka pati kay lékip-la.",
     chapo: "Moun-la ki ka réponn-vou ka risivwè pwogram a-w é konvèsasyon-la. I ka kontinyé la ou rivé.",

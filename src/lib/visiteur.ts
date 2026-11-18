@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { choixActuel, useConsentement } from "@/lib/consentement";
 
 // Ville du visiteur, partagée par les sections : choix enregistré, sinon géolocalisation de l'hébergeur (/api/position),
-// sinon fuseau horaire du navigateur. Une seule détection par page ; « Modifier » met à jour toutes les sections.
+// sinon rien (le visiteur saisit sa ville). Une seule détection par page ; « Modifier » met à jour toutes les sections.
 export type Visiteur = { ville: string; coords: [number, number]; pays?: string }; // pays : code ISO 3166-1 alpha-2, s'il est connu
 export const MEMOIRE_VILLE = "oht-ville";
 let detection: Promise<Visiteur | null> | null = null;
@@ -34,14 +34,12 @@ function detecter() {
       /* rien d'enregistré */
     }
     if (!choixActuel()?.ville) return null; // sans accord : le visiteur saisit sa ville lui-même
+    // pas de repli sur le fuseau horaire : « Europe/Paris » couvre bien d'autres villes que Paris ; rien de sûr, rien de proposé
     try {
-      const v = (await (await fetch("/api/position")).json()) as Visiteur | null;
-      if (v) return v;
+      return ((await (await fetch("/api/position")).json()) as Visiteur | null) ?? null;
     } catch {
-      /* hors ligne ou hors Vercel */
+      return null; // hors ligne ou hors Vercel
     }
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone?.split("/").pop()?.replace(/_/g, " ");
-    return tz ? geocoder(tz) : null;
   })();
   return detection;
 }

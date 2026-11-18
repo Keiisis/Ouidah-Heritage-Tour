@@ -62,7 +62,9 @@ const suivreRetour = (cb: () => void) => {
   return () => window.removeEventListener(RETOUR, cb);
 };
 
-export function KeyDates() {
+// jourInitial : jour de Ouidah au rendu serveur ; le prochain événement est en vue avant l'hydratation, l'horloge du
+// navigateur prend le relais au montage.
+export function KeyDates({ jourInitial }: { jourInitial: number }) {
   const { fmtJour, fmtLong, fmtMois, dateEvenement, dateCourte } = useDates();
   const T = useContenu("fr.datesSection", DATES_SECTION);
   const evenements = useContenu("fr.evenements", EVENEMENTS);
@@ -70,7 +72,7 @@ export function KeyDates() {
   const reduit = useMouvementReduit();
   const [proche, setProche] = useState(false);
   const [maintenant, setMaintenant] = useState<number | null>(null);
-  const aujourdhui = maintenant === null ? null : jourOuidah(maintenant);
+  const aujourdhui = maintenant === null ? jourInitial : jourOuidah(maintenant);
   const sejourGarde = useSejour();
   const [brouillon, setBrouillon] = useState<Sejour | null>(null); // séjour pendant un glissement
   const [formule, setFormule] = useState(0);
@@ -251,7 +253,7 @@ export function KeyDates() {
           {focus && talonOuvert ? (
             <Talon e={focus.e} a={focus.a} b={focus.b} sejour={sejour} formule={formule} setFormule={setFormule} passerelles={passerelles ?? []} retour={retour} onFermer={fermer} />
           ) : focus ? (
-            <Pass focus={focus} sejour={sejour} nuits={nuits} dans={dans.length > 0} apres={apres} maintenant={maintenant!} formule={formule} setFormule={setFormule} payable={payable} onReserver={() => { poserBillet(focus.e.slug, { formule, quantite: 1 }, evenements); setOuvert(true); }} oht={oht} onProlonger={() => apres && sejour && poser({ arrivee: sejour.arrivee, depart: apres.b + 1 })} />
+            <Pass entree={maintenant !== null} focus={focus} sejour={sejour} nuits={nuits} dans={dans.length > 0} apres={apres} maintenant={maintenant ?? minuitOuidah(aujourdhui + 1) - 1 /* avant l'horloge : jours pleins comptés depuis la fin du jour */} formule={formule} setFormule={setFormule} payable={payable} onReserver={() => { poserBillet(focus.e.slug, { formule, quantite: 1 }, evenements); setOuvert(true); }} oht={oht} onProlonger={() => apres && sejour && poser({ arrivee: sejour.arrivee, depart: apres.b + 1 })} />
           ) : null}
         </div>
 
@@ -278,9 +280,9 @@ export function KeyDates() {
                   {T.scrub.legendOther}
                 </span>
               </span>
-              <div role="group" aria-label={T.scrub.lengthsLabel} className="hidden rounded-full bg-black/30 p-1 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)] sm:inline-flex">
+              <div role="group" aria-label={T.scrub.lengthsLabel} className="inline-flex rounded-full bg-black/30 p-1 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.1)]">
                 {T.scrub.lengths.map((l) => (
-                  <button key={l.nuits} type="button" aria-pressed={nuits === l.nuits} onClick={() => duree(l.nuits)} className={`min-h-8 rounded-full px-3.5 text-xs font-semibold transition-colors ${nuits === l.nuits ? "bg-white/95 text-abyss shadow-[0_4px_12px_-4px_rgb(0_0_0/0.5)]" : "text-white/75 hover:text-white"}`}>
+                  <button key={l.nuits} type="button" aria-pressed={nuits === l.nuits} onClick={() => duree(l.nuits)} className={`min-h-8 rounded-full px-2.5 text-xs font-semibold whitespace-nowrap transition-colors sm:px-3.5 ${nuits === l.nuits ? "bg-white/95 text-abyss shadow-[0_4px_12px_-4px_rgb(0_0_0/0.5)]" : "text-white/75 hover:text-white"}`}>
                     {l.label}
                   </button>
                 ))}
@@ -395,7 +397,7 @@ function Compte({ cible, now }: { cible: number; now: number | null }) {
   );
 }
 
-function Pass({ focus, sejour, nuits, dans, apres, maintenant, formule, setFormule, payable, onReserver, oht, onProlonger }: { focus: Occ; sejour: Sejour | null; nuits: number; dans: boolean; apres: Occ | null; maintenant: number; formule: number; setFormule: (i: number) => void; payable: boolean; onReserver: () => void; oht: boolean; onProlonger: () => void }) {
+function Pass({ entree, focus, sejour, nuits, dans, apres, maintenant, formule, setFormule, payable, onReserver, oht, onProlonger }: { entree: boolean; focus: Occ; sejour: Sejour | null; nuits: number; dans: boolean; apres: Occ | null; maintenant: number; formule: number; setFormule: (i: number) => void; payable: boolean; onReserver: () => void; oht: boolean; onProlonger: () => void }) {
   const { fmtJour, dateCourte, fmtFcfa } = useDates();
   const T = useContenu("fr.datesSection", DATES_SECTION);
   const evenements = useContenu("fr.evenements", EVENEMENTS);
@@ -404,9 +406,9 @@ function Pass({ focus, sejour, nuits, dans, apres, maintenant, formule, setFormu
   const jourSejour = (n: number) => (sejour ? n - sejour.arrivee + 1 : 0);
   const champs: [string, string][] = sejour
     ? [[T.pass.arrival, fmtJour(sejour.arrivee)], [T.pass.departure, fmtJour(sejour.depart)], [T.pass.nights, String(nuits)]]
-    : [[T.pass.date, dateCourte(focus)], [T.pass.place, e.place.split(",")[0]], [T.pass.in, `${joursPleins(minuitOuidah(focus.a), maintenant)} j`]];
+    : [[T.pass.date, dateCourte(focus)], [T.pass.place, e.place.split(",")[0]], [T.pass.in, `${joursPleins(minuitOuidah(focus.a), maintenant)} ${T.units.days}`]];
   return (
-    <motion.aside key={e.slug} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} aria-label={e.title} className="overflow-hidden rounded-[1.75rem] bg-[#fbfaf7] text-abyss shadow-[0_40px_64px_-32px_rgb(0_0_0/0.75),inset_0_0_0_1px_rgb(255_255_255/0.8)]">
+    <motion.aside key={e.slug} initial={entree ? { opacity: 0, y: 14 } : false /* rendu serveur : visible sans attendre le script */} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }} aria-label={e.title} className="overflow-hidden rounded-[1.75rem] bg-[#fbfaf7] text-abyss shadow-[0_40px_64px_-32px_rgb(0_0_0/0.75),inset_0_0_0_1px_rgb(255_255_255/0.8)]">
       <div className="relative h-24 lg:h-[7.75rem]">
         <Image src={img.src} alt={img.alt} fill sizes="22rem" className="object-cover" />
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#080b16]/80 to-transparent to-70%" />

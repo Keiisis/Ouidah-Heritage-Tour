@@ -2,6 +2,7 @@ import { lireContenu } from "@/lib/contenu";
 import { servicesDemandes } from "@/lib/conciergerie";
 import { jourOuidah } from "@/lib/jours";
 import { EMAIL, manques, nettoyer } from "@/lib/demande";
+import { adresseSuivi } from "@/lib/suivi";
 import { lireBilletsEnvoyes, tarif } from "@/lib/reservation";
 import { base, baseConfiguree } from "@/lib/serveur/base";
 import { TRANSITIONS_DEMANDE } from "@/lib/serveur/equipe/dossiers-regles";
@@ -121,7 +122,7 @@ export async function POST(req: Request) {
     // ticket numéroté et lien secret de suivi (ticket, puis devis dès qu'un agent l'a validé)
     const [ticket, modele, textesSuivi] = await Promise.all([emettre("T", "demande", demandeId).catch(() => null), lireModele("auto-demande", langueDe(d.reponses.langue)), lireContenu("suivi.suivi")]);
     const jeton = jetonSuivi("d", demandeId), origine = origineSite(req);
-    const lienSuivi = jeton && origine ? `${origine}/suivi/${jeton}` : null;
+    const lienSuivi = jeton && origine ? `${origine}${adresseSuivi(jeton, langueDe(d.reponses.langue))}` : null;
     // texte de l'admin (modèle « auto-demande » dans la langue du client), ticket T- et images du site
     const copie = copieVoyageur(d, reference, lignesBillets, lienSuivi, { ticket: ticket?.numero ?? null, modele, origine: origine ?? undefined, contenu: { ...contenu, releve }, suivi: textesSuivi });
     const avis = avisOht(d, reference, paysNom, lignesBillets, { contenu: { ...contenu, releve }, suivi: textesSuivi });
