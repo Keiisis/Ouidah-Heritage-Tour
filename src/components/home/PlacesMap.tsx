@@ -356,7 +356,7 @@ export function PlacesMap() {
         ) : null}
 
         {reduit ? (
-          <div className="absolute top-20 right-4 left-4 z-[6] rounded-[26px] bg-white p-6 min-[760px]:[@media(max-height:480px)]:right-[472px] [@media(max-height:480px)]:p-5 lg:top-28 lg:right-auto lg:left-16 lg:max-w-md lg:p-9">
+          <div className="absolute top-20 right-4 left-4 z-[6] rounded-[26px] bg-white p-6 [@media(max-height:480px)]:right-[calc(min(440px,50vw_-_24px)_+_32px)] [@media(max-height:480px)]:p-5 lg:top-28 lg:right-auto lg:left-16 lg:max-w-md lg:p-9">
             <h2 id="lieux-titre" className="font-display text-[32px] leading-[1.08] font-semibold lg:text-[46px]">
               {placesIntro.title}
             </h2>
@@ -407,7 +407,7 @@ export function PlacesMap() {
         )}
 
         {/* une fiche par lieu, qui arrive en pile au fil de la marche */}
-        <div className="absolute right-4 bottom-4 left-4 z-[7] grid sm:left-auto sm:w-[440px] lg:right-16 lg:bottom-16 lg:w-[480px]">
+        <div className="absolute right-4 bottom-4 left-4 z-[7] grid sm:left-auto sm:w-[440px] [@media(max-height:480px)]:left-auto [@media(max-height:480px)]:w-[min(440px,50vw_-_24px)] lg:right-16 lg:bottom-16 lg:w-[480px]">
           {places.map((p, i) => {
             const d = etape - i;
             const vu = etape >= 0 && d >= 0;

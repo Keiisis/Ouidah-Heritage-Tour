@@ -81,6 +81,11 @@
 .fc-reserver .oht-lien { color: var(--text-inverse); }
 .fc-reserver .oht-lien::before { background: var(--accent-sun); }
 
+/* ordinateur : la carte occupe la colonne droite en entier ; le bouton de l'assistant passe à gauche, sur le texte qui
+   défile, pour ne plus cacher les noms des étapes */
+@media (min-width: 1024px) {
+  body:has(.fc-carte) .as-lanceur { right: auto; left: 24px; }
+}
 @media (max-width: 1023px) {
   .fc-intro { grid-template-columns: minmax(0, 1fr); padding-top: 40px; padding-bottom: 44px; }
   .fc-grille { display: block; }

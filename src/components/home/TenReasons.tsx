@@ -113,12 +113,14 @@ export function TenReasons() {
   const mots = r.text.split(" ");
   const allumes = reduit ? mots.length : Math.round(mots.length * lecture);
 
+  // téléphone couché (hauteur ≤ 480 px) : la scène épinglée ne laisse pas lire le texte ; les raisons s'empilent en
+  // clair, sans photo ni film, et la barre « entourer » reste collée en bas pour la raison lue
   return (
-    <section ref={zone} id="raisons" aria-labelledby="raisons-titre" className="relative z-[2] bg-white text-abyss" style={{ height: `${100 + n * 75}svh` }}>
-      <div className="sticky top-0 h-[100svh] overflow-hidden pt-20 pb-4 lg:pt-28 lg:pb-8">
+    <section ref={zone} id="raisons" aria-labelledby="raisons-titre" className="relative z-[2] bg-white text-abyss [@media(max-height:480px)]:h-auto!" style={{ height: `${100 + n * 75}svh` }}>
+      <div className="sticky top-0 h-[100svh] overflow-hidden pt-20 pb-4 lg:pt-28 lg:pb-8 [@media(max-height:480px)]:static [@media(max-height:480px)]:h-auto [@media(max-height:480px)]:overflow-visible">
         <div className="mx-auto flex h-full max-w-[1320px] flex-col gap-3 px-4 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)_auto] lg:gap-x-12 lg:gap-y-6 lg:px-24">
           {/* tirage de la vue lue : il se développe (l'image monte du blanc) à chaque nouvelle vue */}
-          <figure className="flex h-[26svh] shrink-0 flex-col bg-white p-2 pb-0 shadow-[0_1px_0_rgb(0_0_0/0.04),0_1.5rem_2.5rem_-1.75rem_rgb(20_24_40/0.45)] max-lg:order-2 lg:h-auto lg:min-h-0 lg:p-3 lg:pb-0">
+          <figure className="flex h-[26svh] shrink-0 flex-col bg-white p-2 pb-0 shadow-[0_1px_0_rgb(0_0_0/0.04),0_1.5rem_2.5rem_-1.75rem_rgb(20_24_40/0.45)] max-lg:order-2 lg:h-auto lg:min-h-0 lg:p-3 lg:pb-0 [@media(max-height:480px)]:hidden">
             <div className="relative min-h-0 flex-1 overflow-hidden bg-white">
               <motion.div
                 key={r.slug}
@@ -147,33 +149,33 @@ export function TenReasons() {
 
             {/* chapitres : la vue précédente s'efface, la vue lue s'allume mot à mot, la suivante attend en gris ; toutes sont
                 rendues à leur taille, seules l'opacité et la position (transform) changent */}
-            <div ref={flux} className="relative min-h-0 flex-1 overflow-hidden [mask-image:linear-gradient(transparent,#000_8%,#000_86%,transparent)] max-lg:order-4 lg:mt-4">
-              <motion.div style={{ y: reduit ? decaleCible : decale }} className="pt-3">
+            <div ref={flux} className="relative min-h-0 flex-1 overflow-hidden [mask-image:linear-gradient(transparent,#000_8%,#000_86%,transparent)] max-lg:order-4 lg:mt-4 [@media(max-height:480px)]:overflow-visible [@media(max-height:480px)]:mask-none">
+              <motion.div style={{ y: reduit ? decaleCible : decale }} className="pt-3 [@media(max-height:480px)]:transform-none!">
                 {tenReasons.map((x, i) => {
                   const etat = i < lue ? "lue" : i > lue ? "suivante" : "actuelle";
                   return (
                     <article
                       key={x.slug}
                       data-raison=""
-                      className={`border-abyss/10 py-4 transition-opacity duration-500 not-first:border-t lg:py-5 ${etat === "lue" ? "opacity-[0.28]" : ""}`}
+                      className={`border-abyss/10 py-4 transition-opacity duration-500 not-first:border-t lg:py-5 [@media(max-height:480px)]:opacity-100 ${etat === "lue" ? "opacity-[0.28]" : ""}`}
                     >
                       <p className="text-xs font-bold text-laterite tabular-nums">
                         ▸ {nn(i)} / {n} · {x.category}
                       </p>
-                      <h3 className={`mt-1.5 font-display text-[1.375rem]/[1.1] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.05] ${etat === "suivante" ? "text-abyss/25" : ""}`}>{x.title}</h3>
+                      <h3 className={`mt-1.5 font-display text-[1.375rem]/[1.1] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.05] [@media(max-height:480px)]:text-abyss ${etat === "suivante" ? "text-abyss/25" : ""}`}>{x.title}</h3>
                       {etat === "actuelle" ? (
                         <>
                           <p className="sr-only">{x.text}</p>
                           <p aria-hidden="true" className="mt-2.5 text-base/[1.6] font-semibold tracking-[-0.005em] lg:mt-3 lg:text-lg/[1.6]">
                             {mots.map((m, k) => (
-                              <span key={k} className={`transition-colors duration-300 ${k < allumes ? "text-abyss" : "text-abyss/55"}`}>
+                              <span key={k} className={`transition-colors duration-300 [@media(max-height:480px)]:text-abyss ${k < allumes ? "text-abyss" : "text-abyss/55"}`}>
                                 {m}{" "}
                               </span>
                             ))}
                           </p>
                         </>
                       ) : (
-                        <p className={`mt-2.5 text-base/[1.6] font-semibold tracking-[-0.005em] transition-opacity duration-500 lg:mt-3 lg:text-lg/[1.6] ${etat === "suivante" ? "opacity-0" : ""}`}>{x.text}</p>
+                        <p className={`mt-2.5 text-base/[1.6] font-semibold tracking-[-0.005em] transition-opacity duration-500 lg:mt-3 lg:text-lg/[1.6] [@media(max-height:480px)]:opacity-100 ${etat === "suivante" ? "opacity-0" : ""}`}>{x.text}</p>
                       )}
                     </article>
                   );
@@ -181,7 +183,7 @@ export function TenReasons() {
               </motion.div>
             </div>
 
-            <div className="flex items-center gap-3 border-t border-abyss/10 pt-3 max-lg:order-5 lg:pt-4">
+            <div className="flex items-center gap-3 border-t border-abyss/10 pt-3 max-lg:order-5 lg:pt-4 [@media(max-height:480px)]:sticky [@media(max-height:480px)]:bottom-0 [@media(max-height:480px)]:bg-white [@media(max-height:480px)]:pb-3">
               {r.href ? (
                 <Link href={r.href} className="hidden min-h-11 items-center rounded-full bg-abyss px-5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun sm:inline-flex">
                   {T.discover}
@@ -211,7 +213,7 @@ export function TenReasons() {
           </div>
 
           {/* bande de film : une vue par raison ; la loupe se pose sur la vue lue ; les vues entourées gardent leur cercle rouge */}
-          <nav aria-label={T.stripLabel} className="shrink-0 max-lg:order-3 max-lg:-mx-4 lg:col-span-2">
+          <nav aria-label={T.stripLabel} className="shrink-0 max-lg:order-3 max-lg:-mx-4 lg:col-span-2 [@media(max-height:480px)]:hidden">
             <div ref={fenetre} className="relative overflow-hidden py-4 lg:overflow-visible lg:py-0">
               <motion.div style={{ x: filmX }} className="oht-pellicule w-[46rem] rounded-[3px] bg-film px-3 pt-5 pb-9 lg:w-auto">
                 <div ref={bande} className="relative flex gap-1.5">

@@ -2,7 +2,7 @@ import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const versionCorrigee = '16.4.1';
+const versionCorrigee = '16.4.6';
 const avant = `for (let [key, value] of Object.entries(headers)){
                         if (typeof value === 'undefined') continue;
                         if (Array.isArray(value)) {`;
@@ -15,7 +15,7 @@ const apres = `for (let [key, value] of Object.entries(headers)){
                         }
                         if (Array.isArray(value)) {`;
 
-/** Next 16.4.1 réapplique avec appendHeader les métadonnées de sa propre réponse ISR.
+/** Next 16.4.1 à 16.4.6 (vérifié le 18/11/2026) réapplique avec appendHeader les métadonnées de sa propre réponse ISR.
  * Location doit remplacer l'en-tête existant ; Set-Cookie et les listes restent inchangés.
  * Retirer ce correctif après vérification d'une version Next qui corrige ce chemin. */
 export function corrigerLocation(source, version) {
