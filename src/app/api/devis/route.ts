@@ -7,7 +7,7 @@ import { lireBilletsEnvoyes, tarif } from "@/lib/reservation";
 import { base, baseConfiguree } from "@/lib/serveur/base";
 import { TRANSITIONS_DEMANDE } from "@/lib/serveur/equipe/dossiers-regles";
 import { peutPasser } from "@/lib/serveur/machines";
-import { empreinteIp, limiteAtteinte, lireCorps, reponse } from "@/lib/serveur/garde";
+import { empreinteIp, limiteAtteinte, lireCorps, refusLimite, reponse } from "@/lib/serveur/garde";
 import { envoyerAvis, envoyerCourriel } from "@/lib/serveur/courriel";
 import { langueDe, lireModele } from "@/lib/serveur/courriels/commun";
 import { avisOht, copieVoyageur } from "@/lib/serveur/messages";
@@ -20,10 +20,11 @@ import { jetonSuivi } from "@/lib/serveur/documents/jeton";
 
 // Envoi du voyage : une demande (/devis) et, dossier unique, les billets d'événement qui l'accompagnent (talon de l'Agenda
 // ou billet de /devis). Tout est revérifié ici : lieux, services, circuit, pays, langue et billets contre le contenu réel,
-// champs obligatoires, piège à robots, temps passé, 5 envois par heure et par connexion. Un billet au prix publié se paie
-// en ligne (une seule réservation payable par envoi) ; un billet « sur demande » rejoint le devis. Rien n'est envoyé à
-// moitié : tout ce qui peut refuser est vérifié avant d'écrire, la demande reste en brouillon tant que le paiement n'est
-// pas prêt, et les e-mails ne partent qu'après. Une seule référence pour tout.
+// champs obligatoires, piège à robots, temps passé, 5 envois par heure et par connexion (recomptés par la base à
+// l'écriture : refus « limite » en 429). Un billet au prix publié se paie en ligne (une seule réservation payable par
+// envoi) ; un billet « sur demande » rejoint le devis. Rien n'est envoyé à moitié : tout ce qui peut refuser est vérifié
+// avant d'écrire, la demande reste en brouillon tant que le paiement n'est pas prêt, et les e-mails ne partent qu'après.
+// Une seule référence pour tout.
 const MAX_PAR_HEURE = 5;
 const DUREE_MIN = 2500; // ms : un humain ne remplit pas la page plus vite
 const fcfa = (n: number) => `${new Intl.NumberFormat("fr-FR").format(n)} FCFA`;
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
     };
     const r = await base("demandes?select=id", { method: "POST", corps: ligne, prefer: "return=representation" }).catch(() => null);
     demandeId = r?.ok ? (((await r.json()) as { id: string }[])[0]?.id ?? null) : null;
-    if (!demandeId) return reponse({ erreur: "base" }, 502);
+    if (!demandeId) return (await refusLimite(r)) ? reponse({ erreur: "limite" }, 429) : reponse({ erreur: "base" }, 502);
   }
 
   let resa: Creee | null = null;
@@ -111,7 +112,7 @@ export async function POST(req: Request) {
     if (demandeId) {
       if (!peutPasser(TRANSITIONS_DEMANDE, "brouillon", "envoyee")) return reponse({ erreur: "base" }, 502);
       const envoyee = await base(`demandes?id=eq.${demandeId}&statut=eq.brouillon`, { method: "PATCH", corps: { statut: "envoyee", modifie_le: new Date().toISOString() } }).catch(() => null);
-      if (!envoyee?.ok) return reponse({ erreur: "base" }, 502);
+      if (!envoyee?.ok) return (await refusLimite(envoyee)) ? reponse({ erreur: "limite" }, 429) : reponse({ erreur: "base" }, 502);
     }
   }
 

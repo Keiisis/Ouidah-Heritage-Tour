@@ -3,6 +3,7 @@ import type { Evenement } from "@/content/types";
 import { jourOuidah } from "@/lib/jours";
 import { tarif, type Tarif } from "@/lib/reservation";
 import { base } from "../base";
+import { refusLimite } from "../garde";
 import { cleAcces } from "./billet";
 import { lireReservation } from "./finaliser";
 import { passerelle, passerellesActives } from ".";
@@ -13,7 +14,7 @@ import type { Lancement, NomPasserelle } from "./types";
 // passerelle (activée par l'admin ET configurée), enregistre la réservation « en attente », puis prépare le paiement.
 export type Payable = { evenement: string; formule: number; quantite: number };
 export type Client = { nom: string; email: string; telephone: string | null; pays: string | null; langue: string };
-export type Refus = { ok: false; erreur: "sur_demande" | "passerelle" | "complet" | "base" | "passerelle_injoignable"; status: number; restantes?: number };
+export type Refus = { ok: false; erreur: "sur_demande" | "passerelle" | "complet" | "base" | "passerelle_injoignable" | "limite"; status: number; restantes?: number };
 export type Pret = { ok: true; tarif: Tarif };
 
 /** Vérifie tout ce qui peut refuser une réservation, avant d'écrire quoi que ce soit. */
@@ -54,6 +55,7 @@ export async function creerReservation(x: { b: Payable; t: Tarif; nom: NomPasser
   };
   const r = await base("reservations?select=id", { method: "POST", corps: ligne, prefer: "return=representation" }).catch(() => null);
   const id = r?.ok ? ((await r.json()) as { id: string }[])[0]?.id : null;
+  if (!id && (await refusLimite(r))) return { ok: false, erreur: "limite", status: 429 }; // 5 par heure et par connexion, recomptées par la base
   const resa = id ? await lireReservation(`id=eq.${id}`) : null;
   if (!resa) return { ok: false, erreur: "base", status: 502 };
   const cle = cleAcces(resa.id);

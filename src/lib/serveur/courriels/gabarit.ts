@@ -45,6 +45,13 @@ export function txt(s: string, langue: string) {
     })
     .join("");
 }
+
+/** Valeur saisie par un visiteur (nom, message, adresse, options) dans un e-mail : aucune adresse web n'y reste
+ * reconnaissable, ni par `txt` (aucun lien créé) ni par le client de messagerie qui relie de lui-même les adresses du
+ * texte et du HTML. Un espace sans chasse (U+200B) suit le « : » de « :// » et précède chaque point placé entre deux
+ * lettres ou chiffres : rien ne change à l'écran, rien n'est retiré. Les liens d'OHT (suivi, désinscription, site)
+ * ne passent jamais ici. */
+export const sansLien = (s: string) => s.replace(/:\/\//g, ":\u200B//").replace(/(?<=[\p{L}\p{N}])\.(?=[\p{L}\p{N}])/gu, "\u200B.");
 const insecable = (s: string) => s.replace(/ /g, " ");
 const sansVeuve = (s: string) => s.replace(/ (\S+)$/, " $1"); // le dernier mot ne reste jamais seul
 export const rang = (contenu: string, pad: string, cls = "px") => `<tr><td class="${cls}" style="padding:${pad};">${contenu}</td></tr>`;

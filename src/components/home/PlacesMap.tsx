@@ -302,7 +302,11 @@ export function PlacesMap() {
           const el = document.createElement("div");
           el.className = "oht-repere";
           el.setAttribute("aria-hidden", "true");
-          el.innerHTML = `<span style="background-image:url('${p.image.src}')"></span><b>${Number(p.n)}</b>`;
+          const photo = document.createElement("span");
+          photo.style.backgroundImage = `url(${JSON.stringify(p.image.src)})`; // adresse du contenu éditable : jamais lue comme du HTML
+          const n = document.createElement("b");
+          n.textContent = String(Number(p.n));
+          el.append(photo, n);
           new ml.Marker({ element: el }).setLngLat([p.coords[1], p.coords[0]]).addTo(m as CarteMapLibre);
           return el;
         });

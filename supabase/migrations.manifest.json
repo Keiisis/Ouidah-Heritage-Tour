@@ -233,6 +233,10 @@
     {
       "fichier": "20261128_machines_etats_trois.sql",
       "sha256": "2b011b674c10cd0fe3938bee42b23101a49ce025b3110b58456691efc8d4ce78"
+    },
+    {
+      "fichier": "20261129_limites_atomiques.sql",
+      "sha256": "92dfc5fee76c97197dd3aba8d08785d5e7e35688dc904110199b456cb4a89a1a"
     }
   ]
 }

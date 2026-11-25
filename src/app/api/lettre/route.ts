@@ -2,15 +2,17 @@ import { after } from "next/server";
 import { lireContenu } from "@/lib/contenu";
 import { EMAIL } from "@/lib/demande";
 import { base, baseConfiguree } from "@/lib/serveur/base";
-import { empreinteIp, limiteAtteinte, lireCorps, reponse } from "@/lib/serveur/garde";
+import { empreinteIp, limiteAtteinte, lireCorps, refusLimite, reponse } from "@/lib/serveur/garde";
 import { noterException } from "@/lib/serveur/courriel";
 import { envoyerLettre } from "@/lib/serveur/courriels/lettre";
 import { jetonLettre } from "@/lib/serveur/equipe/messages/envoi";
 import { origineSite } from "@/lib/serveur/paiement/outils";
 
-// Inscription à la lettre de Ouidah (section 12) : adresse, langue, thèmes choisis, accord daté. Une adresse déjà
-// inscrite met seulement à jour sa langue et ses thèmes. 5 inscriptions par heure et par connexion. Après 201, e-mail de
-// confirmation (courriels/lettre.ts) avec le lien personnel de désinscription quand EQUIPE_SEL le permet.
+// Inscription à la lettre de Ouidah (section 12) : adresse, langue, thèmes choisis, accord daté. Seule une adresse
+// nouvelle est enregistrée ; une adresse déjà connue (active ou désinscrite) n'est jamais modifiée depuis ce formulaire
+// anonyme et ne reçoit rien, avec la même réponse 201 (son existence n'est pas révélée ; audit du 24/11/2026). 5
+// inscriptions par heure et par connexion, recomptées par la base à l'écriture (429). Après une inscription nouvelle,
+// e-mail de confirmation (courriels/lettre.ts) avec le lien personnel de désinscription quand EQUIPE_SEL le permet.
 const MAX_PAR_HEURE = 5;
 
 export async function POST(req: Request) {
@@ -26,15 +28,15 @@ export async function POST(req: Request) {
 
   const ip = empreinteIp(req);
   if (await limiteAtteinte("abonnes_lettre", ip, MAX_PAR_HEURE, 60)) return reponse({ erreur: "limite" }, 429);
-  const maintenant = new Date().toISOString();
   const r = await base("abonnes_lettre?on_conflict=email&select=id", {
     method: "POST",
-    corps: { email, langue, sujets, consentement_le: maintenant, modifie_le: maintenant, ip_hash: ip, desinscrit_le: null }, // réinscription : l'adresse redevient active
-    prefer: "resolution=merge-duplicates,return=representation",
+    corps: { email, langue, sujets, consentement_le: new Date().toISOString(), ip_hash: ip },
+    prefer: "resolution=ignore-duplicates,return=representation", // adresse déjà connue : rien d'écrit, aucune ligne rendue
   }).catch(() => null);
-  if (!r?.ok) return reponse({ erreur: "base" }, 502);
+  if (!r?.ok) return (await refusLimite(r)) ? reponse({ erreur: "limite" }, 429) : reponse({ erreur: "base" }, 502);
   const id = ((await r.json().catch(() => [])) as { id?: string }[])[0]?.id;
-  const origine = origineSite(req), jeton = id ? jetonLettre(id) : null;
+  if (!id) return reponse({ ok: true }, 201);
+  const origine = origineSite(req), jeton = jetonLettre(id);
   if (origine) after(() => envoyerLettre(email, { langue, sujets, desinscription: jeton ? `${origine}/lettre/desinscription/${jeton}` : null }, origine).catch(() => noterException("auto-lettre", email)));
   return reponse({ ok: true }, 201);
 }

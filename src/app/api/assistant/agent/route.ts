@@ -135,9 +135,10 @@ export async function POST(req: Request) {
     if (!(await modifierConversation(c.id, champs))) return reponse({ erreur: "base" }, 502);
     Object.assign(c, champs);
     if (etape === "contact") {
-      // conversation passée à l'équipe hors ligne : accusé au visiteur pour une adresse nouvelle (« l'équipe vous répond »)
+      // conversation passée à l'équipe hors ligne : accusé au visiteur (« l'équipe vous répond »), une seule fois par
+      // conversation, à la première adresse laissée ; une adresse changée ensuite ne fait rien partir (audit 24/11)
       const origine = origineSite(req);
-      if (c.mode === "agent" && c.hors_ligne && email && email !== avant && origine) after(() => envoyerAccuse(c.id, origine).catch(() => null));
+      if (c.mode === "agent" && c.hors_ligne && email && !avant && origine) after(() => envoyerAccuse(c.id, origine).catch(() => null));
       return reponse({ ok: true }, 200);
     }
   }

@@ -135,7 +135,15 @@ export function CheminsCarte({ lieux, releve, categoriesActives, couleur, vue, c
         for (const d of lieux) {
           const el = document.createElement("div");
           el.className = "oht-lieu";
-          el.innerHTML = d.image ? `<span class="oht-lieu-photo" style="background-image:url('${d.image.src}')"><b></b></span><span class="oht-lieu-nom">${d.name}</span>` : `<span class="oht-lieu-point"><b></b></span><span class="oht-lieu-nom">${d.name}</span>`;
+          // nom et photo viennent du contenu éditable : posés en texte et en propriété de style, jamais lus comme du HTML
+          const pastille = document.createElement("span");
+          pastille.className = d.image ? "oht-lieu-photo" : "oht-lieu-point";
+          if (d.image) pastille.style.backgroundImage = `url(${JSON.stringify(d.image.src)})`;
+          pastille.append(document.createElement("b"));
+          const nom = document.createElement("span");
+          nom.className = "oht-lieu-nom";
+          nom.textContent = d.name;
+          el.append(pastille, nom);
           el.addEventListener("click", () => rappels.current.onAller(d.slug));
           reperes.current.set(d.slug, { el, m: new ml.Marker({ element: el, anchor: "left", offset: [d.image ? -22 : -7, 0] }).setLngLat(ll(d)).addTo(m) });
         }

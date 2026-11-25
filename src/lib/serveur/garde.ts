@@ -8,11 +8,21 @@ export function empreinteIp(req: Request) {
   return createHash("sha256").update(`${process.env.EMPREINTE_SEL ?? ""}|${ip}`).digest("hex");
 }
 
-/** Vrai quand `max` envois sont déjà partis de cette empreinte dans les `minutes` passées (ou si la base ne répond pas). */
+/** Vrai quand `max` envois sont déjà partis de cette empreinte dans les `minutes` passées (ou si la base ne répond pas).
+ * Pré-contrôle bon marché : il lit puis la route écrit. Pour demandes, réservations, abonnés de la lettre et commandes de
+ * la boutique, la limite qui fait foi est recomptée sous verrou à l'écriture (déclencheur limiter_formulaires_publics,
+ * migration 20261129) ; son refus se lit avec `refusLimite`. */
 export async function limiteAtteinte(table: string, ip: string, max: number, minutes: number, filtre = "") {
   const depuis = new Date(Date.now() - minutes * 60_000).toISOString();
   const n = await compter(table, `ip_hash=eq.${ip}&cree_le=gte.${encodeURIComponent(depuis)}${filtre}`);
   return n === null || n >= max;
+}
+
+/** Écriture refusée par la base pour dépassement de la limite (exception « limite » d'un déclencheur) : à rendre en 429. */
+export async function refusLimite(r: Response | null | undefined) {
+  if (!r || r.ok) return false;
+  const e = (await r.json().catch(() => null)) as { message?: unknown } | null;
+  return e?.message === "limite";
 }
 
 /** Corps JSON d'au plus `max` octets, sinon null. */

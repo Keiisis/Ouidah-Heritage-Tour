@@ -7,7 +7,7 @@ import { base } from "../base";
 import { envoyerAvis, envoyerCourriel } from "../courriel";
 import { avis, ligne, nomLangue } from "./avis";
 import { cloture, dateLongue, debut, heure, langueDe, lireModele, type Modele, prenomDe, textes } from "./commun";
-import { boutons, courriel, mot, notes, paragraphes, titre } from "./gabarit";
+import { boutons, courriel, mot, notes, paragraphes, sansLien, titre } from "./gabarit";
 
 // Rendez-vous pris sur /rendez-vous : confirmation au client dans sa langue (date et heure de Ouidah, objet, mode, lieu,
 // son message), avis à l'équipe ; rendez-vous annulé par l'équipe : e-mail au client. Aucun lien d'annulation : le site
@@ -38,7 +38,7 @@ export function messageRdv(d: DonneesRdv, origine: string, modele: Modele = null
       c.sep,
       "0px 24px 0px",
     ),
-    mot(d.message ?? "", d.message ? d.nom : null, L, "28px 24px 0px"),
+    mot(sansLien(d.message ?? ""), d.message ? sansLien(d.nom) : null, L, "28px 24px 0px"), // texte du visiteur : sans lien
     ...cloture(L, communs[L].question, a.raison, {}, "28px 24px 48px"),
   ]);
 }

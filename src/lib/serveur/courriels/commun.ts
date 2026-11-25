@@ -3,7 +3,7 @@ import { suivi } from "@/content/suivi";
 import { langueDoc } from "@/lib/suivi";
 import { base } from "../base";
 import { paragraphes as decouper, remplir, type CleAuto, type Valeurs } from "../equipe/messages/rendu";
-import { entete, fin, photo, pied, type Bloc, type Lien } from "./gabarit";
+import { entete, fin, photo, pied, sansLien, type Bloc, type Lien } from "./gabarit";
 
 // Outils communs des e-mails clients : langue, dates et montants dans la langue du client (libellés et mois de
 // content/suivi.ts, comme le ticket), modèle de l'admin (table modeles_courriels), début et fin de chaque e-mail.
@@ -13,7 +13,8 @@ export const origineConfiguree = () => {
   const c = process.env.SITE_URL?.trim().replace(/\/$/, "");
   return c && /^https?:\/\/[^/\s]+$/.test(c) ? c : null;
 };
-export const prenomDe = (nom: string) => nom.trim().split(/\s+/)[0] ?? "";
+/** Premier mot du nom saisi par le client, jamais rendu en lien (sansLien). */
+export const prenomDe = (nom: string) => sansLien(nom.trim().split(/\s+/)[0] ?? "");
 
 const FUSEAU = "Africa/Porto-Novo";
 const locale = (L: LangueCourriel, contenu = suivi) => contenu[L].locale ?? "fr-FR";

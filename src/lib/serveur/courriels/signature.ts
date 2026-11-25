@@ -7,7 +7,7 @@ import { envoyerAvis, envoyerCourriel } from "../courriel";
 import { lireJeton } from "../documents/jeton";
 import { avis, ligne, nomLangue } from "./avis";
 import { cloture, dateLongue, debut, fcfa, heure, langueDe, lireModele, type Modele, prenomDe, textes } from "./commun";
-import { boutons, courriel, notes, paragraphes, titre } from "./gabarit";
+import { boutons, courriel, notes, paragraphes, sansLien, titre } from "./gabarit";
 
 // Devis signé en ligne (/suivi/<jeton>/signer) : confirmation au client signataire, dans la langue enregistrée avec sa
 // signature, et avis à l'équipe. Numéro D-, montant, signataire et date viennent du devis et de sa signature en base.
@@ -33,7 +33,7 @@ export function messageSignature(d: DonneesSignature, origine: string, modele: M
     titre({ phrase: { prenom, avant: a.phrase[0], trait: a.phrase[1], apres: "." }, donnee: a.signeLe(le), montant: fcfa(d.montant, L, textesSuivi) }, L, origine),
     paragraphes(t.corps, L),
     boutons({ principal: { libelle: a.bouton, href: lien }, secondaire: { libelle: communs[L].pdf(T.actions.devis), href: `${lien}/document` } }, c.sep, "0px 24px 8px"),
-    notes([{ libelle: a.signataire, valeur: d.signataire }], [`${T.numero.devis} ${d.numero}`, `${c.refDemande}${c.sep}${d.reference}`], L, c.sep),
+    notes([{ libelle: a.signataire, valeur: sansLien(d.signataire) }], [`${T.numero.devis} ${d.numero}`, `${c.refDemande}${c.sep}${d.reference}`], L, c.sep),
     ...cloture(L, communs[L].question, a.raison),
   ]);
 }

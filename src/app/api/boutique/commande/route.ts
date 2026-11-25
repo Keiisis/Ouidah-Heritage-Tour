@@ -6,7 +6,7 @@ import type { ChoixOptions, DemandeCommande, Produit, ReponseCommande } from "@/
 import { lireProduitsFrais } from "@/lib/boutique";
 import { EMAIL } from "@/lib/demande";
 import { base, baseConfiguree, compter } from "@/lib/serveur/base";
-import { empreinteIp, lireCorps, reponse } from "@/lib/serveur/garde";
+import { empreinteIp, lireCorps, refusLimite, reponse } from "@/lib/serveur/garde";
 import { emettre } from "@/lib/serveur/documents/emettre";
 import { jetonSuivi } from "@/lib/serveur/documents/jeton";
 import { envoyerCommande } from "@/lib/serveur/courriels/boutique";
@@ -19,7 +19,8 @@ import { langueDoc } from "@/lib/suivi";
 
 // Envoi d'une commande de la boutique. Tout est revérifié ici : chaque ligne contre la base (article visible, quantité,
 // pièce unique, taille ou mesures, broderie, coloris), coordonnées, adresse de livraison, piège à robots, temps passé sur
-// la page, 5 commandes par heure et par connexion. Noms et prix enregistrés = ceux de la base, jamais ceux du navigateur.
+// la page, 5 commandes par heure et par connexion (recomptées par la base à l'écriture : refus « limite » en 429). Noms
+// et prix enregistrés = ceux de la base, jamais ceux du navigateur.
 // E-mail au client après la réponse (courriels/boutique.ts) : sans SMTP configuré rien ne part, la commande reste enregistrée.
 // Paiement immédiat (décision de Kevin du 09/11) : si une passerelle est active et que tous les prix sont connus, la base
 // (rpc boutique_commander) relit prix, stock et frais de livraison, réserve le stock et crée la commande « à préparer »
@@ -153,6 +154,7 @@ export async function POST(req: Request) {
       const p = { reference, lignes: lignes.map((l) => ({ slug: l.slug, quantite: l.quantite, options: l.options })), contact, remise, message, devise, ...taux, empreinte_ip: ip, langue };
       const r = await base("rpc/boutique_commander", { method: "POST", corps: { p, p_minutes: MINUTES_PAIEMENT } }).catch(() => null);
       if (r?.status === 409) continue; // référence déjà prise, on en tire une autre
+      if (await refusLimite(r)) return erreur("limite", 429);
       const res = r?.ok ? ((await r.json().catch(() => null)) as { ok?: boolean; id?: string; total_xof?: number; erreur?: string; slug?: string } | null) : null;
       if (res?.erreur === "zone") return erreur("zone", 400, ["remise.zone"]);
       if (res?.erreur === "stock" || res?.erreur === "prix") {
@@ -184,6 +186,7 @@ export async function POST(req: Request) {
       const ticket = id ? await emettre("T", "commande", id).catch(() => null) : null;
       return reponse({ ok: true, reference, suivi: id ? finir(id, reference, total, ticket, false) : null } satisfies ReponseCommande, 201);
     }
+    if (await refusLimite(r)) return erreur("limite", 429);
     if (r?.status !== 409) break; // 409 : référence déjà prise, on en tire une autre
   }
   return erreur("indisponible", 502);
