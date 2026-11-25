@@ -254,7 +254,7 @@ export const securite = {
     categories: {
       demandes: "Demandes et dossiers", devis: "Devis", moments: "Moments des dossiers", documents: "Documents du dossier", clients: "Fiche client", courriels: "E-mails envoyés",
       abonnes: "Abonnement à la lettre", reservations: "Réservations", commandes: "Commandes boutique", factures: "Factures", liens: "Liens de paiement", paiements: "Paiements manuels",
-      rendez_vous: "Rendez-vous", candidatures: "Candidatures partenaires", courriels_recus: "E-mails reçus",
+      rendez_vous: "Rendez-vous", candidatures: "Candidatures partenaires", courriels_recus: "E-mails reçus", conversations: "Conversations de l’assistant",
     } as Record<string, string>,
     conserve: "Conservé",
     conserves: "Conservé au titre des obligations comptables",

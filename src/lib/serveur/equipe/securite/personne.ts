@@ -7,7 +7,8 @@ import { exact, sansSensible } from "./regles";
 
 // Droits d'une personne (accès, effacement ; APDP et RGPD), lot « securite ». Tout part de son adresse e-mail, comparée
 // sans tenir compte de la casse : demandes (et leurs devis, moments, documents, liens, factures, paiements), fiche client,
-// e-mails envoyés, abonnement à la lettre, réservations, commandes boutique. Admin seulement (relu ici).
+// e-mails envoyés, abonnement à la lettre, réservations, commandes boutique, conversations de l'assistant (par l'adresse
+// laissée ou par une de ses demandes ; messages en cascade). Admin seulement (relu ici).
 // Conservé (obligation comptable) : factures et avoirs, paiements manuels, liens payés, réservations payées ou entrées,
 // commandes remises ou payées, et les demandes et devis qui s'y rattachent (clés étrangères « restrict »). De ces
 // demandes gardées, le message libre, la note de l'équipe et le WhatsApp sont vidés. Tout le reste est supprimé
@@ -33,6 +34,7 @@ export type Trouve = {
   rendez_vous: Id[];
   candidatures: Id[];
   courriels_recus: Id[];
+  conversations: Id[];
 };
 export type Apercu = Record<string, { n: number; gardes: number }>;
 
@@ -72,7 +74,7 @@ async function liees<T>(ids: string[], chemin: (filtre: string) => string): Prom
 export async function chercher(email: string): Promise<Trouve | null> {
   if (!(await exigerRole("admins"))) return null;
   const e = exact(email);
-  const [demandes, clients, courriels, abonnes, reservations, commandes, rendez_vous, candidatures, courriels_recus] = await Promise.all([
+  const [demandes, clients, courriels, abonnes, reservations, commandes, rendez_vous, candidatures, courriels_recus, convAdresse] = await Promise.all([
     lire<Demande>(`demandes?select=id,statut&email=ilike.${e}&limit=500`),
     lire<Id>(`clients?select=id&email=eq.${encodeURIComponent(email)}&limit=10`),
     lire<Id>(`courriels_envoyes?select=id&destinataire=ilike.${e}&limit=2000`),
@@ -82,10 +84,11 @@ export async function chercher(email: string): Promise<Trouve | null> {
     lire<Id>(`rendez_vous?select=id&email=eq.${encodeURIComponent(email)}`),
     lire<Id>(`candidatures_partenaires?select=id&email=eq.${encodeURIComponent(email)}`),
     lire<Id>(`courriels_recus?select=id&expediteur=ilike.${e}`),
+    lire<Id>(`conversations?select=id&contact_email=ilike.${e}`),
   ]);
-  if (!demandes || !clients || !courriels || !abonnes || !reservations || !commandes || !rendez_vous || !candidatures || !courriels_recus) return null;
+  if (!demandes || !clients || !courriels || !abonnes || !reservations || !commandes || !rendez_vous || !candidatures || !courriels_recus || !convAdresse) return null;
   const dIds = demandes.map((d) => d.id);
-  const [devis, moments, documents, factures, liens, resasLiees] = await Promise.all([
+  const [devis, moments, documents, factures, liens, resasLiees, convDemandes] = await Promise.all([
     liees<Id & { demande_id: string }>(dIds, ids => `devis?select=id,demande_id&demande_id=in.${ids}`),
     liees<Id>(dIds, ids => `dossier_moments?select=id&demande_id=in.${ids}`),
     liees<Id>(dIds, ids => `equipe_documents?select=id&demande_id=in.${ids}`),
@@ -93,8 +96,9 @@ export async function chercher(email: string): Promise<Trouve | null> {
     liees<Id & { demande_id: string; paye_le: string | null }>(dIds, ids => `liens_paiement?select=id,demande_id,paye_le&demande_id=in.${ids}`),
     // réservations rattachées à une de ses demandes mais à une autre adresse : elles bloquent la demande (restrict)
     liees<Resa>(dIds, ids => `reservations?select=id,statut,demande_id&demande_id=in.${ids}`),
+    liees<Id>(dIds, ids => `conversations?select=id&demande_id=in.${ids}`),
   ]);
-  if (!devis || !moments || !documents || !factures || !liens || !resasLiees) return null;
+  if (!devis || !moments || !documents || !factures || !liens || !resasLiees || !convDemandes) return null;
   const rIds = reservations.map((r) => r.id), cIds = commandes.map((c) => c.id), vIds = devis.map((d) => d.id);
   type Paiement = Id & { devis_id: string | null; reservation_id: string | null; commande_id: string | null };
   const [pv, pr, pc, entrees, lc] = await Promise.all([
@@ -129,6 +133,7 @@ export async function chercher(email: string): Promise<Trouve | null> {
     reservations: resas,
     commandes: commandes.map((c) => ({ ...c, garde: c.statut === "remise" || payes.has(c.id) })),
     rendez_vous, candidatures, courriels_recus,
+    conversations: [...new Map([...convAdresse, ...convDemandes].map((c) => [c.id, c])).values()],
   };
 }
 
@@ -151,6 +156,7 @@ export function apercu(t: Trouve): Apercu {
     rendez_vous: { n: t.rendez_vous.length, gardes: 0 },
     candidatures: { n: t.candidatures.length, gardes: 0 },
     courriels_recus: { n: t.courriels_recus.length, gardes: 0 },
+    conversations: { n: t.conversations.length, gardes: 0 },
   };
 }
 
@@ -175,6 +181,7 @@ export async function exporter(email: string, t: Trouve): Promise<Record<string,
     ["rendez_vous", extraire(t.rendez_vous, ids => `rendez_vous?select=id,cree_le,creneau_id,nom,email,telephone,message,langue,consentement_le,statut&id=in.${ids}`)],
     ["candidatures", extraire(t.candidatures, ids => `candidatures_partenaires?select=id,cree_le,nom,email,telephone,organisation,activite,ville,site,message,langue,statut&id=in.${ids}`)],
     ["courriels_recus", extraire(t.courriels_recus, ids => `courriels_recus?select=recu_le,expediteur,nom,objet,texte,pieces&id=in.${ids}`)],
+    ["conversations", extraire(t.conversations, ids => `conversations?select=id,cree_le,langue,mode,resume,contact_nom,contact_email,contact_whatsapp,contact_accord_le,demande_id,messages:conversation_messages(cree_le,auteur,texte)&id=in.${ids}`)],
   ];
   const r = await Promise.all(parts.map(([, promesse]) => promesse));
   if (r.some((x) => !x)) return null;
@@ -183,7 +190,10 @@ export async function exporter(email: string, t: Trouve): Promise<Record<string,
 
 /**
  * Effacement réel. Ordre imposé par les clés étrangères : documents (stockage puis fiches), moments, liens non payés et
- * devis des demandes effaçables, réservations non payées, demandes, puis fiche client, e-mails, abonnement, commandes.
+ * devis des demandes effaçables, réservations non payées, conversations, demandes, puis fiche client, e-mails, abonnement,
+ * commandes. Les conversations partent avant les demandes : effacée, une demande laisserait leur lien à null, et l'équipe
+ * pourrait refaire une demande de la conversation. Les notifications « conversation_agent » qui les signalent partent en
+ * premier.
  * Chaque étape compte ce qu'elle a vraiment supprimé ; une étape qui échoue arrête la suite (« incomplet »).
  */
 export async function effacerTout(t: Trouve): Promise<{ efface: number; garde: number; complet: boolean } | null> {
@@ -198,7 +208,7 @@ export async function effacerTout(t: Trouve): Promise<{ efface: number; garde: n
     efface += l.length;
     return true;
   };
-  const tous = t.demandes.map((d) => d.id);
+  const tous = t.demandes.map((d) => d.id), conversations = t.conversations.map((c) => c.id);
   const effacables = t.demandes.filter((d) => !d.garde).map((d) => d.id);
   const gardees = t.demandes.filter((d) => d.garde).map((d) => d.id);
   for (const id of tous) {
@@ -206,11 +216,14 @@ export async function effacerTout(t: Trouve): Promise<{ efface: number; garde: n
     if (n === null) return { efface, garde, complet: false };
     efface += n;
   }
+  // notifications de l'équipe : aucune donnée de la personne, non comptées dans « efface »
+  for (const ids of lots(conversations)) if (!(await effacer(`notifications?type=eq.conversation_agent&objet_id=in.${ids}&select=id`))) return { efface, garde, complet: false };
   const etapes: (string | null)[] = [
     ...[...lots(tous)].map(ids => `dossier_moments?demande_id=in.${ids}&select=id`),
     ...[...lots(effacables)].map(ids => `liens_paiement?demande_id=in.${ids}&paye_le=is.null&select=id`),
     ...[...lots(effacables)].map(ids => `devis?demande_id=in.${ids}&select=id`),
     ...t.reservations.filter((r) => !r.garde).map((r) => `reservations?id=eq.${r.id}&statut=eq.attente&select=id`),
+    ...[...lots(conversations)].map(ids => `conversations?id=in.${ids}&select=id`),
     ...[...lots(effacables)].map(ids => `demandes?id=in.${ids}&select=id`),
     ...[...lots(t.clients.map(c => c.id))].map(ids => `clients?id=in.${ids}&select=id`),
     ...[...lots(t.courriels.map(c => c.id))].map(ids => `courriels_envoyes?id=in.${ids}&select=id`),

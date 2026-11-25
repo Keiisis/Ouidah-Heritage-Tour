@@ -346,9 +346,11 @@ const APRES_NOM = new Set("et and y und e i je j ich yo eu mwen an moi me et/ou 
 
 /** Question d'un visiteur sans donnée personnelle : e-mails, IBAN, numéros longs (8 chiffres ou plus, téléphone compris),
  * mots de 6 chiffres ou plus (dossier, passeport), clés et mots de passe, et nom donné après « je m'appelle » (et ses
- * équivalents dans les langues du site) remplacés par [retiré]. */
+ * équivalents dans les langues du site) remplacés par [retiré]. Le texte est d'abord ramené à sa forme simple (NFKC puis
+ * nettoyer : espaces insécables ou fines, trait d'union conditionnel, chiffres et « @ » pleine chasse), sinon un numéro
+ * ou une adresse écrits avec ces caractères échapperaient aux motifs. */
 export function anonymiser(t: string): string {
-  let s = t
+  let s = nettoyer(t.normalize("NFKC"))
     .replace(PRESENTATION, (_, intro: string, esp: string, nom: string) => {
       const mots = nom.split(/\s+/);
       const k = mots.findIndex((m) => APRES_NOM.has(m.toLowerCase()));

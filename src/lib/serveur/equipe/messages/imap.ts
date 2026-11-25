@@ -14,6 +14,9 @@ export function configurationImap() {
   return host && user && pass && Number.isInteger(port) && port > 0 && port <= 65535
     ? { host, user, pass, port, dossier, boite: createHash("sha256").update(`${host.toLowerCase()}|${port}|${user.toLowerCase()}|${dossier}`).digest("hex") } : null;
 }
+/** Chaîne venue d'un message ou de son enveloppe, coupée puis gardable par Postgres : sans moitié de caractère (une coupe
+ * au milieu d'un emoji, réparée par toWellFormed) ni U+0000, que jsonb refuse. Sinon tout le lot serait refusé. */
+const propre = (v: unknown, max: number) => String(v ?? "").slice(0, max).toWellFormed().replace(/\u0000/g, "");
 export async function analyserCourriel(source: Buffer) {
   if (source.length > MAX_MESSAGE) throw new Error("taille");
   const options = { skipHtmlToText: false, skipTextToHtml: true, skipImageLinks: true, maxHtmlLengthToParse: MAX_MESSAGE };
@@ -22,7 +25,7 @@ export async function analyserCourriel(source: Buffer) {
   // Son convertisseur existant traite correctement la même partie HTML comme document MIME autonome.
   const texte = m.text || (m.html ? (await simpleParser(Buffer.from(`Content-Type: text/html; charset=utf-8\r\n\r\n${m.html}`), options)).text : "") || "";
   const adresse = m.from?.value[0];
-  return { message_id: m.messageId?.slice(0, 1000) ?? null, expediteur: (adresse?.address ?? "").toLowerCase().slice(0, 254), nom: (adresse?.name ?? "").slice(0, 200), objet: (m.subject ?? "").slice(0, 1000), texte: texte.replace(/\u0000/g, "").slice(0, 100000), pieces: m.attachments.slice(0, 30).map((p) => ({ nom: (p.filename ?? "").slice(0, 200), type: p.contentType, taille: p.size })) };
+  return { message_id: m.messageId ? propre(m.messageId, 1000) : null, expediteur: propre(adresse?.address?.toLowerCase(), 254), nom: propre(adresse?.name, 200), objet: propre(m.subject, 1000), texte: propre(texte, 100000), pieces: m.attachments.slice(0, 30).map((p) => ({ nom: propre(p.filename, 200), type: propre(p.contentType, 200), taille: p.size })) };
 }
 
 /** Lecture seule du serveur mail : aucun SEEN, MOVE ou DELETE. Le curseur et le lot importé sont validés ensemble. */
@@ -37,6 +40,7 @@ export async function synchroniserImap(automatique = false): Promise<{ ok: true;
   const reserve = await rpcTache<{ jeton: string; validite: string | null; dernier_uid: number } | null>("imap_reserver", { p_boite: config.boite });
   if (!reserve) return { erreur: "panne" };
   if (!reserve.valeur) return { erreur: "occupe" };
+  let jeton = reserve.valeur.jeton;
   const client = new ImapFlow({ host: config.host, port: config.port, secure: config.port === 993, doSTARTTLS: config.port !== 993, auth: { user: config.user, pass: config.pass }, logger: false, disableAutoIdle: true, connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 20000, maxResponseSize: 3 * MAX_MESSAGE });
   // ImapFlow émet aussi « error » hors d'une promesse. Fermer la session fait échouer le lot, dont le curseur reste inchangé.
   client.on("error", () => client.close());
@@ -59,15 +63,29 @@ export async function synchroniserImap(automatique = false): Promise<{ ok: true;
       const source = volumineux ? false : await client.fetchOne(String(m.uid), { source: true }, { uid: true });
       // Un message supprimé entre les deux lectures n'est pas inventé.
       if (!volumineux && !source) { traite = m.uid; continue; }
-      const mail = source && source.source ? await analyserCourriel(source.source) : { message_id: m.envelope?.messageId ?? null, expediteur: m.envelope?.from?.[0]?.address ?? "", nom: m.envelope?.from?.[0]?.name ?? "", objet: (m.envelope?.subject ?? "").slice(0, 1000), texte: "", pieces: [] };
+      const e = m.envelope;
+      const mail = source && source.source ? await analyserCourriel(source.source) : { message_id: e?.messageId ? propre(e.messageId, 1000) : null, expediteur: propre(e?.from?.[0]?.address?.toLowerCase(), 254), nom: propre(e?.from?.[0]?.name, 200), objet: propre(e?.subject, 1000), texte: "", pieces: [] };
       lot.push({ ...mail, uid: m.uid, volumineux, recu_le: m.internalDate instanceof Date ? m.internalDate.toISOString() : new Date(m.internalDate || Date.now()).toISOString() });
       traite = m.uid;
     }
     if (!messages.length || traite === messages.at(-1)?.uid) traite = fin;
-    const resultat = await rpcTache<boolean>("imap_terminer", { p_boite: config.boite, p_jeton: reserve.valeur.jeton, p_validite: validite, p_uid: traite, p_messages: lot, p_erreur: false });
-    return resultat?.valeur ? { ok: true, nombre: lot.length, suite: traite < dernier } : { erreur: "panne" };
+    const terminer = async (uid: number, l: unknown[]) =>
+      (await rpcTache<boolean>("imap_terminer", { p_boite: config.boite, p_jeton: jeton, p_validite: validite, p_uid: uid, p_messages: l, p_erreur: false }))?.valeur === true;
+    if (!(await terminer(traite, lot))) {
+      // Lot refusé : un message à la fois, et s'il est refusé seul, son marqueur (uid, expéditeur, « Message illisible ») :
+      // le curseur avance toujours. Chaque enregistrement rend la réservation, reprise pour le suivant.
+      for (const x of lot) {
+        if (!(await terminer(x.uid, [x])) && !(await terminer(x.uid, [{ ...x, message_id: null, nom: "", objet: "Message illisible", texte: "", pieces: [] }]))) throw new Error("lot");
+        const r = await rpcTache<{ jeton: string } | null>("imap_reserver", { p_boite: config.boite });
+        if (!r?.valeur) throw new Error("reservation");
+        jeton = r.valeur.jeton;
+      }
+      if (!(await terminer(traite, []))) throw new Error("lot");
+    }
+    return { ok: true, nombre: lot.length, suite: traite < dernier };
   } catch {
-    await rpcTache<boolean>("imap_terminer", { p_boite: config.boite, p_jeton: reserve.valeur.jeton, p_validite: null, p_uid: 0, p_messages: [], p_erreur: true });
+    // Réservation rendue avec l'erreur notée : l'admin la voit, et la relève suivante n'attend pas son expiration.
+    await rpcTache<boolean>("imap_terminer", { p_boite: config.boite, p_jeton: jeton, p_validite: null, p_uid: 0, p_messages: [], p_erreur: true });
     return { erreur: "panne" };
   } finally {
     liberation?.();

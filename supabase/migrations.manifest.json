@@ -241,6 +241,10 @@
     {
       "fichier": "20261130_reservations_bornees.sql",
       "sha256": "fe1fca1e7a9eb5f99da3f03cb767ff0ea5c885e77b84196cf58b3a309a95d165"
+    },
+    {
+      "fichier": "20261131_donnees_effacement.sql",
+      "sha256": "b5770dea8c86666ffcb2e787066e7aef2a6b8c30ecb29ae22cba92479043974e"
     }
   ]
 }

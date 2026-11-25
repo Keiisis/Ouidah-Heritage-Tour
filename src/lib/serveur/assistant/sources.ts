@@ -262,12 +262,13 @@ export async function repondreQuestion(id: unknown, fd: unknown): Promise<Retour
   const q = await lire<{ texte: string }>(`assistant_questions?select=texte&id=eq.${id}&repondue_le=is.null`);
   if (!q) return { erreur: "panne" };
   if (!q[0]) return { erreur: "introuvable" };
-  const reste = resteBloquant([reponse], fd);
+  // La question devient le titre d'une fiche publiée : même contrôle que la réponse (l'admin peut confirmer un passage).
+  const titre = [...q[0].texte].slice(0, L.titre).join("").trim();
+  const reste = resteBloquant([titre, reponse], fd);
   if (reste.length) return refusSensible(s, "question.reponse", reste, id);
   const libre = await place(1);
   if (libre === null) return { erreur: "panne" };
   if (!libre) return { erreur: "plein" };
-  const titre = [...q[0].texte].slice(0, L.titre).join("").trim();
   const c = await creer(s, { titre, genre: "texte", nom_fichier: null, taille: null, pages: null, etat: "publie" }, [{ titre, texte: reponse }]);
   if (!c) return { erreur: "panne" };
   const r = await ecrire(`assistant_questions?id=eq.${id}&select=id`, "PATCH", { repondue_le: maintenant(), fiche_id: c.fiches[0] });
