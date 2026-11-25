@@ -237,6 +237,10 @@
     {
       "fichier": "20261129_limites_atomiques.sql",
       "sha256": "92dfc5fee76c97197dd3aba8d08785d5e7e35688dc904110199b456cb4a89a1a"
+    },
+    {
+      "fichier": "20261130_reservations_bornees.sql",
+      "sha256": "fe1fca1e7a9eb5f99da3f03cb767ff0ea5c885e77b84196cf58b3a309a95d165"
     }
   ]
 }

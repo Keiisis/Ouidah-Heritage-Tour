@@ -29,6 +29,7 @@ export type Reservation = {
   demande_id: string | null;
   reglement_manuel?: boolean;
   mode_manuel?: string | null;
+  complet_le?: string | null; // paiement reçu alors que l'événement était complet : reste en attente, à rembourser
 };
 
 // Lancement côté navigateur : widget officiel de la passerelle, ou page de paiement hébergée par elle.

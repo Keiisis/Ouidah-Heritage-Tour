@@ -94,19 +94,24 @@ export async function lireProduitsFrais(slugs: string[]): Promise<Produit[] | nu
 export async function lireCatalogue(langue: Langue = "FR"): Promise<Catalogue> {
   "use cache";
   cacheTag("boutique");
-  const [produits, categories, matieres, zones, passerelles] = await Promise.all([
+  const [produits, categories, matieres, zones, passerelles, retenues] = await Promise.all([
     lire<LigneProduit[]>(`boutique_produits?select=${COLONNES}${visibles()}&order=ordre.asc,nom.asc`),
     lire<LigneCategorie[]>("boutique_categories?select=slug,nom,couleur,photo,ordre,traductions&order=ordre.asc,nom.asc"),
     lire<(Matiere & { traductions?: unknown })[]>("boutique_matieres?select=slug,nom,traductions&order=nom.asc"),
     lire<LigneZone[]>("boutique_livraison_zones?select=code,pays,ville,reste_du_monde,frais_xof,delai_jours,actif&order=ordre.asc,code.asc"),
     baseConfiguree() ? passerellesActives() : [],
+    lire<{ slug: string; echue: number; en_cours: boolean }[]>("rpc/boutique_retenues"),
   ]);
   if (!produits || !categories || !matieres) {
     cacheLife("minutes"); // base muette : catalogue vide, nouvel essai une minute plus tard
     return VIDE;
   }
-  cacheLife("hours");
-  const liste = produits.map((l) => produit(l, langue));
+  // Retenue d'une commande impayée : échue, elle ne compte plus (sans attendre qu'on la rende) ; en cours, le catalogue se
+  // relit dans la minute pour montrer l'article dès l'échéance (migration 20261130).
+  if (retenues?.some((r) => r.en_cours)) cacheLife("minutes");
+  else cacheLife("hours");
+  const echues = new Map(retenues?.map((r) => [r.slug, r.echue]));
+  const liste = produits.map((l) => produit({ ...l, stock_reserve: l.stock_reserve - (echues.get(l.slug) ?? 0) }, langue));
   const cats = new Set(liste.map((p) => p.categorie)), mats = new Set(liste.map((p) => p.matiere));
   return {
     produits: liste,

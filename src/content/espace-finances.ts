@@ -699,6 +699,15 @@ export const avisEquipe = {
     suite: "Prévenir le client : aucun e-mail automatique ne lui a été envoyé.",
     raison: "Avis interne envoyé à l’équipe quand l’écriture inverse d’un règlement en agence remet une réservation en attente.",
   },
+  complet: {
+    sujet: (reference: string) => `Événement complet, paiement à rembourser · ${reference}`,
+    titre: (nom: string) => `Paiement de ${nom} reçu pour un événement complet`,
+    apercu: (nom: string) => `${nom} · paiement reçu, événement complet · remboursement à faire`,
+    lignes: { suite: "À faire", evenement: "Événement", date: "Date", places: "Places", recu: "Montant reçu", passerelle: "Passerelle", transaction: "Transaction", client: "Client", email: "E-mail", langue: "Langue" },
+    suite: "Rembourser depuis la passerelle, puis prévenir le client : la réservation reste en attente, sans billet, et aucun e-mail automatique ne lui a été envoyé.",
+    places: (n: number) => (n > 1 ? `${n} places` : "1 place"),
+    raison: "Avis interne envoyé à l’équipe quand un paiement en ligne arrive pour un événement déjà complet.",
+  },
   paiement: {
     lien: "Lien",
     annule: "Lien annulé au moment du paiement",

@@ -38,8 +38,8 @@ export async function candidater(req: Request) {
   const f = await formulaire(req, "candidatures_partenaires"); if (f.refus) return f.refus;
   const v = lireCandidature(f.brut); if (!v) return reponse({ erreur: "erreur" }, 400);
   const r = await base("candidatures_partenaires?select=id", { method: "POST", corps: { ...v, ip_hash: f.ip }, prefer: "return=representation" }).catch(() => null);
-  // Une nouvelle demande vers une adresse déjà en cours n'expose ni le dossier ni son état.
-  if (r?.status === 409) return reponse({ ok: true }, 201);
+  // Chaque candidature est gardée, même pour une adresse déjà en cours (migration 20261130) : même réponse 201, rien du
+  // dossier existant n'est révélé.
   if(r?.ok)return reponse({ok:true},201);
   const erreur=await r?.json().catch(()=>({}));
   return reponse({ erreur: erreur?.message==="limite"?"limite":"erreur" }, erreur?.message==="limite"?429:502);

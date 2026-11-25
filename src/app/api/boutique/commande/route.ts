@@ -39,6 +39,7 @@ const MESSAGES = {
   refus: "Votre commande n'a pas pu être envoyée. Merci de réessayer dans un instant.",
   champs: "Certaines informations sont à compléter ou à corriger.",
   limite: "Plusieurs commandes viennent déjà d'être envoyées depuis cette connexion. Merci de réessayer dans une heure.",
+  attente: "Une commande attend déjà son paiement pour cette adresse e-mail ou cette connexion. Réglez-la depuis l'e-mail reçu, ou réessayez dans 30 minutes.",
   indisponible: "La boutique ne répond pas pour le moment. Merci de réessayer un peu plus tard.",
   zone: "La livraison vers ce pays n'est pas encore payable en ligne. Choisissez le retrait à Ouidah ou écrivez-nous.",
 };
@@ -157,6 +158,7 @@ export async function POST(req: Request) {
       if (await refusLimite(r)) return erreur("limite", 429);
       const res = r?.ok ? ((await r.json().catch(() => null)) as { ok?: boolean; id?: string; total_xof?: number; erreur?: string; slug?: string } | null) : null;
       if (res?.erreur === "zone") return erreur("zone", 400, ["remise.zone"]);
+      if (res?.erreur === "attente") return erreur("attente", 429); // une commande impayée en cours suffit (migration 20261130)
       if (res?.erreur === "stock" || res?.erreur === "prix") {
         const ko = lignes.flatMap((l, i) => (l.slug === res.slug ? [`lignes.${i}`] : []));
         return erreur("champs", 400, ko.length ? ko : ["lignes"]);

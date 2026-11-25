@@ -1,7 +1,7 @@
 import { contact, copies } from "@/content/courriels";
 import { devisPage } from "@/content/fr";
 import { avisEquipe } from "@/content/espace-finances";
-import { debut, prenomDe } from "./commun";
+import { debut, fcfa, prenomDe } from "./commun";
 import { boutons, courriel, mot, notes, pied, titre, type Lien, type Note } from "./gabarit";
 
 // Avis internes à l'équipe (adresse EMAIL_OHT), en français, au format de l'avis de demande (messages.ts avisOht) :
@@ -55,6 +55,35 @@ export function avisReservationAttente(r: { reference: string; nom: string; emai
         ligne(L.evenement, `${r.evenement} · ${r.formule}`),
         ligne(L.date, r.occurrence),
         ligne(L.motif, r.motif),
+        ligne(L.client, r.nom),
+        ligne(L.email, r.email),
+        ligne(L.langue, nomLangue(r.langue)),
+      ],
+      raison: A.raison,
+    },
+    origine,
+  );
+}
+
+/** Paiement en ligne arrivé pour un événement déjà complet (jauge revérifiée par la base, migration 20261130) : la
+ * réservation reste en attente, sans billet. Avis à l'équipe seulement, pour rembourser puis prévenir le client. */
+export function avisReservationComplete(r: { reference: string; nom: string; email: string; langue: string; evenement: string; occurrence: string; formule: string; quantite: number; recu: number | null; passerelle: string; transaction: string | null }, origine: string) {
+  const A = avisEquipe.complet, L = A.lignes;
+  return avis(
+    {
+      sujet: A.sujet(r.reference),
+      apercu: A.apercu(r.nom),
+      titre: A.titre(r.nom),
+      donnee: r.reference,
+      bouton: r.email ? { libelle: avisEquipe.reservation.ecrire(prenomDe(r.nom)), href: `mailto:${r.email}` } : null,
+      lignes: [
+        ligne(L.suite, A.suite),
+        ligne(L.evenement, `${r.evenement} · ${r.formule}`),
+        ligne(L.date, r.occurrence),
+        ligne(L.places, A.places(r.quantite)),
+        ligne(L.recu, r.recu === null ? null : fcfa(r.recu, "FR")),
+        ligne(L.passerelle, r.passerelle),
+        ligne(L.transaction, r.transaction),
         ligne(L.client, r.nom),
         ligne(L.email, r.email),
         ligne(L.langue, nomLangue(r.langue)),

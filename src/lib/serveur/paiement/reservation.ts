@@ -52,6 +52,7 @@ export async function creerReservation(x: { b: Payable; t: Tarif; nom: NomPasser
     consentement_le: new Date().toISOString(),
     ip_hash: x.ip,
     demande_id: x.demandeId,
+    capacite: x.t.capacite, // jauge revérifiée par la base au paiement (déclencheur capacite_paiement)
   };
   const r = await base("reservations?select=id", { method: "POST", corps: ligne, prefer: "return=representation" }).catch(() => null);
   const id = r?.ok ? ((await r.json()) as { id: string }[])[0]?.id : null;
