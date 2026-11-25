@@ -15,10 +15,25 @@ import type { Langue } from "./langue";
 export type { CleContenu, ValeurContenu } from "./contenu-registre";
 export const tagContenu = (cle: CleEdition) => `contenu:${cle}`;
 
-async function contenusPublies(langue: Langue = "FR"): Promise<Partial<Record<CleContenu, Json>>> {
+/** Brouillons montrés à CETTE requête : mode aperçu ouvert ET session de l'équipe valable avec le droit « site » (un admin
+ * l'a), relue en base. Décidé hors du cache : déconnecté, session révoquée ou droit retiré, le cookie d'aperçu ne montre
+ * plus que la version publiée. Sans mode aperçu (rendu statique compris), aucun cookie n'est lu et la session de l'équipe
+ * n'est même pas chargée. */
+async function apercuPermis(): Promise<boolean> {
+  let actif = false;
+  try {
+    actif = (await draftMode()).isEnabled;
+  } catch {
+    // hors requête (generateStaticParams au build, où draftMode() lève) : la version publiée
+  }
+  if (!actif) return false;
+  const { exigerDroit } = await import("./serveur/equipe/securite/droits");
+  return (await exigerDroit("site")) !== null;
+}
+
+async function contenusPublies(langue: Langue, apercu: boolean): Promise<Partial<Record<CleContenu, Json>>> {
   "use cache";
   cacheTag("contenu");
-  const { isEnabled: apercu } = await draftMode();
   if (!baseConfiguree()) return {};
   let lignes: { cle: string; valeur: Json | null; brouillon: Json | null }[] | null = null;
   try {
@@ -58,12 +73,12 @@ async function contenusPublies(langue: Langue = "FR"): Promise<Partial<Record<Cl
 
 /** Seules les valeurs publiques partent au navigateur. Les documents serveur gardent les mentions complètes. */
 export async function surchargesPubliques(langue: Langue = "FR"): Promise<Partial<Record<CleContenu, Json>>> {
-  const valeurs = await contenusPublies(langue);
+  const valeurs = await contenusPublies(langue, await apercuPermis());
   return Object.fromEntries(Object.entries(valeurs).map(([cle, v]) => [cle, contenuPublic(cle, v)]));
 }
 
 /** Contenu d'une rubrique : la version publiée si elle existe et vaut, sinon le défaut du code. */
 export async function lireContenu<K extends CleContenu>(cle: K, langue: Langue = "FR"): Promise<ValeurContenu<K>> {
-  const valeurs = await contenusPublies(langue);
+  const valeurs = await contenusPublies(langue, await apercuPermis());
   return avecMessages(cle, REGISTRE[cle].defaut as ValeurContenu<K>, valeurs[cle], langue, messagesValides(valeurs["site.messages"]));
 }

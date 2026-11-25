@@ -9,7 +9,7 @@ const plur = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? plusi
 const FAMILLES: [string, string, string[]][] = [
   ["connexion", "Connexion", ["connexion", "deconnexion", "code", "mot_de_passe"]],
   ["equipe", "Équipe et droits", ["equipe", "droits", "profil"]],
-  ["dossiers", "Demandes et dossiers", ["dossier", "moment", "devis", "client", "clients"]],
+  ["dossiers", "Demandes et dossiers", ["dossier", "moment", "devis", "client", "clients", "conversation"]],
   ["messages", "Messages", ["courriel", "modele", "lettre"]],
   ["terrain", "Billets et boutique", ["billet", "commande"]],
   ["finances", "Finances", ["facture", "avoir", "lien", "paiement", "depense", "mois", "grille", "finances"]],
@@ -125,6 +125,7 @@ export const securite = {
       "dossier.attribution": "Dossier attribué", "dossier.etape": "Étape du dossier", "dossier.note": "Note du dossier",
       "moment.ajout": "Moment ajouté", "moment.deplacement": "Moment déplacé", "moment.suppression": "Moment supprimé", "moment.clos": "Moment clos", "moment.proposes": "Moments proposés",
       "devis.brouillon": "Devis enregistré", "devis.pret": "Devis envoyé", "devis.refus": "Devis refusé", "client.note": "Fiche client modifiée", "clients.remplis": "Fiches clients remplies",
+      "conversation.reponse": "Réponse à une conversation", "conversation.demande": "Conversation transformée en demande",
       "courriel.brouillon": "Brouillon d’e-mail", "courriel.test": "E-mail de test", "courriel.envoi": "E-mail envoyé", "courriel.refus": "E-mail refusé",
       "modele.enregistre": "Modèle enregistré", "modele.retire": "Modèle retiré", "modele.test": "Modèle testé",
       "lettre.brouillon": "Lettre enregistrée", "lettre.test": "Lettre testée", "lettre.envoi": "Lettre envoyée",

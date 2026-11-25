@@ -306,6 +306,8 @@ export const pilotage = {
     "devis.refus": "Devis refusé",
     "client.note": "Note client",
     "clients.remplis": "Fiches clients remplies",
+    "conversation.reponse": "Réponse à une conversation",
+    "conversation.demande": "Conversation transformée en demande",
     "courriel.brouillon": "E-mail en brouillon",
     "courriel.test": "E-mail de test",
     "courriel.envoi": "E-mail envoyé",

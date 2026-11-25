@@ -197,6 +197,7 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
               </section>
               <section className="section" aria-labelledby={`${uid}-li`}>
                 <h3 id={`${uid}-li`}>{C.lies}</h3>
+                {fiche.dossiers.some((x) => x.autres) && <p className="mention">{C.ecart}</p>}
                 {fiche.dossiers.length ? (
                   <ul className="liste">
                     {fiche.dossiers.map((x) => (
@@ -206,6 +207,7 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
                           <span className="texte">
                             <span className="titre">{T.admin.demandes.types[x.intention] ?? x.intention}</span>
                             <span className="meta">{T.demandes.recue(ilYa(x.recue, minute))}</span>
+                            {x.autres && <span className="meta">{C.saisi([x.autres.nom, x.autres.whatsapp].filter(Boolean).join(", "))}</span>}
                           </span>
                           <span className="etat" data-e={x.etape}>
                             {T.etapes[x.etape]}

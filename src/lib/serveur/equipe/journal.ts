@@ -11,6 +11,8 @@ type Action =
   | "dossier.attribution" | "dossier.etape" | "dossier.note"
   | "moment.ajout" | "moment.deplacement" | "moment.suppression" | "moment.clos" | "moment.proposes"
   | "devis.brouillon" | "devis.pret" | "devis.refus" | "client.note" | "clients.remplis"
+  // conversations de l'assistant : details.cible = la conversation, details.courriel = réponse partie aussi par e-mail
+  | "conversation.reponse" | "conversation.demande"
   // messages (lot L6) : details.cible = la fiche client, details.modele / details.langue, details.nombre = envois
   | "courriel.brouillon" | "courriel.test" | "courriel.envoi" | "courriel.refus"
   | "modele.enregistre" | "modele.retire" | "modele.test"

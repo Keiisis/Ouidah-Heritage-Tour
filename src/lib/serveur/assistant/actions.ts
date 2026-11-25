@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { consignesRedaction, courrielReponse, LIMITES } from "@/content/assistant";
 import { base, compter } from "../base";
 import { echapper, envoyerCourriel } from "../courriel";
+import { journaliser } from "../equipe/journal";
 import { modeLocal } from "../equipe/mode";
 import { iso } from "../equipe/outils";
 import { assistantDisponible } from "../equipe/reglages/public";
@@ -57,16 +58,18 @@ export async function repondreConversation(e: { id: unknown; texte: unknown }): 
     if (courriel) await base(`conversation_messages?id=eq.${id}`, { method: "PATCH", corps: { envoye_le: t }, prefer: "return=minimal" }).catch(() => null);
   }
   await base(`notifications?profil_id=eq.${s.profilId}&type=eq.conversation_agent&objet_id=eq.${c.id}&lu_le=is.null`, { method: "PATCH", corps: { lu_le: t }, prefer: "return=minimal" }).catch(() => null);
+  await journaliser("conversation.reponse", s.profilId, null, { cible: c.id, courriel });
   refresh();
   return { ok: true, courriel };
 }
 
-/** La conversation devient une demande (nom, e-mail et accord du visiteur exigés), attribuée à qui la suit. */
+/** La conversation devient une demande (nom, e-mail et accord du visiteur exigés), sans agent : un admin l'attribue. */
 export async function transformerConversation(e: { id: unknown }): Promise<RetourAssistant> {
   const p = await conversationPermise(e.id);
   if ("erreur" in p) return { erreur: p.erreur };
   const r = await versDemande(p.c);
   if (r !== "ok") return { erreur: r };
+  await journaliser("conversation.demande", p.s.profilId, null, { cible: p.c.id });
   refresh();
   return { ok: true };
 }

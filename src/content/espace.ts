@@ -589,6 +589,8 @@ export const espace = {
     notesAide: "Visibles de l’équipe seulement.",
     lies: "Dossiers liés",
     aucunLie: "Aucun dossier lié.",
+    ecart: "Des dossiers de cette adresse donnent un autre nom ou un autre numéro que la fiche : l’adresse e-mail d’une demande n’est pas vérifiée. Vérifiez avant d’appeler ou d’écrire.",
+    saisi: (coordonnees: string) => `Saisi dans ce dossier : ${coordonnees}`,
     enregistrer: "Enregistrer la fiche",
     annuler: "Fermer",
     enregistre: (nom: string) => `Fiche de ${nom} enregistrée.`,

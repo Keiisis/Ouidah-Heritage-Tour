@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, draftMode } from "next/headers";
 import { connection } from "next/server";
 import type { Role } from "@/content/equipe";
 import { base, baseConfiguree } from "../base";
@@ -67,8 +67,10 @@ export async function exigerRole(page: Role): Promise<Session | null> {
   return s && autorise(s.role, page) ? s : null;
 }
 
-/** Ferme la session de ce navigateur : révoquée en base, cookie effacé (route handler seulement). */
+/** Ferme la session de ce navigateur : révoquée en base, cookie effacé, mode aperçu du contenu quitté (route handler
+ * seulement). */
 export async function fermerSession() {
+  (await draftMode()).disable();
   const store = await cookies();
   const jeton = store.get(COOKIE)?.value;
   if (jetonValide(jeton) && baseConfiguree()) {

@@ -40,11 +40,12 @@ export async function chiffrerCommande(id: unknown): Promise<RetourCommande> {
 }
 
 /** Lien de paiement en ligne d'une commande confirmée, à envoyer au client : le même que son bouton « Payer en ligne »
- * (montant = total_xof relu en base, lien vivant réutilisé). Droit « Liens de paiement » ; rien n'est lu du navigateur
- * hormis l'identifiant. Renvoie le chemin /payer/<jeton>, complété par l'adresse du site côté écran. */
+ * (montant = total_xof relu en base, lien vivant réutilisé). Droits « Liens de paiement » ET « Boutique » (la page du lien
+ * montre le client et la commande) ; rien n'est lu du navigateur hormis l'identifiant. Renvoie le chemin /payer/<jeton>,
+ * complété par l'adresse du site côté écran. */
 export async function lienPaiementCommande(id: unknown): Promise<{ ok: true; chemin: string } | { erreur: "refuse" | "champs" | RefusLienCommande }> {
   const s = await exigerDroit("liens");
-  if (!s) return { erreur: "refuse" };
+  if (!s || !(await exigerDroit("boutique"))) return { erreur: "refuse" };
   if (typeof id !== "string" || !UUID.test(id)) return { erreur: "champs" };
   const r = await ouvrirLienCommande(id, s.profilId);
   if (!r.ok) return { erreur: r.erreur };

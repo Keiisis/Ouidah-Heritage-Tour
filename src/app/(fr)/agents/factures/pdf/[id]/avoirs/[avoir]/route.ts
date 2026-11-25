@@ -1,9 +1,9 @@
 import { factureAccessible } from "@/lib/serveur/equipe/finances/lectures";
 import { pdfFinancier } from "@/lib/serveur/equipe/finances/pdf";
-import { exigerRole } from "@/lib/serveur/equipe/session";
+import { exigerDroit } from "@/lib/serveur/equipe/securite/droits";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string; avoir: string }> }) {
-  const s = await exigerRole("agents");
+  const s = await exigerDroit("demandes"); // droit « Demandes et devis » ; un admin les a tous
   if (!s) return new Response(null, { status: 403 });
   const { id, avoir } = await params;
   const f = await factureAccessible(s, id);

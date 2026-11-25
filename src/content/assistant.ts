@@ -182,7 +182,7 @@ export const assistantEquipe = {
     demande: (ref: string) => `Devenue la demande ${ref}`,
     voirDemande: "Voir la demande",
     transformerDemande: "Transformer en demande",
-    transformee: "Conversation transformée en demande.",
+    transformee: "Conversation transformée en demande : un admin l’attribuera.",
     auteurs: { visiteur: "Visiteur", assistant: "Assistant", agent: "Équipe" } as Record<string, string>,
     repondre: "Répondre",
     reponse: "Votre réponse",

@@ -217,25 +217,38 @@ export async function momentsDuJour(s: Session, ms: number, equipe: boolean): Pr
 
 // ---------- clients ----------
 
-export type FicheClient = { id: string; nom: string; email: string; pays: string | null; langue: string; telephone: string | null; notes: string | null; dossiers: { id: string; recue: string; etape: Etape; intention: string }[] };
+// autres : nom et téléphone saisis dans ce dossier quand ils diffèrent de la fiche, sinon null. L'e-mail d'une demande
+// n'est pas vérifié : la fiche, remplie par la première demande traitée, peut porter les coordonnées d'une autre personne ;
+// l'écart reste visible au lieu d'écraser la fiche.
+export type FicheClient = {
+  id: string; nom: string; email: string; pays: string | null; langue: string; telephone: string | null; notes: string | null;
+  dossiers: { id: string; recue: string; etape: Etape; intention: string; autres: { nom: string | null; whatsapp: string | null } | null }[];
+};
 type BrutClient = Omit<FicheClient, "dossiers">;
+const autres = (c: BrutClient, nom: string | null, whatsapp: string | null) => {
+  const n = nom?.trim().slice(0, 120) || null;
+  return (n && n !== c.nom) || (whatsapp && whatsapp !== c.telephone) ? { nom: n, whatsapp } : null;
+};
 
 /** Fiches clients : toutes (admin), ou celles des dossiers de l'agent, avec leurs dossiers liés (par adresse e-mail). */
 export async function lireClients(s: Session): Promise<FicheClient[] | null> {
-  const demandes = await lire<{ id: string; cree_le: string; email: string | null; etape: Etape; intention: string }>(`demandes?select=id,cree_le,email,etape,intention&statut=eq.envoyee${filtreAgent(s)}&order=cree_le.desc&limit=2000`);
+  type Lie = { id: string; cree_le: string; email: string | null; etape: Etape; intention: string; nom: string | null; whatsapp: string | null };
+  const demandes = await lire<Lie>(`demandes?select=id,cree_le,email,etape,intention,nom,whatsapp&statut=eq.envoyee${filtreAgent(s)}&order=cree_le.desc&limit=2000`);
   if (!demandes) return null;
-  const parEmail = new Map<string, FicheClient["dossiers"]>();
+  const parEmail = new Map<string, Lie[]>();
   for (const d of demandes) {
     if (!d.email) continue;
     const k = d.email.toLowerCase();
-    parEmail.set(k, [...(parEmail.get(k) ?? []), { id: d.id, recue: d.cree_le, etape: d.etape, intention: d.intention }]);
+    parEmail.set(k, [...(parEmail.get(k) ?? []), d]);
   }
   if (!voitTout(s) && parEmail.size === 0) return [];
   const emails = [...parEmail.keys()];
   // adresses citées entre guillemets doubles dans le filtre in.() (PostgREST) ; une adresse avec un guillemet est écartée
   const filtre = voitTout(s) ? "" : `&email=in.(${emails.filter((e) => !/["\\]/.test(e)).map((e) => `"${encodeURIComponent(e)}"`).join(",")})`;
   const clients = await lire<BrutClient>(`clients?select=id,nom,email,pays,langue,telephone,notes${filtre}&order=nom.asc&limit=2000`);
-  return clients ? clients.map((c) => ({ ...c, dossiers: parEmail.get(c.email.toLowerCase()) ?? [] })) : null;
+  return clients
+    ? clients.map((c) => ({ ...c, dossiers: (parEmail.get(c.email.toLowerCase()) ?? []).map((d) => ({ id: d.id, recue: d.cree_le, etape: d.etape, intention: d.intention, autres: autres(c, d.nom, d.whatsapp) })) }))
+    : null;
 }
 
 /** Une fiche client si cette session y a droit (admin : toutes ; agent : celles de ses dossiers), sinon notFound(). */

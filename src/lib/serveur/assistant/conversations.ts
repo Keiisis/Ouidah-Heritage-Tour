@@ -264,8 +264,10 @@ export async function lireConversationsEquipe(s: Session): Promise<ConversationE
   });
 }
 
-/** La conversation devient une demande (question), attribuée à l'agent qui la suit : il faut un nom, un e-mail et
- * l'accord daté du visiteur (contrainte de la table demandes). */
+/** La conversation devient une demande (question) : il faut un nom, un e-mail et l'accord daté du visiteur (contrainte de
+ * la table demandes). Demande SANS agent : l'e-mail laissé dans la conversation n'est pas vérifié, et un agent qui suit
+ * sa propre conversation se rattacherait sinon la fiche d'un client d'un autre agent ; seul un admin l'attribue
+ * (dossiers-actions.ts, attribuer). */
 export async function versDemande(c: Conversation): Promise<"ok" | "contact" | "deja" | "panne"> {
   if (c.demande_id) return "deja";
   if (!c.contact_nom || !c.contact_email || !c.contact_accord_le) return "contact";
@@ -284,8 +286,6 @@ export async function versDemande(c: Conversation): Promise<"ok" | "contact" | "
         message: resumer(m, assistantEquipe.resume),
         consentement_le: c.contact_accord_le,
         ip_hash: c.ip_hash,
-        agent_id: c.agent_id,
-        ...(c.agent_id ? { attribuee_le: maintenant() } : {}),
       },
       prefer: "return=representation",
     });

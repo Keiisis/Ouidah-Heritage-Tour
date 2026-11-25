@@ -88,7 +88,7 @@ const fichier = (brut: unknown) => {
 // ---------- factures et avoirs ----------
 
 export async function emettreFacture(devisId: unknown): Promise<RetourFin> {
-  const s = await exigerRole("agents");
+  const s = await exigerDroit("demandes"); // droit « Demandes et devis », comme l'écran du devis ; un admin les a tous
   if (!s) return { erreur: "refuse" };
   if (typeof devisId !== "string" || !UUID.test(devisId)) return { erreur: "champs" };
   const d = await devisPayables(s, devisId);
@@ -121,7 +121,7 @@ export async function emettreAvoir(factureId: unknown, brut: unknown): Promise<R
 
 /** E-mail de facture au client, dans sa langue (SMTP d'OHT ; en local, la boîte de test EQUIPE_BOITE). */
 export async function envoyerFacture(factureId: unknown): Promise<RetourFin> {
-  const s = await exigerRole("agents");
+  const s = await exigerDroit("demandes");
   if (!s) return { erreur: "refuse" };
   const f = await factureAccessible(s, factureId);
   if (f === "panne") return { erreur: "panne" };
