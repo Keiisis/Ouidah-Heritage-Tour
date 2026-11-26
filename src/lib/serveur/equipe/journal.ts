@@ -10,7 +10,8 @@ type Action =
   | "equipe.ajout" | "equipe.suspension" | "equipe.reactivation" | "equipe.reinvitation" | "equipe.refus" | "equipe.suppression" | "equipe.role"
   | "dossier.attribution" | "dossier.etape" | "dossier.note"
   | "moment.ajout" | "moment.deplacement" | "moment.suppression" | "moment.clos" | "moment.proposes"
-  | "devis.brouillon" | "devis.pret" | "devis.refus" | "client.note" | "clients.remplis"
+  // client.coordonnees : nom, langue, pays ou téléphone de la fiche corrigés ; client.note : le reste (notes)
+  | "devis.brouillon" | "devis.pret" | "devis.refus" | "client.note" | "client.coordonnees" | "clients.remplis"
   // conversations de l'assistant : details.cible = la conversation, details.courriel = réponse partie aussi par e-mail
   | "conversation.reponse" | "conversation.demande"
   // messages (lot L6) : details.cible = la fiche client, details.modele / details.langue, details.nombre = envois

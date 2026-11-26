@@ -124,7 +124,7 @@ export const securite = {
       "equipe.ajout": "Compte ajouté", "equipe.suspension": "Compte suspendu", "equipe.reactivation": "Compte réactivé", "equipe.reinvitation": "Invitation renvoyée", "equipe.suppression": "Compte supprimé", "equipe.role": "Rôle changé", "equipe.refus": "Changement de compte refusé",
       "dossier.attribution": "Dossier attribué", "dossier.etape": "Étape du dossier", "dossier.note": "Note du dossier",
       "moment.ajout": "Moment ajouté", "moment.deplacement": "Moment déplacé", "moment.suppression": "Moment supprimé", "moment.clos": "Moment clos", "moment.proposes": "Moments proposés",
-      "devis.brouillon": "Devis enregistré", "devis.pret": "Devis envoyé", "devis.refus": "Devis refusé", "client.note": "Fiche client modifiée", "clients.remplis": "Fiches clients remplies",
+      "devis.brouillon": "Devis enregistré", "devis.pret": "Devis envoyé", "devis.refus": "Devis refusé", "client.note": "Fiche client modifiée", "client.coordonnees": "Coordonnées client corrigées", "clients.remplis": "Fiches clients remplies",
       "conversation.reponse": "Réponse à une conversation", "conversation.demande": "Conversation transformée en demande",
       "courriel.brouillon": "Brouillon d’e-mail", "courriel.test": "E-mail de test", "courriel.envoi": "E-mail envoyé", "courriel.refus": "E-mail refusé",
       "modele.enregistre": "Modèle enregistré", "modele.retire": "Modèle retiré", "modele.test": "Modèle testé",

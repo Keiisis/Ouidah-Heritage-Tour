@@ -59,6 +59,7 @@
 .esp .esp-demandes .groupe-etape h3 { display: flex; align-items: center; gap: 8px; font-size: 20px; }
 .esp .compte-petit { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 13px; background: var(--survol); color: var(--encre); font: 800 13px/1 var(--f-texte); }
 .esp .liste-clients .courriel { overflow-wrap: anywhere; }
+.esp .tiroir-client .liste > li > .reprendre { margin: 0 8px 12px; }
 
 /* ---------- tiroir du dossier ---------- */
 .esp .esp-tiroir.tiroir-dossier { width: min(900px, 100%); }

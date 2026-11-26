@@ -341,16 +341,29 @@ export const retirerPassage = (texte: string, passage: string) => (passage ? tex
 
 // ---------- questions sans réponse : anonymisées, puis normalisées ----------
 
+// tirets Unicode (trait d'union, tirets demi-cadratin et cadratin, signe moins, petits tirets et tiret pleine chasse) :
+// ramenés à « - » pour que les motifs ci-dessous reconnaissent un numéro écrit avec eux
+const TIRETS = /[\u2010-\u2015\u2212\ufe58\ufe63\uff0d]/g;
+// numéro d'une question : celui du contrôle des documents (NUMERO), barre oblique comprise (« 01/97/00/00/00 »)
+const NUMERO_QUESTION = /(?:\+|\b00)?\d[\d .()/-]{6,}\d/g;
+// adresse e-mail écrite en toutes lettres : « nom [at] domaine [dot] com », « nom (arobase) domaine », « nom arobase
+// domaine point com ». « at », « dot » et « point » seuls sont des mots courants : « at » ne compte qu'entre crochets,
+// parenthèses ou accolades ; « arobase » (ou « arrobase ») seul compte s'il est suivi d'un domaine à point (« … arobase
+// sur un clavier » reste tel quel).
+const POINT = String.raw`(?:\.|\s*[[({]\s*(?:dot|point)\s*[\])}]\s*|\s+(?:dot|point)\s+)[\p{L}\p{N}-]+`;
+const AROBASE_LETTRES = new RegExp(String.raw`[\p{L}\p{N}._%+-]+(?:\s*[[({]\s*(?:at|arr?obase)\s*[\])}]\s*[\p{L}\p{N}-]+(?:${POINT})*|\s+arr?obase\s+[\p{L}\p{N}-]+(?:${POINT})+)`, "giu");
+
 const PRESENTATION = /(je m['’]appelle|moi c['’]est|mon nom (?:est|c['’]est)|my name is|i am called|me llamo|mi nombre es|ich hei(?:ß|ss)e|mein name ist|meu nome é|(?:eu )?me chamo|mwen rele|non mwen se)(\s+)((?:[^\s,.;:!?()"«»]+)(?:\s+[^\s,.;:!?()"«»]+){0,2})/giu;
 const APRES_NOM = new Set("et and y und e i je j ich yo eu mwen an moi me et/ou mais but pero aber mas pou pour for para fur für de du des la le les a à au aux ce cette c je".split(" "));
 
-/** Question d'un visiteur sans donnée personnelle : e-mails, IBAN, numéros longs (8 chiffres ou plus, téléphone compris),
- * mots de 6 chiffres ou plus (dossier, passeport), clés et mots de passe, et nom donné après « je m'appelle » (et ses
- * équivalents dans les langues du site) remplacés par [retiré]. Le texte est d'abord ramené à sa forme simple (NFKC puis
- * nettoyer : espaces insécables ou fines, trait d'union conditionnel, chiffres et « @ » pleine chasse), sinon un numéro
- * ou une adresse écrits avec ces caractères échapperaient aux motifs. */
+/** Question d'un visiteur sans donnée personnelle : e-mails (même écrits « [at] … [dot] » ou « arobase … point »), IBAN,
+ * numéros longs (8 chiffres ou plus, téléphone compris, séparés par espaces, points, tirets, barres obliques ou
+ * parenthèses), mots de 6 chiffres ou plus (dossier, passeport), clés et mots de passe, et nom donné après « je m'appelle »
+ * (et ses équivalents dans les langues du site) remplacés par [retiré]. Le texte est d'abord ramené à sa forme simple (NFKC,
+ * tirets Unicode en « - », puis nettoyer : espaces insécables ou fines, trait d'union conditionnel, chiffres et « @ » pleine
+ * chasse), sinon un numéro ou une adresse écrits avec ces caractères échapperaient aux motifs. */
 export function anonymiser(t: string): string {
-  let s = nettoyer(t.normalize("NFKC"))
+  let s = nettoyer(t.normalize("NFKC").replace(TIRETS, "-"))
     .replace(PRESENTATION, (_, intro: string, esp: string, nom: string) => {
       const mots = nom.split(/\s+/);
       const k = mots.findIndex((m) => APRES_NOM.has(m.toLowerCase()));
@@ -358,8 +371,8 @@ export function anonymiser(t: string): string {
       return k === 0 ? `${intro}${esp}${nom}` : `${intro}${esp}${RETIRE}${garde.length ? ` ${garde.join(" ")}` : ""}`;
     });
   for (const re of CLES) s = s.replace(re, RETIRE);
-  s = s.replace(SECRET, RETIRE).replace(EMAIL, RETIRE).replace(IBAN, (x) => (ibanValide(x) ? RETIRE : x));
-  s = s.replace(NUMERO, (x) => (chiffres(x).length >= 8 ? RETIRE : x));
+  s = s.replace(SECRET, RETIRE).replace(EMAIL, RETIRE).replace(AROBASE_LETTRES, RETIRE).replace(IBAN, (x) => (ibanValide(x) ? RETIRE : x));
+  s = s.replace(NUMERO_QUESTION, (x) => (chiffres(x).length >= 8 ? RETIRE : x));
   s = s.replace(/[\p{L}\d-]*\d{6,}[\p{L}\d-]*/gu, RETIRE);
   return s;
 }

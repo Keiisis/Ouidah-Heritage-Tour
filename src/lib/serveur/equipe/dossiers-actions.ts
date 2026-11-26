@@ -3,8 +3,10 @@
 import { refresh } from "next/cache";
 import { notFound } from "next/navigation";
 import { espace as T } from "@/content/espace";
+import PAYS from "@/content/pays.json";
 import { soleil } from "@/components/espace/outils";
 import { iso, jourOuidah, minuitOuidah } from "@/lib/jours";
+import { estLangue } from "@/lib/langue";
 import { langueDoc, type Dossier } from "@/lib/suivi";
 import { lireContenu } from "@/lib/contenu";
 import { base } from "../base";
@@ -342,19 +344,32 @@ export async function envoyerDevis(id: unknown, brut: unknown): Promise<RetourDo
 // ---------- clients ----------
 
 const TELEPHONE = /^\+?[0-9][0-9 ().-]{5,31}$/;
+const CODES_PAYS = new Set<string>(PAYS);
 
+/** Fiche client : nom, langue (celle des e-mails de l'équipe), pays, téléphone et notes, corrigés par l'équipe ; la
+ * première demande traitée l'a remplie sans que son adresse soit vérifiée. Pays : code ISO à deux lettres ou vide. */
 export async function noterClient(id: unknown, brut: unknown): Promise<RetourDossier> {
   const s = await exigerDroit("demandes");
   if (!s) return { erreur: "refuse" };
   const c = await clientAccessible(s, id);
   if (!c) return { erreur: "panne" };
   const o = brut && typeof brut === "object" ? (brut as Record<string, unknown>) : {};
+  const nom = uneLigne(o.nom);
+  const pays = o.pays === "" || o.pays === null ? null : o.pays;
   const notes = plusieursLignes(o.notes);
   const telephone = uneLigne(o.telephone);
-  const champs = [...(typeof o.notes !== "string" || notes.length > LIMITES_NOTE ? ["notes"] : []), ...(telephone && !TELEPHONE.test(telephone) ? ["telephone"] : [])];
+  const champs = [
+    ...(!nom || nom.length > 120 ? ["nom"] : []),
+    ...(!estLangue(o.langue) ? ["langue"] : []),
+    ...(pays !== null && !(typeof pays === "string" && CODES_PAYS.has(pays)) ? ["pays"] : []),
+    ...(telephone && !TELEPHONE.test(telephone) ? ["telephone"] : []),
+    ...(typeof o.notes !== "string" || notes.length > LIMITES_NOTE ? ["notes"] : []),
+  ];
   if (champs.length) return { erreur: "champs", champs };
-  if (!(await ecrire(`clients?id=eq.${c.id}`, "PATCH", { notes: notes || null, telephone: telephone || null, modifie_le: maintenantIso() }))) return { erreur: "panne" };
-  await journaliser("client.note", s.profilId, null, { cible: c.id });
+  const fiche = { nom, langue: o.langue, pays, telephone: telephone || null };
+  if (!(await ecrire(`clients?id=eq.${c.id}`, "PATCH", { ...fiche, notes: notes || null, modifie_le: maintenantIso() }))) return { erreur: "panne" };
+  const corrigee = (Object.keys(fiche) as (keyof typeof fiche)[]).some((k) => fiche[k] !== c[k]);
+  await journaliser(corrigee ? "client.coordonnees" : "client.note", s.profilId, null, { cible: c.id });
   refresh();
   return { ok: true };
 }

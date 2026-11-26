@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useId, useRef, useState, useTransition, type FormEvent } from "react";
 import type { Role } from "@/content/equipe";
 import { espace as T } from "@/content/espace";
+import PAYS from "@/content/pays.json";
+import { LANGUES } from "@/lib/langue";
 import { useMouvementReduit } from "@/lib/mouvement";
-import type { FicheClient } from "@/lib/serveur/equipe/dossiers";
+import type { Autres, FicheClient } from "@/lib/serveur/equipe/dossiers";
 import { noterClient, remplirClients } from "@/lib/serveur/equipe/dossiers-actions";
 import { LIMITES_NOTE } from "@/lib/serveur/equipe/dossiers-regles";
 import { Bloc, Vide } from "./Bloc";
@@ -16,8 +18,9 @@ import "./agents.css";
 import "./dossier.css";
 
 // Fiches clients (lot L4) : une par adresse e-mail, remplie depuis les demandes. La fiche s'ouvre dans le tiroir (plein
-// écran en 390) : langue, pays, e-mail, téléphone, notes de l'équipe et dossiers liés. Le serveur relit la session et le
-// droit sur la fiche (un agent : les clients de ses dossiers) à chaque enregistrement.
+// écran en 390) : e-mail, nom, langue, pays, téléphone, notes de l'équipe et dossiers liés. Un dossier qui donne d'autres
+// coordonnées les montre, et un clic les reprend sur la fiche (champs remplis puis enregistrés). Le serveur relit la
+// session et le droit sur la fiche (un agent : les clients de ses dossiers) à chaque enregistrement.
 const C = T.clients;
 const regions = new Intl.DisplayNames(["fr"], { type: "region" });
 const nomPays = (c: string | null) => {
@@ -28,12 +31,14 @@ const nomPays = (c: string | null) => {
     return c;
   }
 };
+const PAYS_TRIES = (PAYS as string[]).map((c) => ({ v: c, l: nomPays(c) ?? c })).sort((a, b) => a.l.localeCompare(b.l, "fr"));
 
 export function Clients({ role, clients, admin }: { role: Role; clients: FicheClient[]; admin: boolean }) {
   const reduit = useMouvementReduit();
   const minute = useMinute();
   const uid = useId();
   const panneau = useRef<HTMLDialogElement>(null);
+  const formulaire = useRef<HTMLFormElement>(null);
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [erreurs, setErreurs] = useState<string[]>([]);
   const [annonce, setAnnonce] = useState<{ texte: string; erreur: boolean } | null>(null);
@@ -67,13 +72,13 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
     e.preventDefault();
     if (!fiche || occupe) return;
     const f = new FormData(e.currentTarget);
-    const brut = { notes: f.get("notes") ?? "", telephone: f.get("telephone") ?? "" };
+    const brut = { nom: f.get("nom") ?? "", langue: f.get("langue") ?? "", pays: f.get("pays") ?? "", notes: f.get("notes") ?? "", telephone: f.get("telephone") ?? "" };
     demarrer(async () => {
       try {
         const r = await noterClient(fiche.id, brut);
         if ("ok" in r) {
           setErreurs([]);
-          annoncer(C.enregistre(fiche.nom));
+          annoncer(C.enregistre(String(brut.nom).trim() || fiche.nom));
           fermer();
         } else if (r.erreur === "champs") setErreurs(r.champs ?? []);
         else annoncer(T.refus[r.erreur === "refuse" ? "refuse" : "panne"], true);
@@ -81,6 +86,17 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
         annoncer(T.refus.reseau, true);
       }
     });
+  };
+  /** Coordonnées d'un dossier reprises sur la fiche : les champs sont remplis, puis la fiche est enregistrée. */
+  const reprendre = (a: Autres) => {
+    const f = formulaire.current;
+    if (!f || occupe) return;
+    const champ = (nom: string) => f.elements.namedItem(nom) as HTMLInputElement | HTMLSelectElement;
+    if (a.nom) champ("nom").value = a.nom;
+    champ("telephone").value = a.whatsapp ?? "";
+    champ("langue").value = a.langue;
+    champ("pays").value = a.pays ?? "";
+    f.requestSubmit();
   };
   const remplir = () =>
     demarrer(async () => {
@@ -148,7 +164,7 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
         onClick={(e) => e.target === e.currentTarget && fermer()}
       >
         {fiche && (
-          <form key={fiche.id} className="tiroir-cadre" noValidate onSubmit={enregistrer}>
+          <form ref={formulaire} key={fiche.id} className="tiroir-cadre" noValidate onSubmit={enregistrer}>
             <header className="tiroir-tete">
               <div>
                 <span className="type">{C.fiche}</span>
@@ -161,14 +177,6 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
             <div className="tiroir-corps" data-lenis-prevent>
               <section className="section">
                 <dl className="paires">
-                  <div>
-                    <dt>{C.langue}</dt>
-                    <dd>{T.langues[fiche.langue] ?? fiche.langue}</dd>
-                  </div>
-                  <div>
-                    <dt>{C.pays}</dt>
-                    <dd>{nomPays(fiche.pays) ?? T.dossier.nonPrecise}</dd>
-                  </div>
                   <div className="large">
                     <dt>{C.email}</dt>
                     <dd>
@@ -180,6 +188,44 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
                 </dl>
               </section>
               <section className="section champs">
+                <div className="champ large">
+                  <label htmlFor={`${uid}-nom`}>{C.nom}</label>
+                  <input id={`${uid}-nom`} type="text" name="nom" maxLength={120} defaultValue={fiche.nom} autoComplete="off" aria-invalid={erreurs.includes("nom")} aria-describedby={erreurs.includes("nom") ? `${uid}-noma` : undefined} />
+                  {erreurs.includes("nom") && (
+                    <span className="aide" id={`${uid}-noma`}>
+                      {C.erreurs.nom}
+                    </span>
+                  )}
+                </div>
+                <div className="champ">
+                  <label htmlFor={`${uid}-la`}>{C.langue}</label>
+                  <select id={`${uid}-la`} name="langue" defaultValue={fiche.langue} aria-invalid={erreurs.includes("langue")} aria-describedby={`${uid}-laa`}>
+                    {LANGUES.map((l) => (
+                      <option key={l} value={l}>
+                        {T.langues[l]}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="aide" id={`${uid}-laa`}>
+                    {erreurs.includes("langue") ? C.erreurs.langue : C.langueAide}
+                  </span>
+                </div>
+                <div className="champ">
+                  <label htmlFor={`${uid}-pa`}>{C.pays}</label>
+                  <select id={`${uid}-pa`} name="pays" defaultValue={fiche.pays ?? ""} aria-invalid={erreurs.includes("pays")} aria-describedby={erreurs.includes("pays") ? `${uid}-paa` : undefined}>
+                    <option value="">{T.dossier.nonPrecise}</option>
+                    {PAYS_TRIES.map((p) => (
+                      <option key={p.v} value={p.v}>
+                        {p.l}
+                      </option>
+                    ))}
+                  </select>
+                  {erreurs.includes("pays") && (
+                    <span className="aide" id={`${uid}-paa`}>
+                      {C.erreurs.pays}
+                    </span>
+                  )}
+                </div>
                 <div className="champ large">
                   <label htmlFor={`${uid}-tel`}>{C.tel}</label>
                   <input id={`${uid}-tel`} type="tel" name="telephone" maxLength={32} defaultValue={fiche.telephone ?? ""} autoComplete="off" inputMode="tel" aria-invalid={erreurs.includes("telephone")} aria-describedby={`${uid}-tela`} />
@@ -200,19 +246,28 @@ export function Clients({ role, clients, admin }: { role: Role; clients: FicheCl
                 {fiche.dossiers.some((x) => x.autres) && <p className="mention">{C.ecart}</p>}
                 {fiche.dossiers.length ? (
                   <ul className="liste">
-                    {fiche.dossiers.map((x) => (
+                    {fiche.dossiers.map(({ autres: a, ...x }) => (
                       <li key={x.id}>
                         <Link className="rangee" href={`/${role}/demandes/${x.id}`}>
                           <Picto nom="dossier" />
                           <span className="texte">
                             <span className="titre">{T.admin.demandes.types[x.intention] ?? x.intention}</span>
                             <span className="meta">{T.demandes.recue(ilYa(x.recue, minute))}</span>
-                            {x.autres && <span className="meta">{C.saisi([x.autres.nom, x.autres.whatsapp].filter(Boolean).join(", "))}</span>}
+                            {a && (
+                              <span className="meta" id={`${uid}-a${x.id}`}>
+                                {C.saisi([a.nom, a.whatsapp, T.langues[a.langue] ?? a.langue, nomPays(a.pays)].filter(Boolean).join(", "))}
+                              </span>
+                            )}
                           </span>
                           <span className="etat" data-e={x.etape}>
                             {T.etapes[x.etape]}
                           </span>
                         </Link>
+                        {a && (
+                          <button type="button" className="bouton-2 reprendre" data-reprendre={x.id} aria-describedby={`${uid}-a${x.id}`} aria-busy={occupe} onClick={() => reprendre(a)}>
+                            {C.reprendre}
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>
