@@ -83,17 +83,36 @@ export async function budgetEpuise(budget: number) {
   return n === null || n >= budget;
 }
 
+/** Part du budget du jour (LIMITES.partConnexion) déjà dépensée par cette connexion (empreinte IP) en 24 h, ou base muette.
+ * Comptée sur les lignes « jetons » d'assistant_compteurs posées par consommer : elles survivent à l'effacement des
+ * conversations, comme les autres limites par connexion (au plus LIMITES.parJourIp lignes par connexion en 24 h). */
+export async function partIpEpuisee(ip: string, budget: number) {
+  try {
+    const depuis = encodeURIComponent(new Date(Date.now() - 86_400_000).toISOString());
+    const r = await base(`assistant_compteurs?select=jetons&ip_hash=eq.${ip}&genre=eq.jetons&cree_le=gte.${depuis}&limit=1000`);
+    if (!r.ok) return true;
+    const l = (await r.json()) as { jetons: unknown }[];
+    return l.reduce((n, x) => n + (Number.isSafeInteger(x.jetons) ? (x.jetons as number) : 0), 0) >= budget * LIMITES.partConnexion;
+  } catch {
+    return true;
+  }
+}
+
 /** Jetons dépensés, comptés dans le budget du jour. Conversation effacée entre-temps (visiteur parti pendant la réponse) :
- * la ligne est gardée sans lien, le budget compte quand même. */
-export async function consommer(source: "public" | "redaction", jetons: number, lien: { conversation?: string; profil?: string }) {
+ * la ligne est gardée sans lien, le budget compte quand même. Avec `ip` (assistant public), aussi comptés pour la
+ * connexion (partIpEpuisee) : ligne sans contenu, effacée avec les autres compteurs après 2 jours. */
+export async function consommer(source: "public" | "redaction", jetons: number, lien: { conversation?: string; profil?: string; ip?: string }) {
+  const n = Math.max(0, Math.min(200_000, Math.round(jetons)));
   const poser = (conversation: string | null) =>
     base("assistant_consommation", {
       method: "POST",
-      corps: { source, jetons: Math.max(0, Math.min(200_000, Math.round(jetons))), conversation_id: conversation, profil_id: lien.profil ?? null },
+      corps: { source, jetons: n, conversation_id: conversation, profil_id: lien.profil ?? null },
       prefer: "return=minimal",
     }).catch(() => null);
+  const connexion = lien.ip ? base("assistant_compteurs", { method: "POST", corps: { ip_hash: lien.ip, genre: "jetons", jetons: n }, prefer: "return=minimal" }).catch(() => null) : null;
   const r = await poser(lien.conversation ?? null);
   if (r && !r.ok && lien.conversation) await poser(null);
+  await connexion;
 }
 
 export type Echange = { role: "system" | "user" | "assistant"; content: string };

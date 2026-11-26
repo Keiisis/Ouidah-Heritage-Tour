@@ -37,6 +37,9 @@ export const LIMITES = {
   connaissanceCaracteres: 5200, // fiches choisies pour une question (le socle s'y ajoute)
   plafondReponse: 700, // jetons par réponse, valeur de départ (réglable par l'admin)
   budgetJour: 200_000, // jetons par jour, assistant public et rédaction ensemble (réglable par l'admin)
+  partEquipe: 0.2, // part du budget du jour gardée pour l'équipe (rédaction, traduction) : l'assistant public s'arrête avant
+  partConnexion: 0.25, // part du budget du jour qu'une seule connexion (empreinte IP, /64 en IPv6) peut dépenser en 24 h
+  // (ces deux parts sont écrites dans l'aide de l'admin : espace-reglages.ts, assistant.budgetAide)
   enLigneMinutes: 10, // un agent est « en ligne » si sa session a servi dans ces minutes
   absentMinutes: 3, // visiteur sans lecture depuis ce délai : la réponse de l'agent part aussi par e-mail (lecture notée au plus chaque minute, interrogation au plus toutes les 90 s en mode économie : 2 min 30 de retard au pire)
   transmission: 600, // caractères du résumé que l'assistant transmet à l'équipe (« transmettre »)

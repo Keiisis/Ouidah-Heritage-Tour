@@ -370,7 +370,7 @@ export const reglages = {
     modeleAide: "Identifiant exact d’un modèle disponible dans votre compte Groq.",
     plafond: "Jetons maximum par réponse",
     budget: "Budget quotidien en jetons",
-    budgetAide: "Budget partagé entre les visiteurs et la rédaction, selon le jour à Ouidah. Les réponses déjà en cours peuvent le dépasser.",
+    budgetAide: "Budget partagé entre les visiteurs et la rédaction, selon le jour à Ouidah. Les visiteurs s’arrêtent à 80 % : le reste est gardé pour l’équipe. Une même connexion ne peut pas dépenser plus d’un quart du budget en 24 heures. Les réponses déjà en cours peuvent le dépasser.",
     publicEnregistre: "Réglages de l’assistant enregistrés.",
     sansCle: "Aucune clé de fournisseur n’est posée sur le serveur.",
     sansCleSous: "Sans clé, l’assistant reste éteint et son bouton n’apparaît dans aucun écran (rédaction, modèles, lettre).",

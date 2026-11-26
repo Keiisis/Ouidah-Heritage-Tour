@@ -17,7 +17,26 @@ export function configurationImap() {
 /** Chaîne venue d'un message ou de son enveloppe, coupée puis gardable par Postgres : sans moitié de caractère (une coupe
  * au milieu d'un emoji, réparée par toWellFormed) ni U+0000, que jsonb refuse. Sinon tout le lot serait refusé. */
 const propre = (v: unknown, max: number) => String(v ?? "").slice(0, max).toWellFormed().replace(/\u0000/g, "");
-export async function analyserCourriel(source: Buffer) {
+
+/** L'adresse From n'est pas authentifiée : n'importe qui peut l'écrire. Seul le serveur de réception (`serveur`, l'hôte IMAP)
+ * la vérifie, et le note dans l'en-tête Authentication-Results (RFC 8601) qu'il pose AU-DESSUS des autres : seul le premier
+ * est lu, et seulement s'il porte le nom de ce serveur (un en-tête plus bas a pu être écrit par l'expéditeur). Vérifié :
+ * dmarc=pass pour le domaine du From, ou spf=pass et dkim=pass alignés sur lui (même domaine ou domaine parent/enfant).
+ * Plusieurs From (ou plusieurs adresses), aucun en-tête, autre serveur : non vérifié. */
+export function expediteurVerifie(entetes: readonly { key: string; line: string }[], serveur: string, adresse: string, nAdresses: number) {
+  const domaine = adresse.split("@")[1] ?? "", ar = entetes.find((e) => e.key === "authentication-results");
+  if (!domaine || !serveur || !ar || nAdresses !== 1 || entetes.filter((e) => e.key === "from").length !== 1) return false;
+  let t = ar.line.replace(/^[^:]*:/, "").replace(/\r?\n[ \t]+/g, " ").toLowerCase();
+  for (let avant = ""; avant !== t; ) [avant, t] = [t, t.replace(/\([^()]*\)/g, " ")]; // commentaires, même imbriqués
+  const [id, ...resultats] = t.split(";").map((x) => x.trim());
+  if (id.split(/\s+/)[0] !== serveur.toLowerCase()) return false;
+  const lus = resultats.map((r) => ({ methode: /^([a-z0-9-]+)\s*=\s*([a-z]+)/.exec(r)?.slice(1).join("=") ?? "", p: Object.fromEntries([...r.matchAll(/([a-z]+\.[a-z0-9_-]+)\s*=\s*"?([^\s";]+)/g)].map((x) => [x[1], x[2].split("@").pop() ?? ""])) }));
+  const aligne = (d?: string) => !!d && (d === domaine || d.endsWith(`.${domaine}`) || domaine.endsWith(`.${d}`));
+  const passe = (methode: string, ok: (p: Record<string, string>) => boolean) => lus.some((x) => x.methode === `${methode}=pass` && ok(x.p));
+  return passe("dmarc", (p) => (p["header.from"] ?? domaine) === domaine) || (passe("spf", (p) => aligne(p["smtp.mailfrom"])) && passe("dkim", (p) => aligne(p["header.d"] ?? p["header.i"])));
+}
+
+export async function analyserCourriel(source: Buffer, serveur = "") {
   if (source.length > MAX_MESSAGE) throw new Error("taille");
   const options = { skipHtmlToText: false, skipTextToHtml: true, skipImageLinks: true, maxHtmlLengthToParse: MAX_MESSAGE };
   const m = await simpleParser(source, options);
@@ -25,7 +44,8 @@ export async function analyserCourriel(source: Buffer) {
   // Son convertisseur existant traite correctement la même partie HTML comme document MIME autonome.
   const texte = m.text || (m.html ? (await simpleParser(Buffer.from(`Content-Type: text/html; charset=utf-8\r\n\r\n${m.html}`), options)).text : "") || "";
   const adresse = m.from?.value[0];
-  return { message_id: m.messageId ? propre(m.messageId, 1000) : null, expediteur: propre(adresse?.address?.toLowerCase(), 254), nom: propre(adresse?.name, 200), objet: propre(m.subject, 1000), texte: propre(texte, 100000), pieces: m.attachments.slice(0, 30).map((p) => ({ nom: propre(p.filename, 200), type: propre(p.contentType, 200), taille: p.size })) };
+  const expediteur = propre(adresse?.address?.toLowerCase(), 254);
+  return { message_id: m.messageId ? propre(m.messageId, 1000) : null, expediteur, expediteur_verifie: expediteurVerifie(m.headerLines, serveur, expediteur, m.from?.value.length ?? 0), nom: propre(adresse?.name, 200), objet: propre(m.subject, 1000), texte: propre(texte, 100000), pieces: m.attachments.slice(0, 30).map((p) => ({ nom: propre(p.filename, 200), type: propre(p.contentType, 200), taille: p.size })) };
 }
 
 /** Lecture seule du serveur mail : aucun SEEN, MOVE ou DELETE. Le curseur et le lot importé sont validés ensemble. */
@@ -64,7 +84,7 @@ export async function synchroniserImap(automatique = false): Promise<{ ok: true;
       // Un message supprimé entre les deux lectures n'est pas inventé.
       if (!volumineux && !source) { traite = m.uid; continue; }
       const e = m.envelope;
-      const mail = source && source.source ? await analyserCourriel(source.source) : { message_id: e?.messageId ? propre(e.messageId, 1000) : null, expediteur: propre(e?.from?.[0]?.address?.toLowerCase(), 254), nom: propre(e?.from?.[0]?.name, 200), objet: propre(e?.subject, 1000), texte: "", pieces: [] };
+      const mail = source && source.source ? await analyserCourriel(source.source, config.host) : { message_id: e?.messageId ? propre(e.messageId, 1000) : null, expediteur: propre(e?.from?.[0]?.address?.toLowerCase(), 254), expediteur_verifie: false, nom: propre(e?.from?.[0]?.name, 200), objet: propre(e?.subject, 1000), texte: "", pieces: [] };
       lot.push({ ...mail, uid: m.uid, volumineux, recu_le: m.internalDate instanceof Date ? m.internalDate.toISOString() : new Date(m.internalDate || Date.now()).toISOString() });
       traite = m.uid;
     }
@@ -93,12 +113,12 @@ export async function synchroniserImap(automatique = false): Promise<{ ok: true;
   }
 }
 
-export type CourrielRecu = { id: string; expediteur: string; nom: string; objet: string; texte: string; recu_le: string; demande_id: string | null; volumineux: boolean; pieces: { nom: string; type: string; taille: number }[] };
+export type CourrielRecu = { id: string; expediteur: string; expediteur_verifie: boolean; nom: string; objet: string; texte: string; recu_le: string; demande_id: string | null; volumineux: boolean; pieces: { nom: string; type: string; taille: number }[] };
 export async function lireCourrielsRecus(s: Session): Promise<CourrielRecu[] | null> {
   if (s.role !== "admin" && !droitsEffectifs(s.droits).demandes) return [];
   const agent = s.role === "admin" ? "" : `,demande:demandes!inner(agent_id)&demande.agent_id=eq.${s.profilId}`;
   try {
-    const r = await base(`courriels_recus?select=id,expediteur,nom,objet,texte,recu_le,demande_id,volumineux,pieces${agent}&order=recu_le.desc,id.asc&limit=100`);
+    const r = await base(`courriels_recus?select=id,expediteur,expediteur_verifie,nom,objet,texte,recu_le,demande_id,volumineux,pieces${agent}&order=recu_le.desc,id.asc&limit=100`);
     return r.ok ? await r.json() as CourrielRecu[] : null;
   } catch { return null; }
 }

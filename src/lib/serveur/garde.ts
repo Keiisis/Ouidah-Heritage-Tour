@@ -1,11 +1,29 @@
 import { createHash } from "node:crypto";
+import { isIPv4, isIPv6 } from "node:net";
 import { compter } from "./base";
 
 // Garde des formulaires publics : adresse IP gardée seulement en empreinte salée (jamais en clair), limite de fréquence
-// comptée en base, corps lu avec une taille bornée. Sur Vercel, x-real-ip / x-forwarded-for sont posés par la plateforme.
+// comptée en base, corps lu avec une taille bornée. Sur Vercel, x-vercel-forwarded-for, x-real-ip et x-forwarded-for sont
+// posés par la plateforme ; x-vercel-forwarded-for d'abord : il reste juste si un proxy est mis devant Vercel, qui peut
+// réécrire x-forwarded-for (vercel.com/docs/headers/request-headers, lu le 26/11/2026).
+
+/** Clé d'une connexion : IPv4 entière ; IPv6 ramenée à son préfixe /64 (un abonné reçoit en général tout un /64 : compter
+ * par adresse lui donnerait un quota par adresse) ; IPv4 mappée (::ffff:a.b.c.d) rendue en IPv4 ; zone (%…) retirée. */
+export function cleIp(brute: string) {
+  const ip = brute.trim().replace(/%.*$/, "").toLowerCase();
+  if (isIPv4(ip) || !isIPv6(ip)) return ip;
+  // forme normale WHATWG : hexadécimal seulement (IPv4 finale convertie), « :: » pour la plus longue suite de zéros
+  const h = new URL(`http://[${ip}]/`).hostname.slice(1, -1);
+  const [a, b] = h.split("::").map((x) => (x ? x.split(":") : []));
+  const g = (b ? [...a, ...Array(8 - a.length - b.length).fill("0"), ...b] : a).map((x) => parseInt(x, 16));
+  if (g.slice(0, 5).every((x) => x === 0) && g[5] === 0xffff) return [g[6] >> 8, g[6] & 255, g[7] >> 8, g[7] & 255].join(".");
+  return `${g.slice(0, 4).map((x) => x.toString(16)).join(":")}::/64`;
+}
+
 export function empreinteIp(req: { headers: Pick<Headers, "get"> }) {
-  const ip = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "inconnue";
-  return createHash("sha256").update(`${process.env.EMPREINTE_SEL ?? ""}|${ip}`).digest("hex");
+  const h = req.headers;
+  const ip = (h.get("x-vercel-forwarded-for") ?? h.get("x-real-ip") ?? h.get("x-forwarded-for"))?.split(",")[0]?.trim() || "inconnue";
+  return createHash("sha256").update(`${process.env.EMPREINTE_SEL ?? ""}|${cleIp(ip)}`).digest("hex");
 }
 
 /** Vrai quand `max` envois sont déjà partis de cette empreinte dans les `minutes` passées (ou si la base ne répond pas).

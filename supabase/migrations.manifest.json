@@ -257,6 +257,10 @@
     {
       "fichier": "20261202_limites_paiement.sql",
       "sha256": "6f155dcb98dfd93e8afebfd1033b6a4ae20b35ae3c3dd05a96af2a3ace39a9b3"
+    },
+    {
+      "fichier": "20261203_assistant_part_ip_courriels_verifies.sql",
+      "sha256": "c36149f2a3e5f1907c2f0f291818af4ad7bf5f521210a98325e04a472fa37d13"
     }
   ]
 }

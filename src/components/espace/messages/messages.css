@@ -66,7 +66,7 @@
 .esp .esp-messages .rangee .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .esp .esp-messages .etat[data-e="envoye"] { background: var(--ok); border-color: var(--ok); color: var(--fond); }
 .esp .esp-messages .etat:is([data-e="brouillon"], [data-e="en_cours"]) { color: var(--attente); }
-.esp .esp-messages .etat[data-e="echec"] { color: var(--accent-agent-texte); border-style: dashed; }
+.esp .esp-messages .etat:is([data-e="echec"], [data-e="non-verifie"]) { color: var(--accent-agent-texte); border-style: dashed; }
 .esp .esp-messages .message { display: grid; gap: 8px; padding: 16px 8px; }
 .esp .esp-messages .message .tete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .esp .esp-messages .message .tete .titre { font-weight: 700; }

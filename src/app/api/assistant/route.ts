@@ -17,7 +17,7 @@ import {
 import { compter } from "@/lib/serveur/assistant/compteur";
 import { connaissances } from "@/lib/serveur/assistant/connaissance";
 import { noterQuestionSansReponse } from "@/lib/serveur/assistant/sources";
-import { appelerGroq, budgetEpuise, cheminFaux, cleGroq, consommer, type Echange, lireReglages } from "@/lib/serveur/assistant/fournisseur";
+import { appelerGroq, budgetEpuise, cheminFaux, cleGroq, consommer, type Echange, lireReglages, partIpEpuisee } from "@/lib/serveur/assistant/fournisseur";
 import { adresses, estimerJetons, estLangue, filtreFlux, lignesSse, lireFin, lireMessage, lireMorceau, lireTransmission, validerActions, validerSuggestions } from "@/lib/serveur/assistant/regles";
 import { baseConfiguree } from "@/lib/serveur/base";
 import { selConfigure } from "@/lib/serveur/equipe/outils";
@@ -85,7 +85,10 @@ export async function POST(req: Request) {
     if (c.mode === "agent") return reponse({ erreur: "agent" }, 409);
   }
   if (await limiteMessage(ip, id)) return reponse({ erreur: "limite" }, 429);
-  if (await budgetEpuise(reg.budget)) return reponse({ erreur: "budget" }, 429);
+  // budget du jour partagé avec l'équipe : le public s'arrête avant la part qui lui est gardée, et une connexion seule n'en
+  // dépense qu'une part (LIMITES.partEquipe, LIMITES.partConnexion)
+  if (await budgetEpuise(reg.budget * (1 - LIMITES.partEquipe))) return reponse({ erreur: "budget" }, 429);
+  if (await partIpEpuisee(ip, reg.budget)) return reponse({ erreur: "limite" }, 429);
 
   const historique = id ? await lireMessages(id, { limite: LIMITES.historique, derniers: true }) : [];
   if (!historique) return reponse({ erreur: "base" }, 502);
@@ -118,53 +121,74 @@ export async function POST(req: Request) {
 
   // mesure d'audience (accord « mesure » du visiteur, transmis par le widget) : une question, sans identifiant
   if (req.headers.get("x-oht-mesure") === "1") after(() => compter("question_posee"));
+  // Visiteur parti pendant la réponse (connexion fermée : cancel) : plus rien ne lui est envoyé, la lecture de Groq est
+  // arrêtée, et les jetons sont quand même comptés. Groq facture l'entrée et ce qu'il a produit ; sans l'usage de son
+  // dernier morceau, la borne haute de l'appel : entrée estimée (3 caractères par jeton, prudent) + plafond de réponse
+  // demandé, que Groq ne peut pas dépasser. after() garde la fonction en vie jusqu'à ce compte.
+  let parti = false, lecteur: ReadableStreamDefaultReader<string> | undefined;
+  const { promise: compte, resolve: fini } = Promise.withResolvers<void>();
+  after(() => compte);
+  const entree = messages.map((x) => x.content).join("");
   const flux = new ReadableStream<Uint8Array>({
     async start(ctl) {
-      ctl.enqueue(ligne({ c: signe }));
+      const envoyer = (o: unknown) => {
+        if (parti) return;
+        try { ctl.enqueue(ligne(o)); } catch { parti = true; }
+      };
+      envoyer({ c: signe });
       const f = filtreFlux(canari, savoir.emailsPublics);
-      let tampon = "", jetons: number | null = null, panne = false;
+      let tampon = "", jetons: number | null = null, panne = false, fin: ReturnType<typeof f.finir> | undefined;
       const traiter = (donnees: string[]) => {
         for (const d of donnees) {
           const x = lireMorceau(d);
           if (x.erreur) panne = true;
           if (x.jetons) jetons = x.jetons;
           const s = x.texte ? f.pousser(x.texte) : "";
-          if (s) ctl.enqueue(ligne({ t: s }));
+          if (s) envoyer({ t: s });
         }
       };
       try {
-        const lecteur = source.pipeThrough(new TextDecoderStream()).getReader();
-        for (;;) {
-          const { value, done } = await lecteur.read();
-          if (done) break;
-          const l = lignesSse(tampon + value);
-          tampon = l.reste;
-          traiter(l.donnees);
+        try {
+          lecteur = source.pipeThrough(new TextDecoderStream()).getReader();
+          for (;;) {
+            const { value, done } = await lecteur.read();
+            if (done) break;
+            const l = lignesSse(tampon + value);
+            tampon = l.reste;
+            traiter(l.donnees);
+          }
+          traiter(lignesSse(`${tampon}\n`).donnees);
+        } catch {
+          panne = true;
         }
-        traiter(lignesSse(`${tampon}\n`).donnees);
-      } catch {
-        panne = true;
+        fin = f.finir();
+        if (parti) return;
+        if (fin.reste) envoyer({ t: fin.reste });
+        const texte = fin.coupe ? refus[langue] : fin.texte;
+        const lu = lireFin(fin.fin);
+        const actions = fin.coupe ? [] : validerActions(lu.actions, savoir.catalogue);
+        const resume = fin.coupe ? null : lireTransmission(lu.transmettre, LIMITES.transmission, [...savoir.emailsPublics, ...adresses(ecrit)]);
+        const suggestions = fin.coupe ? [] : validerSuggestions(lu.suggestions, LIMITES.suggestion);
+        if (!texte || (panne && !fin.texte)) {
+          envoyer({ erreur: "occupe" });
+        } else {
+          if (fin.coupe) envoyer({ remplace: texte });
+          await ajouterMessage({ conversation, auteur: "assistant", texte, actions, sansReponse: !fin.coupe && !lu.connu });
+          // apprentissage : la question sans réponse est gardée anonymisée (sans IP ni conversation) pour que l'équipe y
+          // réponde dans « Ce que l'assistant sait » ; sa réponse devient une fiche lue dès la question suivante
+          if (!fin.coupe && !lu.connu) await noterQuestionSansReponse(m.texte, langue);
+          const transmis = resume ? await transmettre(conversation, resume) : false;
+          envoyer({ fin: true, connu: fin.coupe || lu.connu, actions, suggestions, transmis });
+        }
+      } finally {
+        await consommer("public", jetons ?? (parti ? estimerJetons(entree) + reg.plafond : estimerJetons(entree + (fin?.texte ?? ""))), { conversation, ip });
+        fini();
+        if (!parti) ctl.close();
       }
-      const fin = f.finir();
-      if (fin.reste) ctl.enqueue(ligne({ t: fin.reste }));
-      const texte = fin.coupe ? refus[langue] : fin.texte;
-      const lu = lireFin(fin.fin);
-      const actions = fin.coupe ? [] : validerActions(lu.actions, savoir.catalogue);
-      const resume = fin.coupe ? null : lireTransmission(lu.transmettre, LIMITES.transmission, [...savoir.emailsPublics, ...adresses(ecrit)]);
-      const suggestions = fin.coupe ? [] : validerSuggestions(lu.suggestions, LIMITES.suggestion);
-      await consommer("public", jetons ?? estimerJetons(messages.map((x) => x.content).join("") + fin.texte), { conversation });
-      if (!texte || (panne && !fin.texte)) {
-        ctl.enqueue(ligne({ erreur: "occupe" }));
-      } else {
-        if (fin.coupe) ctl.enqueue(ligne({ remplace: texte }));
-        await ajouterMessage({ conversation, auteur: "assistant", texte, actions, sansReponse: !fin.coupe && !lu.connu });
-        // apprentissage : la question sans réponse est gardée anonymisée (sans IP ni conversation) pour que l'équipe y
-        // réponde dans « Ce que l'assistant sait » ; sa réponse devient une fiche lue dès la question suivante
-        if (!fin.coupe && !lu.connu) await noterQuestionSansReponse(m.texte, langue);
-        const transmis = resume ? await transmettre(conversation, resume) : false;
-        ctl.enqueue(ligne({ fin: true, connu: fin.coupe || lu.connu, actions, suggestions, transmis }));
-      }
-      ctl.close();
+    },
+    cancel() {
+      parti = true;
+      return lecteur?.cancel().catch(() => undefined);
     },
   });
   return new Response(flux, { status: 200, headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "private, no-store", "x-content-type-options": "nosniff" } });
