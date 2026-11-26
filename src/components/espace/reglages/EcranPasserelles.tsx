@@ -59,7 +59,7 @@ export async function EcranPasserelles() {
                       {l.map((p, k) => {
                         const nom = T.modes[p.nom];
                         return (
-                          <tr key={p.nom} className="ligne-arrivee" style={vars({ "--k": k })} data-passerelle={p.nom} data-active={p.active} data-cles={p.cles}>
+                          <tr key={p.nom} className="ligne-arrivee" style={vars({ "--k": k })} data-passerelle={p.nom} data-active={p.active} data-cles={p.cles} data-test-refuse={p.testRefuse}>
                             <td data-col={P.cols.passerelle}>
                               <span className="passerelle-nom">
                                 <span className="logo-plaque">
@@ -69,13 +69,13 @@ export async function EcranPasserelles() {
                               </span>
                             </td>
                             <td data-col={P.cols.cles}>
-                              <Etat e={p.cles ? "configuree" : "manquante"} texte={p.cles ? R.configuree : R.manquante} />
-                              {!p.cles && <span className="sous-cell">{P.manquantes(p.champs.filter((c) => !c.source && !c.champ.endsWith("_SANDBOX")).length)}</span>}
+                              <Etat e={p.cles ? "configuree" : "manquante"} texte={p.cles ? R.configuree : p.testRefuse ? P.bloquee : R.manquante} />
+                              {!p.cles && <span className="sous-cell">{p.testRefuse ? P.testRefuse : P.manquantes(p.champs.filter((c) => !c.source && !c.champ.endsWith("_SANDBOX")).length)}</span>}
                             </td>
                             <td data-col={P.cols.mode}>{p.test === null ? P.sansMode : p.test ? <Etat e="test" texte={P.sandbox} /> : P.reel}</td>
                             <td data-col={P.cols.etat}>
                               <Etat e={p.active ? "active" : "coupee"} texte={p.active ? P.active : P.coupee} />
-                              {p.active && !p.cles && <span className="sous-cell">{P.sansCles}</span>}
+                              {p.active && !p.cles && !p.testRefuse && <span className="sous-cell">{P.sansCles}</span>}
                             </td>
                             <td data-col={P.cols.ordre}>
                               <span className="actions">

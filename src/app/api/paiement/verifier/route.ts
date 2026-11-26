@@ -1,5 +1,6 @@
 import { baseConfiguree } from "@/lib/serveur/base";
-import { lireCorps, reponse } from "@/lib/serveur/garde";
+import { empreinteIp, lireCorps, reponse } from "@/lib/serveur/garde";
+import { noterAppel } from "@/lib/serveur/paiement/appels";
 import { billets, billetsPossibles, cleValide } from "@/lib/serveur/paiement/billet";
 import { finaliser, lireReservation } from "@/lib/serveur/paiement/finaliser";
 import { envoyerBillets } from "@/lib/serveur/paiement/courriel";
@@ -11,6 +12,7 @@ import type { Reservation } from "@/lib/serveur/paiement/types";
 // Retour du client (widget refermé ou page de paiement quittée) : avec sa clé d'accès, il demande l'état réel de sa
 // réservation. S'il est encore « en attente » et qu'une transaction est connue, le serveur la relit auprès de la
 // passerelle et tranche par `finaliser`. Une vérification qui échoue ne change jamais l'état : on renvoie « attente ».
+// Chaque relecture auprès de la passerelle est d'abord notée et bornée en base (appels.ts) : 429 au-delà.
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 const vue = (r: Reservation) => ({
@@ -41,6 +43,9 @@ export async function POST(req: Request) {
   const proposee = typeof corps?.transaction === "string" && /^[A-Za-z0-9_.:-]{1,120}$/.test(corps.transaction) ? corps.transaction : null;
   const transaction = r.transaction_id ?? proposee;
   if (r.statut === "attente") {
+    const appel = await noterAppel(empreinteIp(req), r.id);
+    if (appel === "limite") return reponse({ erreur: "limite" }, 429);
+    if (appel === "base") return reponse({ erreur: "indisponible" }, 503);
     const c = await passerelle(r.passerelle).constater(transaction, r).catch(() => null);
     if (c) r = (await finaliser(r, c)).reservation;
   }

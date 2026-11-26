@@ -7,6 +7,7 @@ import { apresEtat } from "../equipe/finances/effets";
 import { jetonLien } from "../equipe/finances/lectures";
 import { idDuJeton } from "../equipe/finances/public";
 import { commandePayable, sourceLien } from "../equipe/finances/regles";
+import { noterAppel } from "./appels";
 import { passerelle, passerellesActives } from "./index";
 import { PASSERELLES, type Constat, type Lancement, type NomPasserelle, type Reservation } from "./types";
 
@@ -94,11 +95,12 @@ async function commeReservation(l: Ligne, nom: NomPasserelle): Promise<Reservati
   };
 }
 
-export type RefusLancement = "lien" | "expire" | "paye" | "passerelle" | "passerelle_injoignable" | "base";
+export type RefusLancement = "lien" | "expire" | "paye" | "passerelle" | "passerelle_injoignable" | "limite" | "base";
 export type RetourLancement = { ok: true; lancement: Lancement; transaction: string | null } | { ok: false; erreur: RefusLancement };
 
-/** Prépare le paiement d'un lien chez une passerelle proposée par ce lien ET active. `origine` : adresse publique du site. */
-export async function lancerPaiementLien({ jeton, nom, origine }: { jeton: string; nom: string; origine: string }): Promise<RetourLancement> {
+/** Prépare le paiement d'un lien chez une passerelle proposée par ce lien ET active. `origine` : adresse publique du site ;
+ * `ip` : empreinte de la connexion (garde.ts), chaque appel à la passerelle étant noté et borné en base (appels.ts). */
+export async function lancerPaiementLien({ jeton, nom, origine, ip }: { jeton: string; nom: string; origine: string; ip: string }): Promise<RetourLancement> {
   const id = idDuJeton(jeton);
   if (!id) return { ok: false, erreur: "lien" };
   const l = await lireLien(`id=eq.${id}`);
@@ -109,6 +111,8 @@ export async function lancerPaiementLien({ jeton, nom, origine }: { jeton: strin
   if (l.annule_le || Date.parse(l.expire_le) <= Date.now() || source !== "ouverte") return { ok: false, erreur: "expire" };
   const choisie = PASSERELLES.find((p) => p === nom);
   if (!choisie || !l.passerelles.includes(choisie) || !(await passerellesActives()).includes(choisie)) return { ok: false, erreur: "passerelle" };
+  const appel = await noterAppel(ip, l.id);
+  if (appel !== "ok") return { ok: false, erreur: appel };
   const lance = await passerelle(choisie).lancer(await commeReservation(l, choisie), `${origine}/payer/${jeton}`).catch(() => null);
   if (!lance) return { ok: false, erreur: "passerelle_injoignable" };
   // passerelle et transaction notées sur le lien (pas encore payé) : le webhook et le retour du client les retrouvent
@@ -245,8 +249,9 @@ export async function finaliserLienWebhook(nom: NomPasserelle, c: Constat, surPa
 
 /** Retour du client sur /payer/<jeton> : si le lien attend encore et qu'une passerelle a été lancée, la transaction est
  * relue auprès d'elle (celle notée au lancement, sinon celle rendue par le retour, jamais crue sans relecture).
- * `surPaye` : comme pour le webhook (le reçu déjà parti n'est pas renvoyé : sa marque en base l'empêche). */
-export async function verifierLien(jeton: string, proposee: string | null, surPaye?: (lienId: string) => void): Promise<"paye" | "attente" | null> {
+ * `surPaye` : comme pour le webhook (le reçu déjà parti n'est pas renvoyé : sa marque en base l'empêche). `ip` : empreinte
+ * de la connexion ; la relecture est notée et bornée en base (appels.ts) : « limite » au-delà, sans appel. */
+export async function verifierLien(jeton: string, proposee: string | null, ip: string, surPaye?: (lienId: string) => void): Promise<"paye" | "attente" | "limite" | null> {
   const id = idDuJeton(jeton);
   const l = id ? await lireLien(`id=eq.${id}`) : null;
   if (!l) return null;
@@ -255,6 +260,9 @@ export async function verifierLien(jeton: string, proposee: string | null, surPa
     return "paye";
   }
   if (!l.passerelle) return "attente";
+  const appel = await noterAppel(ip, l.id);
+  if (appel === "limite") return "limite";
+  if (appel === "base") return null;
   const transaction = l.transaction_id ?? proposee;
   const c = await passerelle(l.passerelle).constater(transaction, await commeReservation(l, l.passerelle)).catch(() => null);
   const statut = c ? (await finaliserLien(l.id, c)).statut : "attente";

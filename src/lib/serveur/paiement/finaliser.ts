@@ -27,10 +27,13 @@ export async function finaliser(r: Reservation, c: Constat): Promise<Issue> {
   if (r.reglement_manuel) return { statut: r.statut, reservation: r, refus: "reference" };
   if (!rattachee(r, c)) return { statut: r.statut, reservation: r, refus: "reference" };
 
-  // remboursement constaté par l'API : une réservation payée passe en « remboursée » (ses billets ne valent plus)
+  // remboursement constaté par l'API : une réservation payée passe en « remboursée » (ses billets ne valent plus), mais
+  // seulement si c'est la transaction qui l'a payée. Une autre transaction portant la même référence (second paiement,
+  // ou petit paiement d'un tiers qui a lu l'identifiant sur un billet), remboursée, ne retire rien.
   if (c.etat === "rembourse") {
     if (r.statut !== "paye") return { statut: r.statut, reservation: r };
-    return basculer(r, "paye", "rembourse", {});
+    if (r.transaction_id === null || r.transaction_id !== c.transaction) return { statut: r.statut, reservation: r, refus: "reference" };
+    return basculer(r, "paye", "rembourse", {}, `&transaction_id=eq.${encodeURIComponent(c.transaction)}`); // revérifiée à l'écriture
   }
   if (r.statut !== "attente") return { statut: r.statut, reservation: r };
   // complet au paiement : refus définitif, jamais retenté (la base le garde aussi), l'équipe déjà avertie rembourse
@@ -42,11 +45,11 @@ export async function finaliser(r: Reservation, c: Constat): Promise<Issue> {
   return basculer(r, "attente", "paye", { transaction_id: c.transaction, paye_le: new Date().toISOString(), montant_recu: c.montant });
 }
 
-async function basculer(r: Reservation, depuis: Statut, vers: Statut, champs: Record<string, unknown>): Promise<Issue> {
+async function basculer(r: Reservation, depuis: Statut, vers: Statut, champs: Record<string, unknown>, filtre = ""): Promise<Issue> {
   if (!peutPasser(TRANSITIONS_RESERVATION, depuis, vers)) return { statut: r.statut, reservation: r };
   // Une confirmation manuelle peut intervenir depuis la lecture de r : la base revérifie aussi ce mode.
   // vers « payé » : seulement si la jauge n'a pas déjà refusé ce paiement (un seul appel avertit l'équipe)
-  const reponse = await base(`reservations?id=eq.${r.id}&statut=eq.${depuis}&reglement_manuel=is.false${vers === "paye" ? "&complet_le=is.null" : ""}`, { method: "PATCH", corps: { statut: vers, ...champs, modifie_le: new Date().toISOString() }, prefer: "return=representation" }).catch(() => null);
+  const reponse = await base(`reservations?id=eq.${r.id}&statut=eq.${depuis}&reglement_manuel=is.false${vers === "paye" ? "&complet_le=is.null" : ""}${filtre}`, { method: "PATCH", corps: { statut: vers, ...champs, modifie_le: new Date().toISOString() }, prefer: "return=representation" }).catch(() => null);
   if (!reponse) return { statut: r.statut, reservation: r, refus: "base" };
   // 409 : l'index unique (passerelle, transaction_id) refuse une transaction qui a déjà payé une autre réservation
   if (reponse.status === 409) return { statut: r.statut, reservation: r, refus: "transaction_deja_utilisee" };

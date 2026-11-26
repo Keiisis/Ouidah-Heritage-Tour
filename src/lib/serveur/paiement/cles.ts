@@ -83,6 +83,12 @@ export async function chargerCles(frais = false): Promise<void> {
 /** Valeur saisie par un admin, sinon la variable d'environnement du même nom. */
 export const cle = (passerelle: Porteur, champ: string): string | undefined => memo?.v.get(`${passerelle}/${champ}`) ?? process.env[champ];
 
+/** Mode test (bac à sable) demandé pour KkiaPay ou FedaPay alors que le site tourne en production Vercel : refusé. La
+ * passerelle est alors tenue pour non configurée (ni lancement, ni relecture, ni webhook) : une transaction de test n'est
+ * jamais acceptée comme payée. VERCEL_ENV est posée par la plateforme (variables système). */
+export const modeTestRefuse = (passerelle: Porteur): boolean =>
+  process.env.VERCEL_ENV === "production" && (passerelle === "kkiapay" || passerelle === "fedapay") && cle(passerelle, `${passerelle.toUpperCase()}_SANDBOX`) === "true";
+
 /** D'où vient la valeur (jamais la valeur elle-même). */
 export const sourceCle = (passerelle: Porteur, champ: string): SourceCle =>
   memo?.v.has(`${passerelle}/${champ}`) ? "admin" : process.env[champ]?.trim() ? "vercel" : null;

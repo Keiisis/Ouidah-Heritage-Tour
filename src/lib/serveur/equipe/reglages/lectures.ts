@@ -6,7 +6,7 @@ import { lireContenu } from "@/lib/contenu";
 import { base } from "../../base";
 import { courrielConfigure } from "../../courriel";
 import { passerelle } from "../../paiement";
-import { chargerCles, cle, etatCles, saisiePossible, sourceCle, type SourceCle } from "../../paiement/cles";
+import { chargerCles, cle, etatCles, modeTestRefuse, saisiePossible, sourceCle, type SourceCle } from "../../paiement/cles";
 import { PASSERELLES, type NomPasserelle } from "../../paiement/types";
 import { exigerRole, type Session } from "../session";
 import { cleAssistant } from "./public";
@@ -36,11 +36,11 @@ const admin = async () => {
 // ---------- passerelles ----------
 
 export type EtatCle = { champ: string; source: SourceCle };
-export type LignePasserelle = { nom: NomPasserelle; active: boolean; ordre: number; cles: boolean; champs: EtatCle[]; test: boolean | null; modifie_le: string };
+export type LignePasserelle = { nom: NomPasserelle; active: boolean; ordre: number; cles: boolean; champs: EtatCle[]; test: boolean | null; testRefuse: boolean; modifie_le: string };
 
 /** Les 5 passerelles dans l'ordre choisi, avec l'état de leurs clés (champ par champ : saisie ici, variable du serveur ou
  * manquante ; jamais leur valeur). Mode test : réglage sandbox (KkiaPay, FedaPay) ou préfixe sk_test_ (Stripe, Paystack),
- * rendu en booléen seulement. */
+ * rendu en booléen seulement. testRefuse : mode test de KkiaPay ou FedaPay refusé en production (passerelle coupée). */
 export async function lirePasserelles(): Promise<LignePasserelle[] | null> {
   if (!(await admin())) return null;
   const [l] = await Promise.all([lire<{ nom: string; active: boolean; ordre: number; modifie_le: string }>("passerelles_paiement?select=nom,active,ordre,modifie_le&order=ordre.asc,nom.asc"), chargerCles(true)]);
@@ -52,7 +52,7 @@ export async function lirePasserelles(): Promise<LignePasserelle[] | null> {
     stripe: testCle(cle("stripe", "STRIPE_SECRET_KEY")),
     paystack: testCle(cle("paystack", "PAYSTACK_SECRET_KEY")),
   };
-  return l.filter((x): x is typeof x & { nom: NomPasserelle } => (PASSERELLES as readonly string[]).includes(x.nom)).map((x) => ({ ...x, cles: passerelle(x.nom).disponible(), champs: etatCles(x.nom), test: test[x.nom] ?? null }));
+  return l.filter((x): x is typeof x & { nom: NomPasserelle } => (PASSERELLES as readonly string[]).includes(x.nom)).map((x) => ({ ...x, cles: passerelle(x.nom).disponible(), champs: etatCles(x.nom), test: test[x.nom] ?? null, testRefuse: modeTestRefuse(x.nom) }));
 }
 
 // ---------- réglages généraux (taux, e-MECeF, assistant) ----------

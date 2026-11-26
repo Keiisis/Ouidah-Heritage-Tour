@@ -1,4 +1,4 @@
-import { chargerCles, cle } from "./cles";
+import { chargerCles, cle, modeTestRefuse } from "./cles";
 import { appel, egal, json, lireJson } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -23,10 +23,11 @@ export const kkiapay: Passerelle = {
   nom: "kkiapay",
   disponible: () => {
     const e = env();
-    return Boolean(e.publique && e.privee && e.secrete && e.webhook);
+    return !modeTestRefuse("kkiapay") && Boolean(e.publique && e.privee && e.secrete && e.webhook);
   },
   async lancer(r, retour) {
     await chargerCles();
+    if (modeTestRefuse("kkiapay")) return null;
     const e = env();
     return {
       transaction: null, // l'identifiant n'existe qu'après le paiement, rendu par le widget ou le webhook
@@ -39,6 +40,7 @@ export const kkiapay: Passerelle = {
   async constater(transaction) {
     if (!transaction) return null;
     await chargerCles();
+    if (modeTestRefuse("kkiapay")) return null; // jamais une transaction de bac à sable relue en production
     const e = env();
     const s = await json<Statut>(await appel(`${api()}/api/v1/transactions/status`, { method: "POST", headers: { "x-api-key": e.publique!, "x-private-key": e.privee!, "x-secret-key": e.secrete!, "content-type": "application/json" }, body: JSON.stringify({ transactionId: transaction }) }));
     if (!s?.status) return null;

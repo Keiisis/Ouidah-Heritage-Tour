@@ -97,6 +97,8 @@ export const reglages = {
     coupee_ok: "Passerelle coupée.",
     ordre_ok: "Ordre enregistré.",
     sansCles: "Clés à poser avant l’activation.",
+    bloquee: "Bloquée",
+    testRefuse: "Mode test refusé sur le site en ligne : passerelle hors service tant que son mode n’est pas « Paiements réels ».",
     coordonnees: "Coordonnées bancaires et Mobile Money",
     coordonneesSous: "Titulaire, banque, IBAN, BIC et numéros Mobile Money de l’agence, pour le virement et le paiement direct, se règlent avec les paiements manuels.",
     coordonneesLien: "Ouvrir les paiements manuels",

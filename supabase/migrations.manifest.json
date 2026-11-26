@@ -249,6 +249,14 @@
     {
       "fichier": "20261201_lettre_gestion.sql",
       "sha256": "ca7325a0fc577a2db4d05e9829e2c4418f9379c24bd4fc55fe62704e69971361"
+    },
+    {
+      "fichier": "20261202_droits_par_defaut.sql",
+      "sha256": "aad089a4d7ac9ec2e9ea6e9640a24339235502341ee80963edba9ae91ec9c53b"
+    },
+    {
+      "fichier": "20261202_limites_paiement.sql",
+      "sha256": "6f155dcb98dfd93e8afebfd1033b6a4ae20b35ae3c3dd05a96af2a3ace39a9b3"
     }
   ]
 }

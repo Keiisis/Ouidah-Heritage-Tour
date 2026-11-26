@@ -72,6 +72,8 @@ export function verifierProduction(env, { paiements = [], imap = false } = {}) {
     if (nom === 'kkiapay' || nom === 'fedapay') {
       const variable = `${nom.toUpperCase()}_SANDBOX`;
       requis(variable, (v) => v === 'false', 'Production : false explicite et clés live correspondantes requis.');
+      // Le mode saisi dans l’admin (table passerelles_cles) passe avant cette variable et n’est pas lu ici.
+      ajouter(`${variable}_ADMIN`, 'attention', 'Mode saisi dans l’admin prioritaire, non contrôlé ici : le site refuse le mode test quand VERCEL_ENV=production (passerelle coupée) ; garder les variables système Vercel activées et vérifier l’écran Passerelles.');
     }
     if (nom === 'stripe' || nom === 'paystack') {
       const cle = `${nom.toUpperCase()}_SECRET_KEY`;

@@ -1,5 +1,5 @@
 import { lireContenu } from "@/lib/contenu";
-import { chargerCles, cle } from "./cles";
+import { chargerCles, cle, modeTestRefuse } from "./cles";
 import { appel, json, libelle, lireJson, prenomNom, signatureHorodatee } from "./outils";
 import type { Constat, Passerelle } from "./types";
 
@@ -29,9 +29,10 @@ async function iso(id: number | undefined) {
 
 export const fedapay: Passerelle = {
   nom: "fedapay",
-  disponible: () => Boolean(env().secrete && env().webhook),
+  disponible: () => !modeTestRefuse("fedapay") && Boolean(env().secrete && env().webhook),
   async lancer(r, retour) {
     await chargerCles();
+    if (modeTestRefuse("fedapay")) return null;
     const evenements = await lireContenu("fr.evenements");
     const { prenom, nom } = prenomNom(r.nom);
     const t = transactionDe(await json(await appel(`${api()}/transactions`, {
@@ -47,6 +48,7 @@ export const fedapay: Passerelle = {
   async constater(transaction) {
     if (!transaction || !/^\d{1,20}$/.test(transaction)) return null;
     await chargerCles();
+    if (modeTestRefuse("fedapay")) return null; // jamais une transaction de bac à sable relue en production
     const t = transactionDe(await json(await appel(`${api()}/transactions/${transaction}`, { headers: entetes() })));
     if (!t?.status) return null;
     const etat: Constat["etat"] = t.status === "approved" || t.status === "transferred" ? "reussi" : t.status === "refunded" ? "rembourse" : t.status === "expired" ? "echoue" : "en_cours";
