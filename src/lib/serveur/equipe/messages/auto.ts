@@ -88,7 +88,7 @@ export function apercuAuto(cle: CleAuto, L: LangueMsg, modele: Modele, prenom: s
     case "auto-boutique":
       return messageCommande({ id: E.id, reference: E.commande, ticket: E.ticket, jeton: E.jeton, langue: L, contact: { prenom, email: "" }, lignes: [{ nom: E.ligne, quantite: E.quantite, prix_xof: E.prix, options: {} }], remise: { mode: "retrait" }, total_xof: montant, devise: "XOF", taux_usd: null }, origine, modele);
     case "auto-lettre":
-      return messageLettre({ langue: L, sujets: newsletter.sujets.slice(0, 2).map((s) => s.id), desinscription: `${origine}/lettre/desinscription/${E.jeton}` }, origine, modele);
+      return messageLettre({ langue: L, sujets: newsletter.sujets.slice(0, 2).map((s) => s.id), desinscription: `${origine}/lettre/desinscription/${E.jeton}`, gestion: `${origine}/lettre/abonnement/${E.jeton}` }, origine, modele);
     case "auto-code":
       return gabaritCode(prenom, E.code, MINUTES_CODE, L, { premiere: true, origine, modele });
     case "auto-relance":

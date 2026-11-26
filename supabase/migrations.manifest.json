@@ -245,6 +245,10 @@
     {
       "fichier": "20261131_donnees_effacement.sql",
       "sha256": "b5770dea8c86666ffcb2e787066e7aef2a6b8c30ecb29ae22cba92479043974e"
+    },
+    {
+      "fichier": "20261201_lettre_gestion.sql",
+      "sha256": "ca7325a0fc577a2db4d05e9829e2c4418f9379c24bd4fc55fe62704e69971361"
     }
   ]
 }

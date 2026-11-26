@@ -251,9 +251,10 @@ export async function lireNumeros(): Promise<Numero[] | null> {
   return l.map((x) => ({ id: x.id, langue: x.langue, sujets: x.sujets, objet: x.objet, corps: x.corps, statut: x.statut, quand: x.envoye_le ?? x.modifie_le, envoyes: e.filter((y) => y.numero_id === x.id).length }));
 }
 
-/** L'abonné d'un lien de désinscription (adresse, langue, déjà désinscrit ou non), ou null. */
-export async function lireAbonne(id: string): Promise<{ email: string; langue: LangueMsg; desinscrit: boolean } | null> {
-  const l = await lire<{ email: string; langue: string; desinscrit_le: string | null }>(`abonnes_lettre?select=email,langue,desinscrit_le&id=eq.${id}&limit=1`);
+/** L'abonné d'un lien de désinscription ou de gestion (adresse, langue, thèmes, déjà désinscrit ou non), ou null. */
+export async function lireAbonne(id: string): Promise<{ email: string; langue: LangueMsg; sujets: string[]; desinscrit: boolean } | null> {
+  const l = await lire<{ email: string; langue: string; sujets: unknown; desinscrit_le: string | null }>(`abonnes_lettre?select=email,langue,sujets,desinscrit_le&id=eq.${id}&limit=1`);
   const a = l?.[0];
-  return a ? { email: a.email, langue: langueSure(a.langue), desinscrit: Boolean(a.desinscrit_le) } : null;
+  const sujets = Array.isArray(a?.sujets) ? a.sujets.filter((x): x is string => typeof x === "string") : [];
+  return a ? { email: a.email, langue: langueSure(a.langue), sujets, desinscrit: Boolean(a.desinscrit_le) } : null;
 }

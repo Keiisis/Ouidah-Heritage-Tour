@@ -9,6 +9,9 @@
 .lettre-desinscription button { min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: #122460; color: #ffffff; font: 700 16px/1 var(--font-manrope), system-ui, sans-serif; cursor: pointer; transition: transform 320ms cubic-bezier(0.625, 0.05, 0, 1); }
 .lettre-desinscription button:hover { transform: translateY(-2px); }
 .lettre-desinscription button:disabled { cursor: progress; transform: none; }
+/* gestion de l'abonnement : groupe séparé par un filet, bouton secondaire au contour navy */
+.lettre-desinscription .gestion { display: grid; gap: 12px; justify-items: start; width: 100%; margin-top: 8px; padding-top: 20px; border-top: 1px solid color-mix(in oklab, var(--surface-abyss) 12%, transparent); }
+.lettre-desinscription button.secondaire { background: transparent; color: var(--surface-brand); box-shadow: inset 0 0 0 1.5px var(--surface-brand); }
 .lettre-desinscription a { display: inline-flex; align-items: center; min-height: 44px; color: #122460; font-weight: 700; text-underline-offset: 4px; }
 .lettre-desinscription :focus-visible { outline: 3px solid #fdbf28; outline-offset: 2px; }
 @keyframes ld-arrive { from { transform: translateY(32px); opacity: 0; } }

@@ -5,14 +5,18 @@ import { base, baseConfiguree } from "@/lib/serveur/base";
 import { empreinteIp, limiteAtteinte, lireCorps, refusLimite, reponse } from "@/lib/serveur/garde";
 import { noterException } from "@/lib/serveur/courriel";
 import { envoyerLettre } from "@/lib/serveur/courriels/lettre";
-import { jetonLettre } from "@/lib/serveur/equipe/messages/envoi";
+import { envoyerGestion } from "@/lib/serveur/equipe/messages/gestion";
+import { jetonGestion, jetonLettre } from "@/lib/serveur/equipe/messages/envoi";
 import { origineSite } from "@/lib/serveur/paiement/outils";
 
 // Inscription à la lettre de Ouidah (section 12) : adresse, langue, thèmes choisis, accord daté. Seule une adresse
 // nouvelle est enregistrée ; une adresse déjà connue (active ou désinscrite) n'est jamais modifiée depuis ce formulaire
-// anonyme et ne reçoit rien, avec la même réponse 201 (son existence n'est pas révélée ; audit du 24/11/2026). 5
-// inscriptions par heure et par connexion, recomptées par la base à l'écriture (429). Après une inscription nouvelle,
-// e-mail de confirmation (courriels/lettre.ts) avec le lien personnel de désinscription quand EQUIPE_SEL le permet.
+// anonyme (audit du 24/11/2026). Elle reçoit à la place, après la réponse, l'e-mail « Votre abonnement à la lettre de
+// Ouidah » avec son lien de gestion signé (langue, thèmes, désinscription, réinscription) : au plus un par 24 h et par
+// abonné, 5 par heure et par connexion, comptés par la base (lettre_gestion_envois, 20261201). La réponse reste la même
+// 201 dans les deux cas : l'existence de l'adresse ne se devine pas. 5 inscriptions par heure et par connexion,
+// recomptées par la base à l'écriture (429). Après une inscription nouvelle, e-mail de confirmation (courriels/lettre.ts)
+// avec les liens personnels de désinscription et de gestion quand EQUIPE_SEL le permet.
 const MAX_PAR_HEURE = 5;
 
 export async function POST(req: Request) {
@@ -35,8 +39,13 @@ export async function POST(req: Request) {
   }).catch(() => null);
   if (!r?.ok) return (await refusLimite(r)) ? reponse({ erreur: "limite" }, 429) : reponse({ erreur: "base" }, 502);
   const id = ((await r.json().catch(() => [])) as { id?: string }[])[0]?.id;
-  if (!id) return reponse({ ok: true }, 201);
-  const origine = origineSite(req), jeton = jetonLettre(id);
-  if (origine) after(() => envoyerLettre(email, { langue, sujets, desinscription: jeton ? `${origine}/lettre/desinscription/${jeton}` : null }, origine).catch(() => noterException("auto-lettre", email)));
+  const origine = origineSite(req);
+  if (!id) {
+    // adresse déjà connue : rien d'écrit dans l'abonnement, le lien de gestion part vers l'adresse elle-même
+    if (origine) after(() => envoyerGestion({ email }, ip, origine).catch(() => noterException("auto-lettre-gestion", email)));
+    return reponse({ ok: true }, 201);
+  }
+  const jeton = jetonLettre(id), gestion = jetonGestion(id);
+  if (origine) after(() => envoyerLettre(email, { langue, sujets, desinscription: jeton ? `${origine}/lettre/desinscription/${jeton}` : null, gestion: gestion ? `${origine}/lettre/abonnement/${gestion}` : null }, origine).catch(() => noterException("auto-lettre", email)));
   return reponse({ ok: true }, 201);
 }

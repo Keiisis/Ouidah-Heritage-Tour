@@ -1,0 +1,75 @@
+/* Hallmark : extension du système OHT existant (page de désinscription, section 12), sans nouvelle direction graphique. */
+/* jetons : ceux du site (globals.css, couleurs modifiables depuis l'admin), plus le blanc des cartes et son texte gris */
+:root { --la-blanc: #ffffff; --la-gris: #3f4863; --la-ombre: 0 24px 48px -20px rgb(0 0 0 / 0.6); }
+/* Page publique « Votre abonnement à la lettre de Ouidah » : la nuit navy de la page de désinscription et l'emblème rond,
+   puis les cartes de thèmes de la section 12 (objet 3D, coche Soleil tracée) et les langues en pastilles. Texte sable sur
+   navy, titres Fraunces. Mouvement : transform et opacity (plus le tracé de la coche) ; mouvement réduit respecté. */
+.lettre-abonnement { display: grid; justify-items: center; min-height: 100dvh; padding: 160px 24px 96px; background: var(--surface-inverse); color: var(--text-inverse); font: 500 16px/1.55 var(--font-manrope), system-ui, sans-serif; }
+.lettre-abonnement .colonne { display: grid; align-content: start; gap: 20px; justify-items: start; width: min(720px, 100%); animation: la-arrive 720ms cubic-bezier(0.625, 0.05, 0, 1) backwards; }
+.lettre-abonnement .embleme { width: 64px; height: 64px; }
+.lettre-abonnement h1 { margin: 0; color: var(--la-blanc); font: 400 48px/1.08 var(--font-fraunces), Georgia, serif; letter-spacing: -0.02em; text-wrap: balance; }
+.lettre-abonnement p { margin: 0; overflow-wrap: anywhere; }
+.lettre-abonnement .situation { max-width: 56ch; font-size: 18px; }
+.lettre-abonnement .confirme, .lettre-abonnement .faute { color: var(--accent-sun); font-weight: 700; }
+.lettre-abonnement .confirme:empty, .lettre-abonnement .faute:empty { display: none; }
+
+.lettre-abonnement form { display: grid; gap: 32px; width: 100%; margin-top: 12px; }
+.lettre-abonnement fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.lettre-abonnement legend { margin-bottom: 12px; padding: 0; color: var(--la-blanc); font-size: 15px; font-weight: 700; }
+.lettre-abonnement legend span { font-weight: 600; opacity: 0.85; }
+
+/* thèmes : cartes blanches de la section 12, coche Soleil */
+.lettre-abonnement .themes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lettre-abonnement .theme { position: relative; display: grid; align-content: start; gap: 8px; padding: 20px; border-radius: 16px; background: var(--la-blanc); color: var(--surface-abyss); box-shadow: var(--la-ombre); cursor: pointer; transition: transform 500ms cubic-bezier(0.625, 0.05, 0, 1); }
+.lettre-abonnement .theme:hover { transform: translateY(-6px); }
+.lettre-abonnement .theme[data-on] { box-shadow: 0 0 0 2px var(--accent-sun), var(--la-ombre); }
+.lettre-abonnement .theme .oht-objet { width: 72px; height: 72px; }
+.lettre-abonnement .theme .nom { padding-right: 40px; font: 600 22px/1.15 var(--font-fraunces), Georgia, serif; letter-spacing: -0.015em; }
+.lettre-abonnement .theme .texte { color: var(--la-gris); font-size: 15px; line-height: 1.5; }
+.lettre-abonnement .coche { position: absolute; top: 16px; right: 16px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--surface-abyss) 25%, transparent); transition: background-color 300ms; }
+.lettre-abonnement .theme[data-on] .coche { background: var(--accent-sun); box-shadow: none; }
+.lettre-abonnement .coche svg { width: 16px; height: 16px; }
+.lettre-abonnement .coche path { fill: none; stroke: var(--surface-inverse); stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 350ms cubic-bezier(0.625, 0.05, 0, 1); }
+.lettre-abonnement .theme[data-on] .coche path { stroke-dashoffset: 0; }
+
+/* langues : pastilles de la section 12, nom de chaque langue écrit dans cette langue */
+.lettre-abonnement .langues { display: flex; flex-wrap: wrap; gap: 8px; }
+.lettre-abonnement .langue { display: grid; place-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--la-blanc) 75%, transparent); font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 300ms, color 300ms; }
+.lettre-abonnement .langue:hover { background: color-mix(in oklab, var(--la-blanc) 15%, transparent); }
+.lettre-abonnement .langue[data-on] { background: var(--la-blanc); color: var(--surface-abyss); box-shadow: none; }
+
+.lettre-abonnement .accord { display: flex; gap: 12px; align-items: flex-start; max-width: 56ch; cursor: pointer; }
+.lettre-abonnement .accord input { flex: none; width: 20px; height: 20px; margin: 4px 0 0; accent-color: var(--accent-sun); }
+
+/* boutons : pastille blanche (principal), contour sable (secondaire) */
+.lettre-abonnement .actions { display: flex; flex-wrap: wrap; gap: 16px; }
+.lettre-abonnement button, .lettre-abonnement .bouton { display: inline-grid; place-items: center; min-height: 52px; padding: 0 28px; border: 0; border-radius: 999px; font: 700 16px/1.2 var(--font-manrope), system-ui, sans-serif; text-decoration: none; cursor: pointer; transition: transform 320ms cubic-bezier(0.625, 0.05, 0, 1); }
+.lettre-abonnement .principal { background: var(--la-blanc); color: var(--surface-abyss); }
+.lettre-abonnement .secondaire { background: transparent; color: var(--la-blanc); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--la-blanc) 75%, transparent); }
+.lettre-abonnement button:hover, .lettre-abonnement .bouton:hover { transform: translateY(-2px); }
+.lettre-abonnement button:active:not(:disabled), .lettre-abonnement .bouton:active { transform: translateY(1px); }
+.lettre-abonnement button:disabled { cursor: progress; transform: none; }
+
+.lettre-abonnement .quitter { display: grid; gap: 16px; justify-items: start; width: 100%; margin-top: 20px; padding-top: 32px; border-top: 1px solid color-mix(in oklab, var(--text-inverse) 16%, transparent); }
+.lettre-abonnement .quitter h2 { margin: 0; color: var(--la-blanc); font: 400 24px/1.2 var(--font-fraunces), Georgia, serif; }
+.lettre-abonnement .retour { display: inline-flex; align-items: center; min-height: 44px; margin-top: 8px; color: var(--la-blanc); font-weight: 700; text-underline-offset: 4px; }
+
+.lettre-abonnement :focus-visible { outline: 3px solid var(--accent-sun); outline-offset: 2px; }
+.lettre-abonnement .theme:has(:focus-visible), .lettre-abonnement .langue:has(:focus-visible), .lettre-abonnement .accord:has(:focus-visible) { outline: 3px solid var(--accent-sun); outline-offset: 3px; }
+
+@keyframes la-arrive { from { transform: translateY(32px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .lettre-abonnement .colonne, .lettre-abonnement .theme, .lettre-abonnement button, .lettre-abonnement .bouton, .lettre-abonnement .coche path { animation: none; transition: none; }
+}
+@media (max-width: 760px) {
+  .lettre-abonnement { padding: 120px 16px 64px; }
+  .lettre-abonnement h1 { font-size: 34px; }
+  .lettre-abonnement .situation { font-size: 16px; }
+  /* une carte par ligne : objet à gauche, nom et texte à droite */
+  .lettre-abonnement .themes { grid-template-columns: 1fr; gap: 12px; }
+  .lettre-abonnement .theme { grid-template-columns: 56px 1fr; column-gap: 16px; row-gap: 4px; padding: 16px 56px 16px 16px; }
+  .lettre-abonnement .theme .oht-objet { grid-row: span 2; width: 56px; height: 56px; }
+  .lettre-abonnement .theme .nom { padding-right: 0; font-size: 19px; }
+  .lettre-abonnement .theme .texte { font-size: 14px; }
+  .lettre-abonnement .actions, .lettre-abonnement button, .lettre-abonnement .bouton { width: 100%; }
+}

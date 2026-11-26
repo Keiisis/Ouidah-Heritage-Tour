@@ -1,16 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { contact } from "@/content/courriels";
-import { copiesLettre } from "@/content/courriels-lettre";
+import { copiesGestion, copiesLettre } from "@/content/courriels-lettre";
 import { newsletter as NEWSLETTER } from "@/content/fr";
 import { lireContenu } from "@/lib/contenu";
 import { envoyerCourriel } from "../courriel";
 import { cloture, debut, langueDe, lireModele, type Modele, textes } from "./commun";
-import { courriel, liste, paragraphes, titre } from "./gabarit";
+import { boutons, courriel, liste, paragraphes, titre } from "./gabarit";
 
 // « Inscription à la lettre de Ouidah » : thèmes réellement cochés, langue de la lettre, désinscription. Lien personnel
 // (/lettre/desinscription/<jeton>) quand le jeton existe ; sinon consigne « répondez désinscription ». Toujours l'en-tête
-// List-Unsubscribe vers contact@ (sujet « desinscription »).
-export type DonneesLettre = { langue: string; sujets: string[]; desinscription: string | null };
+// List-Unsubscribe vers contact@ (sujet « desinscription »). `gestion` : lien vers la page d'abonnement (langue, thèmes).
+export type DonneesLettre = { langue: string; sujets: string[]; desinscription: string | null; gestion?: string | null };
 
 export function messageLettre(d: DonneesLettre, origine: string, modele: Modele = null, newsletter = NEWSLETTER) {
   const L = langueDe(d.langue), c = copiesLettre[L];
@@ -28,7 +28,8 @@ export function messageLettre(d: DonneesLettre, origine: string, modele: Modele 
     titre({ phrase: { avant: c.phrase[0], trait: c.phrase[1], apres: "." } }, L, origine),
     paragraphes(t.corps, L, "0px 24px 16px"),
     liste(themes, L, L === "FR" || L === "GCF" ? " : " : ": "),
-    paragraphes([c.langue], L, "0px 24px 0px"),
+    paragraphes([c.langue], L, d.gestion ? "0px 24px 8px" : "0px 24px 0px"),
+    d.gestion ? boutons({ secondaire: { libelle: copiesGestion[L].bouton, href: d.gestion } }, L === "FR" || L === "GCF" ? " : " : ": ", "0px 24px 0px") : { h: "", t: "" },
     ...cloture(L, null, c.raison, d.desinscription ? { lien: { libelle: c.lien, href: d.desinscription } } : { consigne: c.consigne }, "28px 24px 48px"),
   ]);
   const entetes = { "List-Unsubscribe": [d.desinscription && `<${d.desinscription}>`, `<mailto:${contact}?subject=desinscription>`].filter(Boolean).join(", ") };
@@ -40,4 +41,20 @@ export async function envoyerLettre(email: string, d: DonneesLettre, origine: st
   const [modele, newsletter] = await Promise.all([lireModele("auto-lettre", langueDe(d.langue)), lireContenu("fr.newsletter")]);
   const m = messageLettre(d, origine, modele, newsletter);
   return envoyerCourriel({ a: email, sujet: m.sujet, html: m.html, texte: m.texte, cle: `lettre-inscription-${randomUUID()}`, entetes: m.entetes, modele: "auto-lettre", repondreA: process.env.EMAIL_OHT || null });
+}
+
+// ---------- « Votre abonnement à la lettre de Ouidah » ----------
+// jours : durée de validité du lien de gestion (JOURS_GESTION, equipe/messages/envoi.ts)
+export type DonneesGestion = { langue: string; gestion: string; desinscription: string | null; jours: number };
+
+export function messageGestion(d: DonneesGestion, origine: string) {
+  const L = langueDe(d.langue), c = copiesGestion[L], sep = L === "FR" || L === "GCF" ? " : " : ": ";
+  return courriel({ langue: L, sujet: c.sujet, apercu: c.texte }, [
+    ...debut(origine, "rue-basilique", L),
+    titre({ phrase: { avant: c.phrase[0], trait: c.phrase[1], apres: "." } }, L, origine),
+    paragraphes([c.texte, c.action(d.jours)], L, "0px 24px 24px"),
+    boutons({ principal: { libelle: c.bouton, href: d.gestion } }, sep, "0px 24px 24px"),
+    paragraphes([c.ignorer], L, "0px 24px 0px"),
+    ...cloture(L, null, c.raison, d.desinscription ? { lien: { libelle: copiesLettre[L].lien, href: d.desinscription } } : {}, "28px 24px 48px"),
+  ]);
 }

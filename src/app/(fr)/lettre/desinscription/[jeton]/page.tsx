@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Desinscription } from "@/components/espace/messages/Desinscription";
-import { lireJetonLettre } from "@/lib/serveur/equipe/messages/envoi";
+import { JOURS_GESTION, lireJetonLettre } from "@/lib/serveur/equipe/messages/envoi";
 import { lireAbonne } from "@/lib/serveur/equipe/messages/lectures";
 import { masquer } from "@/lib/serveur/equipe/messages/rendu";
 
@@ -18,7 +18,7 @@ async function Contenu({ params }: Props) {
   if (!id) notFound();
   const a = await lireAbonne(id);
   if (!a) notFound();
-  return <Desinscription jeton={jeton} langue={a.langue} email={masquer(a.email)} deja={a.desinscrit} />;
+  return <Desinscription jeton={jeton} langue={a.langue} email={masquer(a.email)} deja={a.desinscrit} jours={JOURS_GESTION} />;
 }
 
 export default function Page({ params }: Props) {

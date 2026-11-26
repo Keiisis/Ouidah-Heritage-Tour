@@ -104,3 +104,86 @@ export const copiesLettre: Record<LangueCourriel, CopieLettre> = {
     raison: "Ou ka résévwa imèl-lasa paskè adrès-lasa enskri a lèt a Ouidah asi ouidahheritagetour.bj.",
   },
 };
+
+// E-mail « Votre abonnement à la lettre de Ouidah » (26/11/2026) : une adresse déjà connue a été soumise au formulaire
+// public. Rien n'est modifié ; l'e-mail porte le lien de gestion (/lettre/abonnement/<jeton>, valable `jours` jours), dans
+// la langue enregistrée de l'abonné, jamais celle de la demande. Même gabarit que la confirmation. `bouton` sert aussi de
+// libellé au lien de gestion de la confirmation et des numéros de la lettre. Créoles : à relire par un locuteur.
+type CopieGestion = {
+  sujet: string;
+  phrase: readonly [string, string]; // titre + trait Soleil ; un point suit
+  texte: string;
+  action: (jours: number) => string;
+  bouton: string;
+  ignorer: string;
+  raison: string;
+};
+
+/** Lien de gestion de l'aperçu et du test à soi-même d'un numéro (aucun abonné réel). */
+export const LIEN_GESTION_EXEMPLE = "[lien personnel de gestion]";
+
+export const copiesGestion: Record<LangueCourriel, CopieGestion> = {
+  FR: {
+    sujet: "Votre abonnement à la lettre de Ouidah",
+    phrase: ["Votre abonnement à", "la lettre de Ouidah"],
+    texte: "Une inscription à la lettre de Ouidah vient d’être demandée pour cette adresse, que nous connaissons déjà. Rien n’a changé.",
+    action: (j) => `Pour changer la langue ou les thèmes, vous désinscrire ou vous réinscrire, ouvrez votre page d’abonnement. Ce lien personnel reste valable ${j} jours.`,
+    bouton: "Gérer mon abonnement",
+    ignorer: "Si la demande ne vient pas de vous, ignorez cet e-mail : votre abonnement reste tel quel.",
+    raison: "Vous recevez cet e-mail parce qu’une inscription à la lettre de Ouidah a été demandée pour cette adresse sur ouidahheritagetour.bj.",
+  },
+  EN: {
+    sujet: "Your subscription to the Ouidah letter",
+    phrase: ["Your subscription to", "the Ouidah letter"],
+    texte: "Someone just asked to sign this address up for the Ouidah letter. We already know this address, so nothing has changed.",
+    action: (j) => `To change the language or topics, unsubscribe or subscribe again, open your subscription page. This personal link stays valid for ${j} days.`,
+    bouton: "Manage my subscription",
+    ignorer: "If you did not make this request, ignore this email: your subscription stays as it is.",
+    raison: "You are receiving this email because a sign-up for the Ouidah letter was requested for this address on ouidahheritagetour.bj.",
+  },
+  ES: {
+    sujet: "Su suscripción a la carta de Ouidah",
+    phrase: ["Su suscripción a", "la carta de Ouidah"],
+    texte: "Se acaba de solicitar una suscripción a la carta de Ouidah para esta dirección, que ya conocemos. No ha cambiado nada.",
+    action: (j) => `Para cambiar el idioma o los temas, darse de baja o volver a suscribirse, abra su página de suscripción. Este enlace personal es válido durante ${j} días.`,
+    bouton: "Gestionar mi suscripción",
+    ignorer: "Si la solicitud no viene de usted, ignore este correo: su suscripción sigue igual.",
+    raison: "Recibe este correo porque se solicitó una suscripción a la carta de Ouidah para esta dirección en ouidahheritagetour.bj.",
+  },
+  DE: {
+    sujet: "Ihr Abonnement des Briefs aus Ouidah",
+    phrase: ["Ihr Abonnement des", "Briefs aus Ouidah"],
+    texte: "Für diese Adresse wurde soeben eine Anmeldung zum Brief aus Ouidah angefragt. Die Adresse ist uns bereits bekannt, es hat sich nichts geändert.",
+    action: (j) => `Um Sprache oder Themen zu ändern, sich abzumelden oder wieder anzumelden, öffnen Sie Ihre Abonnementseite. Dieser persönliche Link ist ${j} Tage lang gültig.`,
+    bouton: "Abonnement verwalten",
+    ignorer: "Falls die Anfrage nicht von Ihnen stammt, ignorieren Sie diese E-Mail: Ihr Abonnement bleibt unverändert.",
+    raison: "Sie erhalten diese E-Mail, weil auf ouidahheritagetour.bj für diese Adresse eine Anmeldung zum Brief aus Ouidah angefragt wurde.",
+  },
+  PT: {
+    sujet: "A sua subscrição da carta de Ouidah",
+    phrase: ["A sua subscrição da", "carta de Ouidah"],
+    texte: "Acaba de ser pedida uma inscrição na carta de Ouidah para este endereço, que já conhecemos. Nada mudou.",
+    action: (j) => `Para mudar o idioma ou os temas, cancelar ou voltar a subscrever, abra a sua página de subscrição. Esta ligação pessoal é válida durante ${j} dias.`,
+    bouton: "Gerir a minha subscrição",
+    ignorer: "Se o pedido não partiu de si, ignore este e-mail: a sua subscrição continua igual.",
+    raison: "Recebe este e-mail porque foi pedida uma inscrição na carta de Ouidah para este endereço em ouidahheritagetour.bj.",
+  },
+  HT: {
+    sujet: "Abònman ou nan lèt Ouidah a",
+    phrase: ["Abònman ou nan", "lèt Ouidah a"],
+    texte: "Yon moun fèk mande pou enskri adrès sa a nan lèt Ouidah a. Nou deja konnen adrès sa a, kidonk anyen pa chanje.",
+    action: (j) => `Pou chanje lang oswa sijè yo, dezabòne oswa reabòne, louvri paj abònman ou. Lyen pèsonèl sa a bon pandan ${j} jou.`,
+    bouton: "Jere abònman mwen",
+    ignorer: "Si se pa ou ki fè demann lan, pa okipe imèl sa a: abònman ou rete jan l te ye a.",
+    raison: "Ou resevwa imèl sa a paske yon moun te mande yon enskripsyon nan lèt Ouidah a pou adrès sa a sou ouidahheritagetour.bj.",
+  },
+  GCF: {
+    sujet: "Abònman a-w a lèt a Ouidah",
+    phrase: ["Abònman a-w a", "lèt a Ouidah"],
+    texte: "On moun sòti mandé enskri adrès-lasa a lèt a Ouidah. Nou ja konnèt adrès-lasa, kidonk ayen pa chanjé.",
+    action: (j) => `Pou chanjé lang oben sijè, pa résévwa lèt-la ankò oben enskri-w ankò, ouvè paj abònman a-w. Lyen pèsonèl-lasa bon pandan ${j} jou.`,
+    bouton: "Jéré abònman an mwen",
+    ignorer: "Si sé pa vou ki fè demann-lasa, pa okipé-w di imèl-lasa : abònman a-w ka rété kon i té yé.",
+    raison: "Ou ka résévwa imèl-lasa paskè on moun mandé on enskripsyon a lèt a Ouidah pou adrès-lasa asi ouidahheritagetour.bj.",
+  },
+};

@@ -3,11 +3,12 @@
 import { randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
 import { LIMITES_COURRIEL, type LangueMsg, msg, RAISON_LETTRE } from "@/content/espace-messages";
+import { copiesGestion, LIEN_GESTION_EXEMPLE } from "@/content/courriels-lettre";
 import { lireContenu } from "@/lib/contenu";
 import { base, compter } from "../../base";
 import { journaliser } from "../journal";
 import { exigerRole } from "../session";
-import { emailDe, jetonLettre, origine, partir, voie } from "./envoi";
+import { emailDe, jetonGestion, jetonLettre, origine, partir, voie } from "./envoi";
 import type { RetourMessages } from "./actions";
 import { composer } from "./composer";
 import { estLangue, lireTexte, UUID } from "./rendu";
@@ -63,9 +64,10 @@ async function lire<T>(chemin: string): Promise<T[] | null> {
   }
 }
 
-// même gabarit que les autres e-mails (photo de la rue de la Basilique, comme la confirmation d'inscription) ; lien de
-// désinscription propre à l'abonné dans le pied
-const rendre = (n: Numero, lien: string, o: string) => composer({ langue: n.langue, origine: o, sujet: n.objet, corps: n.corps, raison: RAISON_LETTRE[n.langue].raison, desinscription: { libelle: RAISON_LETTRE[n.langue].lien, href: lien } });
+// même gabarit que les autres e-mails (photo de la rue de la Basilique, comme la confirmation d'inscription) ; liens de
+// gestion (page d'abonnement, 30 jours) et de désinscription propres à l'abonné dans le pied
+const rendre = (n: Numero, liens: { desinscription: string; gestion: string | null }, o: string) =>
+  composer({ langue: n.langue, origine: o, sujet: n.objet, corps: n.corps, raison: RAISON_LETTRE[n.langue].raison, desinscription: { libelle: RAISON_LETTRE[n.langue].lien, href: liens.desinscription }, gestion: liens.gestion ? { libelle: copiesGestion[n.langue].bouton, href: liens.gestion } : null });
 
 /** Abonnés actifs de la langue qui ont choisi un des thèmes (nombre seulement). */
 async function cible(n: Numero): Promise<number | null> {
@@ -97,7 +99,7 @@ export async function testerNumero(brut: unknown): Promise<RetourMessages> {
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };
   if (!a) return { erreur: "panne" };
-  const e = rendre(lu.v, msg.lettre.lienExemple, (await origine()) ?? "");
+  const e = rendre(lu.v, { desinscription: msg.lettre.lienExemple, gestion: LIEN_GESTION_EXEMPLE }, (await origine()) ?? "");
   const parti = await partir({ a, sujet: `${msg.prefixeTest}${e.sujet}`, html: e.html, texte: e.texte, cle: `lettre-test-${randomUUID()}` }, v.boite);
   await journaliser("lettre.test", s.profilId, null, { langue: lu.v.langue, ...(lu.id ? { numero: lu.id } : {}), ...(parti ? {} : { motif: "envoi" as const }) });
   return parti ? { ok: true, a } : { erreur: "envoi" };
@@ -143,8 +145,8 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
     const reserve = await ecrire<{ id: number }>("lettre_envois?on_conflict=numero_id,abonne_id&select=id", "POST", { numero_id: n.id, abonne_id: a.id }, "resolution=ignore-duplicates,return=representation");
     if (!reserve) return { erreur: "panne" };
     if (!reserve.length) continue; // déjà envoyé à cette adresse
-    const jeton = jetonLettre(a.id);
-    const e = rendre(n, `${o}/lettre/desinscription/${jeton}`, o ?? "");
+    const jeton = jetonLettre(a.id), gestion = jetonGestion(a.id);
+    const e = rendre(n, { desinscription: `${o}/lettre/desinscription/${jeton}`, gestion: gestion ? `${o}/lettre/abonnement/${gestion}` : null }, o ?? "");
     const parti = await partir({ a: a.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `lettre-${n.id}-${a.id}` }, v.boite);
     const issue = parti ? "envoye" : "echec";
     if (peutPasser(TRANSITIONS_ENVOI_LETTRE, "envoi", issue)) await ecrire(`lettre_envois?id=eq.${reserve[0].id}&statut=eq.envoi&select=id`, "PATCH", { statut: issue });

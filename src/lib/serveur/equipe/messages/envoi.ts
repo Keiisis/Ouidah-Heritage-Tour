@@ -73,3 +73,24 @@ export function lireJetonLettre(jeton: unknown): string | null {
   if (!m || !selConfigure()) return null;
   return egaux(signer(m[1]), m[2]) ? m[1] : null;
 }
+
+// ---------- jeton de gestion de l'abonnement : <uuid>-<échéance en secondes, base 36>-<HMAC tronqué>, avec EQUIPE_SEL ----------
+// Il change les thèmes et la langue, désinscrit, et donne un nouvel accord daté (réinscription) : il expire, à la
+// différence du lien de désinscription, que les messageries suivent d'elles-mêmes (List-Unsubscribe) et qui ne fait que
+// désinscrire. Signature distincte (« gestion ») : aucun des deux jetons ne vaut pour l'autre.
+export const JOURS_GESTION = 30;
+const FORME_GESTION = /^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-([0-9a-z]{1,9})-([0-9a-f]{32})$/;
+const signerGestion = (id: string, fin: string) => hmac(`lettre|gestion|${id}|${fin}`).slice(0, 32);
+
+export function jetonGestion(abonneId: string, maintenant = Date.now()) {
+  if (!selConfigure()) return null;
+  const fin = Math.floor(maintenant / 1000 + JOURS_GESTION * 86_400).toString(36);
+  return `${abonneId}-${fin}-${signerGestion(abonneId, fin)}`;
+}
+
+/** L'abonné d'un lien de gestion, et si son échéance est passée ; null pour un jeton faux ou modifié. */
+export function lireJetonGestion(jeton: unknown, maintenant = Date.now()): { id: string; expire: boolean } | null {
+  const m = typeof jeton === "string" ? FORME_GESTION.exec(jeton) : null;
+  if (!m || !selConfigure() || !egaux(signerGestion(m[1], m[2]), m[3])) return null;
+  return { id: m[1], expire: parseInt(m[2], 36) * 1000 <= maintenant };
+}

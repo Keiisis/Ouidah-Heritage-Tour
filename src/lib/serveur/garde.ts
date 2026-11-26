@@ -3,7 +3,7 @@ import { compter } from "./base";
 
 // Garde des formulaires publics : adresse IP gardée seulement en empreinte salée (jamais en clair), limite de fréquence
 // comptée en base, corps lu avec une taille bornée. Sur Vercel, x-real-ip / x-forwarded-for sont posés par la plateforme.
-export function empreinteIp(req: Request) {
+export function empreinteIp(req: { headers: Pick<Headers, "get"> }) {
   const ip = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "inconnue";
   return createHash("sha256").update(`${process.env.EMPREINTE_SEL ?? ""}|${ip}`).digest("hex");
 }

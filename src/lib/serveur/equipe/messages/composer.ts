@@ -78,17 +78,20 @@ function signatureLettre(origine: string, L: LangueMsg, pad: string): Bloc {
   return { h: rang(`${nomSouligne("Ouidah Heritage Tour", L)}${site ? p(lien({ libelle: site, href: origine }), `margin:8px 0 0;${texte(15, 22, GRIS)}`, "t-gris") : ""}`, pad), t: ["Ouidah Heritage Tour", site].filter(Boolean).join("\n") };
 }
 
-function pied(o: { adresse: string; raison: string; desinscription?: Lien | null }, L: LangueMsg, sep: string): Bloc {
-  const h = `${gris(txt(o.adresse, L))}${gris(lien({ libelle: contact, href: `mailto:${contact}` }), "0 0 12px")}${gris(txt(o.raison, L))}${o.desinscription ? gris(lien(o.desinscription), "12px 0 0") : ""}`;
+// numéro de la lettre : « Gérer mon abonnement · Se désinscrire » sur une ligne
+function pied(o: { adresse: string; raison: string; desinscription?: Lien | null; gestion?: Lien | null }, L: LangueMsg, sep: string): Bloc {
+  const liens = [o.gestion, o.desinscription].filter((x): x is Lien => Boolean(x));
+  const h = `${gris(txt(o.adresse, L))}${gris(lien({ libelle: contact, href: `mailto:${contact}` }), "0 0 12px")}${gris(txt(o.raison, L))}${liens.length ? gris(liens.map((x) => lien(x)).join(" &nbsp;·&nbsp; "), "12px 0 0") : ""}`;
   return {
     h: rang(`<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td class="filet" style="border-top:1px solid ${FILET};padding:24px 0 0;">${h}</td></tr></table>`, "0px 24px 44px"),
-    t: ["—", o.adresse, contact, o.raison, o.desinscription && `${o.desinscription.libelle}${sep}${o.desinscription.href}`].filter(Boolean).join("\n"),
+    t: ["—", o.adresse, contact, o.raison, ...liens.map((x) => `${x.libelle}${sep}${x.href}`)].filter(Boolean).join("\n"),
   };
 }
 
 /** E-mail complet (HTML et texte) d'un agent (`agent`, devis lié facultatif) ou d'un numéro de la lettre de Ouidah
- * (`desinscription`). `raison` : pourquoi cet e-mail arrive (pied). Sans `origine` : aucune image. */
-export function composer(m: { langue: LangueMsg; origine: string; sujet: string; corps: string; raison: string; agent?: Agent | null; document?: DocumentLie | null; desinscription?: Lien | null }) {
+ * (`desinscription`, et `gestion` : lien vers la page d'abonnement). `raison` : pourquoi cet e-mail arrive (pied). Sans
+ * `origine` : aucune image. */
+export function composer(m: { langue: LangueMsg; origine: string; sujet: string; corps: string; raison: string; agent?: Agent | null; document?: DocumentLie | null; desinscription?: Lien | null; gestion?: Lien | null }) {
   const L = m.langue, c = copies[L], blocs = paragraphes(apostrophes(m.corps)), lettre = Boolean(m.desinscription);
   // formule de fin (« Je reste à votre écoute, ») : dernier paragraphe court, sur une ligne, qui finit par une virgule ;
   // avec un document lié, elle passe sous sa carte, juste avant la signature, comme dans une lettre
@@ -102,6 +105,6 @@ export function composer(m: { langue: LangueMsg; origine: string; sujet: string;
     m.document ? carte(m.document, L, c.sep) : { h: "", t: "" },
     formule ? blocsTexte([formule], L, "28px 24px 0px") : { h: "", t: "" },
     m.agent ? signature(m.agent, L, formule ? "20px 24px 48px" : "32px 24px 48px") : signatureLettre(m.origine, L, "32px 24px 48px"),
-    pied({ adresse: c.signature, raison: m.raison, desinscription: m.desinscription }, L, c.sep),
+    pied({ adresse: c.signature, raison: m.raison, desinscription: m.desinscription, gestion: m.gestion }, L, c.sep),
   ]);
 }
