@@ -29,7 +29,7 @@
 .esp .esp-contenu .ct-champs > :is(.ct-groupe, .ct-liste, .ct-image, .ct-paire, .ct-un, .ct-facultatif:has(.ct-groupe, .ct-image, .large, .ct-un)), .esp .esp-contenu .ct-champ.large { grid-column: 1 / -1; }
 .esp .esp-contenu .ct-champ { display: grid; gap: 6px; min-width: 0; align-content: start; }
 .esp .esp-contenu .ct-champ > label, .esp .esp-contenu legend, .esp .esp-contenu .ct-nom { color: var(--encre); font: 700 14px/1.3 var(--f-texte); }
-.esp .esp-contenu :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-contenu :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 16px/1.3 var(--f-texte); }
 .esp .esp-contenu textarea { min-height: 88px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
 .esp .esp-contenu input[type="file"] { max-width: 100%; min-height: 48px; padding: 10px 0; color: var(--encre-2); font: 600 14px/1.3 var(--f-texte); }
 .esp .esp-contenu input:read-only:not([type="file"]):not([type="checkbox"]) { background: var(--survol); color: var(--encre-2); }

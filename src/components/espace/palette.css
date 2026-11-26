@@ -9,12 +9,12 @@
 .esp .palette-champ { display: flex; align-items: center; gap: 12px; padding: 0 20px; border-bottom: 1px solid var(--filet); color: var(--encre-3); }
 .esp .palette-champ input { flex: 1; min-width: 0; height: 60px; border: 0; background: none; font-size: 17px; color: var(--encre); }
 .esp .palette-champ input:focus-visible { outline: none; }
-.esp .esp-palette ul { list-style: none; margin: 0; padding: 8px; max-height: 360px; overflow-y: auto; }
+.esp .esp-palette ul { list-style: none; margin: 0; padding: 8px; max-height: min(360px, calc(100dvh - 112px)); overflow-y: auto; }
 .esp .esp-palette li { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 12px; font-weight: 600; cursor: pointer; }
 .esp .esp-palette li small { margin-left: auto; color: var(--encre-3); font-size: 13px; font-weight: 600; }
 .esp .esp-palette li[aria-selected="true"] { background: var(--survol); box-shadow: inset 3px 0 0 var(--accent); }
 .esp .esp-palette .rien { color: var(--encre-2); cursor: default; }
 
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .esp .esp-palette { margin-top: 16px; }
 }

@@ -20,7 +20,7 @@
 .esp .esp-securite .champ.large { grid-column: 1 / -1; }
 .esp .esp-securite .champ > :is(label, legend) { padding: 0; color: var(--encre); font: 700 14px/1.3 var(--f-texte); }
 .esp .esp-securite .aide { color: var(--encre-2); font-size: 13px; line-height: 1.45; }
-.esp .esp-securite :is(select, input:not([type="checkbox"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-securite :is(select, input:not([type="checkbox"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 16px/1.3 var(--f-texte); }
 .esp .esp-securite textarea { min-height: 96px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
 .esp .esp-securite :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--accent-agent-texte); box-shadow: inset 0 0 0 1px var(--accent-agent-texte); }
 .esp .esp-securite .sec-pied { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }

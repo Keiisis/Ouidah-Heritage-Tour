@@ -23,7 +23,7 @@
 .esp .esp-finances .champ > label:has(input[type="checkbox"]) { display: flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; }
 .esp .esp-finances .champ > label > input[type="checkbox"] { width: 20px; height: 20px; flex: none; accent-color: var(--accent-texte); }
 .esp .esp-finances .champ .aide { color: var(--encre-2); font-size: 13px; line-height: 1.45; }
-.esp .esp-finances :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--encre-3); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-finances :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--encre-3); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 16px/1.3 var(--f-texte); }
 .esp .esp-finances textarea { padding: 10px 12px; resize: vertical; line-height: 1.5; }
 .esp .esp-finances input[type="file"] { width: 100%; min-width: 0; max-width: 100%; min-height: 48px; padding: 10px 0; color: var(--encre-2); font: 600 14px/1.3 var(--f-texte); }
 .esp .esp-finances :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--accent-agent-texte); box-shadow: inset 0 0 0 1px var(--accent-agent-texte); }

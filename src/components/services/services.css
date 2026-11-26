@@ -43,7 +43,7 @@ body:has(.services-page) [data-navigation] { background: var(--surface-abyss); }
 .services-recu { border-top: 4px solid var(--accent-sun); padding-top: 24px; overflow-wrap: anywhere; }
 .services-recu p { margin-bottom: 24px; }
 .services-equipe { display: grid; gap: 32px; margin: 24px; }
-.esp .services-equipe :where(input,select,textarea) { color: var(--encre); background: var(--surface); border-color: var(--filet-fort); }
+.esp .services-equipe :where(input,select,textarea) { color: var(--encre); background: var(--surface); border-color: var(--filet-fort); font-size: 16px; }
 .esp .services-equipe .services-bouton { color: var(--accent-sur); background: var(--accent); border-color: var(--accent); }
 .esp .services-equipe .services-bouton.secondaire { color: var(--encre); background: var(--surface); border-color: var(--filet-fort); }
 .esp .services-equipe .services-bouton:disabled { color: var(--encre-3); background: var(--survol); border-color: var(--filet); }

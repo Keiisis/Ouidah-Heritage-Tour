@@ -24,7 +24,7 @@
 .esp .esp-reglages .champ > label, .esp .esp-reglages fieldset > legend { color: var(--encre); font: 700 14px/1.3 var(--f-texte); }
 .esp .esp-reglages .aide, .esp .esp-reglages .mention { color: var(--encre-2); font-size: 13px; line-height: 1.5; }
 .esp .esp-reglages .mention { font-size: 14px; }
-.esp .esp-reglages :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-reglages :is(select, input:not([type="checkbox"]):not([type="file"]), textarea) { width: 100%; max-width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 16px/1.3 var(--f-texte); }
 .esp .esp-reglages textarea { min-height: 88px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
 .esp .esp-reglages input[type="file"] { max-width: 100%; min-height: 48px; padding: 10px 0; color: var(--encre-2); font: 600 14px/1.3 var(--f-texte); }
 .esp .esp-reglages input:read-only:not([type="file"]) { background: var(--survol); color: var(--encre-2); }
@@ -33,6 +33,9 @@
 .esp .esp-reglages .cases { display: flex; flex-wrap: wrap; gap: 8px; }
 .esp .esp-reglages .case { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; font-weight: 600; cursor: pointer; }
 .esp .esp-reglages .case input { width: 20px; height: 20px; margin: 0; accent-color: var(--ocean); }
+/* case seule dans son libellé (sans .case) : la ligne entière se touche au doigt */
+.esp .esp-reglages label:not(.case):has(> input[type="checkbox"]) { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.esp .esp-reglages label:not(.case) > input[type="checkbox"] { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--ocean); }
 .esp[data-theme="sombre"] .esp-reglages .case input { accent-color: var(--soleil); }
 .esp .esp-reglages .reg-pied { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 
@@ -79,7 +82,8 @@
 .esp .esp-reglages .interrupteur b { font-weight: 700; }
 
 /* textes par langue (repli natif) */
-.esp .esp-reglages .langue { border: 1px solid var(--filet); border-radius: 14px; }
+/* .langue est aussi la petite étiquette de langue (jetons.css : inline-grid, 24 px de haut) : ici un bloc repliable entier */
+.esp .esp-reglages .langue { display: block; place-items: normal; height: auto; min-width: 0; padding: 0; border: 1px solid var(--filet); border-radius: 14px; color: var(--encre); font: inherit; }
 .esp .esp-reglages .langue > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 14px; font-weight: 700; cursor: pointer; list-style: none; }
 .esp .esp-reglages .langue > summary::-webkit-details-marker { display: none; }
 .esp .esp-reglages .langue > summary .ic { transition: transform var(--d-moyen) var(--c-glisse); }
@@ -118,7 +122,9 @@
   from { clip-path: inset(0 0 0 100% round 20px); opacity: 0; transform: translateY(8px); }
 }
 
-@media (max-width: 760px) {
+/* tableaux empilés sous 1100 px, comme Finances et Équipe : en 768 et 1024, la colonne de travail (moins la navigation
+   latérale) est trop étroite pour leurs colonnes */
+@media (max-width: 1100px) {
   .esp .esp-reglages .tableau thead { display: none; }
   .esp .esp-reglages .tableau, .esp .esp-reglages .tableau tbody, .esp .esp-reglages .tableau tr, .esp .esp-reglages .tableau td { display: block; width: 100%; }
   .esp .esp-reglages .tableau tr { padding: 12px 0; border-bottom: 1px solid var(--filet); }
@@ -126,6 +132,8 @@
   .esp .esp-reglages .tableau td { padding: 4px 0; border: 0; text-align: left; }
   .esp .esp-reglages .tableau td[data-col]::before { content: attr(data-col); display: block; color: var(--encre-2); font: 700 12px/1.3 var(--f-texte); }
   .esp .esp-reglages .tableau .actions { justify-content: flex-start; }
+}
+@media (max-width: 760px) {
   .esp .esp-reglages .valeurs > div { grid-template-columns: minmax(0, 1fr); }
   .esp .esp-reglages .carte-visite { grid-template-columns: minmax(0, 1fr); padding: 20px; }
   .esp .esp-reglages .carte-visite .qr { justify-self: center; width: min(240px, 100%); }

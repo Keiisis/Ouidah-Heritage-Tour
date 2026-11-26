@@ -25,8 +25,10 @@
 .esp .esp-terrain .bouton-petit { min-height: 44px; padding: 0 12px; font-size: 14px; }
 .esp .esp-terrain :is(.bouton, .bouton-2):disabled { background: var(--survol); border-color: var(--filet); color: var(--encre-3); cursor: not-allowed; transform: none; }
 .esp .esp-terrain :is(.bouton, .bouton-2) .ic { width: 18px; height: 18px; }
-.esp .esp-terrain :is(select, input:not([type="checkbox"]), textarea) { max-width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 15px/1.3 var(--f-texte); }
+.esp .esp-terrain :is(select, input:not([type="checkbox"]), textarea) { max-width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--filet-fort); border-radius: 12px; background: var(--fond); color: var(--encre); font: 600 16px/1.3 var(--f-texte); }
 .esp .esp-terrain textarea { width: 100%; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+/* un champ remplit sa case (sinon un long nom de lieu élargit la liste au-delà de l'écran) */
+.esp .esp-terrain .champ > :is(select, input:not([type="checkbox"])) { width: 100%; }
 .esp .esp-terrain :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--accent-agent-texte); box-shadow: inset 0 0 0 1px var(--accent-agent-texte); }
 .esp .esp-terrain .champ { display: grid; gap: 4px; min-width: 0; font-size: 13px; font-weight: 700; color: var(--encre-2); }
 .esp .esp-terrain .filtres { display: flex; flex-wrap: wrap; gap: 4px 8px; min-width: 0; margin-bottom: 12px; }
@@ -50,9 +52,9 @@
 .esp .esp-terrain .etat.tampon { animation: t-tampon 520ms var(--c-arrivee) backwards; }
 @keyframes t-tampon { from { transform: scale(1.6) rotate(-8deg); opacity: 0; } }
 
-/* tableau qui s'empile en 390 : chaque cellule garde son intitulé (data-l) */
+/* tableau qui s'empile sous 1100 px (comme blocs.css) : chaque cellule garde son intitulé (data-l) */
 .esp .esp-terrain .tableau td small { display: block; color: var(--encre-2); font-size: 13px; }
-@media (max-width: 760px) {
+@media (max-width: 1100px) {
   .esp .esp-terrain .tableau.empile thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .esp .esp-terrain .tableau.empile, .esp .esp-terrain .tableau.empile tbody, .esp .esp-terrain .tableau.empile tr, .esp .esp-terrain .tableau.empile td { display: block; }
   .esp .esp-terrain .tableau.empile tr { padding: 10px 0; border-bottom: 1px solid var(--filet); }
@@ -68,7 +70,7 @@
 .esp .controle-haut h2 { min-width: 0; color: var(--sur-nuit); font-size: 24px; }
 .esp .controle-haut .retour, .esp .entrees-mini { display: none; }
 .esp .controle-haut .retour .ic { transform: rotate(180deg); }
-.esp .viseur-zone select { min-height: 48px; padding: 0 12px; border: 1px solid var(--trait-nuit-fort); border-radius: 12px; background: var(--nuit); color: var(--sur-nuit); font: 700 15px/1.3 var(--f-texte); }
+.esp .viseur-zone select { min-height: 48px; padding: 0 12px; border: 1px solid var(--trait-nuit-fort); border-radius: 12px; background: var(--nuit); color: var(--sur-nuit); font: 700 16px/1.3 var(--f-texte); }
 .esp .viseur { --hv: 440px; position: relative; height: var(--hv); overflow: hidden; border-radius: 20px; background: #070d22; }
 .esp .viseur video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .esp .viseur .repos { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 8px; color: var(--sur-nuit-2); font-weight: 700; }
@@ -182,6 +184,7 @@
 .esp .commande .client a { color: var(--accent-texte); font-weight: 700; }
 .esp .commande .total { font-weight: 800; }
 .esp .commande .bouton { justify-self: start; min-height: 44px; }
+.esp .commande details > summary { min-height: 44px; padding-block: 10px; font-weight: 700; cursor: pointer; }
 
 /* ---------- réservations (admin) ---------- */
 .esp .evenement-resa { display: grid; gap: 16px; }
