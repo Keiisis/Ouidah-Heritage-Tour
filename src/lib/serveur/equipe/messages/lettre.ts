@@ -6,6 +6,7 @@ import { LIMITES_COURRIEL, type LangueMsg, msg, RAISON_LETTRE } from "@/content/
 import { copiesGestion, LIEN_GESTION_EXEMPLE } from "@/content/courriels-lettre";
 import { lireContenu } from "@/lib/contenu";
 import { base, compter } from "../../base";
+import { type CopieEnvoyee, copierEnvoyes } from "../../courriel";
 import { journaliser } from "../journal";
 import { exigerRole } from "../session";
 import { emailDe, jetonGestion, jetonLettre, origine, partir, voie } from "./envoi";
@@ -19,7 +20,8 @@ import { type StatutNumero, TRANSITIONS_ENVOI_LETTRE, TRANSITIONS_NUMERO } from 
 // relit la session et exige le rôle admin. L'envoi réel demande le nombre de destinataires annoncé à l'écran (recompté
 // ici : s'il a changé, rien ne part) ; chaque abonné est d'abord « réservé » dans lettre_envois (unicité numéro + abonné),
 // puis l'e-mail part avec SON lien de désinscription : un numéro ne part jamais deux fois à la même adresse, même si deux
-// appels se croisent. Les désinscrits ne reçoivent rien (relu à chaque lot).
+// appels se croisent. Les désinscrits ne reçoivent rien (relu à chaque lot). Un seul exemplaire par numéro va dans
+// « Envoyés » de la boîte IMAP (le premier parti) : les autres ne diffèrent que par l'adresse et les liens de l'abonné.
 
 const LOT = LIMITES_COURRIEL.lot; // e-mails par appel
 const PAGE = 400; // abonnés examinés par appel
@@ -135,6 +137,9 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
   const page = await lire<Abonne>(`abonnes_lettre?select=id,email,sujets&langue=eq.${n.langue}&desinscrit_le=is.null${n.curseur ? `&id=gt.${n.curseur}` : ""}&order=id.asc&limit=${PAGE}`);
   if (!page) return { erreur: "panne" };
   let partis = 0, curseur = n.curseur, toutVu = true;
+  // premier appel de l'envoi (le numéro était encore brouillon) : le premier e-mail parti est copié dans « Envoyés »
+  const copies: CopieEnvoyee[] = [];
+  let copier = n.statut === "brouillon";
   for (const a of page) {
     if (partis >= LOT) {
       toutVu = false;
@@ -147,7 +152,11 @@ export async function envoyerLettre(id: unknown, attendu: unknown): Promise<Reto
     if (!reserve.length) continue; // déjà envoyé à cette adresse
     const jeton = jetonLettre(a.id), gestion = jetonGestion(a.id);
     const e = rendre(n, { desinscription: `${o}/lettre/desinscription/${jeton}`, gestion: gestion ? `${o}/lettre/abonnement/${gestion}` : null }, o ?? "");
-    const parti = await partir({ a: a.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `lettre-${n.id}-${a.id}` }, v.boite);
+    const parti = await partir({ a: a.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `lettre-${n.id}-${a.id}`, ...(copier ? { copie: copies } : {}) }, v.boite);
+    if (parti && copier) {
+      copier = false;
+      await copierEnvoyes(copies);
+    }
     const issue = parti ? "envoye" : "echec";
     if (peutPasser(TRANSITIONS_ENVOI_LETTRE, "envoi", issue)) await ecrire(`lettre_envois?id=eq.${reserve[0].id}&statut=eq.envoi&select=id`, "PATCH", { statut: issue });
     partis++;

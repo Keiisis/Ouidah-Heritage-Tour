@@ -94,6 +94,12 @@ export const uneLigne = (v: unknown) => (typeof v === "string" ? v.replace(/[\u0
 export const plusieursLignes = (v: unknown) => (typeof v === "string" ? v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, "").trim() : "");
 export const paragraphes = (t: string) => t.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 
+/** Objet d'une réponse : « Re: » devant l'objet reçu, sans doublon (« RE : », « re: » déjà là), coupé à la limite. */
+export function objetReponse(recu: string) {
+  const o = uneLigne(recu);
+  return (/^re\s*:/i.test(o) ? o : `Re: ${o}`.trim()).slice(0, LIMITES_COURRIEL.objet);
+}
+
 /** Objet et message saisis relus selon les limites ; « objet » et « corps » en champs refusés. */
 export function lireTexte(objet: unknown, corps: unknown, objetRequis: boolean) {
   const o = uneLigne(objet), c = plusieursLignes(corps);

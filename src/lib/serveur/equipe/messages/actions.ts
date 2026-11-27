@@ -4,13 +4,15 @@ import { randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
 import { LIMITES_COURRIEL, type LangueMsg, msg, type Variable, RAISON_COURRIER } from "@/content/espace-messages";
 import { base } from "../../base";
+import { type CopieEnvoyee, copierEnvoyes } from "../../courriel";
 import { effacer } from "../dossiers";
 import { journaliser } from "../journal";
 import { exigerRole, type Session } from "../session";
 import { apercuAuto } from "./auto";
 import { emailDe, languesDe, origine, partir, voie } from "./envoi";
+import { type CourrielComplet, courrielRecu } from "./imap";
 import { type ClientCourrier, clientsChoisis } from "./lectures";
-import { autoConnue, CLE, type CleAuto, estAuto, estLangue, jetonsInconnus, lireAdresses, lireTexte, remplir, uneLigne, UUID, type Valeurs, valeursApercu, valeursDe, variablesHors } from "./rendu";
+import { autoConnue, CLE, type CleAuto, estAuto, estLangue, jetonsInconnus, lireAdresses, lireTexte, objetReponse, remplir, uneLigne, UUID, type Valeurs, valeursApercu, valeursDe, variablesHors } from "./rendu";
 import { type Agent, composer } from "./composer";
 import { peutPasser } from "../../machines";
 import { TRANSITIONS_COURRIEL } from "./regles";
@@ -23,13 +25,16 @@ import { TRANSITIONS_COURRIEL } from "./regles";
 // clé unique (Message-ID stable), et va au journal sans adresse ni texte. refresh() renvoie l'écran à jour.
 // Mode « adresse » : adresse(s) saisie(s) à la main, sans fiche client (client_id null) : une seule pour un agent, au plus
 // LIMITES_COURRIEL.adresses pour un admin ; seul {prénom} (saisi) y a une valeur, {dates} {lien} {référence} sont refusés.
+// Réponse à un courriel reçu (reponse = son id, mode « adresse ») : relu avec les droits de l'écran boîte, l'adresse doit
+// être celle de son expéditeur et l'objet est « Re: » + le sien, fixés ici ; l'e-mail porte In-Reply-To et References, et
+// sa ligne garde le courriel d'origine et son dossier. Les e-mails partis (composeur) sont copiés dans « Envoyés ».
 
 export type RefusMessages = "refuse" | "champs" | "panne" | "smtp" | "envoi" | "variables" | "etat" | "confirmer";
 export type RetourMessages =
   | { ok: true; id?: string; envoyes?: number; echecs?: number; a?: string; fini?: boolean; total?: number; sujet?: string; html?: string }
   | { erreur: RefusMessages; champs?: string[]; manque?: Variable[]; total?: number };
 
-type Saisie = { mode: "un" | "groupe" | "adresse"; ids: string[]; adresses: string[]; prenom: string; langue: LangueMsg; modele: string | null; objet: string; corps: string; devis: boolean; brouillon: string | null };
+type Saisie = { mode: "un" | "groupe" | "adresse"; ids: string[]; adresses: string[]; prenom: string; langue: LangueMsg; modele: string | null; objet: string; corps: string; devis: boolean; brouillon: string | null; reponse: string | null };
 const objet = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
 const maintenant = () => new Date().toISOString();
 
@@ -63,9 +68,24 @@ function lireSaisie(brut: unknown, s: Session, objetRequis: boolean, destRequis 
   if (devis && mode !== "un") champs.push("pieces");
   const brouillon = typeof o.brouillon === "string" && o.brouillon ? o.brouillon : null;
   if (brouillon !== null && !UUID.test(brouillon)) champs.push("brouillon");
+  const reponse = typeof o.reponse === "string" && o.reponse ? o.reponse : null;
+  if (reponse !== null && (!UUID.test(reponse) || mode !== "adresse")) champs.push("reponse");
   if (champs.length) return { ok: false, champs };
-  return { ok: true, v: { mode, ids: ids as string[], adresses, prenom, langue: o.langue as LangueMsg, modele, objet: t.objet, corps: t.corps, devis, brouillon } };
+  return { ok: true, v: { mode, ids: ids as string[], adresses, prenom, langue: o.langue as LangueMsg, modele, objet: t.objet, corps: t.corps, devis, brouillon, reponse } };
 }
+
+/** Courriel reçu auquel répond la saisie (null sans `reponse`), et la saisie avec son objet « Re: ». Refus : courriel
+ * absent ou hors des droits du compte (« etat »), adresse qui n'est pas celle de son expéditeur (« adresses »). */
+async function fil(s: Session, v: Saisie): Promise<{ ok: true; recu: CourrielComplet | null; v: Saisie } | { erreur: RefusMessages; champs?: string[] }> {
+  if (!v.reponse) return { ok: true, recu: null, v };
+  const c = await courrielRecu(s, v.reponse);
+  if (c === null) return { erreur: "panne" };
+  if (c === "non") return { erreur: "etat" };
+  if (v.adresses.length !== 1 || v.adresses[0] !== c.expediteur.toLowerCase()) return { erreur: "champs", champs: ["adresses"] };
+  return { ok: true, recu: c, v: { ...v, objet: objetReponse(c.objet) } };
+}
+/** Message-ID reçu repris dans In-Reply-To et References, seulement s'il a la forme « <…> » sans espace. */
+const idMessage = (c: CourrielComplet | null) => (c?.message_id && /^<[^<>\s]{1,996}>$/.test(c.message_id) ? c.message_id : null);
 
 /** L'e-mail d'un destinataire, rempli avec SES valeurs ; `manque` : champs variables sans valeur pour lui. */
 function rendre(vals: Valeurs, devis: ClientCourrier["devis"], v: Pick<Saisie, "objet" | "corps" | "devis" | "langue">, agent: Agent, o: string) {
@@ -121,8 +141,10 @@ export async function enregistrerBrouillon(brut: unknown): Promise<RetourMessage
 export async function envoyerTest(brut: unknown): Promise<RetourMessages> {
   const s = await exigerRole("agents");
   if (!s) return { erreur: "refuse" };
-  const lu = lireSaisie(brut, s, true, false);
-  if (!lu.ok) return lu.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: lu.champs };
+  const saisi = lireSaisie(brut, s, true, false);
+  if (!saisi.ok) return saisi.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: saisi.champs };
+  const lu = await fil(s, saisi.v);
+  if (!("ok" in lu)) return lu;
   let vals = valeursApercu(s.prenom, lu.v.langue), devis: ClientCourrier["devis"] = null, cible: string | undefined;
   if (lu.v.adresses.length) vals = valeursAdresse(lu.v.prenom);
   else if (lu.v.ids.length) {
@@ -146,8 +168,10 @@ export async function envoyerTest(brut: unknown): Promise<RetourMessages> {
 export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
   const s = await exigerRole("agents");
   if (!s) return { erreur: "refuse" };
-  const lu = lireSaisie(brut, s, true);
-  if (!lu.ok) return lu.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: lu.champs };
+  const saisi = lireSaisie(brut, s, true);
+  if (!saisi.ok) return saisi.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: saisi.champs };
+  const lu = await fil(s, saisi.v);
+  if (!("ok" in lu)) return lu;
   let dests: { id: string | null; email: string; vals: Valeurs; devis: ClientCourrier["devis"] }[];
   if (lu.v.mode === "adresse") dests = lu.v.adresses.map((a) => ({ id: null, email: a, vals: valeursAdresse(lu.v.prenom), devis: null }));
   else {
@@ -169,19 +193,25 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
   const seul = lu.v.mode !== "groupe" && dests.length === 1;
   const lot = seul ? null : randomUUID();
   let envoyes = 0, echecs = 0;
-  for (const { c, e } of rendus) {
-    // la ligne est posée avant l'envoi : sa clé donne le Message-ID, et rien ne part sans trace
-    const ligne = { client_id: c.id, destinataire: c.email, modele: lu.v.modele, langue: lu.v.langue, objet: e.sujet, corps: e.corps, pieces: e.pieces, modifie_le: maintenant() };
-    const r = lu.v.brouillon && lu.v.mode === "un"
-      ? await ecrire<{ id: string }>(`courriels_envoyes?id=eq.${lu.v.brouillon}&auteur_id=eq.${s.profilId}&statut=eq.brouillon&select=id`, "PATCH", ligne)
-      : await ecrire<{ id: string }>("courriels_envoyes?select=id", "POST", { ...ligne, statut: "brouillon", auteur_id: s.profilId, lot });
-    if (!r) return { erreur: "panne" };
-    if (!r[0]) return { erreur: "etat" };
-    const parti = await partir({ a: c.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `courrier-${r[0].id}` }, v.boite);
-    const issue = parti ? "envoye" : "echec";
-    if (peutPasser(TRANSITIONS_COURRIEL, "brouillon", issue)) await ecrire(`courriels_envoyes?id=eq.${r[0].id}&statut=eq.brouillon&select=id`, "PATCH", { statut: issue, envoye_le: maintenant(), modifie_le: maintenant() });
-    if (parti) envoyes++;
-    else echecs++;
+  const copies: CopieEnvoyee[] = [], enReponseA = idMessage(lu.recu);
+  try {
+    for (const { c, e } of rendus) {
+      // la ligne est posée avant l'envoi : sa clé donne le Message-ID, et rien ne part sans trace
+      const ligne = { client_id: c.id, destinataire: c.email, modele: lu.v.modele, langue: lu.v.langue, objet: e.sujet, corps: e.corps, pieces: e.pieces, modifie_le: maintenant(), ...(lu.recu ? { reponse_a: lu.recu.id, demande_id: lu.recu.demande_id } : {}) };
+      const r = lu.v.brouillon && lu.v.mode === "un"
+        ? await ecrire<{ id: string }>(`courriels_envoyes?id=eq.${lu.v.brouillon}&auteur_id=eq.${s.profilId}&statut=eq.brouillon&select=id`, "PATCH", ligne)
+        : await ecrire<{ id: string }>("courriels_envoyes?select=id", "POST", { ...ligne, statut: "brouillon", auteur_id: s.profilId, lot });
+      if (!r) return { erreur: "panne" };
+      if (!r[0]) return { erreur: "etat" };
+      const parti = await partir({ a: c.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `courrier-${r[0].id}`, enReponseA, copie: copies }, v.boite);
+      const issue = parti ? "envoye" : "echec";
+      if (peutPasser(TRANSITIONS_COURRIEL, "brouillon", issue)) await ecrire(`courriels_envoyes?id=eq.${r[0].id}&statut=eq.brouillon&select=id`, "PATCH", { statut: issue, envoye_le: maintenant(), modifie_le: maintenant() });
+      if (parti) envoyes++;
+      else echecs++;
+    }
+  } finally {
+    // copie dans « Envoyés » des e-mails déjà partis, même si le lot s'est arrêté en route
+    await copierEnvoyes(copies);
   }
   // journal sans adresse ni texte : la fiche visée (un client), ou le mode « adresse » et le nombre
   await journaliser("courriel.envoi", s.profilId, null, { ...(lu.v.mode === "un" && dests[0].id ? { cible: dests[0].id } : {}), ...(lu.v.mode === "adresse" ? { mode: "adresse" } : {}), langue: lu.v.langue, nombre: envoyes, ...(lu.v.modele ? { modele: lu.v.modele } : {}), ...(echecs ? { motif: "envoi" as const } : {}) });

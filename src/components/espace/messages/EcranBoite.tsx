@@ -14,22 +14,25 @@ import { Picto } from "../Picto";
 import { Tete } from "../Tete";
 import { transversal as X } from "@/content/transversal";
 import { configurationImap, lireCourrielsRecus } from "@/lib/serveur/equipe/messages/imap";
+import { droitsEffectifs } from "@/lib/serveur/equipe/securite/droits";
 import { lireTaches } from "@/lib/serveur/equipe/pilotage/taches";
 import { lire } from "@/lib/serveur/equipe/finances/lectures";
 import { ReglageTache } from "../pilotage/ReglageTache";
-import { Reception, ReleverBoite } from "./Reception";
+import { Reception, ReleveAuto, ReleverBoite } from "./Reception";
 import "./messages.css";
 
 // Boîte de réception (lot L6), rendue sous <Suspense> : source 1, les questions posées sur le site (table demandes) —
 // l'agent ne voit que celles de ses dossiers, l'admin toutes. « Répondre » ouvre le composeur sur la fiche du client avec
 // le modèle « Réponse à une demande » ; sans fiche, sur l'adresse du message (?a=, mode « Une adresse »). Source 2 :
-// courriels IMAP importés, rattachés au dossier courant, avec le même « Répondre » vers l'adresse de l'expéditeur.
+// courriels IMAP importés, rattachés au dossier courant ; « Répondre » ouvre le composeur dans le fil (?reponse=), les
+// pièces jointes se téléchargent, et l'écran relève la boîte toutes les 3 minutes tant qu'il est visible (ReleveAuto).
 export async function EcranBoite({ role }: { role: Role }) {
   const s = await exigerRole(role);
   if (!s) redirect(`/${role}`);
   const messages = await lireBoite(s);
   const [courriels, reglages, dossiers] = await Promise.all([lireCourrielsRecus(s), s.role === "admin" ? lireTaches() : null, s.role === "admin" ? lire<{ id: string; nom: string }>("demandes?select=id,nom&statut=eq.envoyee&order=cree_le.desc&limit=500") : null]);
-  const config = s.role === "admin" ? configurationImap() : null;
+  // relève automatique pour qui voit les courriels reçus : l'admin, l'agent qui a le droit « demandes »
+  const config = s.role === "admin" || droitsEffectifs(s.droits).demandes ? configurationImap() : null;
   const releve = config ? await lire<{ releve_le: string | null; erreur: boolean }>(`imap_releves?select=releve_le,erreur&boite=eq.${config.boite}`) : null;
   const B = msg.boite;
   const minute = minuteServeur();
@@ -79,9 +82,9 @@ export async function EcranBoite({ role }: { role: Role }) {
           )}
         </Bloc>
         <Bloc id="t-imap" titre={X.imap.titre} s={12} i={2}>
+          {config && <ReleveAuto releve={releve?.[0]?.releve_le ?? null} />}
           {s.role === "admin" && <>
             {!config && <p className="mention">{X.imap.sansConfig}</p>}
-            {releve?.[0]?.releve_le && <p className="aide">{X.imap.dernier} : {ilYa(releve[0].releve_le, minute)}</p>}
             {releve?.[0]?.erreur && <p role="status">{X.imap.erreur}</p>}
             <ReleverBoite configure={Boolean(config)} />
             {reglages && <ReglageTache nom="imap_actif" actif={reglages.imap_actif} libelle={X.imap.auto} />}

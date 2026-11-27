@@ -209,13 +209,13 @@ export const reglages = {
     journalCols: { quand: "Quand", modele: "E-mail", a: "Destinataire", resultat: "Résultat" },
     journalParti: "Parti",
     journalEchec: (motif: string | null) => `Échec${motif ? ` (${motif})` : ""}`,
-    motifs: { smtp_absent: "SMTP non configuré", exception: "erreur avant l’envoi", inconnu: "motif inconnu" } as Record<string, string>,
+    motifs: { smtp_absent: "SMTP non configuré", exception: "erreur avant l’envoi", inconnu: "motif inconnu", imap_absent: "boîte IMAP non configurée", imap: "boîte IMAP injoignable", imap_append: "copie refusée par la boîte" } as Record<string, string>,
     modeles: {
       "auto-billets": "Billets payés", "auto-demande": "Demande reçue", "auto-devis-pret": "Devis prêt", "auto-boutique": "Commande reçue", "auto-lettre": "Inscription à la lettre",
       "auto-code": "Code de connexion", "auto-relance": "Relance de facture", "auto-rdv": "Rendez-vous confirmé", "auto-rdv-annule": "Rendez-vous annulé", "auto-recu": "Paiement reçu",
       "auto-signature": "Devis signé", "auto-assistant": "Message transmis à l’équipe", "auto-lien": "Lien de paiement", donnees: "Accès à mes données", facture: "Facture",
       "avis-demande": "Avis : nouvelle demande", "avis-commande": "Avis : nouvelle commande", "avis-paiement": "Avis : paiement reçu", "avis-signature": "Avis : devis signé", "avis-rdv": "Avis : rendez-vous",
-      "avis-assistant": "Avis : conversation sans agent", "avis-relance": "Avis : relance envoyée", "avis-test": "Avis de test", autre: "Autre e-mail",
+      "avis-assistant": "Avis : conversation sans agent", "avis-relance": "Avis : relance envoyée", "avis-test": "Avis de test", "copie-envoyes": "Copie dans « Envoyés »", autre: "Autre e-mail",
     } as Record<string, string>,
   },
 

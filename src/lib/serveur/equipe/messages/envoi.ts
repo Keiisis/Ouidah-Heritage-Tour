@@ -2,7 +2,7 @@ import "server-only";
 import { appendFile } from "node:fs/promises";
 import { headers } from "next/headers";
 import { base } from "../../base";
-import { courrielConfigure, envoyerCourriel } from "../../courriel";
+import { type CopieEnvoyee, courrielConfigure, envoyerCourriel } from "../../courriel";
 import { modeLocal } from "../mode";
 import { egaux, hmac, selConfigure } from "../outils";
 
@@ -18,8 +18,9 @@ export async function voie(): Promise<{ boite: string | null } | null> {
   return courrielConfigure() ? { boite: null } : null;
 }
 
-// modele : clé du journal des envois (courriel.ts) ; repondreA : adresse de réponse
-export type Message = { a: string; sujet: string; html: string; texte: string; cle: string; modele?: string; repondreA?: string | null };
+// modele : clé du journal des envois (courriel.ts) ; repondreA : adresse de réponse ; enReponseA : Message-ID du courriel
+// reçu auquel on répond ; copie : liste des e-mails partis à copier dans « Envoyés » (SMTP seulement, courriel.ts)
+export type Message = { a: string; sujet: string; html: string; texte: string; cle: string; modele?: string; repondreA?: string | null; enReponseA?: string | null; copie?: CopieEnvoyee[] };
 
 export async function partir(m: Message, boite: string | null): Promise<boolean> {
   if (boite) {

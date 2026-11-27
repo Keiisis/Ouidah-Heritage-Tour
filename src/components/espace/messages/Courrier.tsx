@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { type FormEvent, useId, useRef, useState, useTransition } from "react";
 import type { Role } from "@/content/equipe";
 import { espace as T } from "@/content/espace";
 import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, msg, VARIABLES } from "@/content/espace-messages";
+import { transversal as X } from "@/content/transversal";
 import { useMouvementReduit } from "@/lib/mouvement";
 import { enregistrerBrouillon, envoyerCourrier, envoyerTest, type RetourMessages } from "@/lib/serveur/equipe/messages/actions";
 import type { ClientCourrier, Envoi, Modele } from "@/lib/serveur/equipe/messages/lectures";
@@ -20,10 +22,15 @@ import { Apercu, texteRefus, useAnnonce } from "./Apercu";
 // un groupe d'une même langue), modèle et langue du client, champs variables, devis lié, aperçu, brouillon, test à soi-même,
 // envoi. L'aperçu montre ce que le serveur enverra : même rendu (rendu.ts), mêmes valeurs ; le serveur les relit à l'envoi.
 // Mode « Une adresse » : adresse(s) tapée(s) à la main, sans fiche (agent : une ; admin : plusieurs), prénom facultatif.
+// Réponse à un courriel reçu (`initial.reponse`, depuis la boîte) : mode « Une adresse », adresse de l'expéditeur et objet
+// « Re: … » en lecture seule (le serveur les refixe), message d'origine cité et repliable ; « Écrire un nouvel e-mail »
+// quitte le fil.
 const C = msg.courrier;
+/** Courriel reçu auquel on répond : objet déjà préfixé « Re: » par le serveur. */
+export type Reponse = { id: string; a: string; nom: string; objet: string; texte: string; recu: string; verifie: boolean };
 type Erreurs = Partial<Record<"dest" | "groupe" | "adresses" | "prenom" | "objet" | "langue" | "corps", string>>;
 
-export function Courrier({ role, admin, clients, modeles, envois, moi, initial, redaction = false }: { role: Role; admin: boolean; clients: ClientCourrier[]; modeles: Modele[]; envois: Envoi[]; moi: { prenom: string; nom: string }; initial: { client: string | null; modele: string | null; adresse?: string | null }; redaction?: boolean }) {
+export function Courrier({ role, admin, clients, modeles, envois, moi, initial, redaction = false }: { role: Role; admin: boolean; clients: ClientCourrier[]; modeles: Modele[]; envois: Envoi[]; moi: { prenom: string; nom: string }; initial: { client: string | null; modele: string | null; adresse?: string | null; reponse?: Reponse | null }; redaction?: boolean }) {
   const uid = useId();
   const reduit = useMouvementReduit();
   const minute = useMinute();
@@ -37,15 +44,16 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
   const depart = clients.find((c) => c.id === initial.client) ?? null;
   const modeleDepart = initial.modele && modeles.some((m) => m.cle === initial.modele) ? initial.modele : "libre";
   const t0 = depart && modeleDepart !== "libre" ? texteDe(modeleDepart, depart.langue) : null;
+  const reponse = initial.reponse ?? null;
 
-  const [mode, setMode] = useState<"un" | "adresse" | "groupe">(initial.adresse && !depart ? "adresse" : "un");
+  const [mode, setMode] = useState<"un" | "adresse" | "groupe">(reponse || (initial.adresse && !depart) ? "adresse" : "un");
   const [client, setClient] = useState(depart?.id ?? "");
   const [groupe, setGroupe] = useState<string[]>([]);
-  const [adresses, setAdresses] = useState(initial.adresse ?? "");
+  const [adresses, setAdresses] = useState(reponse?.a ?? initial.adresse ?? "");
   const [prenom, setPrenom] = useState("");
   const [langue, setLangue] = useState<LangueMsg | "">(depart?.langue ?? "");
   const [modele, setModele] = useState(modeleDepart);
-  const [objet, setObjet] = useState(t0?.sujet ?? "");
+  const [objet, setObjet] = useState(reponse?.objet ?? t0?.sujet ?? "");
   const [corps, setCorps] = useState(t0?.corps ?? "");
   const [devis, setDevis] = useState(Boolean(modeleDepart === "devis" && depart?.devis));
   const [brouillon, setBrouillon] = useState<string | null>(null);
@@ -64,7 +72,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
   const appliquer = (cle: string, l: LangueMsg | "") => {
     if (cle === "libre" || !l) return;
     const t = texteDe(cle, l);
-    setObjet(t?.sujet ?? "");
+    if (!reponse) setObjet(t?.sujet ?? ""); // dans le fil, l'objet reste « Re: … »
     setCorps(t?.corps ?? "");
   };
   const choisirClient = (id: string) => {
@@ -112,7 +120,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
     if (premier) formulaire.current?.querySelector<HTMLElement>(`[data-champ="${premier}"]`)?.focus();
     return !premier;
   };
-  const saisie = () => ({ mode, client, clients: groupe, adresses, prenom, langue, modele, objet, corps, devis: mode === "un" && devis, brouillon });
+  const saisie = () => ({ mode, client, clients: groupe, adresses, prenom, langue, modele, objet, corps, devis: mode === "un" && devis, brouillon, reponse: reponse?.id ?? null });
   const repondre = (r: RetourMessages, ok: () => void) => {
     if ("ok" in r) return ok();
     if (r.erreur === "champs") {
@@ -154,9 +162,10 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
       if (f && !reduit) f.animate([{ clipPath: "inset(0)", transform: "none", opacity: 1 }, { clipPath: "inset(0 0 100% 0)", transform: "translateY(-24px) scale(.96)", opacity: 0 }], { duration: 640, easing: "cubic-bezier(.4,0,1,1)" });
       setClient("");
       setGroupe([]);
-      setAdresses("");
+      // dans le fil, l'adresse et l'objet restent ceux du courriel reçu
+      if (!reponse) setAdresses("");
       setPrenom("");
-      setObjet("");
+      if (!reponse) setObjet("");
       setCorps("");
       setDevis(false);
       setBrouillon(null);
@@ -194,21 +203,38 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
             <b>{msg.expediteur}</b>
           </div>
           <div className="champs">
-            <div className="champ large">
-              <div className="bascule" role="group" aria-label={C.a}>
-                {modes.map((m) => (
-                  <button key={m} type="button" aria-pressed={mode === m} data-mode={m} onClick={() => { setMode(m); setBrouillon(null); setErreurs({}); }}>
-                    {C.mode[m]}
-                  </button>
-                ))}
+            {reponse ? (
+              <div className="champ large fil" data-fil={reponse.id}>
+                <div className="tete">
+                  <b>{C.fil}</b>
+                  {!reponse.verifie && <span className="etat" data-e="non-verifie">{X.imap.nonVerifie}</span>}
+                  <Link className="bouton-2 bouton-petit" href={`/${role}/courrier`}>
+                    {C.nouveau}
+                  </Link>
+                </div>
+                <span className="aide">{C.filAide}</span>
+                <details open>
+                  <summary>{C.original(reponse.nom || reponse.a, ilYa(reponse.recu, minute))}</summary>
+                  <blockquote data-lenis-prevent>{reponse.texte || X.imap.tropGrand}</blockquote>
+                </details>
               </div>
-            </div>
+            ) : (
+              <div className="champ large">
+                <div className="bascule" role="group" aria-label={C.a}>
+                  {modes.map((m) => (
+                    <button key={m} type="button" aria-pressed={mode === m} data-mode={m} onClick={() => { setMode(m); setBrouillon(null); setErreurs({}); }}>
+                      {C.mode[m]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {mode === "adresse" && (
               <>
                 <div className="champ large">
                   <label htmlFor={`${uid}-adresses`}>{C.adresses}</label>
-                  <input type="text" inputMode="email" id={`${uid}-adresses`} name="adresses" data-champ="adresses" autoComplete="off" spellCheck={false} maxLength={260 * maxAdresses} value={adresses} required aria-invalid={Boolean(erreurs.adresses)} aria-describedby={`${uid}-aadresses ${uid}-eadresses`} onChange={(e) => setAdresses(e.target.value)} />
-                  <span className="aide" id={`${uid}-aadresses`}>{C.adressesAide(maxAdresses)}</span>
+                  <input type="text" inputMode="email" id={`${uid}-adresses`} name="adresses" data-champ="adresses" autoComplete="off" spellCheck={false} maxLength={260 * maxAdresses} value={adresses} required readOnly={Boolean(reponse)} aria-invalid={Boolean(erreurs.adresses)} aria-describedby={`${uid}-aadresses ${uid}-eadresses`} onChange={(e) => setAdresses(e.target.value)} />
+                  {!reponse && <span className="aide" id={`${uid}-aadresses`}>{C.adressesAide(maxAdresses)}</span>}
                   <span className="erreur" id={`${uid}-eadresses`}>{erreurs.adresses}</span>
                 </div>
                 <div className="champ">
@@ -291,7 +317,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
             )}
             <div className="champ large">
               <label htmlFor={`${uid}-objet`}>{C.objet}</label>
-              <input type="text" id={`${uid}-objet`} name="objet" data-champ="objet" autoComplete="off" maxLength={LIMITES_COURRIEL.objet} value={objet} required aria-invalid={Boolean(erreurs.objet)} aria-describedby={`${uid}-eobjet`} onChange={(e) => setObjet(e.target.value)} />
+              <input type="text" id={`${uid}-objet`} name="objet" data-champ="objet" autoComplete="off" maxLength={LIMITES_COURRIEL.objet} value={objet} required readOnly={Boolean(reponse)} aria-invalid={Boolean(erreurs.objet)} aria-describedby={`${uid}-eobjet`} onChange={(e) => setObjet(e.target.value)} />
               <span className="erreur" id={`${uid}-eobjet`}>{erreurs.objet}</span>
             </div>
             <div className="champ large">
@@ -307,7 +333,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
               </div>
               {langue && A_RELIRE.includes(langue) && <span className="aide">{C.locuteur}</span>}
               {redaction && <Rediger objet={objet} corps={corps} langue={langue} utiliser={(o, c) => {
-                    setObjet(o);
+                    if (!reponse) setObjet(o);
                     setCorps(c);
                   }} />}
             </div>

@@ -228,6 +228,12 @@ export const msg = {
     vide: ["Aucun e-mail pour l’instant.", "Vos brouillons et vos envois s’affichent ici."],
     pour: (qui: string, quand: string) => `${qui}, ${quand}`,
     locuteur: "Langue créole : faites relire le texte par un locuteur avant l’envoi.",
+    // réponse à un courriel reçu (boîte de réception) : adresse et objet fixés pour rester dans la même conversation
+    fil: "Réponse dans le fil",
+    filAide: "L’adresse et l’objet suivent le courriel reçu : la réponse reste dans la même conversation chez le client.",
+    original: (nom: string, quand: string) => `Message de ${nom}, ${quand}`,
+    nouveau: "Écrire un nouvel e-mail",
+    filAbsent: "Ce courriel n’est plus disponible pour votre compte : écrivez un nouvel e-mail.",
   },
 
   modeles: {

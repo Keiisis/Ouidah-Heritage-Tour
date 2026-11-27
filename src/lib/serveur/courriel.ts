@@ -1,5 +1,6 @@
 import "server-only";
 import nodemailer from "nodemailer";
+import MailComposer from "nodemailer/lib/mail-composer";
 import { expediteur } from "@/content/courriels";
 import { base, baseConfiguree } from "./base";
 
@@ -43,9 +44,14 @@ async function noter(modele: string, a: string, reussi: boolean, motif: string |
 /** Échec avant tout envoi (exception de rendu ou de lecture) : tracé au journal au lieu d'être avalé. */
 export const noterException = (modele: string, a: string) => noter(modele, a, false, "exception");
 
+/** E-mail parti, tel qu'il a été remis au SMTP (RFC 822), à copier dans « Envoyés » (copierEnvoyes). */
+export type CopieEnvoyee = { a: string; brut: Buffer };
+
 // pieces : vrais fichiers joints (PDF) ; entetes : en-têtes ajoutés (ex. List-Unsubscribe de la lettre) ; modele : clé
-// du journal (auto-…, avis-…), « autre » à défaut.
-export async function envoyerCourriel(m: { a: string; sujet: string; html: string; texte: string; repondreA?: string | null; cle: string; nom?: string; pieces?: PieceJointe[]; entetes?: Record<string, string>; modele?: string }) {
+// du journal (auto-…, avis-…), « autre » à défaut ; enReponseA : Message-ID du courriel auquel on répond (In-Reply-To et
+// References) ; copie : liste où ranger le message parti, construit une seule fois (MailComposer) puis remis tel quel au
+// SMTP, pour que sa copie dans « Envoyés » soit identique, Message-ID compris (e-mails écrits par l'équipe seulement).
+export async function envoyerCourriel(m: { a: string; sujet: string; html: string; texte: string; repondreA?: string | null; cle: string; nom?: string; pieces?: PieceJointe[]; entetes?: Record<string, string>; modele?: string; enReponseA?: string | null; copie?: CopieEnvoyee[] }) {
   const modele = m.modele && /^[a-z0-9][a-z0-9-]{0,39}$/.test(m.modele) ? m.modele : "autre";
   if (!courrielConfigure()) {
     await noter(modele, m.a, false, "smtp_absent");
@@ -65,7 +71,7 @@ export async function envoyerCourriel(m: { a: string; sujet: string; html: strin
       socketTimeout: 20000,
       dnsTimeout: 10000,
     });
-    await transport.sendMail({
+    const message = {
       from: { name: m.nom ?? expediteur, address: adresse },
       to: m.a,
       subject: m.sujet,
@@ -73,15 +79,30 @@ export async function envoyerCourriel(m: { a: string; sujet: string; html: strin
       text: m.texte,
       messageId: `<${m.cle}@${adresse.split("@")[1]}>`,
       ...(m.repondreA ? { replyTo: m.repondreA } : {}),
+      ...(m.enReponseA ? { inReplyTo: m.enReponseA, references: m.enReponseA } : {}),
       ...(m.pieces?.length ? { attachments: m.pieces.map((p) => ({ filename: p.nom, content: Buffer.from(p.contenu), contentType: p.type })) } : {}),
       ...(m.entetes ? { headers: m.entetes } : {}),
-    });
+    };
+    if (m.copie) {
+      const brut = await new MailComposer(message).compile().build();
+      await transport.sendMail({ envelope: { from: adresse, to: [m.a] }, raw: brut });
+      m.copie.push({ a: m.a, brut });
+    } else await transport.sendMail(message);
     await noter(modele, m.a, true, null);
     return true;
   } catch (e) {
     await noter(modele, m.a, false, motifEchec(e));
     return false;
   }
+}
+
+/** Copie dans « Envoyés » de la boîte IMAP des e-mails partis avec `copie`. L'envoi est déjà fait : un échec ne le défait
+ * pas, il est noté au journal des envois (modèle « copie-envoyes », écran E-mail d'envoi de l'admin). */
+export async function copierEnvoyes(liste: CopieEnvoyee[]) {
+  if (!liste.length) return;
+  const { copierDansEnvoyes } = await import("./equipe/messages/imap");
+  const motifs = await copierDansEnvoyes(liste.map((c) => c.brut));
+  await Promise.all(liste.map((c, i) => (motifs[i] ? noter("copie-envoyes", c.a, false, motifs[i]) : null)));
 }
 
 export const MAX_AVIS = 10;

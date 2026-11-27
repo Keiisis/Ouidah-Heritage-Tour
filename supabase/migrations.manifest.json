@@ -261,6 +261,10 @@
     {
       "fichier": "20261203_assistant_part_ip_courriels_verifies.sql",
       "sha256": "c36149f2a3e5f1907c2f0f291818af4ad7bf5f521210a98325e04a472fa37d13"
+    },
+    {
+      "fichier": "20261204_boite_gmail.sql",
+      "sha256": "8c7d425ed3637192e6bdec7263084a1626f22d6cf6a3cd99e659518a62bfef29"
     }
   ]
 }
