@@ -2,9 +2,9 @@
 
 import { randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
-import { LIMITES_COURRIEL, type LangueMsg, msg, type Variable, RAISON_COURRIER } from "@/content/espace-messages";
+import { LIMITES_COURRIEL, LIMITES_PIECES, type LangueMsg, msg, type Variable, RAISON_COURRIER } from "@/content/espace-messages";
 import { base } from "../../base";
-import { type CopieEnvoyee, copierEnvoyes } from "../../courriel";
+import { type CopieEnvoyee, copierEnvoyes, type PieceJointe } from "../../courriel";
 import { effacer } from "../dossiers";
 import { journaliser } from "../journal";
 import { exigerRole, type Session } from "../session";
@@ -12,6 +12,7 @@ import { apercuAuto } from "./auto";
 import { emailDe, languesDe, origine, partir, voie } from "./envoi";
 import { type CourrielComplet, courrielRecu } from "./imap";
 import { type ClientCourrier, clientsChoisis } from "./lectures";
+import { extension, nomSur, refusPieces, type RefusPiece, signatureValide, TYPES_PIECES } from "./pieces";
 import { autoConnue, CLE, type CleAuto, estAuto, estLangue, jetonsInconnus, lireAdresses, lireTexte, objetReponse, remplir, uneLigne, UUID, type Valeurs, valeursApercu, valeursDe, variablesHors } from "./rendu";
 import { type Agent, composer } from "./composer";
 import { peutPasser } from "../../machines";
@@ -28,11 +29,15 @@ import { TRANSITIONS_COURRIEL } from "./regles";
 // Réponse à un courriel reçu (reponse = son id, mode « adresse ») : relu avec les droits de l'écran boîte, l'adresse doit
 // être celle de son expéditeur et l'objet est « Re: » + le sien, fixés ici ; l'e-mail porte In-Reply-To et References, et
 // sa ligne garde le courriel d'origine et son dossier. Les e-mails partis (composeur) sont copiés dans « Envoyés ».
+// Fichiers joints (`fichiers`, des File) : ils arrivent dans le corps de l'action (4 Mo au plus, next.config), sont relus
+// ici (pieces.ts : nombre, extension, tailles, signature du contenu) et partent en vraies pièces jointes de chaque e-mail,
+// copie « Envoyés » comprise. Rien n'est stocké : la ligne garde leur nom, leur type et leur taille ; un brouillon ne les
+// garde pas.
 
-export type RefusMessages = "refuse" | "champs" | "panne" | "smtp" | "envoi" | "variables" | "etat" | "confirmer";
+export type RefusMessages = "refuse" | "champs" | "panne" | "smtp" | "envoi" | "variables" | "etat" | "confirmer" | RefusPiece | "fichiersDestinataires";
 export type RetourMessages =
   | { ok: true; id?: string; envoyes?: number; echecs?: number; a?: string; fini?: boolean; total?: number; sujet?: string; html?: string }
-  | { erreur: RefusMessages; champs?: string[]; manque?: Variable[]; total?: number };
+  | { erreur: RefusMessages; champs?: string[]; manque?: Variable[]; total?: number; fichier?: string };
 
 type Saisie = { mode: "un" | "groupe" | "adresse"; ids: string[]; adresses: string[]; prenom: string; langue: LangueMsg; modele: string | null; objet: string; corps: string; devis: boolean; brouillon: string | null; reponse: string | null };
 const objet = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
@@ -73,6 +78,24 @@ function lireSaisie(brut: unknown, s: Session, objetRequis: boolean, destRequis 
   if (champs.length) return { ok: false, champs };
   return { ok: true, v: { mode, ids: ids as string[], adresses, prenom, langue: o.langue as LangueMsg, modele, objet: t.objet, corps: t.corps, devis, brouillon, reponse } };
 }
+
+/** Fichiers joints de la saisie, relus : nombre, extension et tailles, puis signature du contenu. Le type annoncé par le
+ * navigateur n'est pas lu ; le nom est assaini. */
+async function lireFichiers(brut: unknown): Promise<{ ok: true; v: PieceJointe[] } | { erreur: RefusPiece; fichier?: string }> {
+  const l = objet(brut).fichiers ?? [];
+  if (!Array.isArray(l) || !l.every((f): f is File => typeof File !== "undefined" && f instanceof File)) return { erreur: "fichierType" };
+  const refus = refusPieces(l);
+  if (refus) return refus;
+  const v: PieceJointe[] = [];
+  for (const f of l) {
+    const ext = extension(f.name), contenu = new Uint8Array(await f.arrayBuffer());
+    if (!signatureValide(ext, contenu)) return { erreur: "fichierType", fichier: nomSur(f.name) };
+    v.push({ nom: nomSur(f.name), type: TYPES_PIECES[ext], contenu });
+  }
+  return { ok: true, v };
+}
+/** Ce que la ligne garde d'un fichier joint : jamais son contenu. */
+const tracePieces = (l: PieceJointe[]) => l.map((p) => ({ type: "fichier", nom: p.nom, mime: p.type, taille: p.contenu.length }));
 
 /** Courriel reçu auquel répond la saisie (null sans `reponse`), et la saisie avec son objet « Re: ». Refus : courriel
  * absent ou hors des droits du compte (« etat »), adresse qui n'est pas celle de son expéditeur (« adresses »). */
@@ -143,6 +166,8 @@ export async function envoyerTest(brut: unknown): Promise<RetourMessages> {
   if (!s) return { erreur: "refuse" };
   const saisi = lireSaisie(brut, s, true, false);
   if (!saisi.ok) return saisi.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: saisi.champs };
+  const joints = await lireFichiers(brut);
+  if (!("ok" in joints)) return joints;
   const lu = await fil(s, saisi.v);
   if (!("ok" in lu)) return lu;
   let vals = valeursApercu(s.prenom, lu.v.langue), devis: ClientCourrier["devis"] = null, cible: string | undefined;
@@ -158,7 +183,7 @@ export async function envoyerTest(brut: unknown): Promise<RetourMessages> {
   const [v, a] = await Promise.all([voie(), emailDe(s.profilId)]);
   if (!v) return { erreur: "smtp" };
   if (!a) return { erreur: "panne" };
-  const parti = await partir({ a, sujet: `${msg.prefixeTest}${e.sujet}`, html: e.html, texte: e.texte, cle: `courrier-test-${randomUUID()}` }, v.boite);
+  const parti = await partir({ a, sujet: `${msg.prefixeTest}${e.sujet}`, html: e.html, texte: e.texte, cle: `courrier-test-${randomUUID()}`, pieces: joints.v }, v.boite);
   await journaliser("courriel.test", s.profilId, null, { ...(cible ? { cible } : {}), ...(lu.v.mode === "adresse" ? { mode: "adresse" } : {}), langue: lu.v.langue, ...(parti ? {} : { motif: "envoi" as const }) });
   return parti ? { ok: true, a } : { erreur: "envoi" };
 }
@@ -170,6 +195,8 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
   if (!s) return { erreur: "refuse" };
   const saisi = lireSaisie(brut, s, true);
   if (!saisi.ok) return saisi.refuse ? { erreur: "refuse" } : { erreur: "champs", champs: saisi.champs };
+  const joints = await lireFichiers(brut);
+  if (!("ok" in joints)) return joints;
   const lu = await fil(s, saisi.v);
   if (!("ok" in lu)) return lu;
   let dests: { id: string | null; email: string; vals: Valeurs; devis: ClientCourrier["devis"] }[];
@@ -184,6 +211,8 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
     dests = clients.map((c) => ({ id: c.id, email: c.email, vals: valeursDe(c.faits, lu.v.langue), devis: c.devis }));
   }
   if (lu.v.devis && !dests[0]?.devis) return { erreur: "champs", champs: ["pieces"] };
+  // chaque e-mail porte les fichiers en entier (mémoire et durée de la fonction) : envoi borné quand il y en a
+  if (joints.v.length && dests.length > LIMITES_PIECES.destinataires) return { erreur: "fichiersDestinataires" };
   const [o, agent] = [(await origine()) ?? "", await agentDe(s)];
   const rendus = dests.map((c) => ({ c, e: rendre(c.vals, c.devis, lu.v, agent, o) }));
   const manque = [...new Set(rendus.flatMap((r) => r.e.manque))];
@@ -197,13 +226,13 @@ export async function envoyerCourrier(brut: unknown): Promise<RetourMessages> {
   try {
     for (const { c, e } of rendus) {
       // la ligne est posée avant l'envoi : sa clé donne le Message-ID, et rien ne part sans trace
-      const ligne = { client_id: c.id, destinataire: c.email, modele: lu.v.modele, langue: lu.v.langue, objet: e.sujet, corps: e.corps, pieces: e.pieces, modifie_le: maintenant(), ...(lu.recu ? { reponse_a: lu.recu.id, demande_id: lu.recu.demande_id } : {}) };
+      const ligne = { client_id: c.id, destinataire: c.email, modele: lu.v.modele, langue: lu.v.langue, objet: e.sujet, corps: e.corps, pieces: [...e.pieces, ...tracePieces(joints.v)], modifie_le: maintenant(), ...(lu.recu ? { reponse_a: lu.recu.id, demande_id: lu.recu.demande_id } : {}) };
       const r = lu.v.brouillon && lu.v.mode === "un"
         ? await ecrire<{ id: string }>(`courriels_envoyes?id=eq.${lu.v.brouillon}&auteur_id=eq.${s.profilId}&statut=eq.brouillon&select=id`, "PATCH", ligne)
         : await ecrire<{ id: string }>("courriels_envoyes?select=id", "POST", { ...ligne, statut: "brouillon", auteur_id: s.profilId, lot });
       if (!r) return { erreur: "panne" };
       if (!r[0]) return { erreur: "etat" };
-      const parti = await partir({ a: c.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `courrier-${r[0].id}`, enReponseA, copie: copies }, v.boite);
+      const parti = await partir({ a: c.email, sujet: e.sujet, html: e.html, texte: e.texte, cle: `courrier-${r[0].id}`, enReponseA, copie: copies, pieces: joints.v }, v.boite);
       const issue = parti ? "envoye" : "echec";
       if (peutPasser(TRANSITIONS_COURRIEL, "brouillon", issue)) await ecrire(`courriels_envoyes?id=eq.${r[0].id}&statut=eq.brouillon&select=id`, "PATCH", { statut: issue, envoye_le: maintenant(), modifie_le: maintenant() });
       if (parti) envoyes++;

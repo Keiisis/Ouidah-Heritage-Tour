@@ -17,6 +17,14 @@ export type Variable = keyof typeof VARIABLES;
 /** `adresses` : plafond des adresses saisies à la main (admin ; un agent : une seule) ; `prenom` : prénom saisi avec elles. */
 export const LIMITES_COURRIEL = { objet: 200, corps: 8000, groupe: 50, cle: 40, lot: 40, adresses: 10, prenom: 60 } as const;
 
+/** Fichiers joints du composeur. Ils voyagent dans l'action serveur, dont le corps est borné à 4 Mo (next.config, sous les
+ * 4,5 Mo d'une fonction Vercel) : `total` (3,5 Mo, en octets) laisse la place du message. `destinataires` : plafond d'un
+ * envoi avec fichiers, chaque e-mail les portant en entier. `nombre` : courriels_envoyes.pieces accepte 5 entrées (CHECK de
+ * 20261103_messages.sql), soit 4 fichiers et le devis lié. */
+export const LIMITES_PIECES = { nombre: 4, total: 3_670_016, destinataires: 10 } as const;
+/** « 340 Ko », « 1,2 Mo ». */
+export const poids = (octets: number) => (octets < 1_048_576 ? `${Math.max(1, Math.round(octets / 1024))} Ko` : `${(octets / 1_048_576).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Mo`);
+
 type Textes = Record<LangueMsg, string>;
 export type ModeleDepart = { nom: string; sujet: Textes; corps: Textes };
 
@@ -173,6 +181,11 @@ export const msg = {
     etat: "Cet élément a changé entre-temps : rechargez la page.",
     confirmer: "Le nombre de destinataires a changé : relisez-le avant d’envoyer.",
     reseau: "La connexion a échoué. Vérifiez votre réseau, puis réessayez.",
+    fichierType: "Type de fichier refusé. Acceptés : PDF, images JPEG, PNG ou WebP, Word, Excel, PowerPoint, ODT, TXT, CSV.",
+    fichierLourd: `Fichier trop lourd : ${poids(LIMITES_PIECES.total)} au plus.`,
+    fichiersTotal: `Le total des fichiers joints dépasse ${poids(LIMITES_PIECES.total)}.`,
+    fichiersNombre: `${LIMITES_PIECES.nombre} fichiers joints au plus.`,
+    fichiersDestinataires: `Avec des fichiers joints, ${LIMITES_PIECES.destinataires} destinataires au plus par envoi.`,
   },
   manque: { prenom: "le prénom", dates: "les dates du séjour", lien: "le lien de suivi", reference: "la référence" } satisfies Record<Variable, string>,
   manquent: (l: string[]) => `Sans valeur pour ce destinataire : ${l.join(", ")}. Retirez ces champs ou complétez le dossier.`,
@@ -208,6 +221,15 @@ export const msg = {
     choisirDabord: "Choisissez d’abord un client.",
     pieceDevis: (n: string) => `Devis ${n}`,
     pieceNote: "Le document part en lien sécurisé vers son PDF, dans la langue du client.",
+    fichiers: "Fichiers joints",
+    joindre: "Joindre un fichier",
+    fichiersAide: `PDF, images, Word, Excel, PowerPoint, ODT, TXT ou CSV. ${poids(LIMITES_PIECES.total)} au total, ${LIMITES_PIECES.nombre} fichiers au plus.`,
+    retirer: "Retirer",
+    retirerFichier: (nom: string) => `Retirer ${nom}`,
+    totalFichiers: (n: number, total: number) => `${plur(n, "fichier joint", "fichiers joints")}, ${poids(total)} sur ${poids(LIMITES_PIECES.total)}`,
+    fichierRefuse: (nom: string, raison: string) => `« ${nom} » : ${raison}`,
+    fichiersBrouillon: "Un brouillon ne garde pas les fichiers joints : joignez-les de nouveau avant l’envoi.",
+    fichiersEnvoi: (noms: string) => `Fichiers joints : ${noms}`,
     apercu: "Aperçu",
     apercuVide: "L’aperçu apparaît dès que vous écrivez.",
     apercuGroupe: (nom: string) => `Aperçu pour ${nom}`,
@@ -220,6 +242,7 @@ export const msg = {
     resume: "Trois champs sont obligatoires : destinataire, objet, langue.",
     testEnvoye: (a: string) => `Test envoyé à ${a}.`,
     brouillonOk: "Brouillon enregistré.",
+    brouillonSansFichiers: "Brouillon enregistré, sans les fichiers joints.",
     envoye: (c: string) => `E-mail envoyé à ${c}.`,
     envoyes: (ok: number, ko: number) => `${plur(ok, "e-mail envoyé", "e-mails envoyés")}${ko ? `, ${plur(ko, "échec", "échecs")}` : ""}.`,
     derniers: "Derniers e-mails",

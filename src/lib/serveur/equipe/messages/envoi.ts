@@ -2,7 +2,7 @@ import "server-only";
 import { appendFile } from "node:fs/promises";
 import { headers } from "next/headers";
 import { base } from "../../base";
-import { type CopieEnvoyee, courrielConfigure, envoyerCourriel } from "../../courriel";
+import { type CopieEnvoyee, courrielConfigure, envoyerCourriel, type PieceJointe } from "../../courriel";
 import { modeLocal } from "../mode";
 import { egaux, hmac, selConfigure } from "../outils";
 
@@ -19,13 +19,14 @@ export async function voie(): Promise<{ boite: string | null } | null> {
 }
 
 // modele : clé du journal des envois (courriel.ts) ; repondreA : adresse de réponse ; enReponseA : Message-ID du courriel
-// reçu auquel on répond ; copie : liste des e-mails partis à copier dans « Envoyés » (SMTP seulement, courriel.ts)
-export type Message = { a: string; sujet: string; html: string; texte: string; cle: string; modele?: string; repondreA?: string | null; enReponseA?: string | null; copie?: CopieEnvoyee[] };
+// reçu auquel on répond ; copie : liste des e-mails partis à copier dans « Envoyés » (SMTP seulement, courriel.ts) ;
+// pieces : fichiers joints du composeur (pieces.ts), déjà contrôlés
+export type Message = { a: string; sujet: string; html: string; texte: string; cle: string; modele?: string; repondreA?: string | null; enReponseA?: string | null; copie?: CopieEnvoyee[]; pieces?: PieceJointe[] };
 
 export async function partir(m: Message, boite: string | null): Promise<boolean> {
   if (boite) {
     try {
-      await appendFile(boite, `${JSON.stringify({ type: "courriel", a: m.a, sujet: m.sujet, texte: m.texte, cle: m.cle, le: new Date().toISOString() })}\n`, "utf8");
+      await appendFile(boite, `${JSON.stringify({ type: "courriel", a: m.a, sujet: m.sujet, texte: m.texte, cle: m.cle, ...(m.pieces?.length ? { pieces: m.pieces.map((p) => ({ nom: p.nom, type: p.type, taille: p.contenu.length })) } : {}), le: new Date().toISOString() })}\n`, "utf8");
       return true;
     } catch {
       return false;

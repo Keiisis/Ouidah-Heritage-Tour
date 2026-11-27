@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useId, useRef, useState, useTransition } from "react";
+import { type ChangeEvent, type FormEvent, useId, useRef, useState, useTransition } from "react";
 import type { Role } from "@/content/equipe";
 import { espace as T } from "@/content/espace";
-import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, msg, VARIABLES } from "@/content/espace-messages";
+import { A_RELIRE, LANGUES_MSG, type LangueMsg, LIMITES_COURRIEL, msg, poids, VARIABLES } from "@/content/espace-messages";
 import { transversal as X } from "@/content/transversal";
 import { useMouvementReduit } from "@/lib/mouvement";
 import { enregistrerBrouillon, envoyerCourrier, envoyerTest, type RetourMessages } from "@/lib/serveur/equipe/messages/actions";
 import type { ClientCourrier, Envoi, Modele } from "@/lib/serveur/equipe/messages/lectures";
+import { ACCEPT_PIECES, refusPieces } from "@/lib/serveur/equipe/messages/pieces";
 import { TRANSITIONS_COURRIEL } from "@/lib/serveur/equipe/messages/regles";
 import { estLangue, lireAdresses, remplir, type Valeurs, valeursDe } from "@/lib/serveur/equipe/messages/rendu";
 import { Rediger } from "../assistant/Rediger";
@@ -25,6 +26,8 @@ import { Apercu, texteRefus, useAnnonce } from "./Apercu";
 // Réponse à un courriel reçu (`initial.reponse`, depuis la boîte) : mode « Une adresse », adresse de l'expéditeur et objet
 // « Re: … » en lecture seule (le serveur les refixe), message d'origine cité et repliable ; « Écrire un nouvel e-mail »
 // quitte le fil.
+// Fichiers joints : choisis ici, contrôlés avant l'envoi (extension, tailles : pieces.ts) puis relus par le serveur, qui
+// décide. Ils partent avec l'envoi et le test, jamais avec un brouillon (l'écran le dit).
 const C = msg.courrier;
 /** Courriel reçu auquel on répond : objet déjà préfixé « Re: » par le serveur. */
 export type Reponse = { id: string; a: string; nom: string; objet: string; texte: string; recu: string; verifie: boolean };
@@ -39,6 +42,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
   const zone = useRef<HTMLTextAreaElement>(null);
   const feuille = useRef<HTMLDivElement>(null);
   const formulaire = useRef<HTMLFormElement>(null);
+  const choix = useRef<HTMLInputElement>(null);
 
   const texteDe = (cle: string, l: LangueMsg) => modeles.find((m) => m.cle === cle)?.textes[l] ?? null;
   const depart = clients.find((c) => c.id === initial.client) ?? null;
@@ -58,6 +62,8 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
   const [devis, setDevis] = useState(Boolean(modeleDepart === "devis" && depart?.devis));
   const [brouillon, setBrouillon] = useState<string | null>(null);
   const [erreurs, setErreurs] = useState<Erreurs>({});
+  const [fichiers, setFichiers] = useState<File[]>([]);
+  const [erreurFichiers, setErreurFichiers] = useState("");
 
   const choisi = clients.find((c) => c.id === client) ?? null;
   const candidats = langue ? clients.filter((c) => c.langue === langue) : [];
@@ -106,6 +112,21 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
     });
   };
 
+  const texteFichier = (x: { erreur: string; fichier?: string }) => (x.fichier ? C.fichierRefuse(x.fichier, texteRefus(x)) : texteRefus(x));
+  /** Ajoute chaque fichier choisi tant que la liste reste acceptable ; le dernier refus est dit, avec le nom du fichier. */
+  const joindre = (e: ChangeEvent<HTMLInputElement>) => {
+    let l = fichiers, refus = "";
+    for (const f of e.target.files ?? []) {
+      if (l.some((x) => x.name === f.name)) continue;
+      const x = refusPieces([...l, f]);
+      if (x) refus = texteFichier({ ...x, fichier: x.fichier ?? f.name });
+      else l = [...l, f];
+    }
+    e.target.value = ""; // le même fichier peut être rechoisi après un retrait
+    setFichiers(l);
+    setErreurFichiers(refus);
+  };
+
   /** `destRequis` faux (test à soi-même) : le destinataire peut manquer, mais une adresse tapée doit être valable. */
   const verifier = (destRequis = true) => {
     const e: Erreurs = {};
@@ -120,13 +141,17 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
     if (premier) formulaire.current?.querySelector<HTMLElement>(`[data-champ="${premier}"]`)?.focus();
     return !premier;
   };
-  const saisie = () => ({ mode, client, clients: groupe, adresses, prenom, langue, modele, objet, corps, devis: mode === "un" && devis, brouillon, reponse: reponse?.id ?? null });
+  const saisie = () => ({ mode, client, clients: groupe, adresses, prenom, langue, modele, objet, corps, devis: mode === "un" && devis, brouillon, reponse: reponse?.id ?? null, fichiers });
   const repondre = (r: RetourMessages, ok: () => void) => {
     if ("ok" in r) return ok();
     if (r.erreur === "champs") {
       const e: Erreurs = {};
       for (const k of r.champs ?? []) if (k in C.erreurs) e[k as keyof Erreurs] = C.erreurs[k as keyof typeof C.erreurs];
       setErreurs(e);
+    }
+    if (r.erreur.startsWith("fichier")) {
+      setErreurFichiers(texteFichier(r));
+      return annoncer(texteFichier(r), true);
     }
     annoncer(texteRefus(r), true);
   };
@@ -142,9 +167,9 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
 
   const enregistrer = () => {
     if (!client) return verifier();
-    lancer(() => enregistrerBrouillon(saisie()), (r) => {
+    lancer(() => enregistrerBrouillon({ ...saisie(), fichiers: [] }), (r) => {
       setBrouillon(r.id ?? null);
-      annoncer(C.brouillonOk);
+      annoncer(fichiers.length ? C.brouillonSansFichiers : C.brouillonOk);
     });
   };
   const tester = () => {
@@ -168,6 +193,8 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
       if (!reponse) setObjet("");
       setCorps("");
       setDevis(false);
+      setFichiers([]);
+      setErreurFichiers("");
       setBrouillon(null);
       setModele("libre");
       if (mode !== "groupe") setLangue("");
@@ -187,7 +214,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
     formulaire.current?.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });
   };
 
-  const pieces = mode === "un" && devis && choisi?.devis ? [C.pieceDevis(choisi.devis.numero)] : [];
+  const pieces = [...(mode === "un" && devis && choisi?.devis ? [C.pieceDevis(choisi.devis.numero)] : []), ...fichiers.map((f) => `${f.name} (${poids(f.size)})`)];
   const aEcrire = mode === "adresse" ? liste.join(", ") : temoin ? `${temoin.nom} <${temoin.email}>` : "";
   const modes = admin ? (["un", "adresse", "groupe"] as const) : (["un", "adresse"] as const);
 
@@ -356,6 +383,34 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
                 {choisi?.devis && <span className="aide">{C.pieceNote}</span>}
               </fieldset>
             )}
+            <fieldset className="champ large" aria-describedby={`${uid}-afichiers ${uid}-efichiers`}>
+              <legend>{C.fichiers}</legend>
+              <input ref={choix} type="file" id="m-fichier" multiple hidden accept={ACCEPT_PIECES} onChange={joindre} />
+              {fichiers.length > 0 && (
+                <ul className="fichiers" id="m-fichiers">
+                  {fichiers.map((f) => (
+                    <li key={f.name}>
+                      <Picto nom="document" />
+                      <span className="nom">{f.name}</span>
+                      <span className="aide">{poids(f.size)}</span>
+                      <button type="button" className="bouton-2 bouton-petit" aria-label={C.retirerFichier(f.name)} onClick={() => { setFichiers(fichiers.filter((x) => x !== f)); setErreurFichiers(""); }}>
+                        {C.retirer}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="puces">
+                <button type="button" className="bouton-2" id="m-joindre" disabled={occupe} onClick={() => choix.current?.click()}>
+                  <Picto nom="document" />
+                  {C.joindre}
+                </button>
+                {fichiers.length > 0 && <b id="m-total">{C.totalFichiers(fichiers.length, fichiers.reduce((n, f) => n + f.size, 0))}</b>}
+              </div>
+              <span className="aide" id={`${uid}-afichiers`}>{C.fichiersAide}</span>
+              {mode === "un" && fichiers.length > 0 && <span className="aide" id="m-fichiers-brouillon">{C.fichiersBrouillon}</span>}
+              <span className="erreur" role="alert" id={`${uid}-efichiers`}>{erreurFichiers}</span>
+            </fieldset>
           </div>
           <div className="pied-actions">
             {mode === "un" && (
@@ -389,6 +444,7 @@ export function Courrier({ role, admin, clients, modeles, envois, moi, initial, 
                   <span className="texte">
                     <span className="titre">{x.objet || "…"}</span>
                     <span className="meta">{C.pour(x.client?.nom ?? x.destinataire, ilYa(x.quand, minute))}{admin && x.auteur ? ` · ${x.auteur}` : ""}</span>
+                    {x.fichiers.length > 0 && <span className="meta" data-fichiers>{C.fichiersEnvoi(x.fichiers.map((f) => `${f.nom} (${poids(f.taille)})`).join(", "))}</span>}
                   </span>
                   <span className="langue" title={T.langues[x.langue]}>{x.langue}</span>
                   <span className="etat" data-e={x.statut}>{C.etats[x.statut]}</span>

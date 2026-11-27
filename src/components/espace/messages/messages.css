@@ -44,6 +44,13 @@
 .esp .esp-messages .groupe-liste .puce { justify-content: flex-start; border-color: transparent; }
 .esp .esp-messages .groupe-outils { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .esp .esp-messages .pied-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+/* fichiers joints du composeur : une ligne par fichier (nom, taille, retirer) */
+.esp .esp-messages .fichiers { list-style: none; display: grid; gap: 4px; margin: 4px 0 0; padding: 0; }
+.esp .esp-messages .fichiers li { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 4px 4px 12px; border: 1px solid var(--filet); border-radius: 12px; }
+.esp .esp-messages .fichiers .ic { flex: none; width: 18px; height: 18px; color: var(--encre-3); }
+.esp .esp-messages .fichiers .nom { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 14px; font-weight: 600; }
+.esp .esp-messages .fichiers .aide { flex: none; white-space: nowrap; }
+.esp .esp-messages #m-total { font-size: 14px; }
 
 /* aperçu : la feuille de l'e-mail */
 .esp .esp-messages .apercu { border: 1px solid var(--filet-fixe); border-radius: 16px; background: var(--blanc); color: var(--encre-fixe); overflow: hidden; transform-origin: 50% 0; }

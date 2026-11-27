@@ -88,8 +88,9 @@ export async function clientsChoisis(s: Session, ids: string[]): Promise<ClientC
 
 // ---------- e-mails rédigés ----------
 
-export type Envoi = { id: string; statut: StatutCourriel; client: { id: string; nom: string } | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: string[]; quand: string; auteur: string; mien: boolean };
-type BrutEnvoi = { id: string; statut: Envoi["statut"]; auteur_id: string | null; client_id: string | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: { type: string }[]; cree_le: string; envoye_le: string | null; client: { nom: string } | null; auteur: { prenom: string; nom: string } | null };
+/** `pieces` : types des pièces de la ligne (« devis », « fichier ») ; `fichiers` : nom et taille des fichiers joints. */
+export type Envoi = { id: string; statut: StatutCourriel; client: { id: string; nom: string } | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: string[]; fichiers: { nom: string; taille: number }[]; quand: string; auteur: string; mien: boolean };
+type BrutEnvoi = { id: string; statut: Envoi["statut"]; auteur_id: string | null; client_id: string | null; destinataire: string; modele: string | null; langue: LangueMsg; objet: string; corps: string; pieces: { type: string; nom?: unknown; taille?: unknown }[]; cree_le: string; envoye_le: string | null; client: { nom: string } | null; auteur: { prenom: string; nom: string } | null };
 
 export async function envoisRecents(s: Session): Promise<Envoi[] | null> {
   const qui = voitTout(s) ? "" : `&auteur_id=eq.${s.profilId}`;
@@ -106,6 +107,7 @@ export async function envoisRecents(s: Session): Promise<Envoi[] | null> {
         // seul le brouillon de son auteur revient au composeur
         corps: x.statut === "brouillon" && x.auteur_id === s.profilId ? x.corps : "",
         pieces: x.pieces.map((p) => p.type),
+        fichiers: x.pieces.flatMap((p) => (p.type === "fichier" && typeof p.nom === "string" && typeof p.taille === "number" ? [{ nom: p.nom, taille: p.taille }] : [])),
         quand: x.envoye_le ?? x.cree_le,
         auteur: x.auteur ? `${x.auteur.prenom} ${x.auteur.nom}` : "",
         mien: x.auteur_id === s.profilId,

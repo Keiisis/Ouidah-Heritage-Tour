@@ -1,4 +1,5 @@
 import { courrielRecu, lirePiece, MAX_PIECE } from "@/lib/serveur/equipe/messages/imap";
+import { nomSur } from "@/lib/serveur/equipe/messages/pieces";
 import { exigerDroit } from "@/lib/serveur/equipe/securite/droits";
 
 // Pièce jointe d'un courriel reçu (écran boîte), relue à la demande sur le serveur IMAP : rien n'est stocké ailleurs, aucune
@@ -15,11 +16,6 @@ const SURS = new Set([
   "application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.spreadsheet",
 ]);
 
-/** Nom gardé lisible, sans caractère de contrôle, de séparateur de chemin, ni d'inversion de sens (« gpj.exe »). */
-function nomSur(nom: string) {
-  const n = nom.normalize("NFC").replace(/[\u0000-\u001f\u007f-\u009f\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, "").replace(/[\\/:*?"<>|]/g, "_").replace(/^[.\s]+/, "").trim().slice(0, 150);
-  return n || "piece-jointe";
-}
 function disposition(nom: string) {
   const n = nomSur(nom), ascii = n.replace(/[^\x20-\x7e]/g, "_").replace(/[%;\\]/g, "_");
   return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(n).replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)}`;
